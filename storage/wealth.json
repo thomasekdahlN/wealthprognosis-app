@@ -6,7 +6,7 @@
     },
     "period": {
         "start": 2008,
-        "end": 2019
+        "end": 2029
     },
     "tax": {
         "private": {
@@ -26,48 +26,52 @@
             "value": {
                 "2009": {
                     "value": 4000000,
-                    "increase": 1.05,
+                    "changerate": 1.05,
                     "description": "Kjøpte huset",
                     "repeat": true
                 },
                 "2016": {
                     "value": 5000000,
-                    "increase": 1.06,
+                    "changerate": 1.06,
                     "description": "Skilsmisse",
                     "repeat": true
                 },
                 "2018": {
                     "value": 600000,
-                    "increase": 1.07,
+                    "changerate": 1.07,
                     "description": "Takst",
                     "repeat": true
                 }
             },
             "income": {
-                "2015": {
+                "2010": {
                     "name": "Utleie",
                     "description": "Utleie av leilighet",
-                    "value": 10000,
-                    "increase": 3.5,
+                    "value": 13000,
+                    "changerate": 1.05,
                     "repeat": true
                 }
             },
-            "expences": {
-                "2019": {
+            "expence": {
+                "2011": {
                     "name": "Utgifter",
                     "description": "Kommunale/Forsikring/Strøm",
                     "value": 3000,
-                    "increase": 3.5,
+                    "changerate": 1.05,
                     "repeat": true
                 }
             },
-            "loan": {
-                "2021": {
-                    "interestrate": "2",
-                    "gebyr": 50,
-                    "tax": 22,
+            "mortgage": {
+                "2010": {
                     "value": 3000000,
-                    "extradownpayment": 1000
+                    "interest": "20",
+                    "gebyr": 600,
+                    "tax": 22,
+                    "paymentExtra": "home.$year.cashflow.amount",
+                    "years": 20
+                },
+                "2020": {
+                    "interest": "5"
                 }
             }
         },
@@ -78,19 +82,19 @@
             "value": {
                 "2009": {
                     "value": 1000000,
-                    "increase": 1.05,
+                    "changerate": 1.05,
                     "description": "Kjøpte huset",
                     "repeat": true
                 },
                 "2016": {
                     "value": 2000000,
-                    "increase": 1.06,
+                    "changerate": 1.06,
                     "description": "Skilsmisse",
                     "repeat": true
                 },
                 "2018": {
                     "value": 3000000,
-                    "increase": 1.07,
+                    "changerate": 1.07,
                     "description": "Takst",
                     "repeat": true
                 }
@@ -99,27 +103,31 @@
                 "2012": {
                     "name": "Utleie",
                     "description": "Utleie av leilighet",
-                    "value": 10000,
-                    "increase": 3.5,
+                    "value": 13000,
+                    "changerate": 3.5,
                     "repeat": true
                 }
             },
-            "expences": {
+            "expence": {
                 "2013": {
                     "name": "Utgifter",
                     "description": "Kommunale/Forsikring/Strøm",
                     "value": 3000,
-                    "increase": 3.5,
+                    "changerate": 3.5,
                     "repeat": true
                 }
             },
-            "loan": {
-                "2021": {
-                    "interestrate": "2",
-                    "gebyr": 50,
+            "mortgage": {
+                "2010": {
+                    "value": 300000,
+                    "interest": "5",
+                    "gebyr": 6000,
                     "tax": 22,
-                    "value": 3000000,
-                    "extradownpayment": 1000
+                    "paymentExtra": "rental.$year.cashflow.amount",
+                    "years": 20
+                },
+                "2020": {
+                    "interest": "5"
                 }
             }
         }
@@ -136,7 +144,7 @@
             "loan",
             "mortgage",
             "income",
-            "expences",
+            "expence",
             "rest"
         ]
     }

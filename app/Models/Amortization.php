@@ -22,59 +22,73 @@ class Amortization extends Model
     private $balance;
     private $term_pay;
     private $data;
-    private $assett;
+    private $assettname;
 
-    public function __construct($data, $config, $assett)
+/*
+            $mortgageconfig = array(
+                'year_start'    => $this->periodStart,
+                'year_end'      => $this->periodEnd,
+                'loan_amount'   => 1000000,
+                'term_years'    => 10,
+                'interest'      => 2.02,
+                'terms'         => 1
+                );
+*/
+    public function __construct($data, $config, $assettname)
     {
             $this->data         = $data;
-            $this->assett       = $assett;
-            $this->year_start   = (float) $config['year_start'];
-            $this->year_end     = (float) $config['year_end'];
-            $this->loan_amount  = (float) $config['loan_amount'];
-            $this->term_years   = (int) $config['term_years'];
-            $this->interest     = (float) $config['interest'];
-            $this->terms        = (int) $config['terms'];
-            
-            $this->terms = ($this->terms == 0) ? 1 : $this->terms;
+            $this->assettname   = $assettname;
 
-            $this->period = $this->terms * $this->term_years;
-            $this->interest = ($this->interest/100) / $this->terms;
+            foreach($config as $year => $mortgage) {
 
-            $results = array(
-                #'inputs' => $config,
-                #'summary' => $this->getSummary(),
-                'schedule' => $this->getSchedule(),
-                );
+                $this->year_start   = (int) $year;
+                $this->year_end     = (int) $year + $mortgage['years'];
+                $this->loan_amount  = (float) $mortgage['value'];
+                $this->term_years   = (int) $mortgage['years'];
+                $this->interest     = (float) $mortgage['interest'];
+                $this->terms        = (int) 1; //1 termin i året
+                
+                $this->terms        = ($this->terms == 0) ? 1 : $this->terms;
 
-            //dd($this->data);
+                $this->period       = $this->terms * $this->term_years;
+                $this->interest     = ($this->interest/100) / $this->terms;
+
+                $this->getSchedule();
+            }
+            dd($this->data);
     }
 
     private function calculate($year)
     {
-
-
         #handle extra payment
-        $paymentExtra = Arr::get($this->data,"$this->assett.$year.cashflow.amount", 0);
+        $paymentExtra = Arr::get($this->data,"$this->assettname.$year.cashflow.amount", 0);
 
         print "$year: pow((1+ interest: $this->interest), period: $this->period)\n";
         $deno = 1 - 1 / pow((1+ $this->interest),$this->period);
 
-        $this->term_pay = ($this->loan_amount * $this->interest) / $deno;
-        $interest = $this->loan_amount * $this->interest;
+        if($deno > 0) {
+            $this->term_pay = ($this->loan_amount * $this->interest) / $deno;
+            $interest = $this->loan_amount * $this->interest;
 
-        $this->principal = $this->term_pay - $interest + $paymentExtra; //Experimental
-        $this->balance = $this->loan_amount - $this->principal;
+            #$this->principal = $this->term_pay + $paymentExtra - $interest ; //Experimental
+            $this->principal = $this->term_pay - $interest; //Normal
 
+            #$this->balance = $this->loan_amount - $this->principal - $paymentExtra;
+            $this->balance = $this->loan_amount - $this->principal;
 
-        $this->data [$this->assett][$year]['mortgage'] = [
-            'payment' => $this->term_pay,
-            'paymentExtra' => $paymentExtra,
-            'interest' => $interest,
-            'principal' => $this->principal,
-            'balance' => $this->balance,
-            'gebyr' => 0,
-            'description' => '',
-        ];
+            if($this->balance > 0) {
+                $this->data [$this->assettname][$year]['mortgage'] = [
+                    'payment' => $this->term_pay,
+                    'paymentExtra' => $paymentExtra,
+                    'interest' => $this->interest,
+                    'interestAmount' => $interest,
+                    'principal' => $this->principal,
+                    'balance' => $this->balance,
+                    'gebyr' => 0,
+                    'description' => '',
+                ];
+            }
+        }
     }
 
     public function getSummary()
@@ -90,10 +104,10 @@ class Amortization extends Model
     }
 
     public function getSchedule ()
-    {        
+    {
         for ($year = $this->year_start; $year <= $this->year_end; $year++) {
 
-            if($this->period > 0) {
+            if($this->balance >= 0) {
                 $this->calculate($year);
                 //collect(
                 //    $this->calculate($year)

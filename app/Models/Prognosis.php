@@ -28,99 +28,123 @@ class Prognosis
         $this->periodEnd  = (integer) Arr::get($this->config, 'period.end');
 
         foreach(Arr::get($this->config, 'assets') as $assetname => $asset) {
-            $increase = 1; 
-            $prevIncrease = 1; 
-            $value = 0;
-            $prevValue = 0;
+
+            $assetValue = 0;
+            $prevAssetValue = 0;
+            $assetChangerate = 1; 
+            $prevAssetChangerate = 1; 
+
+
             $income = 0;
             $prevIncome = 0;
+            $incomeChangerate = 1; 
+            $prevIncomeChangerate = 1; 
+
             $expence = 0;
             $prevExpence = 0;
+            $expenceChangerate = 1; 
+            $prevExpenceChangerate = 1; 
+
             $rest = 0;
             $restAccumulated = 0;
-            $loan = 0;
-            $loanPrev = 0;
 
             #print_r($asset);
 
             for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
 
                 #####################################################
-                #Cashflow
-                $expences = Arr::get($asset, "expences.$year.value");
-                if($expence) {
-                    $prevExpence = $expence;
+                #Cashflow expence
+                $expenceChangerate = Arr::get($asset, "expence.$year.changerate");
+                if($expenceChangerate) {
+                    $prevExpenceChangerate = $expenceChangerate;
                 } else {
+                    $expenceChangerate = $prevExpenceChangerate;
+                }
+
+                $expence = Arr::get($asset, "expence.$year.value", 0);
+                if(!$expence) {
                     $expence = $prevExpence;
                 }
 
-                $income = Arr::get($asset, "income.$year.value");
-                if($income) {
-                    $prevIncome = $income;
+                #####################################################
+                #Cashflow income
+                $incomeChangerate = Arr::get($asset, "income.$year.changerate");
+                if($incomeChangerate) {
+                    $prevIncomeChangerate = $incomeChangerate;
                 } else {
+                    $incomeChangerate = $prevIncomeChangerate;
+                }
+
+                $income = Arr::get($asset, "income.$year.value", 0);
+                if(!$income) {
                     $income = $prevIncome;
                 }
 
                 $rest = $income - $expence;
                 $restAccumulated += $rest;
 
-                $this->data[$assetname][$year]['cashflow'] = [
-                    'changerate' => 1.05,
+                $this->data[$assetname][$year]['income'] = [
+                    'changerate' => $incomeChangerate,
                     'income' => $income,
+                    'description' => Arr::get($asset, "income.$year.description"),
+                    ];
+
+                $this->data[$assetname][$year]['expence'] = [
+                    'changerate' => $expenceChangerate,
                     'expence' => $expence,
-                    'amount' => $income - $expences,
+                    'description' => Arr::get($asset, "expence.$year.description"),
+                    ];
+
+                $this->data[$assetname][$year]['cashflow'] = [
+                    'amount' => $rest,
                     'amountAccumulated' => $restAccumulated,
-                    'description' => Arr::get($asset, "value.$year.description"),
                     ];
 
                 #####################################################
                 #Assett
-                $increase = Arr::get($asset, "value.$year.increase");
-                if($increase) {
-                    $prevIncrease = $increase;
+                $assetChangerate = Arr::get($asset, "value.$year.changerate");
+                if($assetChangerate) {
+                    $prevAssetChangerate = $assetChangerate;
                 } else {
-                    $increase = $prevIncrease;
+                    $assetChangerate = $prevAssetChangerate;
                 }
 
                 #print_r(Arr::get($asset, "value.$year.increase"));
 
-                $value = Arr::get($asset, "value.$year.value");
-                if(!$value) {
-                    $value = $prevValue;
+                $assetValue = Arr::get($asset, "value.$year.value");
+                if(!$assetValue) {
+                    $assetValue = $prevAssetValue;
                 }
-                print "$value = $prevValue = $value * $increase\n";
+                #print "$assetValue = $prevAssetValue = $assetValue * $assetChangerate\n";
 
                 #print_r(Arr::get($asset, "assets.0.value.$year"));
                 #exit;
                    $this->data[$assetname][$year]['asset'] = collect([
-                    'value' => $value,
-                    'changerate' => $increase,
+                    'value' => $assetValue,
+                    'changerate' => $assetChangerate,
                     'description' => Arr::get($asset, "value.$year.description"),
                     ]
                 );
                 #dd($this->data);
-                $value = $prevValue = $value * $increase;
+                $expence    = $prevExpence      = $expence * $expenceChangerate;
+                $income     = $prevIncome       = $income * $incomeChangerate;
+                $assetValue = $prevAssetValue   = $assetValue * $assetChangerate;
             }
 
             #####################################################
             #Loan
             //$this->collections = $this->collections->keyBy('year');
             #dd($this->collections);
-            $mortgageconfig = array(
-                'year_start'    => $this->periodStart,
-                'year_end'      => $this->periodEnd,
-                'loan_amount'   => 1000000,
-                'term_years'    => 10,
-                'interest'      => 2.02,
-                'terms'         => 1
-                );
 
-            $amortization = new Amortization($this->data, $mortgageconfig, $assetname);
+            $mortgage = Arr::get($asset, "mortgage");
+            #dd($mortgage);
+
+            $amortization = new Amortization($this->data, $mortgage, $assetname);
 
             //return $this->collections; #??????
         }
 
 
-    dd($this->data);    
+    #dd($this->data);    
     }
 }
