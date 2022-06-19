@@ -4,56 +4,36 @@ php artisan ReadFile
 
 Will soon make it possible to adda config file as a input
 
-    2016 => array:3 [
-      "cashflow" => array:6 [
+    2027 => array:5 [
+      "income" => array:3 [
         "changerate" => 1.05
-        "income" => 10000
-        "expence" => 0
-        "amount" => 10000
-        "amountAccumulated" => 20000
-        "description" => "Skilsmisse"
-      ]
-      "asset" => Illuminate\Support\Collection^ {#689
-        #items: array:3 [
-          "value" => 5000000
-          "changerate" => 1.06
-          "description" => "Skilsmisse"
-        ]
-        #escapeWhenCastingToString: false
-      }
-      "mortgage" => array:7 [
-        "payment" => 106291.04899632
-        "paymentExtra" => 10000
-        "interest" => 4167.4633672926
-        "principal" => 112123.58562902
-        "balance" => 94186.482058729
-        "gebyr" => 0
-        "description" => ""
-      ]
-    ]
-    2017 => array:3 [
-      "cashflow" => array:6 [
-        "changerate" => 1.05
-        "income" => 10000
-        "expence" => 0
-        "amount" => 10000
-        "amountAccumulated" => 30000
+        "income" => 29796.238131413
         "description" => null
       ]
-      "asset" => Illuminate\Support\Collection^ {#690
+      "expence" => array:3 [
+        "changerate" => 1.05
+        "expence" => 6548.6237651458
+        "description" => null
+      ]
+      "cashflow" => array:2 [
+        "amount" => 23247.614366268
+        "amountAccumulated" => 288199.90169162
+      ]
+      "asset" => Illuminate\Support\Collection^ {#700
         #items: array:3 [
-          "value" => 5300000.0
-          "changerate" => 1.06
+          "value" => 1103075.5274521
+          "changerate" => 1.07
           "description" => null
         ]
         #escapeWhenCastingToString: false
       }
-      "mortgage" => array:7 [
-        "payment" => 96089.048996315
-        "paymentExtra" => 10000
-        "interest" => 1902.5669375863
-        "principal" => 104186.48205873
-        "balance" => -9999.9999999999
+      "mortgage" => array:8 [
+        "payment" => 616069.59207913
+        "paymentExtra" => 23247.614366268
+        "interest" => 0.2
+        "interestAmount" => 259547.83740371
+        "principal" => 356521.75467542
+        "balance" => 941217.43234311
         "gebyr" => 0
         "description" => ""
       ]
