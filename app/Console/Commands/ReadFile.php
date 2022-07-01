@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Exports\Exports;
+use App\Exports\PrognosisExport;
 use App\Models\Prognosis;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
@@ -30,6 +30,6 @@ class ReadFile extends Command
      */
     public function handle()
     {
-        Excel::store(new Exports, 'prognosis.xlsx');
+        Excel::store(new PrognosisExport, 'prognosis.xlsx');
     }
 }

@@ -139,7 +139,7 @@ class Prognosis
             $mortgage = Arr::get($asset, "mortgage");
             #dd($mortgage);
 
-            $amortization = new Amortization($this->data, $mortgage, $assetname);
+            #$amortization = new Amortization($this->data, $mortgage, $assetname);
 
             //return $this->collections; #??????
         }

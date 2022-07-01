@@ -38,24 +38,26 @@ class Amortization extends Model
     {
             $this->data         = $data;
             $this->assettname   = $assettname;
-
             foreach($config as $year => $mortgage) {
 
+                if(!$mortgage) { continue; }
                 $this->year_start   = (int) $year;
-                $this->year_end     = (int) $year + $mortgage['years'];
-                $this->loan_amount  = (float) $mortgage['value'];
-                $this->term_years   = (int) $mortgage['years'];
-                $this->interest     = (float) $mortgage['interest'];
+                $this->year_end     = (int) $year + 20;
+
+#                $this->year_end     = (int) $year + $mortgage['years'];
+                #$this->loan_amount  = (float) $mortgage['value'];
+                #$this->term_years   = (int) $mortgage['years'];
+                #$this->interest     = (float) $mortgage['interest'];
                 $this->terms        = (int) 1; //1 termin i året
                 
-                $this->terms        = ($this->terms == 0) ? 1 : $this->terms;
+                #$this->terms        = ($this->terms == 0) ? 1 : $this->terms;
 
-                $this->period       = $this->terms * $this->term_years;
-                $this->interest     = ($this->interest/100) / $this->terms;
+                #$this->period       = $this->terms * $this->term_years;
+                #$this->interest     = ($this->interest/100) / $this->terms;
 
                 $this->getSchedule();
             }
-            dd($this->data);
+            #dd($this->data);
     }
 
     private function calculate($year)
@@ -116,6 +118,6 @@ class Amortization extends Model
                 $this->period--;
             }
         }
-    dd($this->data); 
+    ##dd($this->data); 
     }
 }
