@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Amortization extends Model
 {
@@ -25,24 +26,42 @@ class Amortization extends Model
     private $assettname;
     private $dataH = array();
 
-    public function __construct($dataH, $config, $assettname)
+    public function __construct($config, $dataH, $mortgages, $assettname)
     {
             $this->dataH = $dataH;
             $this->assettname   = $assettname;
+            $this->config = $config;
 
-            foreach($config as $year => $mortgage) { #OBS på at det kan være loop med mer som forekommer her, det er ikke håndtert.
-                if(!$this->year_start) {
-                    $this->year_start   = (int) $year;
-                    $this->term_years   = (int) Arr::get($mortgage, "years");
-                    $this->year_end     = (int) $year + $this->term_years;
-                    $this->loan_amount  = (float) Arr::get($mortgage, "value");
-                    $this->interest     = (float) Arr::get($mortgage, "interest") / 100;
-                    $this->terms        = 1; //1 termin i året pga visningen her
-                    $this->period       = (int) $this->terms * $this->term_years;
+            $keys = array_keys( $mortgages );
+            $size = sizeof($keys);
+
+            for($x = 0; $x < $size; $x++ ) {
+            #foreach($mortgages as $year => $mortgage) { #OBS på at det kan være loop med mer som forekommer her, det er ikke håndtert.
+                $year = $keys[$x]; #+1
+                #dd($mortgages);
+
+                #Reset for each loop
+                $this->year_start   = (int) $year;
+                $this->term_years   = (int) Arr::get($mortgages, "$year.years");
+                $this->loan_amount  = (float) Arr::get($mortgages, "$year.value");
+                $this->interest     = $this->percentToDecimal2(Arr::get($mortgages, "$year.interest"));
+                $this->terms        = 1; //1 termin i året pga visningen her
+                $this->period       = (int) $this->terms * $this->term_years;
+                $this->balance      = 0;
+                $this->year_end     = $year + $this->term_years;
+
+                #$next_year = $keys[$x+1]; #Look ahead, but the last element in array will not exist
+
+                if(isset($keys[$x+1]) && $keys[$x+1] < $this->year_end) { #If a next mortgage year exists
+                    #Overwrite year end in this scenario, since the nextmortgage starts before the first one is finished
+                    $this->year_end = $keys[$x+1] - 1;  #Asset has multiple mortgages that has to be recalculated, but they may not overlap in time, and they have to be stopped the year before the next starts
                 }
+                print "$x: from: $this->year_start, to: $this->year_end, year: $year\n";
+                #Calculate
+                $this->getSchedule();
             }
             #dd($this);
-            $this->getSchedule();
+
     }
 
     public function getSchedule ()
@@ -65,7 +84,7 @@ class Amortization extends Model
         $deno = 1 - (1 / pow((1+ $this->interest), $this->period));
         #print "$deno = 1 - (1 / pow((1+ $this->interest), $this->period))\n";
 
-        #if($deno > 0) {
+        if($deno > 0) {
             $this->term_pay = ($this->loan_amount * $this->interest) / $deno;
             $interest = $this->loan_amount * $this->interest;
 
@@ -92,14 +111,17 @@ class Amortization extends Model
                 #Tax calculations
                 $amountDeductableYearly = $interest * 0.22; #Remove hardcoded percentage later
                 $this->dataH[$this->assettname][$year]['tax']['amountDeductableYearly'] = $amountDeductableYearly;
-                $this->dataH[$this->assettname][$year]['cashflow']['amount'] = $this->dataH[$this->assettname][$year]['cashflow']['amount'] + $amountDeductableYearly - $this->term_pay;
-                $this->dataH[$this->assettname][$year]['cashflow']['amountAccumulated'] = $this->dataH[$this->assettname][$year]['cashflow']['amountAccumulated'] + $amountDeductableYearly - $this->term_pay;  #Cashflow accumulated må reberegnes til slutt???
-                $this->dataH[$this->assettname][$year]['asset']['amountLoanDeducted'] -= $this->balance;  #Cashflow accumulated må reberegnes til slutt???
-                $this->dataH[$this->assettname][$year]['asset']['loanPercentage'] = $this->balance / $this->dataH[$this->assettname][$year]['asset']['amount'];  #Cashflow accumulated må reberegnes til slutt???
-
+                if(isset($this->dataH[$this->assettname][$year]['cashflow'])) {
+                    $this->dataH[$this->assettname][$year]['cashflow']['amount'] = $this->dataH[$this->assettname][$year]['cashflow']['amount'] + $amountDeductableYearly - $this->term_pay;
+                    $this->dataH[$this->assettname][$year]['cashflow']['amountAccumulated'] = $this->dataH[$this->assettname][$year]['cashflow']['amountAccumulated'] + $amountDeductableYearly - $this->term_pay;  #Cashflow accumulated må reberegnes til slutt???
+                }
+                if(isset($this->dataH[$this->assettname][$year]['asset'])) {
+                    $this->dataH[$this->assettname][$year]['asset']['amountLoanDeducted'] -= $this->balance;  #Cashflow accumulated må reberegnes til slutt???
+                    $this->dataH[$this->assettname][$year]['asset']['loanPercentage'] = $this->balance / $this->dataH[$this->assettname][$year]['asset']['amount'];  #Cashflow accumulated må reberegnes til slutt???
+                }
 
             #}
-        #}
+        }
     }
 
     public function getSummary()
@@ -123,5 +145,18 @@ class Amortization extends Model
     public function get(){
         return $this->dataH;
         #dd($this->dataH);
+    }
+
+    public function percentToDecimal2($percent){
+
+        if($percent != null && Str::isAscii($percent)) { #Allow to read the numbers from a config
+            $percent = Arr::get($this->config, $percent, null);
+        }
+
+        if($percent != null && is_numeric($percent)) { #Allow numbers directly
+            return ($percent / 100);
+        } else {
+            return 0; #We need zero in return for tests to be correct, if we found no value
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace App\Models;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Prognosis
 {
@@ -45,7 +46,7 @@ class Prognosis
             $PercentDeductableRealization = Arr::get($this->config, "tax." . $taxtype. ".realization", 0) / 100;
 
 
-            print "$assetname: $taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization\n";
+            #print "$assetname: $taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization\n";
 
             $assetValue = 0;
             $firstAssetValue = 0;
@@ -72,6 +73,8 @@ class Prognosis
             $rest = 0;
             $restAccumulated = 0;
 
+            #dd($this->config['changerates']);
+
             for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
 
                 #####################################################
@@ -84,14 +87,16 @@ class Prognosis
                     $expenceRepeat = $prevExpenceRepeat;
                 }
 
-                $expenceChangerate = Arr::get($asset, "expence.$year.changerate");
-                if($expenceChangerate) {
+                $expenceChangerate = $this->percentToDecimal(Arr::get($asset, "expence.$year.changerate", null));
+                if($expenceChangerate > 0) {
+                    #print "Fant: $expenceChangerate\n";
                     $prevExpenceChangerate = $expenceChangerate;
                 } else {
                     $expenceChangerate = $prevExpenceChangerate;
+                    #print "Fant ikke\n";
                 }
 
-                $expence = Arr::get($asset, "expence.$year.value", 0);
+                $expence = Arr::get($asset, "expence.$year.value", 0) * 12; #Expence is added as a monthly repeat in config
                 if(!$expence) {
                     $expence = $prevExpence;
                 }
@@ -102,23 +107,25 @@ class Prognosis
                     'description' => Arr::get($asset, "expence.$year.description"),
                 ];
 
+                #print "$year: expenceChangerate = $expenceChangerate - expence * $expence\n";
+
                 #####################################################
                 #income
-                $incomeRepeat = Arr::get($asset, "income.$year.repeat", null);
+                $incomeRepeat = Arr::get($asset, "income.$year.repeat", 1);
                 if(isset($incomeRepeat)) {
                     $prevIncomeRepeat = $incomeRepeat;
                 } else {
                     $incomeRepeat = $prevIncomeRepeat;
                 }
 
-                $incomeChangerate = Arr::get($asset, "income.$year.changerate");
+                $incomeChangerate = $this->percentToDecimal(Arr::get($asset, "income.$year.changerate", null));
                 if($incomeChangerate) {
                     $prevIncomeChangerate = $incomeChangerate;
                 } else {
                     $incomeChangerate = $prevIncomeChangerate;
                 }
 
-                $income = Arr::get($asset, "income.$year.value", 0);
+                $income = Arr::get($asset, "income.$year.value", 0) * 12; #Income is added as a monthly repeat in config
                 if(!$income) {
                     $income = $prevIncome;
                 }
@@ -138,7 +145,7 @@ class Prognosis
                     $assetRepeat = $prevAssetRepeat;
                 }
 
-                $assetChangerate = Arr::get($asset, "value.$year.changerate");
+                $assetChangerate = $this->percentToDecimal(Arr::get($asset, "value.$year.changerate", null));
                 if($assetChangerate) {
                     $prevAssetChangerate = $assetChangerate;
                 } else {
@@ -241,7 +248,7 @@ class Prognosis
             #print_r($mortgage);
             if($mortgage) {
                 #Kjører bare dette om mortgage strukturen i json er utfylt
-                $this->dataH = (new Amortization($this->dataH, $mortgage, $assetname))->get();
+                $this->dataH = (new Amortization($this->config, $this->dataH, $mortgage, $assetname))->get();
                 #$this->dataH = new Amortization($this->dataH, $mortgage, $assetname);
 
                 #dd($this->dataH);
@@ -257,6 +264,27 @@ class Prognosis
 
     public function add($assettname, $year, $type, $dataH){
         #$this->dataH[$assettname][$year][$type] = $dataH;
+    }
+
+    public function percentToDecimal($percent){
+
+        #print "** percent: $percent\n";
+        if($percent != null && !is_numeric($percent)) { #Allow to read the numbers from a config
+
+            $percent = Arr::get($this->config, $percent, null);
+            #print "## percent: '$percent'\n";
+        }
+        #print "-- percent: '$percent'\n";
+
+
+#        if($percent <> 0 && is_numeric($percent)) { #Allow numbers directly
+        if($percent <> 0) { #Allow numbers directly
+            #$percent = ($percent / 100) + 1;
+            #print "## return: '$percent'\n";
+            return ($percent / 100) + 1;
+        } else {
+            return 0; #We need zero in return for tests to be correct, if we found no value
+        }
     }
 
     function group() {
