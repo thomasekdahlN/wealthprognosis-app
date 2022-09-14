@@ -96,9 +96,18 @@ class Prognosis
                     #print "Fant ikke\n";
                 }
 
-                $expence = Arr::get($asset, "expence.$year.value", 0) * 12; #Expence is added as a monthly repeat in config
-                if(!$expence) {
+                $expenceThis = Arr::get($asset, "expence.$year.value", null) * 12; #Expence is added as a monthly repeat in config
+                if($expenceThis == null) {
+                    #Set it to the previous value
                     $expence = $prevExpence;
+                } elseif($expenceThis < 0) {
+                    #We subtract this value relatively, since it is negative we add it to subtract;-)
+                    #print "## $expence += $expenceThis\n";
+                    $expence += $expenceThis ;
+                    #print "** $expence += $expenceThis\n";
+
+                } else {
+                    $expence = $expenceThis; #Set it to the given value
                 }
 
                 $this->dataH[$assetname][$year]['expence'] = [
@@ -125,9 +134,17 @@ class Prognosis
                     $incomeChangerate = $prevIncomeChangerate;
                 }
 
-                $income = Arr::get($asset, "income.$year.value", 0) * 12; #Income is added as a monthly repeat in config
-                if(!$income) {
+                $incomeThis = Arr::get($asset, "income.$year.value", null) * 12; #Income is added as a monthly repeat in config
+                if($incomeThis == null) {
+                    #Set it to the previous value
                     $income = $prevIncome;
+                } elseif($incomeThis < 0) {
+                    #We subtract this value relatively, since it is negative we add it to subtract;-)
+                    print "## $income += $incomeThis\n";
+                    $income += $incomeThis ;
+                    print "** $income += $incomeThis\n";
+                } else {
+                    $income = $incomeThis; #Set it to the given value
                 }
 
                 $this->dataH[$assetname][$year]['income'] = [
@@ -153,7 +170,6 @@ class Prognosis
                 }
 
                 #print_r(Arr::get($asset, "value.$year.increase"));
-
                 $assetValue = Arr::get($asset, "value.$year.value");
                 if(!$assetValue) {
                     $assetValue = $prevAssetValue;

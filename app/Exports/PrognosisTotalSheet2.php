@@ -112,7 +112,9 @@ class PrognosisTotalSheet2
                 $this->worksheet->setCellValue("K$this->rows", Arr::get($this->totalH[$year], "cashflow.amount"));
                 $this->worksheet->setCellValue("L$this->rows", Arr::get($this->totalH[$year], "asset.amount"));
                 $this->worksheet->setCellValue("M$this->rows", Arr::get($this->totalH[$year], "asset.amountLoanDeducted"));
-                $this->worksheet->setCellValue("N$this->rows", Arr::get($this->totalH[$year], "mortgage.balance") / Arr::get($this->totalH[$year], "asset.amount"));
+                if (isset($this->totalH[$year]['asset'])) {
+                   $this->worksheet->setCellValue("N$this->rows", Arr::get($this->totalH[$year], "mortgage.balance") / Arr::get($this->totalH[$year], "asset.amount"));
+                }
             }
 
             #Company
@@ -144,7 +146,9 @@ class PrognosisTotalSheet2
                 $this->worksheet->setCellValue("AI$this->rows", Arr::get($this->groupH['private'][$year], "cashflow.amount"));
                 $this->worksheet->setCellValue("AJ$this->rows", Arr::get($this->groupH['private'][$year], "asset.amount"));
                 $this->worksheet->setCellValue("AK$this->rows", Arr::get($this->groupH['private'][$year], "asset.amountLoanDeducted"));
-                $this->worksheet->setCellValue("AL$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.balance") / Arr::get($this->groupH['private'][$year], "asset.amount"));
+                if(isset($this->groupH['private'][$year]['asset'])) {
+                    $this->worksheet->setCellValue("AL$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.balance") / Arr::get($this->groupH['private'][$year], "asset.amount"));
+                }
             }
             $this->rows++;
         }
