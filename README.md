@@ -9,20 +9,26 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 
 Supports % changerates on expences, income and asset values
 Supports mortage calculations and new mortages taking over for a previous mortage
-Support incrementell decrease of income / expence
+Support incrementell decrease of income / expence / asset (using negative amount as input)
 Calculates all values for all assets
 Groups assets into groups for group overview
 Groups assets into total, company and private for a total overview of your economic future
-
+Estimates your max loan capasity from banks.
+- Calculate 4% retirement on asset cash flow (FIRE)
+- FIRE income = income + 4%asset value + deductable taxes
+- FIRE expence = expence + mortgage + taxable taxes
+- FIRE diff = FIRE income - FIRE expence amount
+- FIRE % = FIRE income / FIRE expence = How close you are to fire 
 
 On the wishlist:
 - Mortage calculation supporting extra downpayments each year (Need help here)
-- Configurabl transfer of cash flow in % between assets (and mortages)
-- Support incremental addition of expences/income (not only %)
+- Configurable transfer of cash flow in % between assets (and mortages)
+- Support incremental amount addition of expences/income (not only %)
 - Showing % increase on assets, income and expences in asset spreadsheet
 - Showing all values compared to KPI index (relative value)
 - Central changerates configured pr year to make curve predictions
 - Retrieving asset values from API, like Crypto/Fond/stocks
+- FIRE asset usage is not deducted from the asset value, it probably should.
 
 {
 "meta": {

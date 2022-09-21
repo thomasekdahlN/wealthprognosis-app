@@ -56,7 +56,7 @@ class Amortization extends Model
                     #Overwrite year end in this scenario, since the nextmortgage starts before the first one is finished
                     $this->year_end = $keys[$x+1] - 1;  #Asset has multiple mortgages that has to be recalculated, but they may not overlap in time, and they have to be stopped the year before the next starts
                 }
-                print "$x: from: $this->year_start, to: $this->year_end, year: $year\n";
+                #print "$x: from: $this->year_start, to: $this->year_end, year: $year\n";
                 #Calculate
                 $this->getSchedule();
             }
@@ -96,7 +96,7 @@ class Amortization extends Model
 
             #if($this->balance > 0) {
 
-                print "$year: $this->period : deno: $deno : $this->interest : loanamount: " . round($this->loan_amount)  . " $this->interest : terminbelop: " . round($this->term_pay)  . " : renter " . round($interest) . " : avdrag: " . round($this->principal) . " : balance: " . round($this->balance) . "\n";
+                #print "$year: $this->period : deno: $deno : $this->interest : loanamount: " . round($this->loan_amount)  . " $this->interest : terminbelop: " . round($this->term_pay)  . " : renter " . round($interest) . " : avdrag: " . round($this->principal) . " : balance: " . round($this->balance) . "\n";
 
                 $this->dataH[$this->assettname][$year]['mortgage'] = [
                         'payment' => $this->term_pay,
@@ -119,6 +119,11 @@ class Amortization extends Model
                     $this->dataH[$this->assettname][$year]['asset']['amountLoanDeducted'] -= $this->balance;  #Cashflow accumulated må reberegnes til slutt???
                     $this->dataH[$this->assettname][$year]['asset']['loanPercentage'] = $this->balance / $this->dataH[$this->assettname][$year]['asset']['amount'];  #Cashflow accumulated må reberegnes til slutt???
                 }
+
+                $this->dataH[$this->assettname][$year]['fire']['amountIncome'] += $amountDeductableYearly; #Vi legger til rentefradraget som inntekt.
+                $this->dataH[$this->assettname][$year]['fire']['amountExpence'] += $this->term_pay; #Vi legger lånet til kostnadene
+                $this->dataH[$this->assettname][$year]['fire']['amountDiff'] = $this->dataH[$this->assettname][$year]['fire']['amountIncome'] - $this->dataH[$this->assettname][$year]['fire']['amountExpence'];
+                $this->dataH[$this->assettname][$year]['fire']['percentDiff'] = $this->dataH[$this->assettname][$year]['fire']['amountIncome'] / $this->dataH[$this->assettname][$year]['fire']['amountExpence'];
 
             #}
         }

@@ -169,12 +169,20 @@ class Prognosis
                     $assetChangerate = $prevAssetChangerate;
                 }
 
-                #print_r(Arr::get($asset, "value.$year.increase"));
-                $assetValue = Arr::get($asset, "value.$year.value");
-                if(!$assetValue) {
+                $assetThis = Arr::get($asset, "value.$year.value", null); #Income is added as a monthly repeat in config
+                if($assetThis == null) {
+                    #Set it to the previous value
                     $assetValue = $prevAssetValue;
-                } elseif(!$firstAssetValue) {
-                    $firstAssetValue = $assetValue; #Remember the first assetvalue, used for tax calculations on realization
+                } elseif($assetThis < 0) {
+                    #We subtract this value relatively, since it is negative we add it to subtract;-)
+                    print "## $assetValue += $assetThis\n";
+                    $assetValue += $assetThis ;
+                    print "** $assetValue += $assetThis\n";
+                } else {
+                    $assetValue = $assetThis; #Set it to the given value
+                    if(!$firstAssetValue) {
+                        $firstAssetValue = $assetValue; #Remember the first assetvalue, used for tax calculations on realization
+                    }
                 }
 
                 #print "$assetValue = $prevAssetValue = $assetValue * $assetChangerate\n";
@@ -188,51 +196,129 @@ class Prognosis
                         'description' => Arr::get($asset, "value.$year.description"),
                     ];
 
-                ########################################################################################################
-                if($income or $expence) {
 
-                    $AmountDeductableYearly = 0; #Fratrekk klarer vi først når vi beregner lån
-                    $AmountDeductableRealization = 0; #Fratrekk klarer vi først når vi beregner lån
+                $AmountDeductableYearly = 0; #Fratrekk klarer vi først når vi beregner lån
+                $AmountDeductableRealization = 0; #Fratrekk klarer vi først når vi beregner lån
+                $AmountTaxableYearly = 0;
+                $AmountTaxableRealization = 0;
+
+                ########################################################################################################
+                #if($income or $expence) {
+
 
                     #Forskjell på hva man betaler skatt av
-                    if($taxtype == 'salary') {
-                        $AmountTaxableYearly        = $income * $PercentTaxableYearly;
-                        $AmountTaxableRealization   = ($assetValue - 0) * $PercentTaxableRealization;
+                    $potentialIncome = 0;
+                    if ($taxtype == 'salary') {
+                        $AmountTaxableYearly = $income * $PercentTaxableYearly;
+                        $AmountTaxableRealization = ($assetValue - 0) * $PercentTaxableRealization;
                         $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
-                    } elseif($taxtype == 'rental' || $taxtype == 'house') {
+                        $potentialIncome = $income;
+
+                    } elseif ($taxtype == 'house') {
                         #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-                        $AmountTaxableYearly        = ($income - $expence) * $PercentTaxableYearly;
-                        $AmountTaxableRealization   = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                        $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
+                        $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                         $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
+                        $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+
+                    } elseif ($taxtype == 'cabin') {
+                        #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
+                        $AmountTaxableYearly = $income * $PercentTaxableYearly;
+                        $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                        $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
+                        $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+
+                    } elseif ($taxtype == 'rental') {
+                        #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
+                        $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
+                        $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                        $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
+                        #$potentialIncome = (($income - $AmountTaxableYearly) / 12) * 10; #Bank beregning, ikke sunn fornuft, ikke med skatt
+                        $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+
+                    } elseif ($taxtype == 'company') {
+                        #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
+                        $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
+                        $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                        $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
+                        $potentialIncome = $income - $AmountTaxableYearly;
+
                     } else {
                         #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-                        $AmountTaxableYearly        = ($income - $expence) * $PercentTaxableYearly;
-                        $AmountTaxableRealization   = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                        $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
+                        $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                         $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
+                        $potentialIncome = 0;  #For nå antar vi ingen inntekt fra annet enn lønn eller utleie, men utbytte vil også telle.
                     }
                     $restAccumulated += $cashflow;
 
+
+                    #Free money to spend
                     $this->dataH[$assetname][$year]['cashflow'] = [
                         'amount' => $cashflow,
                         'amountAccumulated' => $restAccumulated,
                     ];
 
-                    $this->dataH[$assetname][$year]['tax'] = [
-                        'amountTaxableYearly' => -$AmountTaxableYearly,
-                        'percentTaxableYearly' => $PercentTaxableYearly,
-                        'amountDeductableYearly' => -$AmountDeductableYearly,
-                        'percentDeductableYearly' => $PercentDeductableYearly,
-                        'amountTaxableRealization' => -$AmountTaxableRealization,
-                        'percentTaxableRealization' => $PercentTaxableRealization,
-                        'amountDeductableRealization' => -$AmountDeductableRealization,
-                        'percentDeductableRealization' => $PercentDeductableRealization,
+
+                    #Calculate the potential max loan you can handle base on income, tax adjusted - as seen from the bank.
+                    #print "$assetname - p:$potentialIncome = i:$income - t:$AmountTaxableYearly\n";
+                    $this->dataH[$assetname][$year]['potential'] = [
+                        'income' => $potentialIncome,
+                        'loan' => $potentialIncome * 5
                     ];
+                #}
 
-                    #print "i:$income - e:$expence, rest: $rest, restAccumulated: $restAccumulated\n";
-
-                    #print_r($this->dataH[$assetname][$year]['cashflow']);
-
+                #FIRE - Financial Independence Retire Early - beregninger på assets
+                #Achievement er hvor mye du mangler for å nå målet? Feil navn?
+                # amount = assetverdi - lån i beregningene + inntekt? (Hvor mye er 4% av de reelle kostnadene + inntekt (sannsynligvis kunn inntekt fra utleie)
+                # amountAchievement = amount - expences
+                #NOTE: Svakhet at den ikke hensyntar lån som utgift!!!!!!!!!!
+                if($taxtype == 'house' || $taxtype == 'rental' || $taxtype == 'cabin'|| $taxtype == 'car' || $taxtype == 'boat'|| $taxtype == 'salary') {
+                    #Kan ikke selge biter av en asset her, her regnes kun inntekt
+                    $ThisFirePercent = 0;
+                    $ThisFireIncome = 0; #Only asset value
+                } else {
+                    #Her kan vi selge biter av en asset (meta tagge opp det istedenfor tro?
+                    $ThisFirePercent = 0.04; #4% av en salgbar asset verdi
+                    $ThisFireIncome = $assetValue * $ThisFirePercent; #Only asset value
+                    $AmountTaxableYearly        += $ThisFireIncome * $PercentTaxableYearly; #Legger til skatt på utbytte fra salg av en % av disse eiendelene her (De har neppe en inntekt, men det skal også fikses fint)
+                    #print "ATY: $AmountTaxableYearly        += TFI:$ThisFireIncome * PTY:$PercentTaxableYearly;\n";
                 }
+
+                #NOTE - Deductable yarly blir bare satt i låneberegningen, så den må legges til globalt der.
+                $ThisFireTotalIncome = $ThisFireIncome + $income + $AmountDeductableYearly; #Percent of asset value + income from asset. HUSK KUN INNTEKTER her
+                $ThisFireTotalExpence = $expence + $AmountTaxableYearly;
+                #print "$assetname - FTI: $ThisFireTotalIncome = FI:$ThisFireIncome + I:$income + D:$AmountDeductableYearly\n"; #Percent of asset value + income from asset
+
+                $ThisFireAmountDiff = $ThisFireTotalIncome - $ThisFireTotalExpence; #Hvor lang er man unna fire målet
+
+                if($expence > 0) {
+                    $ThisFirePercentDiff = $ThisFireTotalIncome / $ThisFireTotalExpence; #Hvor mange % unna er inntektene å dekke utgiftene.
+                } else {
+                    $ThisFirePercentDiff = 1;
+                }
+                $this->dataH[$assetname][$year]['fire'] = [
+                    'percent' => $ThisFirePercent,
+                    'amountIncome' => $ThisFireTotalIncome,
+                    'amountExpence' => $ThisFireTotalExpence,
+                    'percentDiff' => $ThisFirePercentDiff,
+                    'amountDiff' => $ThisFireAmountDiff
+                ];
+
+                $this->dataH[$assetname][$year]['tax'] = [
+                    'amountTaxableYearly' => -$AmountTaxableYearly,
+                    'percentTaxableYearly' => $PercentTaxableYearly,
+                    'amountDeductableYearly' => -$AmountDeductableYearly,
+                    'percentDeductableYearly' => $PercentDeductableYearly,
+                    'amountTaxableRealization' => -$AmountTaxableRealization,
+                    'percentTaxableRealization' => $PercentTaxableRealization,
+                    'amountDeductableRealization' => -$AmountDeductableRealization,
+                    'percentDeductableRealization' => $PercentDeductableRealization,
+                ];
+
+                #print "i:$income - e:$expence, rest: $rest, restAccumulated: $restAccumulated\n";
+
+                #print_r($this->dataH[$assetname][$year]['cashflow']);
 
                 ########################################################################################################
                 if($expenceRepeat) {
@@ -324,6 +410,11 @@ class Prognosis
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.interestAmount");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.principal");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.balance");
+                $this->calculate($year, $assetH['meta'], $assetH[$year], "potential.income"); #Beregnet potensiell inntekt slik bankene ser det.
+                $this->calculate($year, $assetH['meta'], $assetH[$year], "potential.loan"); #Beregner maks potensielt lån på 5 x inntekt.
+                $this->calculate($year, $assetH['meta'], $assetH[$year], "fire.amountIncome");
+                $this->calculate($year, $assetH['meta'], $assetH[$year], "fire.amountExpence");
+                $this->calculate($year, $assetH['meta'], $assetH[$year], "fire.amountDiff");
             }
         }
         #print "group\n";

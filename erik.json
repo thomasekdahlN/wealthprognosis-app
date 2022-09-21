@@ -1,7 +1,7 @@
 {
     "meta": {
-        "name": "John Doe",
-        "birthyear": "1975",
+        "name": "Erik",
+        "birthyear": "2006",
         "prognoseyear": "2032"
     },
     "period": {
@@ -18,7 +18,7 @@
             "realization": 35.6
         },
         "salary": {
-            "yearly": 46,
+            "yearly": 15,
             "realization": 0
         },
         "house": {
@@ -46,11 +46,11 @@
                 "group": "private",
                 "name": "My house",
                 "description": "Here I live",
-                "active" : true,
+                "active" : false,
                 "tax": "house"
             },
             "value": {
-                "2015": {
+                "2022": {
                     "value": 3000000,
                     "changerate": "changerates.house",
                     "description": "Bought the house",
@@ -58,7 +58,7 @@
                 }
             },
             "income": {
-                "2015": {
+                "2022": {
                     "name": "Rental",
                     "description": "Rental 10000 pr month",
                     "value": 10000,
@@ -67,7 +67,7 @@
                 }
             },
             "expence": {
-                "2010": {
+                "2022": {
                     "name": "Utgifter",
                     "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
                     "value": 7300,
@@ -76,7 +76,7 @@
                 }
             },
             "mortgage": {
-                "2015": {
+                "2022": {
                     "value": 1500000,
                     "interest": "changerates.interest",
                     "gebyr": 600,
@@ -86,25 +86,7 @@
                 }
             }
         },
-        "crypto": {
-            "meta" : {
-                "type": "crypto",
-                "group": "private",
-                "name": "My Crypto",
-                "description": "Coinbase private",
-                "active": true,
-                "tax": "private"
-            },
-            "value": {
-                "2022": {
-                    "value": 5000,
-                    "changerate": "changerates.crypto",
-                    "description": "",
-                    "repeat": true
-                }
-            }
-        },
-        "nordnet": {
+        "Fond": {
             "meta" : {
                 "type": "fond",
                 "group": "private",
@@ -115,14 +97,14 @@
             },
             "value": {
                 "2022": {
-                    "value": 50000,
+                    "value": 500,
                     "changerate": "changerates.fond",
                     "description": "",
                     "repeat": true
                 }
             }
         },
-        "cash": {
+        "Kontanter": {
             "meta" : {
                 "type": "cash",
                 "group": "private",
@@ -133,24 +115,24 @@
             },
             "value": {
                 "2022": {
-                    "value": 50000,
+                    "value": 5000,
                     "changerate": "changerates.cash",
                     "description": "Kontanter p.t.",
                     "repeat": true
                 }
             }
         },
-        "car": {
+        "Bil": {
             "meta" : {
                 "type": "car",
                 "group": "private",
-                "name": "Avensis",
+                "name": "Bil",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "wealth"
             },
             "value": {
-                "2020": {
+                "2022": {
                     "value": 50000,
                     "changerate": -5,
                     "description": "5% verditap",
@@ -158,7 +140,7 @@
                 }
             },
             "expence": {
-                "2019": {
+                "2022": {
                     "name": "Utgifter",
                     "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
                     "value": 3000,
@@ -167,70 +149,7 @@
                 }
             }
         },
-        "boat": {
-            "meta" : {
-                "type": "boat",
-                "group": "private",
-                "name": "Boat",
-                "description": "",
-                "active": true,
-                "tax": "wealth"
-            },
-            "value": {
-                "2022": {
-                    "value": 200000,
-                    "changerate": -5,
-                    "description": "5% verditap",
-                    "repeat": true
-                }
-            },
-            "expence": {
-                "2022": {
-                    "name": "Utgifter",
-                    "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
-                    "value": 2000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
-            }
-        },
-        "klp": {
-            "meta" : {
-                "type": "fond",
-                "group": "company",
-                "name": "KLP fond",
-                "description": "",
-                "active": true,
-                "tax": "company"
-            },
-            "value": {
-                "2022": {
-                    "description": "",
-                    "value": 1000000,
-                    "changerate": "changerates.fond",
-                    "repeat": true
-                }
-            }
-        },
-        "Company AS": {
-            "meta" : {
-                "type": "stock",
-                "group": "company",
-                "name": "Company AS",
-                "description": "I own stocks here",
-                "active": true,
-                "tax": "company"
-            },
-            "value": {
-                "2022": {
-                    "value": 2500000,
-                    "changerate": 3.5,
-                    "description": "Initielt kjøp",
-                    "repeat": true
-                }
-            }
-        },
-        "salary": {
+        "Lønn": {
             "meta": {
                 "type": "salary",
                 "group": "private",
@@ -242,8 +161,8 @@
             "income": {
                 "2022": {
                     "name": "Salary",
-                    "description": "My monthly salary",
-                    "value": 35000,
+                    "description": "",
+                    "value": 19250,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
@@ -251,8 +170,27 @@
             "expence": {
                 "2022": {
                     "name": "Expences",
-                    "description": "My monthly expences - not including house, car and boat",
-                    "value": 10000,
+                    "description": "Sifo forsiktig",
+                    "value": 7000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                }
+            }
+        },
+        "Leie": {
+            "meta": {
+                "type": "house",
+                "group": "private",
+                "name": "Leie",
+                "description": "Leie",
+                "active": true,
+                "tax": "house"
+            },
+            "expence": {
+                "2022": {
+                    "name": "",
+                    "description": "Husleie inkl internett: 8000, Strøm: 1000, innboforsikring: 300",
+                    "value": 9300,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }

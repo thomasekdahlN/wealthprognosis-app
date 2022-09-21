@@ -16,13 +16,14 @@ class PrognosisAssetSheet2
     private $spreadsheet;
     public $worksheet;
 
-    public $columns = 12;
+    public $columns = 14;
     public $rows = 4 ;
     public $rowHeader = 3;
     public $groups = 1;
 
-    public function __construct($spreadsheet, $name, $asset)
+    public function __construct($spreadsheet, $config, $name, $asset)
     {
+        $this->config = $config;
         $this->name = $name;
         $this->asset = $asset;
         $this->meta = $this->asset['meta'];
@@ -62,7 +63,14 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("O$this->rowHeader","Asset");
         $this->worksheet->setCellValue("P$this->rowHeader","Asset - lån");
         $this->worksheet->setCellValue("Q$this->rowHeader","Grad");
-        $this->worksheet->setCellValue("R$this->rowHeader","Description");
+        $this->worksheet->setCellValue("R$this->rowHeader","Betjeningsevne");
+        $this->worksheet->setCellValue("S$this->rowHeader","Max lån");
+        $this->worksheet->setCellValue("T$this->rowHeader","Rest evne");
+        $this->worksheet->setCellValue("U$this->rowHeader","FIRE inntekt");
+        $this->worksheet->setCellValue("V$this->rowHeader","FIRE utgift");
+        $this->worksheet->setCellValue("W$this->rowHeader","FIRE diff");
+        $this->worksheet->setCellValue("X$this->rowHeader","FIRE %");
+        $this->worksheet->setCellValue("Y$this->rowHeader","Description");
 
        #return;
 
@@ -71,7 +79,7 @@ class PrognosisAssetSheet2
             if($year == 'meta') { continue; }; #Hopp over metadata
 
             $this->worksheet->setCellValue("A$this->rows", $year);
-            $this->worksheet->setCellValue("B$this->rows",(int) $year-1974);
+            $this->worksheet->setCellValue("B$this->rows",(int) $year-Arr::get($this->config, 'meta.birthyear'));
             $this->worksheet->setCellValue("C$this->rows", Arr::get($data, "income.amount"), DataType::TYPE_NUMERIC);
             $this->worksheet->setCellValue("D$this->rows", Arr::get($data, "expence.amount"), DataType::TYPE_NUMERIC);
             $this->worksheet->setCellValue("E$this->rows", Arr::get($data, "mortgage.payment"), DataType::TYPE_NUMERIC);
@@ -87,7 +95,15 @@ class PrognosisAssetSheet2
             $this->worksheet->setCellValue("O$this->rows", Arr::get($data, "asset.amount"), DataType::TYPE_NUMERIC);
             $this->worksheet->setCellValue("P$this->rows", Arr::get($data, "asset.amountLoanDeducted"), DataType::TYPE_NUMERIC);
             $this->worksheet->setCellValue("Q$this->rows", Arr::get($data, "asset.loanPercentage"), DataType::TYPE_NUMERIC);
-            $this->worksheet->setCellValue("R$this->rows", Arr::get($data, "income.description") . Arr::get($data, "expence.description") . Arr::get($data, "asset.description"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("R$this->rows", Arr::get($data, "potential.income"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("S$this->rows", Arr::get($data, "potential.loan"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("T$this->rows", Arr::get($data, "potential.loan") - Arr::get($data, "mortgage.balance"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("U$this->rows", Arr::get($data, "fire.amountIncome"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("V$this->rows", Arr::get($data, "fire.amountExpence"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("W$this->rows", Arr::get($data, "fire.amountDiff"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("X$this->rows", Arr::get($data, "fire.percentDiff"), DataType::TYPE_NUMERIC);
+            $this->worksheet->setCellValue("Y$this->rows", Arr::get($data, "income.description") . Arr::get($data, "expence.description") . Arr::get($data, "asset.description"), DataType::TYPE_NUMERIC);
+
 
             $this->rows++;
         }

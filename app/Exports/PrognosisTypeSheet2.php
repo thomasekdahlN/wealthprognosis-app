@@ -68,7 +68,7 @@ class PrognosisTypeSheet2
         $this->rows = 4;
         for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
             $this->worksheet->setCellValue("A$this->rows",$year);
-            $this->worksheet->setCellValue("B$this->rows",$year-1974); #Må bytte ut med en variabel her
+            $this->worksheet->setCellValue("B$this->rows",$year-Arr::get($this->config, 'meta.birthyear')); #Må bytte ut med en variabel her
 
             #Iterate all groups
             $this->columns = 3;

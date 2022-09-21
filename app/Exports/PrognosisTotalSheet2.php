@@ -46,7 +46,7 @@ class PrognosisTotalSheet2
 
         $this->worksheet->setCellValue('C2',"Total");
         $this->worksheet->setCellValue('N2',"Company");
-        $this->worksheet->setCellValue('Y2',"Private");
+        $this->worksheet->setCellValue('AA2',"Private");
 
         $this->worksheet->setCellValue('A3',"Year");
         $this->worksheet->setCellValue('B3',"Age");
@@ -91,13 +91,19 @@ class PrognosisTotalSheet2
         $this->worksheet->setCellValue('AJ3',"Asset");
         $this->worksheet->setCellValue('AK3',"Asset - lån");
         $this->worksheet->setCellValue('AL3',"Grad");
-
+        $this->worksheet->setCellValue("AM3","Betjeningsevne");
+        $this->worksheet->setCellValue("AN3","Max lån");
+        $this->worksheet->setCellValue("AO3","Evne");
+        $this->worksheet->setCellValue("AP3","FIRE inntekt");
+        $this->worksheet->setCellValue("AQ3","FIRE utgift");
+        $this->worksheet->setCellValue("AR3","FIRE diff");
+        $this->worksheet->setCellValue("AS3","FIRE %");
 
 
         #total
         for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
             $this->worksheet->setCellValue("A$this->rows",$year);
-            $this->worksheet->setCellValue("B$this->rows",$year-1974); #Må bytte ut med en variabel her
+            $this->worksheet->setCellValue("B$this->rows",$year-Arr::get($this->config, 'meta.birthyear')); #Må bytte ut med en variabel her
 
             #Total
             if(isset($this->totalH[$year])) {
@@ -148,6 +154,16 @@ class PrognosisTotalSheet2
                 $this->worksheet->setCellValue("AK$this->rows", Arr::get($this->groupH['private'][$year], "asset.amountLoanDeducted"));
                 if(isset($this->groupH['private'][$year]['asset'])) {
                     $this->worksheet->setCellValue("AL$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.balance") / Arr::get($this->groupH['private'][$year], "asset.amount"));
+                }
+                $this->worksheet->setCellValue("AM$this->rows", Arr::get($this->groupH['private'][$year], "potential.income"));
+                $this->worksheet->setCellValue("AN$this->rows", Arr::get($this->groupH['private'][$year], "potential.loan"));
+                $this->worksheet->setCellValue("AO$this->rows", Arr::get($this->groupH['private'][$year], "potential.loan") - Arr::get($this->groupH['private'][$year], "mortgage.balance"));
+
+                $this->worksheet->setCellValue("AP$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountIncome"));
+                $this->worksheet->setCellValue("AQ$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountExpence"));
+                $this->worksheet->setCellValue("AR$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountDiff"));
+                if(Arr::get($this->groupH['private'][$year], "fire.amountExpence") > 0 ) {
+                    $this->worksheet->setCellValue("AS$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountIncome") / Arr::get($this->groupH['private'][$year], "fire.amountExpence"));
                 }
             }
             $this->rows++;
