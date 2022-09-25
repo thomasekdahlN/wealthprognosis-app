@@ -11,6 +11,7 @@ class PrognosisExport2
     public $configfile;
     public $yearRow = 21;
     public $yearTenRow = 31;
+    public $yearTwentyRow = 41;
 
     public function __construct($configfile, $exportfile)
     {
@@ -41,25 +42,25 @@ class PrognosisExport2
         $sheet->getStyle("C3:$lastcolexcel" . $prognosisTotal->rows)->getNumberFormat()->setFormatCode('#,##');
 
 
-        for ($column = 1; $column <= $prognosisTotal->columns + 5; $column++) {
+        for ($column = 1; $column <= $prognosisTotal->columns + 7; $column++) {
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
         }
 
-        $sheet->getStyle("C3:AR54")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##'); #% styling
+        $sheet->getStyle("C3:AT54")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##'); #% styling
 
         $sheet->getStyle("N4:N54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
         $sheet->getStyle("Z4:Z54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("AL4:AL54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("AS4:AS54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("AN4:AN54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("AU4:AU54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
 
-        $sheet->getStyle('A3:AS3')->getFill()
+        $sheet->getStyle('A3:AV3')->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('CCCCCC');
-        $sheet->getStyle('A3:AS3')->getFont()->setSize(18);
+        $sheet->getStyle('A3:AV3')->getFont()->setSize(18);
 
         #Kolonne header
-        $sheet->getStyle('A3:AS3')->getFill()
+        $sheet->getStyle('A3:AV3')->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('CCCCCC');
 
@@ -88,12 +89,17 @@ class PrognosisExport2
         }
 
         #I år
-        $sheet->getStyle("A$this->yearRow:AS$this->yearRow")->getFill()
+        $sheet->getStyle("A$this->yearRow:AV$this->yearRow")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('BBBBBB');
 
         #Om 10 år
-        $sheet->getStyle("A$this->yearTenRow:AS$this->yearTenRow")->getFill()
+        $sheet->getStyle("A$this->yearTenRow:AV$this->yearTenRow")->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('BBBBBB');
+
+        #Om 20 år
+        $sheet->getStyle("A$this->yearTwentyRow:AV$this->yearTwentyRow")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('BBBBBB');
 
@@ -181,13 +187,13 @@ class PrognosisExport2
             $spreadsheet->setActiveSheetIndexByName($assetname);
             $sheet = $spreadsheet->getActiveSheet();
 
-            $sheet->getStyle("B3:W54")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
+            $sheet->getStyle("B3:X54")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
 
             $sheet->getStyle("F4:F54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
             $sheet->getStyle("J4:J54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
             $sheet->getStyle("L4:L54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-            $sheet->getStyle("Q4:Q54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-            $sheet->getStyle("X4:X54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+            $sheet->getStyle("R4:R54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+            $sheet->getStyle("Y4:Y54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
 
             for ($column = 1; $column <= 20+6; $column++) {
@@ -195,7 +201,7 @@ class PrognosisExport2
             }
 
             #Kolonne header
-            $sheet->getStyle('A3:X3')->getFill()
+            $sheet->getStyle('A3:Z3')->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB('CCCCCC');
 
@@ -215,12 +221,17 @@ class PrognosisExport2
                 ->getStartColor()->setARGB('FFCCCB');
 
             #I år
-            $sheet->getStyle("A$this->yearRow:X$this->yearRow")->getFill()
+            $sheet->getStyle("A$this->yearRow:Z$this->yearRow")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB('BBBBBB');
 
             #Om 10 år
-            $sheet->getStyle("A$this->yearTenRow:X$this->yearTenRow")->getFill()
+            $sheet->getStyle("A$this->yearTenRow:Z$this->yearTenRow")->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('BBBBBB');
+
+            #Om 20 år
+            $sheet->getStyle("A" . $this->yearTwentyRow . ":Z" . $this->yearTwentyRow)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB('BBBBBB');
 

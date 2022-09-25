@@ -44,6 +44,7 @@ class Prognosis
             $PercentTaxableRealization = Arr::get($this->config, "tax." . $taxtype. ".realization", 0) / 100;
             $PercentDeductableYearly = Arr::get($this->config, "tax." . $taxtype. ".yearly", 0) / 100;
             $PercentDeductableRealization = Arr::get($this->config, "tax." . $taxtype. ".realization", 0) / 100;
+            $PercentTaxableFortune = Arr::get($this->config, "tax." . $taxtype. ".fortune", 0) / 100;
 
 
             #print "$assetname: $taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization\n";
@@ -199,12 +200,9 @@ class Prognosis
 
                 $AmountDeductableYearly = 0; #Fratrekk klarer vi først når vi beregner lån
                 $AmountDeductableRealization = 0; #Fratrekk klarer vi først når vi beregner lån
+                $AmountTaxableFortune  = 0; #Den skattemessige formuen. Dvs den formuen det betales formuesskatt av.
                 $AmountTaxableYearly = 0;
                 $AmountTaxableRealization = 0;
-
-                ########################################################################################################
-                #if($income or $expence) {
-
 
                     #Forskjell på hva man betaler skatt av
                     $potentialIncome = 0;
@@ -236,7 +234,7 @@ class Prognosis
                         #$potentialIncome = (($income - $AmountTaxableYearly) / 12) * 10; #Bank beregning, ikke sunn fornuft, ikke med skatt
                         $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
 
-                    } elseif ($taxtype == 'company') {
+                    } elseif ($taxtype == 'stock' || $taxtype == 'fond') {
                         #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
                         $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
                         $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
@@ -250,6 +248,8 @@ class Prognosis
                         $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
                         $potentialIncome = 0;  #For nå antar vi ingen inntekt fra annet enn lønn eller utleie, men utbytte vil også telle.
                     }
+
+                    $AmountTaxableFortune = $assetValue * $PercentTaxableFortune;
                     $restAccumulated += $cashflow;
 
 
@@ -314,6 +314,7 @@ class Prognosis
                     'percentTaxableRealization' => $PercentTaxableRealization,
                     'amountDeductableRealization' => -$AmountDeductableRealization,
                     'percentDeductableRealization' => $PercentDeductableRealization,
+                    'amountFortune' => $AmountTaxableFortune
                 ];
 
                 #print "i:$income - e:$expence, rest: $rest, restAccumulated: $restAccumulated\n";
@@ -403,6 +404,7 @@ class Prognosis
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountTaxableRealization");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountDeductableYearly");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountDeductableRealization");
+                $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountFortune");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "cashflow.amount");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "cashflow.amountAccumulated");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.payment");

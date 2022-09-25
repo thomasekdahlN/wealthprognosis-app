@@ -21,7 +21,7 @@ class PrognosisTotalSheet2
     public $periodEnd;
     public static $letters = array(1 => "A", 2 => "B", 3=> "C", 4 => "D", 5 => "E", 6 => "F", 7 => "G", 8=> "H", 9=> "I", 10 => "J", 11 =>"K", 12 => "L", 13 => "M", 14 => "N", 15=> "O", 16 => "P", 17 => "Q", 18 => "R", 19 => "S", 20 => "T", 21 => "U", 22 => "V", 23 => "W", 24 => "X", 25 => "Y", 26 => "Z");
 
-    public $columns = 39;
+    public $columns = 41;
     public $rows = 4;
     public $groups = 3;
 
@@ -86,18 +86,21 @@ class PrognosisTotalSheet2
         $this->worksheet->setCellValue("AE3","Avdrag");
         $this->worksheet->setCellValue("AF3","Rest");
         $this->worksheet->setCellValue('AG3',"Skatt");
-        $this->worksheet->setCellValue('AH3',"Fradrag");
-        $this->worksheet->setCellValue('AI3',"Cashflow");
-        $this->worksheet->setCellValue('AJ3',"Asset");
-        $this->worksheet->setCellValue('AK3',"Asset - lån");
-        $this->worksheet->setCellValue('AL3',"Grad");
-        $this->worksheet->setCellValue("AM3","Betjeningsevne");
-        $this->worksheet->setCellValue("AN3","Max lån");
-        $this->worksheet->setCellValue("AO3","Evne");
-        $this->worksheet->setCellValue("AP3","FIRE inntekt");
-        $this->worksheet->setCellValue("AQ3","FIRE utgift");
-        $this->worksheet->setCellValue("AR3","FIRE diff");
-        $this->worksheet->setCellValue("AS3","FIRE %");
+        $this->worksheet->setCellValue('AH3',"Formues Skatt");
+        $this->worksheet->setCellValue('AI3',"Fradrag");
+        $this->worksheet->setCellValue('AJ3',"Cashflow");
+        $this->worksheet->setCellValue('AK3',"Asset");
+        $this->worksheet->setCellValue('AL3',"Skattbar formue");
+        $this->worksheet->setCellValue('AM3',"Asset - lån");
+        $this->worksheet->setCellValue('AN3',"Grad");
+        $this->worksheet->setCellValue("AO3","Betjeningsevne");
+        $this->worksheet->setCellValue("AP3","Max lån");
+        $this->worksheet->setCellValue("AQ3","Evne");
+        $this->worksheet->setCellValue("AR3","FIRE inntekt");
+        $this->worksheet->setCellValue("AS3","FIRE utgift");
+        $this->worksheet->setCellValue("AT3","FIRE diff");
+        $this->worksheet->setCellValue("AU3","FIRE %");
+        $this->worksheet->setCellValue("AV3","KPI");
 
 
         #total
@@ -148,27 +151,36 @@ class PrognosisTotalSheet2
                 $this->worksheet->setCellValue("AE$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.principal"));
                 $this->worksheet->setCellValue("AF$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.balance"));
                 $this->worksheet->setCellValue("AG$this->rows", Arr::get($this->groupH['private'][$year], "tax.amountTaxableYearly"));
-                $this->worksheet->setCellValue("AH$this->rows", Arr::get($this->groupH['private'][$year], "tax.amountDeductableYearly"));
-                $this->worksheet->setCellValue("AI$this->rows", Arr::get($this->groupH['private'][$year], "cashflow.amount"));
-                $this->worksheet->setCellValue("AJ$this->rows", Arr::get($this->groupH['private'][$year], "asset.amount"));
-                $this->worksheet->setCellValue("AK$this->rows", Arr::get($this->groupH['private'][$year], "asset.amountLoanDeducted"));
+                $this->worksheet->setCellValue("AH$this->rows", $this->fortuneTax(Arr::get($this->groupH['private'][$year], "tax.amountFortune")));
+                $this->worksheet->setCellValue("AI$this->rows", Arr::get($this->groupH['private'][$year], "tax.amountDeductableYearly"));
+                $this->worksheet->setCellValue("AJ$this->rows", Arr::get($this->groupH['private'][$year], "cashflow.amount"));
+                $this->worksheet->setCellValue("AK$this->rows", Arr::get($this->groupH['private'][$year], "asset.amount"));
+                $this->worksheet->setCellValue("AL$this->rows", Arr::get($this->groupH['private'][$year], "tax.amountFortune"));
+                $this->worksheet->setCellValue("AM$this->rows", Arr::get($this->groupH['private'][$year], "asset.amountLoanDeducted"));
                 if(isset($this->groupH['private'][$year]['asset'])) {
-                    $this->worksheet->setCellValue("AL$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.balance") / Arr::get($this->groupH['private'][$year], "asset.amount"));
+                    $this->worksheet->setCellValue("AN$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.balance") / Arr::get($this->groupH['private'][$year], "asset.amount"));
                 }
-                $this->worksheet->setCellValue("AM$this->rows", Arr::get($this->groupH['private'][$year], "potential.income"));
-                $this->worksheet->setCellValue("AN$this->rows", Arr::get($this->groupH['private'][$year], "potential.loan"));
-                $this->worksheet->setCellValue("AO$this->rows", Arr::get($this->groupH['private'][$year], "potential.loan") - Arr::get($this->groupH['private'][$year], "mortgage.balance"));
+                $this->worksheet->setCellValue("AO$this->rows", Arr::get($this->groupH['private'][$year], "potential.income"));
+                $this->worksheet->setCellValue("AP$this->rows", Arr::get($this->groupH['private'][$year], "potential.loan"));
+                $this->worksheet->setCellValue("AQ$this->rows", Arr::get($this->groupH['private'][$year], "potential.loan") - Arr::get($this->groupH['private'][$year], "mortgage.balance"));
 
-                $this->worksheet->setCellValue("AP$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountIncome"));
-                $this->worksheet->setCellValue("AQ$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountExpence"));
-                $this->worksheet->setCellValue("AR$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountDiff"));
+                $this->worksheet->setCellValue("AR$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountIncome"));
+                $this->worksheet->setCellValue("AS$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountExpence"));
+                $this->worksheet->setCellValue("AT$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountDiff"));
                 if(Arr::get($this->groupH['private'][$year], "fire.amountExpence") > 0 ) {
-                    $this->worksheet->setCellValue("AS$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountIncome") / Arr::get($this->groupH['private'][$year], "fire.amountExpence"));
+                    $this->worksheet->setCellValue("AU$this->rows", Arr::get($this->groupH['private'][$year], "fire.amountIncome") / Arr::get($this->groupH['private'][$year], "fire.amountExpence"));
                 }
+                $this->worksheet->setCellValue("AV$this->rows", Arr::get($this->groupH['private'][$year], "kpi.amount"));
             }
             $this->rows++;
         }
         $this->rows--;
+    }
+
+    public static function fortuneTax($amount) {
+        $tax = ($amount - 1700000) * 0.0095; #This hardcoding should be configurable pr year. https://www.skatteetaten.no/satser/formuesskatt/?year=2022#rateShowYear
+        if($tax < 0) { $tax = 0;}
+        return $tax;
     }
 
     /**

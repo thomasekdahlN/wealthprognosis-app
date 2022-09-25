@@ -2,39 +2,70 @@
     "meta": {
         "name": "John Doe",
         "birthyear": "1975",
-        "prognoseyear": "2032"
+        "prognoseyear": "2032",
+        "pensionyear": "2037"
     },
     "period": {
         "start": 2005,
         "end": 2055
     },
     "tax": {
-        "rental": {
-            "yearly": 22,
-            "realization": 22
-        },
-        "company": {
-            "yearly": 0,
-            "realization": 35.6
-        },
-        "salary": {
-            "yearly": 46,
-            "realization": 0
-        },
         "house": {
             "yearly": 0,
-            "realization": 22
+            "realization": 22,
+            "fortune": 25
+        },
+        "cabin": {
+            "yearly": 0,
+            "realization": 22,
+            "fortune": 25
+        },
+        "rental": {
+            "yearly": 22,
+            "realization": 22,
+            "fortune": 95
+        },
+        "stock": {
+            "yearly": 35.6,
+            "realization": 35.6,
+            "fortune": 75
+        },
+        "salary": {
+            "yearly": 50,
+            "realization": 0,
+            "fortune": 0
         },
         "fond": {
             "yearly": 22,
-            "realization": 35.6
+            "realization": 35.6,
+            "fortune": 75
+        },
+        "inheritance": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 100
+        },
+        "fortune": {
+            "yearly": 0.95,
+            "realization": 0,
+            "fortune": 100
+        },
+        "car": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 100
+        },
+        "boat": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 100
         }
     },
     "changerates": {
         "kpi" : 3.5,
         "crypto" : 8,
-        "fond" : 6,
-        "company": 15,
+        "fond" : 5,
+        "stock": 15,
         "cash" : 1,
         "house" : 5,
         "interest" : 4.5
@@ -93,7 +124,7 @@
                 "name": "My Crypto",
                 "description": "Coinbase private",
                 "active": true,
-                "tax": "private"
+                "tax": "cash"
             },
             "value": {
                 "2022": {
@@ -104,14 +135,14 @@
                 }
             }
         },
-        "nordnet": {
+        "fond": {
             "meta" : {
                 "type": "fond",
                 "group": "private",
-                "name": "Nordnet Privat",
+                "name": "fond privat",
                 "description": "",
                 "active": true,
-                "tax": "private"
+                "tax": "fond"
             },
             "value": {
                 "2022": {
@@ -147,7 +178,7 @@
                 "name": "Avensis",
                 "description": "",
                 "active": true,
-                "tax": "wealth"
+                "tax": "car"
             },
             "value": {
                 "2020": {
@@ -174,7 +205,7 @@
                 "name": "Boat",
                 "description": "",
                 "active": true,
-                "tax": "wealth"
+                "tax": "boat"
             },
             "value": {
                 "2022": {
@@ -201,7 +232,7 @@
                 "name": "KLP fond",
                 "description": "",
                 "active": true,
-                "tax": "company"
+                "tax": "fond"
             },
             "value": {
                 "2022": {
@@ -219,7 +250,7 @@
                 "name": "Company AS",
                 "description": "I own stocks here",
                 "active": true,
-                "tax": "company"
+                "tax": "stock"
             },
             "value": {
                 "2022": {
@@ -235,15 +266,15 @@
                 "type": "salary",
                 "group": "private",
                 "name": "Salary",
-                "description": "My Salary",
+                "description": "Salary",
                 "active": true,
                 "tax": "salary"
             },
             "income": {
                 "2022": {
                     "name": "Salary",
-                    "description": "My monthly salary",
-                    "value": 35000,
+                    "description": "Salary",
+                    "value": 40000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
@@ -251,9 +282,65 @@
             "expence": {
                 "2022": {
                     "name": "Expences",
-                    "description": "My monthly expences - not including house, car and boat",
-                    "value": 10000,
+                    "description": "",
+                    "value": 15000,
                     "changerate": "changerates.kpi",
+                    "repeat": true
+                }
+            }
+        },
+        "arv": {
+            "meta": {
+                "type": "inheritance",
+                "group": "private",
+                "name": "inheritance",
+                "description": "inheritance",
+                "active": false,
+                "tax": "inheritance"
+            },
+            "value": {
+                "2037": {
+                    "name": "inheritance",
+                    "description": "",
+                    "value": 1000000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                }
+            }
+        },
+        "folketrygden": {
+            "meta": {
+                "type": "pension",
+                "group": "private",
+                "name": "Folketrygden",
+                "description": "Folketrygden",
+                "active": true,
+                "tax": "salary"
+            },
+            "income": {
+                "2037": {
+                    "name": "Folketrygden",
+                    "description": "Folketrygden",
+                    "value": 15000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                }
+            }
+        },
+        "otp": {
+            "meta" : {
+                "type": "pension",
+                "group": "private",
+                "name": "OTP",
+                "description": "OTP",
+                "active": true,
+                "tax": "otp"
+            },
+            "value": {
+                "2022": {
+                    "value": 1000000,
+                    "changerate": "changerates.fond",
+                    "description": "",
                     "repeat": true
                 }
             }
