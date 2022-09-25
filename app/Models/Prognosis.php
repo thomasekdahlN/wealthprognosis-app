@@ -27,12 +27,40 @@ class Prognosis
     public $companyH = array();
 
 
+    public function test() {
+
+        #Just for testing
+        $prevValue = 1000;
+        $thisValue = "-50%";
+        $thisValue = "+50%";
+        $thisValue = "100";
+        $thisValue = "+100";
+        $thisValue = "-100";
+        $thisValue = "+1/10";
+        #$thisValue = "-1/10";
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+        list($prevValue, $thisValue) = $this->valueAdjustment($prevValue, $thisValue);
+
+    }
+
     public function __construct($config)
     {
+
+        #$this->test();
         $this->config = $config;
 
         $this->periodStart = (integer) Arr::get($this->config, 'period.start');
         $this->periodEnd  = (integer) Arr::get($this->config, 'period.end');
+
 
         foreach(Arr::get($this->config, 'assets') as $assetname => $asset) {
 
@@ -49,29 +77,24 @@ class Prognosis
 
             #print "$assetname: $taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization\n";
 
-            $assetValue = 0;
             $firstAssetValue = 0;
             $prevAssetValue = 0;
-            $assetChangerate = 1;
+            $prevAssetRule = null;
             $prevAssetChangerate = 1;
             $prevAssetRepeat = false;
-            $assetRepeat = false;
 
             $income = 0;
             $prevIncome = 0;
-            $incomeChangerate = 1;
             $prevIncomeChangerate = 1;
+            $prevIncomeRule = null;
             $prevIncomeRepeat = false;
-            $incomeRepeat = false;
 
             $expence = 0;
             $prevExpence = 0;
-            $expenceChangerate = 1;
             $prevExpenceChangerate = 1;
+            $prevExpenceRule = null;
             $prevExpenceRepeat = false;
-            $expenceRepeat = false;
 
-            $rest = 0;
             $restAccumulated = 0;
 
             #dd($this->config['changerates']);
@@ -98,18 +121,8 @@ class Prognosis
                 }
 
                 $expenceThis = Arr::get($asset, "expence.$year.value", null) * 12; #Expence is added as a monthly repeat in config
-                if($expenceThis == null) {
-                    #Set it to the previous value
-                    $expence = $prevExpence;
-                } elseif($expenceThis < 0) {
-                    #We subtract this value relatively, since it is negative we add it to subtract;-)
-                    #print "## $expence += $expenceThis\n";
-                    $expence += $expenceThis ;
-                    #print "** $expence += $expenceThis\n";
 
-                } else {
-                    $expence = $expenceThis; #Set it to the given value
-                }
+                #list($expence, $prevExpenceRule) = $this->valueAdjustment($prevExpence, $expenceThis, $prevExpenceRule);
 
                 $this->dataH[$assetname][$year]['expence'] = [
                     'changerate' => $expenceChangerate,
@@ -121,7 +134,7 @@ class Prognosis
 
                 #####################################################
                 #income
-                $incomeRepeat = Arr::get($asset, "income.$year.repeat", 1);
+                $incomeRepeat = Arr::get($asset, "income.$year.repeat", null);
                 if(isset($incomeRepeat)) {
                     $prevIncomeRepeat = $incomeRepeat;
                 } else {
@@ -136,17 +149,8 @@ class Prognosis
                 }
 
                 $incomeThis = Arr::get($asset, "income.$year.value", null) * 12; #Income is added as a monthly repeat in config
-                if($incomeThis == null) {
-                    #Set it to the previous value
-                    $income = $prevIncome;
-                } elseif($incomeThis < 0) {
-                    #We subtract this value relatively, since it is negative we add it to subtract;-)
-                    print "## $income += $incomeThis\n";
-                    $income += $incomeThis ;
-                    print "** $income += $incomeThis\n";
-                } else {
-                    $income = $incomeThis; #Set it to the given value
-                }
+
+                #list($income, $prevIncomeRule) = $this->valueAdjustment($prevIncome, $incomeThis, $prevIncomeRule);
 
                 $this->dataH[$assetname][$year]['income'] = [
                     'changerate' => $incomeChangerate,
@@ -171,31 +175,15 @@ class Prognosis
                 }
 
                 $assetThis = Arr::get($asset, "value.$year.value", null); #Income is added as a monthly repeat in config
-                if($assetThis == null) {
-                    #Set it to the previous value
-                    $assetValue = $prevAssetValue;
-                } elseif($assetThis < 0) {
-                    #We subtract this value relatively, since it is negative we add it to subtract;-)
-                    print "## $assetValue += $assetThis\n";
-                    $assetValue += $assetThis ;
-                    print "** $assetValue += $assetThis\n";
-                } else {
-                    $assetValue = $assetThis; #Set it to the given value
-                    if(!$firstAssetValue) {
-                        $firstAssetValue = $assetValue; #Remember the first assetvalue, used for tax calculations on realization
-                    }
-                }
 
-                #print "$assetValue = $prevAssetValue = $assetValue * $assetChangerate\n";
+                list($assetValue, $prevAssetValue, $prevAssetRule) = $this->valueAdjustment($prevAssetValue, $assetThis, $prevAssetRule);
 
-                #print_r(Arr::get($asset, "assets.0.value.$year"));
-                #exit;
-                   $this->dataH[$assetname][$year]['asset'] = [
-                        'amount' => $assetValue,
-                        'amountLoanDeducted' => $assetValue,
-                        'changerate' => $assetChangerate,
-                        'description' => Arr::get($asset, "value.$year.description"),
-                    ];
+               $this->dataH[$assetname][$year]['asset'] = [
+                    'amount' => $assetValue,
+                    'amountLoanDeducted' => $assetValue,
+                    'changerate' => $assetChangerate,
+                    'description' => Arr::get($asset, "value.$year.description") . " Asset rule " . $prevAssetRule,
+                ];
 
 
                 $AmountDeductableYearly = 0; #Fratrekk klarer vi først når vi beregner lån
@@ -323,21 +311,21 @@ class Prognosis
 
                 ########################################################################################################
                 if($expenceRepeat) {
-                    $expence    = $prevExpence      = $expence * $expenceChangerate;
+                    $prevExpence      = $expence * $expenceChangerate;
                 } else {
-                    $expence    = $prevExpence      = null;
+                    $prevExpence      = null;
                 }
 
                 if($incomeRepeat) {
-                    $income     = $prevIncome       = $income * $incomeChangerate;
+                    $prevIncome       = $income * $incomeChangerate;
                 } else {
-                    $income     = $prevIncome       = null;
+                    $prevIncome       = null;
                 }
 
                 if($assetRepeat) {
-                    $assetValue = $prevAssetValue   = $assetValue * $assetChangerate;
+                    $prevAssetValue   = $assetValue * $assetChangerate;
                 } else {
-                    $assetValue = $prevAssetValue   = null;
+                    $prevAssetValue   = null;
                 }
             }
 
@@ -388,6 +376,81 @@ class Prognosis
         } else {
             return 0; #We need zero in return for tests to be correct, if we found no value
         }
+    }
+
+        /**
+        -- "1000" - Value is set to 1000.
+        -- "+10%" - Adds 10% to value (Supported now, but syntax : 10)
+        -- "+1000" - Adds 1000 to value
+        -- "-10%" - Subtracts 10% from value
+        -- "-1000" - Subtracts 1000 from value (Supported now - same syntax)
+        -- =+1/10" - Adds 1 tenth of the amount yearly
+        -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10
+         */
+    public function valueAdjustment($prevValue, $thisValue, $rule = NULL){
+        #Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor has memory for now.
+        $value = null;
+        $match = null;
+
+        #print "INNKOMMENDE: PV: $prevValue, TV: $thisValue, rule: $rule\n";
+
+        if($rule){
+            if(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+                #Divison ex 1/12
+                list($value, $rule, $match) = $this->divisor($prevValue, $matches);
+            }
+        }
+        elseif($thisValue == null) {
+            #Set it to the previous value
+            $value = $prevValue;
+            $match = "Previous value";
+        } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
+            #Percentages
+            if($matches[1][0] == '-') {
+                $value = $prevValue * ((-$matches[2][0] / 100) + 1);
+            } else {
+                $value = $prevValue * (($matches[2][0] / 100) + 1);
+            }
+            $match = "Percent";
+        } elseif(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)){
+            #Divison ex 1/12
+            list($value, $rule, $match) = $this->divisor($prevValue, $matches);
+
+        } elseif(preg_match('/(\+|\-)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
+            #number that starts with + or - (to be added or subtracted
+            $value = $prevValue + $thisValue; #Should fix both + and -
+            $match = "Adding or subtracting a number";
+
+        }
+
+        #A normal value will override all logic from earlier years, also rules and divisors. A normal number is a number without leading + or -, it will just be set to the number
+        if(is_numeric($thisValue) && !preg_match('/(\+|\-)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)){
+            #Its a normal number
+            $match = "Fixed number override";
+            $value = $thisValue; #Set it to the given value
+        }
+
+        #print "PV: $prevValue, TV: $thisValue,  value: $value = rule: $rule - match: $match\n";
+
+        return [$value, $prevValue, $rule]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
+    }
+
+    public function divisor($prevValue, $matches) {
+
+        $rule = null;
+
+        if($matches[1][0] == '-') {
+            $value = $prevValue - ($prevValue / $matches[3][0]);
+        } else {
+            $value = $prevValue + ($prevValue / $matches[3][0]);
+        }
+        $matches[3][0]--; #We reduce the divisor each time we run it, so its the same as the remaining runs.
+        if($matches[3][0] > 0) {
+            $rule = $matches[1][0] . $matches[2][0] . "/" . $matches[3][0];
+        }
+        $match = "Divisor";
+
+        return [$value, $rule, $match];
     }
 
     function group() {

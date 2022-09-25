@@ -25,10 +25,11 @@ Estimates your max loan capasity from banks.
 
 On the wishlist:
 - Support for more sophisticated dynamics in income/expence/asset - 
--- "+10%" - Adds 10% to value
+-- "1000" - Value is set to 1000.
+-- "+10%" - Adds 10% to value (Supported now, but syntax : 10)
 -- "+1000" - Adds 1000 to value
 -- "-10%" - Subtracts 10% from value
--- "-1000" - Subtracts 1000 from value
+-- "-1000" - Subtracts 1000 from value (Supported now - same syntax)
 -- =+1/10" - Adds 1 tenth of the amount yearly
 -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10 years. Lile 1/10 first year, 1/9 next year, 1/8 the year after and the last year 1/1.
 - Mortage calculation supporting extra downpayments each year (Need help here)

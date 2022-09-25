@@ -121,7 +121,7 @@ class PrognosisTotalSheet2
                 $this->worksheet->setCellValue("K$this->rows", Arr::get($this->totalH[$year], "cashflow.amount"));
                 $this->worksheet->setCellValue("L$this->rows", Arr::get($this->totalH[$year], "asset.amount"));
                 $this->worksheet->setCellValue("M$this->rows", Arr::get($this->totalH[$year], "asset.amountLoanDeducted"));
-                if (isset($this->totalH[$year]['asset'])) {
+                if (isset($this->totalH[$year]['asset']) && Arr::get($this->totalH[$year], "asset.amount") > 0) {
                    $this->worksheet->setCellValue("N$this->rows", Arr::get($this->totalH[$year], "mortgage.balance") / Arr::get($this->totalH[$year], "asset.amount"));
                 }
             }
@@ -157,7 +157,7 @@ class PrognosisTotalSheet2
                 $this->worksheet->setCellValue("AK$this->rows", Arr::get($this->groupH['private'][$year], "asset.amount"));
                 $this->worksheet->setCellValue("AL$this->rows", Arr::get($this->groupH['private'][$year], "tax.amountFortune"));
                 $this->worksheet->setCellValue("AM$this->rows", Arr::get($this->groupH['private'][$year], "asset.amountLoanDeducted"));
-                if(isset($this->groupH['private'][$year]['asset'])) {
+                if(isset($this->groupH['private'][$year]['asset']) && Arr::get($this->groupH['private'][$year], "asset.amount") > 0) {
                     $this->worksheet->setCellValue("AN$this->rows", Arr::get($this->groupH['private'][$year], "mortgage.balance") / Arr::get($this->groupH['private'][$year], "asset.amount"));
                 }
                 $this->worksheet->setCellValue("AO$this->rows", Arr::get($this->groupH['private'][$year], "potential.income"));

@@ -117,6 +117,8 @@ class Amortization extends Model
                 }
                 if(isset($this->dataH[$this->assettname][$year]['asset'])) {
                     $this->dataH[$this->assettname][$year]['asset']['amountLoanDeducted'] -= $this->balance;  #Cashflow accumulated må reberegnes til slutt???
+                }
+                if($this->dataH[$this->assettname][$year]['asset']['amount'] > 0) {
                     $this->dataH[$this->assettname][$year]['asset']['loanPercentage'] = $this->balance / $this->dataH[$this->assettname][$year]['asset']['amount'];  #Cashflow accumulated må reberegnes til slutt???
                 }
 

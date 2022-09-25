@@ -3,7 +3,8 @@
         "name": "John Doe",
         "birthyear": "1975",
         "prognoseyear": "2032",
-        "pensionyear": "2037"
+        "pensionyear": "2037",
+        "deathyear": "2047"
     },
     "period": {
         "start": 2005,
@@ -68,6 +69,10 @@
         "stock": 15,
         "cash" : 1,
         "house" : 5,
+        "rental" : 5,
+        "cabin" : 5,
+        "car" : -5,
+        "boat" : -5,
         "interest" : 4.5
     },
     "assets": {
@@ -85,6 +90,12 @@
                     "value": 3000000,
                     "changerate": "changerates.house",
                     "description": "Bought the house",
+                    "repeat": true
+                },
+                "2023": {
+                    "value": "-1/3",
+                    "changerate": "changerates.house",
+                    "description": "Selling part of the house",
                     "repeat": true
                 }
             },
@@ -123,7 +134,7 @@
                 "group": "private",
                 "name": "My Crypto",
                 "description": "Coinbase private",
-                "active": true,
+                "active": false,
                 "tax": "cash"
             },
             "value": {
@@ -141,7 +152,7 @@
                 "group": "private",
                 "name": "fond privat",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "fond"
             },
             "value": {
@@ -159,7 +170,7 @@
                 "group": "private",
                 "name": "Cash",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "cash"
             },
             "value": {
@@ -177,7 +188,7 @@
                 "group": "private",
                 "name": "Avensis",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "car"
             },
             "value": {
@@ -204,7 +215,7 @@
                 "group": "private",
                 "name": "Boat",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "boat"
             },
             "value": {
@@ -231,7 +242,7 @@
                 "group": "company",
                 "name": "KLP fond",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "fond"
             },
             "value": {
@@ -249,7 +260,7 @@
                 "group": "company",
                 "name": "Company AS",
                 "description": "I own stocks here",
-                "active": true,
+                "active": false,
                 "tax": "stock"
             },
             "value": {
@@ -267,7 +278,7 @@
                 "group": "private",
                 "name": "Salary",
                 "description": "Salary",
-                "active": true,
+                "active": false,
                 "tax": "salary"
             },
             "income": {
@@ -314,7 +325,7 @@
                 "group": "private",
                 "name": "Folketrygden",
                 "description": "Folketrygden",
-                "active": true,
+                "active": false,
                 "tax": "salary"
             },
             "income": {
@@ -333,7 +344,7 @@
                 "group": "private",
                 "name": "OTP",
                 "description": "OTP",
-                "active": true,
+                "active": false,
                 "tax": "otp"
             },
             "value": {
