@@ -2,6 +2,8 @@
 
 Predicts your economic future and wealth taking into consideration all known parameters, and calculates it for yearly as long as you wish
 
+Note: This is just a hack and is not production ready.
+
 How to run
 php artisan ReadFile2 example.json example.xlsx
 
@@ -10,6 +12,7 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 Supports % changerates on expences, income and asset values
 Supports mortage calculations and new mortages taking over for a previous mortage
 Support incrementell decrease of income / expence / asset (using negative amount as input)
+Supports calculation of fortune tax in norway (but not adding it to expences)
 Calculates all values for all assets
 Groups assets into groups for group overview
 Groups assets into total, company and private for a total overview of your economic future
@@ -18,9 +21,16 @@ Estimates your max loan capasity from banks.
 - FIRE income = income + 4%asset value + deductable taxes
 - FIRE expence = expence + mortgage + taxable taxes
 - FIRE diff = FIRE income - FIRE expence amount
-- FIRE % = FIRE income / FIRE expence = How close you are to fire 
+- FIRE % = FIRE income / FIRE expence = How close you are to fire
 
 On the wishlist:
+- Support for more sophisticated dynamics in income/expence/asset - 
+-- "+10%" - Adds 10% to value
+-- "+1000" - Adds 1000 to value
+-- "-10%" - Subtracts 10% from value
+-- "-1000" - Subtracts 1000 from value
+-- =+1/10" - Adds 1 tenth of the amount yearly
+-- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10 years. Lile 1/10 first year, 1/9 next year, 1/8 the year after and the last year 1/1.
 - Mortage calculation supporting extra downpayments each year (Need help here)
 - Configurable transfer of cash flow in % between assets (and mortages)
 - Support incremental amount addition of expences/income (not only %)
@@ -29,6 +39,8 @@ On the wishlist:
 - Central changerates configured pr year to make curve predictions
 - Retrieving asset values from API, like Crypto/Fond/stocks
 - FIRE asset usage is not deducted from the asset value, it probably should.
+- Fortune tax is not added to expences for the year calculated.
+- Refactoring and cleanup of code.
 
 {
 "meta": {
