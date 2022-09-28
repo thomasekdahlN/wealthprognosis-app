@@ -2,6 +2,8 @@
 namespace App\Exports;
 
 use App\Models\Prognosis;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -9,13 +11,31 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class PrognosisExport2
 {
     public $configfile;
-    public $yearRow = 21;
-    public $yearTenRow = 31;
-    public $yearTwentyRow = 41;
+    public $config;
+    public $birthYear;
+    public $economyStartYear;
+    public $thisYear;
+    public $prognoseYear;
+    public $pensionYear;
+    public $deathYear;
+
+
+    public $birthRowColor = 'BBBBBB';
+    public $economyStartRowColor = 'BBBBBB';
+    public $thisYearRowColor = '32CD32';
+    public $prognoseYearRowColor = '7FFFD4';
+    public $pensionYearRowColor = 'FFA500';
+    public $deathYearRowColor = 'FFCCCB';
+    public $incomeColor = '90EE90';
+    public $expenceColor = 'FFCCCB';
+    public $cashflowColor = 'ADD8E6';
+
 
     public function __construct($configfile, $exportfile)
     {
         $this->configfile = $configfile;
+
+
         $spreadsheet = new Spreadsheet();
 
         $spreadsheet->getProperties()
@@ -32,6 +52,27 @@ class PrognosisExport2
         $spreadsheet->removeSheetByIndex(0); //Siden jeg ikke klarte å navne det første
         $this->config = json_decode(file_get_contents($configfile), true);
 
+        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthyear');
+        $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
+        $this->thisYear  = now()->year;
+        $this->prognoseYear  = (integer) Arr::get($this->config, 'meta.prognoseYear');
+        $this->pensionYear  = (integer) Arr::get($this->config, 'meta.pensionYear');
+        $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
+        $this->pensionYears = $this->deathYear - $this->pensionYear; #The number of years you vil live with pension, used i divisor calculations
+        $this->leftYears = $this->deathYear - $this->thisYear; #The number of years until you die, used i divisor calculations
+        $this->untilPensionYears = $this->pensionYear - $this->thisYear; #The number of years until pension, used i divisor calculations
+
+        #Variable replacement before start
+        $content = str_replace(
+            array('$birthYear','$economyStartYear','$thisYear','$prognoseYear', '$pensionYear','$deathYear', '$pensionYears','$leftYears','$untilPensionYears'), # use '  not " here!!!
+            array($this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionYear, $this->deathYear, $this->pensionYears, $this->leftYears, $this->untilPensionYears),
+            file_get_contents($configfile));
+
+        #print $content;
+
+        $this->config = json_decode($content, true);
+
+
         $prognosis = (new Prognosis($this->config));
 
         $prognosisTotal = new PrognosisTotalSheet2($spreadsheet, $this->config, $prognosis->totalH, $prognosis->groupH);
@@ -46,12 +87,12 @@ class PrognosisExport2
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
         }
 
-        $sheet->getStyle("C3:AT54")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##'); #% styling
+        $sheet->getStyle("C3:AT71")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##'); #% styling
 
-        $sheet->getStyle("N4:N54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("Z4:Z54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("AN4:AN54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("AU4:AU54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("N4:N71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("Z4:Z71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("AN4:AN71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("AU4:AU71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
 
         $sheet->getStyle('A3:AV3')->getFill()
@@ -69,39 +110,49 @@ class PrognosisExport2
             #Inntekt
             $colexcel = $prognosisTotal->convertNumberToExcelCol($groupstart);
 
+            #Income
             $sheet->getStyle($colexcel . "4:$colexcel" . $prognosisTotal->rows)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('90EE90');
+                ->getStartColor()->setARGB($this->incomeColor);
 
             #Utgift
             $colexcel = $prognosisTotal->convertNumberToExcelCol($groupstart + 1);
             $sheet->getStyle($colexcel . "4:$colexcel". $prognosisTotal->rows)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('FFCCCB');
+                ->getStartColor()->setARGB($this->expenceColor);
 
             #cashflow blå
             $colexcel = $prognosisTotal->convertNumberToExcelCol($groupstart + 8);
             $sheet->getStyle($colexcel . "4:$colexcel". $prognosisTotal->rows)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('ADD8E6');
+                ->getStartColor()->setARGB($this->cashflowColor);
 
             $groupstart += 12;
         }
 
         #I år
-        $sheet->getStyle("A$this->yearRow:AV$this->yearRow")->getFill()
+        $row = $this->thisYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:AV$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('BBBBBB');
+            ->getStartColor()->setARGB($this->thisYearRowColor);
 
-        #Om 10 år
-        $sheet->getStyle("A$this->yearTenRow:AV$this->yearTenRow")->getFill()
+        #Prognose
+        $row = $this->prognoseYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:AV$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('BBBBBB');
+            ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
-        #Om 20 år
-        $sheet->getStyle("A$this->yearTwentyRow:AV$this->yearTwentyRow")->getFill()
+        #Pension
+        $row = $this->pensionYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:AV$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('BBBBBB');
+            ->getStartColor()->setARGB($this->pensionYearRowColor);
+
+        #Death
+        $row = $this->deathYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:AV$row")->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->deathYearRowColor);
 
         ##########################################################################################
         $prognosisGroup = new PrognosisTypeSheet2($spreadsheet, $this->config, $prognosis->groupH);
@@ -134,21 +185,22 @@ class PrognosisExport2
 
             $sheet->getStyle("E3:E50")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##'); #% styling
 
+            #Income
             $sheet->getStyle($colexcel . "4:$colexcel" . $prognosisGroup->rows)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('90EE90');
+                ->getStartColor()->setARGB($this->incomeColor);
 
             #Utgift
             $colexcel = $prognosisGroup->convertNumberToExcelCol($groupstart + 1);
             $sheet->getStyle($colexcel . "4:$colexcel". $prognosisGroup->rows)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('FFCCCB');
+                ->getStartColor()->setARGB($this->expenceColor);
 
             #cashflow blå
             $colexcel = $prognosisGroup->convertNumberToExcelCol($groupstart + 4);
             $sheet->getStyle($colexcel . "4:$colexcel". $prognosisGroup->rows)->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('ADD8E6');
+                ->getStartColor()->setARGB($this->cashflowColor);
 
 
             $colexcel = $prognosisGroup->convertNumberToExcelCol($groupstart +2);
@@ -168,14 +220,28 @@ class PrognosisExport2
         }
 
         #I år
-        $sheet->getStyle("A$this->yearRow:" . $lastcolexcel . $this->yearRow)->getFill()
+        $row = $this->thisYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:" . $lastcolexcel . $row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('BBBBBB');
+            ->getStartColor()->setARGB($this->thisYearRowColor);
 
-        #Om 10 år
-        $sheet->getStyle("A$this->yearTenRow:" . $lastcolexcel . $this->yearTenRow)->getFill()
+        #Prognose
+        $row = $this->prognoseYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:" . $lastcolexcel . $row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('BBBBBB');
+            ->getStartColor()->setARGB($this->prognoseYearRowColor);
+
+        #Pension
+        $row = $this->pensionYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:" . $lastcolexcel . $row)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->pensionYearRowColor);
+
+        #Death
+        $row = $this->deathYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:" . $lastcolexcel . $row)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->deathYearRowColor);
 
         ######################################################################
         foreach($prognosis->dataH as $assetname => $asset) {
@@ -187,13 +253,13 @@ class PrognosisExport2
             $spreadsheet->setActiveSheetIndexByName($assetname);
             $sheet = $spreadsheet->getActiveSheet();
 
-            $sheet->getStyle("B3:X54")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
+            $sheet->getStyle("B3:X71")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
 
-            $sheet->getStyle("F4:F54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-            $sheet->getStyle("J4:J54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-            $sheet->getStyle("L4:L54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-            $sheet->getStyle("R4:R54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-            $sheet->getStyle("Y4:Y54")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+            $sheet->getStyle("F4:F71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+            $sheet->getStyle("J4:J71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+            $sheet->getStyle("L4:L71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+            $sheet->getStyle("R4:R71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+            $sheet->getStyle("Y4:Y71")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
 
             for ($column = 1; $column <= 20+6; $column++) {
@@ -208,32 +274,41 @@ class PrognosisExport2
             #Inntekt
             $sheet->getStyle("C4:C$prognosisTotal->rows")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('90EE90');
-
-            #cashflow blå
-            $sheet->getStyle("N4:N$prognosisTotal->rows")->getFill()
-                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('ADD8E6');
+                ->getStartColor()->setARGB($this->incomeColor);
 
             #Utgift
             $sheet->getStyle("D4:D$prognosisTotal->rows")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('FFCCCB');
+                ->getStartColor()->setARGB($this->expenceColor);
+
+            #cashflow blå
+            $sheet->getStyle("N4:N$prognosisTotal->rows")->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB($this->cashflowColor);
 
             #I år
-            $sheet->getStyle("A$this->yearRow:Z$this->yearRow")->getFill()
+            $row = $this->thisYear - $this->economyStartYear + 4;
+            $sheet->getStyle("A$row:Z$row")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('BBBBBB');
+                ->getStartColor()->setARGB($this->thisYearRowColor);
 
-            #Om 10 år
-            $sheet->getStyle("A$this->yearTenRow:Z$this->yearTenRow")->getFill()
+            #Prognosis year
+            $row = $this->prognoseYear - $this->economyStartYear + 4;
+            $sheet->getStyle("A$row:Z$row")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('BBBBBB');
+                ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
-            #Om 20 år
-            $sheet->getStyle("A" . $this->yearTwentyRow . ":Z" . $this->yearTwentyRow)->getFill()
+            #Pension year
+            $row = $this->pensionYear - $this->economyStartYear + 4;
+            $sheet->getStyle("A$row:Z$row")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('BBBBBB');
+                ->getStartColor()->setARGB($this->pensionYearRowColor);
+
+            #Deathyear
+            $row = $this->deathYear - $this->economyStartYear + 4;
+            $sheet->getStyle("A" . $row . ":Z" . $row)->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB($this->deathYearRowColor);
 
         }
 

@@ -32,11 +32,13 @@ class PrognosisTotalSheet2
         $this->totalH = $totalH;
         $this->groupH = $groupH;
 
-        #print_r($this->privateH);
-
         $this->spreadsheet = $spreadsheet;
-        $this->periodStart = (integer) Arr::get($this->config, 'period.start');
-        $this->periodEnd  = (integer) Arr::get($this->config, 'period.end');
+        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
+        $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
+        $this->thisYear  = now()->year;
+        $this->prognoseYear  = (integer) Arr::get($this->config, 'meta.prognoseYear');
+        $this->pensionYear  = (integer) Arr::get($this->config, 'meta.pensionYear');
+        $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
 
         $mask = '£#,##0.00_-';
 
@@ -104,9 +106,12 @@ class PrognosisTotalSheet2
 
 
         #total
-        for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
+        print " $this->economyStartYear <= $this->deathYear\n";
+        for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
+
+            print "$year\n";
             $this->worksheet->setCellValue("A$this->rows",$year);
-            $this->worksheet->setCellValue("B$this->rows",$year-Arr::get($this->config, 'meta.birthyear')); #Må bytte ut med en variabel her
+            $this->worksheet->setCellValue("B$this->rows",$year-Arr::get($this->config, 'meta.birthYear')); #Må bytte ut med en variabel her
 
             #Total
             if(isset($this->totalH[$year])) {

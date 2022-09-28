@@ -80,7 +80,7 @@ class PrognosisAssetSheet2
             if($year == 'meta') { continue; }; #Hopp over metadata
 
             $this->worksheet->setCellValue("A$this->rows", $year);
-            $this->worksheet->setCellValue("B$this->rows",(int) $year-Arr::get($this->config, 'meta.birthyear'));
+            $this->worksheet->setCellValue("B$this->rows",(int) $year-Arr::get($this->config, 'meta.birthYear'));
             $this->worksheet->setCellValue("C$this->rows", Arr::get($data, "income.amount"), DataType::TYPE_NUMERIC);
             $this->worksheet->setCellValue("D$this->rows", Arr::get($data, "expence.amount"), DataType::TYPE_NUMERIC);
             $this->worksheet->setCellValue("E$this->rows", Arr::get($data, "mortgage.payment"), DataType::TYPE_NUMERIC);

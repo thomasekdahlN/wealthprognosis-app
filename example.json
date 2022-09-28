@@ -1,14 +1,10 @@
 {
     "meta": {
         "name": "John Doe",
-        "birthyear": "1975",
-        "prognoseyear": "2032",
-        "pensionyear": "2037",
-        "deathyear": "2047"
-    },
-    "period": {
-        "start": 2005,
-        "end": 2055
+        "birthYear": "1975",
+        "prognoseYear": "2032",
+        "pensionYear": "2037",
+        "deathYear": "2047"
     },
     "tax": {
         "house": {
@@ -82,7 +78,7 @@
                 "group": "private",
                 "name": "My house",
                 "description": "Here I live",
-                "active" : true,
+                "active" : false,
                 "tax": "house"
             },
             "value": {
@@ -104,6 +100,13 @@
                     "name": "Rental",
                     "description": "Rental 10000 pr month",
                     "value": 10000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                },
+                "2020": {
+                    "name": "Rental",
+                    "description": "Rental 10000 pr month",
+                    "value": "=50000",
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
@@ -325,11 +328,11 @@
                 "group": "private",
                 "name": "Folketrygden",
                 "description": "Folketrygden",
-                "active": false,
+                "active": true,
                 "tax": "salary"
             },
             "income": {
-                "2037": {
+                "$pensionYear": {
                     "name": "Folketrygden",
                     "description": "Folketrygden",
                     "value": 15000,
@@ -348,10 +351,10 @@
                 "tax": "otp"
             },
             "value": {
-                "2022": {
-                    "value": 1000000,
+                "$pensionYear": {
+                    "value": "12/$pensionYear",
                     "changerate": "changerates.fond",
-                    "description": "",
+                    "description": "Du blir pensjonist i år: $pensionYear",
                     "repeat": true
                 }
             }

@@ -16,8 +16,11 @@ use Illuminate\Support\Str;
 class Prognosis
 {
     use HasFactory;
-    public $periodStart;
-    public $periodEnd;
+    public $thisYear;
+    public $economyStartYear;
+    public $prognoseYear;
+    public $pensionYear;
+    public $deathYear;
     public $config;
     public $dataH = array();
     public $assetH = array();
@@ -25,7 +28,6 @@ class Prognosis
     public $groupH = array();
     public $privateH = array();
     public $companyH = array();
-
 
     public function test() {
 
@@ -58,8 +60,12 @@ class Prognosis
         #$this->test();
         $this->config = $config;
 
-        $this->periodStart = (integer) Arr::get($this->config, 'period.start');
-        $this->periodEnd  = (integer) Arr::get($this->config, 'period.end');
+        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
+        $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
+        $this->thisYear  = now()->year;
+        $this->prognoseYear  = (integer) Arr::get($this->config, 'meta.prognoseYear');
+        $this->pensionYear  = (integer) Arr::get($this->config, 'meta.pensionYear');
+        $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
 
 
         foreach(Arr::get($this->config, 'assets') as $assetname => $asset) {
@@ -77,6 +83,7 @@ class Prognosis
 
             #print "$assetname: $taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization\n";
 
+            $assetValue = 0;
             $firstAssetValue = 0;
             $prevAssetValue = 0;
             $prevAssetRule = null;
@@ -99,7 +106,7 @@ class Prognosis
 
             #dd($this->config['changerates']);
 
-            for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
+            for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
 
                 #####################################################
                 #expence
@@ -120,9 +127,9 @@ class Prognosis
                     #print "Fant ikke\n";
                 }
 
-                $expenceThis = Arr::get($asset, "expence.$year.value", null) * 12; #Expence is added as a monthly repeat in config
+                $expenceThis = Arr::get($asset, "expence.$year.value", null); #Expence is added as a monthly repeat in config
 
-                #list($expence, $prevExpenceRule) = $this->valueAdjustment($prevExpence, $expenceThis, $prevExpenceRule);
+                list($expence, $prevExpence, $prevExpenceRule) = $this->valueAdjustment($prevExpence, $expenceThis, $prevExpenceRule, 12);
 
                 $this->dataH[$assetname][$year]['expence'] = [
                     'changerate' => $expenceChangerate,
@@ -148,9 +155,9 @@ class Prognosis
                     $incomeChangerate = $prevIncomeChangerate;
                 }
 
-                $incomeThis = Arr::get($asset, "income.$year.value", null) * 12; #Income is added as a monthly repeat in config
+                $incomeThis = Arr::get($asset, "income.$year.value", null); #Income is added as a monthly repeat in config
 
-                #list($income, $prevIncomeRule) = $this->valueAdjustment($prevIncome, $incomeThis, $prevIncomeRule);
+                list($income, $prevIncome, $prevIncomeRule) = $this->valueAdjustment($prevIncome, $incomeThis, $prevIncomeRule, 12);
 
                 $this->dataH[$assetname][$year]['income'] = [
                     'changerate' => $incomeChangerate,
@@ -176,7 +183,7 @@ class Prognosis
 
                 $assetThis = Arr::get($asset, "value.$year.value", null); #Income is added as a monthly repeat in config
 
-                list($assetValue, $prevAssetValue, $prevAssetRule) = $this->valueAdjustment($prevAssetValue, $assetThis, $prevAssetRule);
+                list($assetValue, $prevAssetValue, $prevAssetRule) = $this->valueAdjustment($prevAssetValue, $assetThis, $prevAssetRule, 1);
 
                $this->dataH[$assetname][$year]['asset'] = [
                     'amount' => $assetValue,
@@ -379,7 +386,8 @@ class Prognosis
     }
 
         /**
-        -- "1000" - Value is set to 1000.
+        -- "=1000" - Sets the value equal to this value
+        -- "1000" - Adds 1000 to the value (evaluates to same as +1000
         -- "+10%" - Adds 10% to value (Supported now, but syntax : 10)
         -- "+1000" - Adds 1000 to value
         -- "-10%" - Subtracts 10% from value
@@ -387,7 +395,7 @@ class Prognosis
         -- =+1/10" - Adds 1 tenth of the amount yearly
         -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10
          */
-    public function valueAdjustment($prevValue, $thisValue, $rule = NULL){
+    public function valueAdjustment($prevValue, $thisValue, $rule = NULL, $factor = 1){
         #Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor has memory for now.
         $value = null;
         $match = null;
@@ -400,16 +408,16 @@ class Prognosis
                 list($value, $rule, $match) = $this->divisor($prevValue, $matches);
             }
         }
-        elseif($thisValue == null) {
+        elseif($thisValue == null || $thisValue == 0) {
             #Set it to the previous value
-            $value = $prevValue;
+            $value = $prevValue; #Previous value is already factored, only new values has to be factored
             $match = "Previous value";
         } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
             #Percentages
             if($matches[1][0] == '-') {
-                $value = $prevValue * ((-$matches[2][0] / 100) + 1);
+                $value = $prevValue * $factor * ((-$matches[2][0] / 100) + 1);
             } else {
-                $value = $prevValue * (($matches[2][0] / 100) + 1);
+                $value = $prevValue * $factor * (($matches[2][0] / 100) + 1);
             }
             $match = "Percent";
         } elseif(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)){
@@ -418,16 +426,20 @@ class Prognosis
 
         } elseif(preg_match('/(\+|\-)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
             #number that starts with + or - (to be added or subtracted
-            $value = $prevValue + $thisValue; #Should fix both + and -
+            $value = $prevValue + ($thisValue * $factor); #Should fix both + and -
             $match = "Adding or subtracting a number";
 
-        }
+        } elseif(preg_match('/(\=)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
+            #number that starts with = Fixed number override
+            $value = $matches[2][0] * $factor; #Should fix both + and -
+            $match = "Fixed number override";
 
-        #A normal value will override all logic from earlier years, also rules and divisors. A normal number is a number without leading + or -, it will just be set to the number
-        if(is_numeric($thisValue) && !preg_match('/(\+|\-)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)){
+        } elseif(is_numeric($thisValue) && !preg_match('/(\+|\-)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)){
+            #A normal value will override all logic from earlier years, also rules and divisors. A normal number is a number without leading + or -, it will just be set to the number
+
             #Its a normal number
             $match = "Fixed number override";
-            $value = $thisValue; #Set it to the given value
+            $value = $thisValue * $factor; #Set it to the given value
         }
 
         #print "PV: $prevValue, TV: $thisValue,  value: $value = rule: $rule - match: $match\n";
@@ -458,7 +470,8 @@ class Prognosis
         foreach($this->dataH as $assetname => $assetH) {
             if(!$assetH['meta']['active']) continue; #Hopp over de inaktive
 
-            for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
+            for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
+                #print "$year\n";
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "asset.amount");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "asset.amountLoanDeducted");
                 $this->calculate($year, $assetH['meta'], $assetH[$year], "income.amount");
@@ -509,5 +522,17 @@ class Prognosis
             Arr::set($this->groupH, $grouppath, Arr::get($this->groupH, $grouppath, 0) + Arr::get($data, $dotpath));
             Arr::set($this->groupH, $typepath, Arr::get($this->groupH, $typepath, 0) + Arr::get($data, $dotpath));
         }
+    }
+
+    public function replace_in_array($find, $replace, &$array) {
+        array_walk_recursive($array, function(&$array) use($find, $replace) {
+
+            print "$array = $find\n";
+            if($array === $find) {
+                dd($array);
+                $array= $replace;
+            }
+        });
+        return $array;
     }
 }

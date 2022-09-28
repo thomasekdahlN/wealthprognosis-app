@@ -34,8 +34,12 @@ class PrognosisTypeSheet2
         #print_r($this->groupH);
 
         $this->spreadsheet = $spreadsheet;
-        $this->periodStart = (integer) Arr::get($this->config, 'period.start');
-        $this->periodEnd  = (integer) Arr::get($this->config, 'period.end');
+        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
+        $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
+        $this->thisYear  = now()->year;
+        $this->prognoseYear  = (integer) Arr::get($this->config, 'meta.prognoseYear');
+        $this->pensionYear  = (integer) Arr::get($this->config, 'meta.pensionYear');
+        $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
 
         $mask = '£#,##0.00_-';
 
@@ -66,9 +70,9 @@ class PrognosisTypeSheet2
 
         #total
         $this->rows = 4;
-        for ($year = $this->periodStart; $year <= $this->periodEnd; $year++) {
+        for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
             $this->worksheet->setCellValue("A$this->rows",$year);
-            $this->worksheet->setCellValue("B$this->rows",$year-Arr::get($this->config, 'meta.birthyear')); #Må bytte ut med en variabel her
+            $this->worksheet->setCellValue("B$this->rows",$year-Arr::get($this->config, 'meta.birthYear')); #Må bytte ut med en variabel her
 
             #Iterate all groups
             $this->columns = 3;
