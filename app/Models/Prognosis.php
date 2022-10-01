@@ -428,7 +428,7 @@ class Prognosis
                 $matches[1][0]);
 
             #dd($matches);
-            print "PV: $prevValue, TV: $thisValue,  value: $value = rule: $rule - match: $match\n";
+            #print "PV: $prevValue, TV: $thisValue,  value: $value = rule: $rule - match: $match\n";
 
             if($matches[2][0] == '=') {
                 #Add the value deducted here to the dotpath (transfers value from an value asset to typical income)
@@ -448,7 +448,7 @@ class Prognosis
 
 
         $value += $transferValue;
-        print "Transfer: $transferValue, PV: $prevValue, TV: $thisValue,  value: $value = rule: $rule - match: $match\n";
+        #print "Transfer: $transferValue, PV: $prevValue, TV: $thisValue,  value: $value = rule: $rule - match: $match\n";
 
         return [$value, $prevValue, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }

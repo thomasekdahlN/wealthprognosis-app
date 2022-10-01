@@ -103,10 +103,10 @@ class PrognosisTotalSheet2
 
 
         #total
-        print " $this->economyStartYear <= $this->deathYear\n";
+        #print " $this->economyStartYear <= $this->deathYear\n";
         for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
 
-            print "$year\n";
+            #print "$year\n";
             $this->worksheet->setCellValue("A$this->rows",$year);
             $this->worksheet->setCellValue("B$this->rows",$year-Arr::get($this->config, 'meta.birthYear')); #Må bytte ut med en variabel her
 

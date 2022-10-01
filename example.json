@@ -168,7 +168,7 @@
                 "2022": {
                     "value": "=500000",
                     "changerate": "changerates.otp",
-                    "transfer": "salary.$year.income.amount=value",
+                    "transfer": "salary.$year.income.amount*0.05",
                     "description": "OTP Sparing frem til pensjonsår",
                     "repeat": true
                 },
