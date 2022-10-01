@@ -56,16 +56,17 @@ class PrognosisExport2
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
         $this->thisYear  = now()->year;
         $this->prognoseYear  = (integer) Arr::get($this->config, 'meta.prognoseYear');
-        $this->pensionYear  = (integer) Arr::get($this->config, 'meta.pensionYear');
+        $this->pensionOfficialYear  = (integer) Arr::get($this->config, 'meta.pensionOfficialYear');
+        $this->pensionWishYear  = (integer) Arr::get($this->config, 'meta.pensionWishYear');
         $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
-        $this->pensionYears = $this->deathYear - $this->pensionYear; #The number of years you vil live with pension, used i divisor calculations
-        $this->leftYears = $this->deathYear - $this->thisYear; #The number of years until you die, used i divisor calculations
-        $this->untilPensionYears = $this->pensionYear - $this->thisYear; #The number of years until pension, used i divisor calculations
+        $this->pensionYears = $this->deathYear - $this->pensionWishYear + 1; #The number of years you vil live with pension, used i divisor calculations
+        $this->leftYears = $this->deathYear - $this->thisYear + 1; #The number of years until you die, used i divisor calculations
+        $this->untilPensionYears = $this->pensionYear - $this->thisYear + 1; #The number of years until pension, used i divisor calculations
 
         #Variable replacement before start
         $content = str_replace(
-            array('$birthYear','$economyStartYear','$thisYear','$prognoseYear', '$pensionYear','$deathYear', '$pensionYears','$leftYears','$untilPensionYears'), # use '  not " here!!!
-            array($this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionYear, $this->deathYear, $this->pensionYears, $this->leftYears, $this->untilPensionYears),
+            ['$birthYear','$economyStartYear','$thisYear','$prognoseYear', '$pensionOfficialYear', '$pensionWishYear', '$deathYear', '$pensionYears','$leftYears','$untilPensionYears'],
+            [$this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionOfficialYear, $this->pensionWishYear, $this->deathYear, $this->pensionYears, $this->leftYears, $this->untilPensionYears],
             file_get_contents($configfile));
 
         #print $content;
@@ -142,8 +143,14 @@ class PrognosisExport2
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
-        #Pension
-        $row = $this->pensionYear - $this->economyStartYear + 4;
+        #Pension official - offisiell pensjonsdato
+        $row = $this->pensionOfficialYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:AV$row")->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->pensionYearRowColor);
+
+        #Pension wish - ønsket pensjonsdato
+        $row = $this->pensionWishYear - $this->economyStartYear + 4;
         $sheet->getStyle("A$row:AV$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionYearRowColor);
@@ -231,8 +238,14 @@ class PrognosisExport2
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
-        #Pension
-        $row = $this->pensionYear - $this->economyStartYear + 4;
+        #Pension Official
+        $row = $this->pensionOfficialYear - $this->economyStartYear + 4;
+        $sheet->getStyle("A$row:" . $lastcolexcel . $row)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->pensionYearRowColor);
+
+        #Pension Wish
+        $row = $this->pensionWishYear - $this->economyStartYear + 4;
         $sheet->getStyle("A$row:" . $lastcolexcel . $row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionYearRowColor);
@@ -298,11 +311,18 @@ class PrognosisExport2
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
-            #Pension year
-            $row = $this->pensionYear - $this->economyStartYear + 4;
+            #Pension official
+            $row = $this->pensionOfficialYear - $this->economyStartYear + 4;
             $sheet->getStyle("A$row:Z$row")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB($this->pensionYearRowColor);
+
+            #Pension wish
+            $row = $this->pensionWishYear - $this->economyStartYear + 4;
+            $sheet->getStyle("A$row:Z$row")->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB($this->pensionYearRowColor);
+
 
             #Deathyear
             $row = $this->deathYear - $this->economyStartYear + 4;

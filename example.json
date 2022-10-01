@@ -3,8 +3,9 @@
         "name": "John Doe",
         "birthYear": "1975",
         "prognoseYear": "2032",
-        "pensionYear": "2037",
-        "deathYear": "2047"
+        "pensionOfficialYear": "2042",
+        "pensionWishYear": "2037",
+        "deathYear": "2055"
     },
     "tax": {
         "house": {
@@ -42,11 +43,6 @@
             "realization": 0,
             "fortune": 100
         },
-        "fortune": {
-            "yearly": 0.95,
-            "realization": 0,
-            "fortune": 100
-        },
         "car": {
             "yearly": 0,
             "realization": 0,
@@ -54,6 +50,16 @@
         },
         "boat": {
             "yearly": 0,
+            "realization": 0,
+            "fortune": 100
+        },
+        "cash": {
+            "yearly": 22,
+            "realization": 0,
+            "fortune": 100
+        },
+        "fortune": {
+            "yearly": 0.0095,
             "realization": 0,
             "fortune": 100
         }
@@ -69,16 +75,119 @@
         "cabin" : 5,
         "car" : -5,
         "boat" : -5,
-        "interest" : 4.5
+        "interest" : 4.5,
+        "otp" : 4.5,
+        "ask" : 4.5,
+        "pension" : 4.5,
+        "zero" : 0
     },
     "assets": {
+        "salary": {
+            "meta": {
+                "type": "salary",
+                "group": "private",
+                "name": "Salary",
+                "description": "Salary",
+                "active": true,
+                "tax": "salary"
+            },
+            "income": {
+                "2022": {
+                    "name": "Salary",
+                    "description": "Salary",
+                    "value": 40000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                },
+                "$pensionWishYear": {
+                    "name": "Salary",
+                    "description": "Pensioned, no more salary from here",
+                    "value": "=0",
+                    "changerate": "changerates.zero",
+                    "repeat": false
+                }
+            },
+            "expence": {
+                "2022": {
+                    "name": "Expences",
+                    "description": "",
+                    "value": 15000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                }
+            }
+        },
+        "arv": {
+            "meta": {
+                "type": "inheritance",
+                "group": "private",
+                "name": "inheritance",
+                "description": "inheritance",
+                "active": true,
+                "tax": "inheritance"
+            },
+            "value": {
+                "2037": {
+                    "name": "inheritance",
+                    "description": "",
+                    "value": 1000000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                }
+            }
+        },
+        "folketrygden": {
+            "meta": {
+                "type": "pension",
+                "group": "private",
+                "name": "Folketrygden",
+                "description": "Folketrygden",
+                "active": true,
+                "tax": "salary"
+            },
+            "income": {
+                "$pensionOfficialYear": {
+                    "name": "Folketrygden",
+                    "description": "Folketrygden fra $pensionOfficialYear",
+                    "value": 15000,
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                }
+            }
+        },
+        "otp": {
+            "meta" : {
+                "type": "pension",
+                "group": "private",
+                "name": "OTP",
+                "description": "OTP",
+                "active": true,
+                "tax": "otp"
+            },
+            "value": {
+                "2022": {
+                    "value": "=500000",
+                    "changerate": "changerates.otp",
+                    "transfer": "salary.$year.income.amount=value",
+                    "description": "OTP Sparing frem til pensjonsår",
+                    "repeat": true
+                },
+                "$pensionWishYear": {
+                    "value": "-1/$pensionYears",
+                    "transfer": "salary.$year.income.amount=value",
+                    "changerate": "changerates.otp",
+                    "description": "Pensjonist ønsket fra $pensionWishYear, 1/$pensionYears av formuen fra pensjonsåret",
+                    "repeat": true
+                }
+            }
+        },
         "house": {
             "meta" : {
                 "type": "house",
                 "group": "private",
                 "name": "My house",
                 "description": "Here I live",
-                "active" : false,
+                "active" : true,
                 "tax": "house"
             },
             "value": {
@@ -137,7 +246,7 @@
                 "group": "private",
                 "name": "My Crypto",
                 "description": "Coinbase private",
-                "active": false,
+                "active": true,
                 "tax": "cash"
             },
             "value": {
@@ -155,7 +264,7 @@
                 "group": "private",
                 "name": "fond privat",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "fond"
             },
             "value": {
@@ -173,7 +282,7 @@
                 "group": "private",
                 "name": "Cash",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "cash"
             },
             "value": {
@@ -191,7 +300,7 @@
                 "group": "private",
                 "name": "Avensis",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "car"
             },
             "value": {
@@ -218,7 +327,7 @@
                 "group": "private",
                 "name": "Boat",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "boat"
             },
             "value": {
@@ -245,7 +354,7 @@
                 "group": "company",
                 "name": "KLP fond",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "fond"
             },
             "value": {
@@ -263,7 +372,7 @@
                 "group": "company",
                 "name": "Company AS",
                 "description": "I own stocks here",
-                "active": false,
+                "active": true,
                 "tax": "stock"
             },
             "value": {
@@ -271,90 +380,6 @@
                     "value": 2500000,
                     "changerate": 3.5,
                     "description": "Initielt kjøp",
-                    "repeat": true
-                }
-            }
-        },
-        "salary": {
-            "meta": {
-                "type": "salary",
-                "group": "private",
-                "name": "Salary",
-                "description": "Salary",
-                "active": false,
-                "tax": "salary"
-            },
-            "income": {
-                "2022": {
-                    "name": "Salary",
-                    "description": "Salary",
-                    "value": 40000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
-            },
-            "expence": {
-                "2022": {
-                    "name": "Expences",
-                    "description": "",
-                    "value": 15000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
-            }
-        },
-        "arv": {
-            "meta": {
-                "type": "inheritance",
-                "group": "private",
-                "name": "inheritance",
-                "description": "inheritance",
-                "active": false,
-                "tax": "inheritance"
-            },
-            "value": {
-                "2037": {
-                    "name": "inheritance",
-                    "description": "",
-                    "value": 1000000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
-            }
-        },
-        "folketrygden": {
-            "meta": {
-                "type": "pension",
-                "group": "private",
-                "name": "Folketrygden",
-                "description": "Folketrygden",
-                "active": true,
-                "tax": "salary"
-            },
-            "income": {
-                "$pensionYear": {
-                    "name": "Folketrygden",
-                    "description": "Folketrygden",
-                    "value": 15000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
-            }
-        },
-        "otp": {
-            "meta" : {
-                "type": "pension",
-                "group": "private",
-                "name": "OTP",
-                "description": "OTP",
-                "active": false,
-                "tax": "otp"
-            },
-            "value": {
-                "$pensionYear": {
-                    "value": "12/$pensionYear",
-                    "changerate": "changerates.fond",
-                    "description": "Du blir pensjonist i år: $pensionYear",
                     "repeat": true
                 }
             }
