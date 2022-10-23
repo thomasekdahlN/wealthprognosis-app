@@ -33,9 +33,9 @@ class PrognosisTotalSheet2
         $this->groupH = $groupH;
 
         $this->spreadsheet = $spreadsheet;
-        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
+        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear', 1970);
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
-        $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
+        $this->deathYear  = (integer) $this->birthYear + Arr::get($this->config, 'meta.deathYear', 82);
 
         $mask = '£#,##0.00_-';
 
@@ -99,7 +99,7 @@ class PrognosisTotalSheet2
         $this->worksheet->setCellValue("AS3","FIRE utgift");
         $this->worksheet->setCellValue("AT3","FIRE diff");
         $this->worksheet->setCellValue("AU3","FIRE %");
-        $this->worksheet->setCellValue("AV3","KPI");
+        $this->worksheet->setCellValue("AX3","KPI");
 
 
         #total

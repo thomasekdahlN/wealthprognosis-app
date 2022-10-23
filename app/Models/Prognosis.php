@@ -18,8 +18,6 @@ class Prognosis
     use HasFactory;
     public $thisYear;
     public $economyStartYear;
-    public $prognoseYear;
-    public $pensionYear;
     public $deathYear;
     public $config;
     public $dataH = array();
@@ -63,10 +61,7 @@ class Prognosis
         $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
         $this->thisYear  = now()->year;
-        $this->prognoseYear  = (integer) Arr::get($this->config, 'meta.prognoseYear');
-        $this->pensionYear  = (integer) Arr::get($this->config, 'meta.pensionYear');
-        $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
-
+        $this->deathYear  = (integer) $this->birthYear + Arr::get($this->config, 'meta.deathYear');
 
         foreach(Arr::get($this->config, 'assets') as $assetname => $asset) {
 
@@ -131,7 +126,7 @@ class Prognosis
 
                 $expenceThis = Arr::get($asset, "expence.$year.value", null); #Expence is added as a monthly repeat in config
 
-                list($expence, $prevExpence, $prevExpenceRule, $explanation) = $this->valueAdjustment($year, $prevExpence, $expenceThis, $prevExpenceRule, null,12);
+                list($expence, $prevExpenceRule, $explanation) = $this->valueAdjustment($assetname, $year, 'expence',$prevExpence, $expenceThis, $prevExpenceRule, null,12);
 
                 $this->dataH[$assetname][$year]['expence'] = [
                     'changerate' => $expenceChangerate,
@@ -159,7 +154,7 @@ class Prognosis
 
                 $incomeThis = Arr::get($asset, "income.$year.value", null); #Income is added as a monthly repeat in config
 
-                list($income, $prevIncome, $prevIncomeRule, $explanation) = $this->valueAdjustment($year, $prevIncome, $incomeThis, $prevIncomeRule, null, 12);
+                list($income, $prevIncomeRule, $explanation) = $this->valueAdjustment($assetname, $year, 'income', $prevIncome, $incomeThis, $prevIncomeRule, null, 12);
 
                 $this->dataH[$assetname][$year]['income'] = [
                     'changerate' => $incomeChangerate,
@@ -192,7 +187,7 @@ class Prognosis
 
                 $assetThis = Arr::get($asset, "value.$year.value", null); #Income is added as a monthly repeat in config
 
-                list($assetValue, $prevAssetValue, $prevAssetRule, $explanation) = $this->valueAdjustment($year, $prevAssetValue, $assetThis, $prevAssetRule, $assetTransfer, 1);
+                list($assetValue, $prevAssetRule, $explanation) = $this->valueAdjustment($assetname, $year, 'asset', $prevAssetValue, $assetThis, $prevAssetRule, $assetTransfer, 1);
                 if(!$firstAssetValue) {
                     $firstAssetValue = $assetValue; #Ta vare på den første verdien vi ser på en asset, da den brukes til skatteberegning ved salg.
                 }
@@ -265,9 +260,9 @@ class Prognosis
                     'percentTaxableYearly' => $PercentTaxableYearly,
                     'amountDeductableYearly' => -$AmountDeductableYearly,
                     'percentDeductableYearly' => $PercentDeductableYearly,
-                    'amountTaxableRealization' => -$AmountTaxableRealization,
+                    'amountTaxableRealization' => $AmountTaxableRealization,
                     'percentTaxableRealization' => $PercentTaxableRealization,
-                    'amountDeductableRealization' => -$AmountDeductableRealization,
+                    'amountDeductableRealization' => $AmountDeductableRealization,
                     'percentDeductableRealization' => $PercentDeductableRealization,
                     'amountFortune' => $AmountTaxableFortune
                 ];
@@ -316,7 +311,7 @@ class Prognosis
 
         } #End loop over assets
 
-        #print_r($this->dataH);
+        #dd($this->dataH['nordnet']);
         $this->group();
     }
 
@@ -355,7 +350,7 @@ class Prognosis
         -- =+1/10" - Adds 1 tenth of the amount yearly
         -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10
          */
-    public function valueAdjustment($year, $prevValue, $thisValue, $rule = NULL, $transfer, $factor = 1){
+    public function valueAdjustment($assetname, $year, $type, $prevValue, $thisValue, $rule = NULL, $transfer, $factor = 1){
         #Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor has memory for now.
         $value = null;
         $match = null;
@@ -363,9 +358,7 @@ class Prognosis
         $transferValue = null; #Rules on how to transfer value from other assets, is added after new value is calculated
         $explanation = '';
 
-        #print "INNKOMMENDE: Year: $year, PV: $prevValue, TV: $thisValue, rule: $rule, transfer: $transfer, factor: $factor\n";
-
-
+        #print "INNKOMMENDE: $assetname.$year.$type, PV: $prevValue, TV: $thisValue, rule: $rule, transfer: $transfer, factor: $factor\n";
 
         if($rule){
             if(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
@@ -380,6 +373,7 @@ class Prognosis
             $value = $prevValue; #Previous value is already factored, only new values has to be factored
             $diff = 0;
             if($value != null) {
+                #print "value: $value\n";
                 $explanation = "Using previous value: " . number_format($value, 2, ',', ' ');
             }
         } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
@@ -419,8 +413,12 @@ class Prognosis
         }
 
         #Check if any value transfers should be done between assets
-        #print "$transfer\n";
-        if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)(\*|\=)([0-9]*[.]?[0-9]+|value|amount)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
+        if($transfer) {
+            print "$transfer\n";
+        }
+        if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)(\*|=)([0-9]*[.]?[0-9]+|value|diff)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
+        #if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)\*|=(value|amount)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
+
             #match this pattern:         "transfer": "salary.$year.income.value*0.05",
             $dotpath = str_replace(
                 ['$year'],
@@ -433,24 +431,32 @@ class Prognosis
             if($matches[2][0] == '=') {
                 #Add the value deducted here to the dotpath (transfers value from an value asset to typical income)
 
-                if($diff <> 0) {
-                    $explanation .= " transfer " . number_format($diff, 2, ',', ' ') . " to $dotpath\n";
+                if($matches[3][0] == 'diff' && $diff <> 0) { #Transfer the deducted diff from the amount
+                    $explanation .= " transfer diff " . number_format($diff, 2, ',', ' ') . " to $dotpath\n";
 
                     Arr::set($this->dataH, $dotpath, Arr::get($this->dataH, $dotpath, 0) + $diff); #The real transfer from this asset to another takes place here
+
+                } elseif($matches[3][0] == 'value' && $value <> 0)  { #Tramsfer the entire value
+                    $explanation .= " transfer value " . number_format($value, 2, ',', ' ') . " to $dotpath, exisiting value: " . Arr::get($this->dataH, $dotpath, 0)  . "\n";
+                    Arr::set($this->dataH, $dotpath, Arr::get($this->dataH, $dotpath, 0) + $value); #The real transfer from this asset to another takes place here
+                    $value = 0; #We have moved it, nothing left here.
                 }
             } else {
-                #Just calculate a value to be added
+                #Just calculate a value to be added (nothing subtracted)
                 $transferValue = Arr::get($this->dataH, $dotpath, 0) * $matches[3][0];
                 $explanation .=  " increasing value with " . $matches[3][0] . " of $dotpath $transferValue";
-                #dd($this->dataH['salary'][$year]['income']);
             }
+            #print "$year - $explanation\n";
         }
 
+        #Note: This only works correctly if the value we are retrieving from is processed before the one we are calculationg, so ut realy shoudl check if it was processed before or not, for correct handling.
+        $orgValue = Arr::get($this->dataH, $assetname . "." . $year . "." . $type . ".amount", 0); #We have to add values transferred in the datahH structure from earlier. The original stored value. Note this is sequenze sensitive.
+        $value += $transferValue + $orgValue;
 
-        $value += $transferValue;
-        #print "Transfer: $transferValue, PV: $prevValue, TV: $thisValue,  value: $value = rule: $rule - match: $match\n";
-
-        return [$value, $prevValue, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
+        if($orgValue > 0) {
+            print "$assetname.$year.$type - Transfer: $transferValue, PV: $prevValue, TV: $thisValue,  value: $value, orgValue=$orgValue rule: $rule - match: $match\n";
+        }
+        return [$value, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
 
     public function divisor($prevValue, $matches) {
@@ -560,21 +566,23 @@ class Prognosis
         } elseif ($taxtype == 'house') {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
-            $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            $AmountTaxableRealization = 0;  #Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
             $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
 
         } elseif ($taxtype == 'cabin') {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $AmountTaxableYearly = ($income - 10000) * $PercentTaxableYearly; #Airbnb skatten
-            $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            $AmountTaxableRealization = 0;  #Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
             $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
 
         } elseif ($taxtype == 'rental') {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
-            $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            if($assetValue > 0) {
+                $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien skal skattes ved salg
+            }
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
             #$potentialIncome = (($income - $AmountTaxableYearly) / 12) * 10; #Bank beregning, ikke sunn fornuft, ikke med skatt
             $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
@@ -582,22 +590,30 @@ class Prognosis
         } elseif ($taxtype == 'stock') {
             #Hm. Aksjer som selges skattes bare som formuesskatt og ved realisasjon
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
+            #NOTE: Skjermingsfradrag
+            #NOTE: Stor forskjell på skattlegging mot privat 35.2%vs bedrift 0%?.
             $AmountTaxableYearly = 0;
-            $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            if($assetValue > 0) {
+                $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien skal skattes ved salg?
+            }
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
             $potentialIncome = $income - $AmountTaxableYearly;
 
         } elseif ($taxtype == 'fond') {
             #Hm. fond i praksis bare eid i firmaer, alt privat i ASK og skattes bare ved realisasjon + formuesskatt
             $AmountTaxableYearly = 0;
-            $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            if($assetValue > 0) {
+                $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
             $potentialIncome = $income - $AmountTaxableYearly;
 
         } elseif ($taxtype == 'ask') {
             #Aksjesparekonto. TODO Fix. Kun skatt ved salg??? Ikke årlig
             $AmountTaxableYearly = 0; #Ikke årlig skatt på ASK
-            $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            if($assetValue > 0) {
+                $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
             $potentialIncome = $income;
 
@@ -612,10 +628,14 @@ class Prognosis
         } else {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
-            $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            if($assetValue > 0) {
+                $AmountTaxableRealization = ($assetValue - $firstAssetValue) * $PercentTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
             $potentialIncome = 0;  #For nå antar vi ingen inntekt fra annet enn lønn eller utleie, men utbytte vil også telle.
         }
+
+        #print "$taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization, AmountTaxableRealization: $AmountTaxableRealization\n";
 
         return [$cashflow, $potentialIncome, $AmountTaxableYearly, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization];
     }

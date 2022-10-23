@@ -2,20 +2,20 @@
     "meta": {
         "name": "John Doe",
         "birthYear": "1975",
-        "prognoseYear": "2032",
-        "pensionOfficialYear": "2042",
-        "pensionWishYear": "2037",
-        "deathYear": "2055"
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "82"
     },
     "tax": {
         "house": {
             "yearly": 0,
-            "realization": 22,
+            "realization": 0,
             "fortune": 25
         },
         "cabin": {
             "yearly": 0,
-            "realization": 22,
+            "realization": 0,
             "fortune": 25
         },
         "rental": {
@@ -24,9 +24,9 @@
             "fortune": 95
         },
         "stock": {
-            "yearly": 35.6,
-            "realization": 35.6,
-            "fortune": 75
+            "yearly": 0,
+            "realization": 37.84,
+            "fortune": 80
         },
         "salary": {
             "yearly": 50,
@@ -36,7 +36,7 @@
         "fond": {
             "yearly": 22,
             "realization": 35.6,
-            "fortune": 75
+            "fortune": 80
         },
         "inheritance": {
             "yearly": 0,
@@ -65,20 +65,20 @@
         }
     },
     "changerates": {
-        "kpi" : 3.5,
-        "crypto" : 8,
-        "fond" : 5,
+        "kpi" : 2.3,
+        "crypto" : 5,
+        "fond" : 4,
         "stock": 15,
         "cash" : 1,
-        "house" : 5,
-        "rental" : 5,
-        "cabin" : 5,
-        "car" : -5,
-        "boat" : -5,
-        "interest" : 4.5,
-        "otp" : 4.5,
-        "ask" : 4.5,
-        "pension" : 4.5,
+        "house" : 4,
+        "rental" : 4,
+        "cabin" : 3,
+        "car" : -7,
+        "boat" : -7,
+        "interest" : 5,
+        "otp" : 4,
+        "ask" : 4,
+        "pension" : 2.5,
         "zero" : 0
     },
     "assets": {
@@ -157,12 +157,12 @@
         },
         "otp": {
             "meta" : {
-                "type": "pension",
+                "type": "fond",
                 "group": "private",
                 "name": "OTP",
                 "description": "OTP",
                 "active": true,
-                "tax": "otp"
+                "tax": "fond"
             },
             "value": {
                 "2022": {
@@ -172,11 +172,11 @@
                     "description": "OTP Sparing frem til pensjonsår",
                     "repeat": true
                 },
-                "$pensionWishYear": {
-                    "value": "-1/$pensionYears",
-                    "transfer": "salary.$year.income.amount=value",
+                "$otpStartYear": {
+                    "value": "-1/$otpYears",
+                    "transfer": "salary.$year.income.amount=diff",
                     "changerate": "changerates.otp",
-                    "description": "Pensjonist ønsket fra $pensionWishYear, 1/$pensionYears av formuen fra pensjonsåret",
+                    "description": "OTP fra $otpStartYear, -1/$otpYears av formuen fra pensjonsåret",
                     "repeat": true
                 }
             }
@@ -247,7 +247,7 @@
                 "name": "My Crypto",
                 "description": "Coinbase private",
                 "active": true,
-                "tax": "cash"
+                "tax": "fond"
             },
             "value": {
                 "2022": {

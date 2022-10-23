@@ -36,7 +36,7 @@ class PrognosisTypeSheet2
         $this->spreadsheet = $spreadsheet;
         $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
-        $this->deathYear  = (integer) Arr::get($this->config, 'meta.deathYear');
+        $this->deathYear  = (integer) $this->birthYear + Arr::get($this->config, 'meta.deathYear');
 
         $mask = '£#,##0.00_-';
 
