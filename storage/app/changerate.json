@@ -1,0 +1,17 @@
+{
+    "kpi": 5,
+    "crypto": 3,
+    "fond": 5,
+    "stock": 25,
+    "cash": 3,
+    "house": 4,
+    "rental": 4,
+    "cabin": 1,
+    "car": -10,
+    "boat": -7,
+    "interest": 5,
+    "otp": 5,
+    "ask": 5,
+    "pension": 4,
+    "zero": 0
+}
