@@ -1,0 +1,85 @@
+{
+    "meta": {
+        "name": "Thomas Ekdahl",
+        "description": "Normal prognose",
+        "birthYear": "1974",
+        "prognoseYear": "55",
+        "pensionWishYear": "58",
+        "pensionOfficialYear": "63",
+        "deathYear": "80"
+    },
+    "tax": {
+        "house": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 25
+        },
+        "cabin": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 25
+        },
+        "rental": {
+            "yearly": 22,
+            "realization": 22,
+            "fortune": 95
+        },
+        "stock": {
+            "yearly": 0,
+            "realization": 37.84,
+            "fortune": 80
+        },
+        "salary": {
+            "yearly": 50,
+            "realization": 0,
+            "fortune": 0
+        },
+        "fond": {
+            "yearly": 22,
+            "realization": 35.6,
+            "fortune": 80
+        },
+        "inheritance": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 100
+        },
+        "car": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 100
+        },
+        "boat": {
+            "yearly": 0,
+            "realization": 0,
+            "fortune": 100
+        },
+        "cash": {
+            "yearly": 22,
+            "realization": 0,
+            "fortune": 100
+        },
+        "fortune": {
+            "yearly": 0.0095,
+            "realization": 0,
+            "fortune": 100
+        }
+    },
+    "changerates": {
+        "kpi": 5,
+        "crypto": 3,
+        "fond": 5,
+        "stock": 25,
+        "cash": 3,
+        "house": 4,
+        "rental": 4,
+        "cabin": 1,
+        "car": -10,
+        "boat": -7,
+        "interest": 5,
+        "otp": 5,
+        "ask": 5,
+        "pension": 4,
+        "zero": 0
+    }
+}
