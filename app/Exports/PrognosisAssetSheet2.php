@@ -21,30 +21,27 @@ class PrognosisAssetSheet2
     public $rowHeader = 3;
     public $groups = 1;
 
-    public function __construct($spreadsheet, $config, $name, $asset)
+    public function __construct($spreadsheet, $config, $asset, $meta)
     {
         $this->config = $config;
-        $this->name = $name;
         $this->asset = $asset;
-        $this->meta = $this->asset['meta'];
-        $this->name = $this->meta['name'];
 
         $this->spreadsheet = $spreadsheet;
 
-        $this->worksheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, $name);
+        $this->worksheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, $meta['name']);
 
-        $this->worksheet->setCellValue('A1', $this->name );
+        $this->worksheet->setCellValue('A1', $meta['name'] );
 
         $this->worksheet->setCellValue('A2', "kortnavn" );
-        $this->worksheet->setCellValue('B2', $name );
+        $this->worksheet->setCellValue('B2', $meta['name'] );
         $this->worksheet->setCellValue('C2', "Gruppe" );
-        $this->worksheet->setCellValue('D2', $this->meta['group'] );
+        $this->worksheet->setCellValue('D2', $meta['group'] );
         $this->worksheet->setCellValue('E2', "Type" );
-        $this->worksheet->setCellValue('F2', $this->meta['type'] );
+        $this->worksheet->setCellValue('F2', $meta['type'] );
         $this->worksheet->setCellValue('G2', "Aktiv" );
-        $this->worksheet->setCellValue('H2', $this->meta['active'] );
+        $this->worksheet->setCellValue('H2', $meta['active'] );
         $this->worksheet->setCellValue('I2', "Beskrivelse" );
-        $this->worksheet->setCellValue('J2', $this->meta['description'] );
+        $this->worksheet->setCellValue('J2', $meta['description'] );
 
         $this->worksheet->setCellValue("A$this->rowHeader","Year");
         $this->worksheet->setCellValue("B$this->rowHeader","Age");
