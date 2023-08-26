@@ -20,6 +20,8 @@ class Prognosis
     public $economyStartYear;
     public $deathYear;
     public $config;
+    public $tax;
+    public $changerate;
     public $dataH = array();
     public $assetH = array();
     public $totalH = array();
@@ -52,11 +54,12 @@ class Prognosis
 
     }
 
-    public function __construct($config)
+    public function __construct($config, $tax, $changerate)
     {
-
         #$this->test();
         $this->config = $config;
+        $this->tax = $tax;
+        $this->changerate = $changerate;
 
         $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
@@ -69,11 +72,11 @@ class Prognosis
             $this->dataH[$assetname]['meta'] = $meta = $asset['meta'];
             if(!$meta['active']) continue; #Hopp over de inaktive
             $taxtype = Arr::get($meta, "tax", null);
-            $PercentTaxableYearly = Arr::get($this->config, "tax." . $taxtype. ".yearly", 0) / 100;
-            $PercentTaxableRealization = Arr::get($this->config, "tax." . $taxtype. ".realization", 0) / 100;
-            $PercentDeductableYearly = Arr::get($this->config, "tax." . $taxtype. ".yearly", 0) / 100;
-            $PercentDeductableRealization = Arr::get($this->config, "tax." . $taxtype. ".realization", 0) / 100;
-            $PercentTaxableFortune = Arr::get($this->config, "tax." . $taxtype. ".fortune", 0) / 100;
+            $PercentTaxableYearly = Arr::get($this->tax, $taxtype. ".yearly", 0) / 100;
+            $PercentTaxableRealization = Arr::get($this->tax, $taxtype. ".realization", 0) / 100;
+            $PercentDeductableYearly = Arr::get($this->tax, $taxtype. ".yearly", 0) / 100;
+            $PercentDeductableRealization = Arr::get($this->tax, $taxtype. ".realization", 0) / 100;
+            $PercentTaxableFortune = Arr::get($this->tax, $taxtype. ".fortune", 0) / 100;
 
 
             #print "$assetname: $taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization\n";
@@ -301,10 +304,10 @@ class Prognosis
             #print_r($mortgage);
             if($mortgage) {
                 #Kjører bare dette om mortgage strukturen i json er utfylt
-                $this->dataH = (new Amortization($this->config, $this->dataH, $mortgage, $assetname))->get();
+                $this->dataH = (new Amortization($this->config, $this->changerate, $this->dataH, $mortgage, $assetname))->get();
                 #$this->dataH = new Amortization($this->dataH, $mortgage, $assetname);
 
-                #dd($this->dataH);
+                #dd($this->dataH['Smørbukkveien 3']);
             }
 
             //return $this->collections; #??????
@@ -322,9 +325,11 @@ class Prognosis
     public function percentToDecimal($percent){
 
         #print "** percent: $percent\n";
-        if($percent != null && !is_numeric($percent)) { #Allow to read the numbers from a config
+        if($percent != null && !is_numeric($percent)) { #Allow to read the changerate from the changerate config
 
-            $percent = Arr::get($this->config, $percent, null);
+            #Remove the "changerates." from the text
+            preg_match('/changerates.(\w*)/i', $percent, $matches, PREG_OFFSET_CAPTURE);
+            $percent = Arr::get($this->changerate, $matches[1][0], null);
             #print "## percent: '$percent'\n";
         }
         #print "-- percent: '$percent'\n";

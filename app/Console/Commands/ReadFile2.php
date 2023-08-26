@@ -14,7 +14,7 @@ class ReadFile2 extends Command
      *
      * @var string
      */
-    protected $signature = 'ReadFile2 {configfile} {exportfile}';
+    protected $signature = 'ReadFile2 {configfile} {exportfile} {generate : All | Private | Company}';
 
     /**
      * The console command description.
@@ -32,6 +32,6 @@ class ReadFile2 extends Command
     {
         #new PrognosisExport($this->argument('configfile'));
 
-        new PrognosisExport2($this->argument('configfile'), $this->argument('exportfile'));
+        new PrognosisExport2($this->argument('configfile'), $this->argument('exportfile'), $this->argument('generate'));
     }
 }

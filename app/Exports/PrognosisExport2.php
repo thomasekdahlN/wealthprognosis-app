@@ -4,6 +4,7 @@ namespace App\Exports;
 use App\Models\Prognosis;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -12,6 +13,8 @@ class PrognosisExport2
 {
     public $configfile;
     public $config;
+    public $tax;
+    public $changerate;
     public $birthYear;
     public $economyStartYear;
     public $thisYear;
@@ -33,10 +36,9 @@ class PrognosisExport2
     public $cashflowColor = 'ADD8E6';
 
 
-    public function __construct($configfile, $exportfile)
+    public function __construct($configfile, $exportfile, $generate)
     {
         $this->configfile = $configfile;
-
 
         $spreadsheet = new Spreadsheet();
 
@@ -53,6 +55,8 @@ class PrognosisExport2
 
         $spreadsheet->removeSheetByIndex(0); //Siden jeg ikke klarte å navne det første
         $this->config = json_decode(file_get_contents($configfile), true);
+        $this->tax = json_decode(Storage::disk('local')->get('tax.json'), true);
+        $this->changerate = json_decode(Storage::disk('local')->get('changerate.json'), true);
 
         $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
@@ -86,7 +90,7 @@ class PrognosisExport2
         $this->config = json_decode($content, true);
 
 
-        $prognosis = (new Prognosis($this->config));
+        $prognosis = (new Prognosis($this->config, $this->tax, $this->changerate));
 
         $prognosisTotal = new PrognosisTotalSheet2($spreadsheet, $this->config, $prognosis->totalH, $prognosis->groupH);
         $spreadsheet->addSheet($prognosisTotal->worksheet);

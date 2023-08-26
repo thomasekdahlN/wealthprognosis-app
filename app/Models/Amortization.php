@@ -26,11 +26,12 @@ class Amortization extends Model
     private $assettname;
     private $dataH = array();
 
-    public function __construct($config, $dataH, $mortgages, $assettname)
+    public function __construct($config, $changerate, $dataH, $mortgages, $assettname)
     {
             $this->dataH = $dataH;
-            $this->assettname   = $assettname;
             $this->config = $config;
+            $this->assettname   = $assettname;
+            $this->changerate = $changerate;
 
             $keys = array_keys( $mortgages );
             $size = sizeof($keys);
@@ -82,7 +83,7 @@ class Amortization extends Model
         #$paymentExtra = Arr::get($this->mortgageH,"$this->assettname.$year.cashflow.amount", 0); #Håndterer ikke ekstra innbetalinger pr nå
 
         $deno = 1 - (1 / pow((1+ $this->interest), $this->period));
-        #print "$deno = 1 - (1 / pow((1+ $this->interest), $this->period))\n";
+        #print "##year: $year deno: $deno = 1 - (1 / pow((1+ $this->interest), $this->period))\n";
 
         if($deno > 0) {
             $this->term_pay = ($this->loan_amount * $this->interest) / $deno;
@@ -97,7 +98,6 @@ class Amortization extends Model
             #if($this->balance > 0) {
 
                 #print "$year: $this->period : deno: $deno : $this->interest : loanamount: " . round($this->loan_amount)  . " $this->interest : terminbelop: " . round($this->term_pay)  . " : renter " . round($interest) . " : avdrag: " . round($this->principal) . " : balance: " . round($this->balance) . "\n";
-
                 $this->dataH[$this->assettname][$year]['mortgage'] = [
                         'payment' => $this->term_pay,
                         'interest' => $this->interest,
@@ -156,8 +156,10 @@ class Amortization extends Model
 
     public function percentToDecimal2($percent){
 
+        #print "percent: $percent\n";
         if($percent != null && Str::isAscii($percent)) { #Allow to read the numbers from a config
-            $percent = Arr::get($this->config, $percent, null);
+            preg_match('/changerates.(\w*)/i', $percent, $matches, PREG_OFFSET_CAPTURE);
+            $percent = Arr::get($this->changerate, $matches[1][0], null);
         }
 
         if($percent != null && is_numeric($percent)) { #Allow numbers directly
