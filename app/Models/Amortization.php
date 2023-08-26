@@ -109,7 +109,7 @@ class Amortization extends Model
                     ];
 
                 #Tax calculations
-                $amountDeductableYearly = $interest * 0.22; #Remove hardcoded percentage later
+                $amountDeductableYearly = $interest * 0.22; #FIX: Remove hardcoded percentage later to read from ta x config
                 $this->dataH[$this->assettname][$year]['tax']['amountDeductableYearly'] = $amountDeductableYearly;
                 if(isset($this->dataH[$this->assettname][$year]['cashflow'])) {
                     $this->dataH[$this->assettname][$year]['cashflow']['amount'] = $this->dataH[$this->assettname][$year]['cashflow']['amount'] + $amountDeductableYearly - $this->term_pay;
@@ -122,11 +122,11 @@ class Amortization extends Model
                     $this->dataH[$this->assettname][$year]['asset']['loanPercentage'] = $this->balance / $this->dataH[$this->assettname][$year]['asset']['amount'];  #Cashflow accumulated må reberegnes til slutt???
                 }
 
-                $this->dataH[$this->assettname][$year]['fire']['amountIncome'] += $amountDeductableYearly; #Vi legger til rentefradraget som inntekt.
-                $this->dataH[$this->assettname][$year]['fire']['amountExpence'] += $this->term_pay; #Vi legger lånet til kostnadene
-                $this->dataH[$this->assettname][$year]['fire']['amountDiff'] = $this->dataH[$this->assettname][$year]['fire']['amountIncome'] - $this->dataH[$this->assettname][$year]['fire']['amountExpence'];
+                $this->dataH[$this->assettname][$year]['fire']['amountIncome'] += $this->principal + $amountDeductableYearly; #Vi legger til avdrag og rentefradrag som inntekt.
+                $this->dataH[$this->assettname][$year]['fire']['amountExpence'] += $interest; #Vi legger rentene av lånet som kostnad (ikke totalt innbetalt)
+                $this->dataH[$this->assettname][$year]['fire']['cashFlow'] = $this->dataH[$this->assettname][$year]['fire']['amountIncome'] - $this->dataH[$this->assettname][$year]['fire']['amountExpence'];
                 $this->dataH[$this->assettname][$year]['fire']['percentDiff'] = $this->dataH[$this->assettname][$year]['fire']['amountIncome'] / $this->dataH[$this->assettname][$year]['fire']['amountExpence'];
-
+                $this->dataH[$this->assettname][$year]['fire']['savingRate'] = ($this->dataH[$this->assettname][$year]['fire']['amountIncome'] - $this->dataH[$this->assettname][$year]['fire']['amountExpence']) / $this->dataH[$this->assettname][$year]['fire']['amountIncome'];
             #}
         }
     }

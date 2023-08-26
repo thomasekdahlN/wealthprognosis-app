@@ -155,7 +155,7 @@ class Prognosis
                     $incomeChangerate = $prevIncomeChangerate;
                 }
 
-                $incomeThis = Arr::get($asset, "income.$year.value", null); #Income is added as a monthly repeat in config
+                $incomeThis = Arr::get($asset, "income.$year.value", null); #Income is added as a yearly repeat in config
 
                 list($income, $prevIncomeRule, $explanation) = $this->valueAdjustment($assetname, $year, 'income', $prevIncome, $incomeThis, $prevIncomeRule, null, 12);
 
@@ -225,7 +225,7 @@ class Prognosis
                 #Achievement er hvor mye du mangler for å nå målet? Feil navn?
                 # amount = assetverdi - lån i beregningene + inntekt? (Hvor mye er 4% av de reelle kostnadene + inntekt (sannsynligvis kunn inntekt fra utleie)
                 # amountAchievement = amount - expences
-                #NOTE: Svakhet at den ikke hensyntar lån som utgift!!!!!!!!!!
+                #FIX: Something is wrong with this classification, and automatically calculating sales of everything not in this list.
                 if($taxtype == 'house' || $taxtype == 'rental' || $taxtype == 'cabin'|| $taxtype == 'car' || $taxtype == 'boat'|| $taxtype == 'salary') {
                     #Kan ikke selge biter av en asset her, her regnes kun inntekt
                     $ThisFirePercent = 0;
@@ -243,19 +243,27 @@ class Prognosis
                 $ThisFireTotalExpence = $expence + $AmountTaxableYearly;
                 #print "$assetname - FTI: $ThisFireTotalIncome = FI:$ThisFireIncome + I:$income + D:$AmountDeductableYearly\n"; #Percent of asset value + income from asset
 
-                $ThisFireAmountDiff = $ThisFireTotalIncome - $ThisFireTotalExpence; #Hvor lang er man unna fire målet
+                $ThisFireCashFlow = $ThisFireTotalIncome - $ThisFireTotalExpence; #Hvor lang er man unna fire målet
 
                 if($expence > 0) {
                     $ThisFirePercentDiff = $ThisFireTotalIncome / $ThisFireTotalExpence; #Hvor mange % unna er inntektene å dekke utgiftene.
                 } else {
                     $ThisFirePercentDiff = 1;
                 }
+
+                #Sparerate = Det du nedbetaler i gjeld + det du sparer eller investerer på andre måter / total inntekt (etter skatt).
+                $ThisFireSavingRate = 0;
+                if($ThisFireTotalIncome > 0) {
+                    $ThisFireSavingRate = ($ThisFireTotalIncome - $ThisFireTotalExpence) / $ThisFireTotalIncome;
+                }
+
                 $this->dataH[$assetname][$year]['fire'] = [
                     'percent' => $ThisFirePercent,
                     'amountIncome' => $ThisFireTotalIncome,
                     'amountExpence' => $ThisFireTotalExpence,
                     'percentDiff' => $ThisFirePercentDiff,
-                    'amountDiff' => $ThisFireAmountDiff
+                    'cashFlow' => $ThisFireCashFlow,
+                    'savingRate' => $ThisFireSavingRate,
                 ];
 
                 $this->dataH[$assetname][$year]['tax'] = [
@@ -419,7 +427,7 @@ class Prognosis
 
         #Check if any value transfers should be done between assets
         if($transfer) {
-            print "$transfer\n";
+            #print "$transfer\n";
         }
         if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)(\*|=)([0-9]*[.]?[0-9]+|value|diff)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
         #if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)\*|=(value|amount)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
@@ -454,12 +462,12 @@ class Prognosis
             #print "$year - $explanation\n";
         }
 
-        #Note: This only works correctly if the value we are retrieving from is processed before the one we are calculationg, so ut realy shoudl check if it was processed before or not, for correct handling.
+        #Note: This only works correctly if the value we are retrieving from is processed before the one we are calculationg, so ut realy should check if it was processed before or not, for correct handling.
         $orgValue = Arr::get($this->dataH, $assetname . "." . $year . "." . $type . ".amount", 0); #We have to add values transferred in the datahH structure from earlier. The original stored value. Note this is sequenze sensitive.
         $value += $transferValue + $orgValue;
 
         if($orgValue > 0) {
-            print "$assetname.$year.$type - Transfer: $transferValue, PV: $prevValue, TV: $thisValue,  value: $value, orgValue=$orgValue rule: $rule - match: $match\n";
+            #print "$assetname.$year.$type - Transfer: $transferValue, PV: $prevValue, TV: $thisValue,  value: $value, orgValue=$orgValue rule: $rule - match: $match\n";
         }
         return [$value, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
@@ -484,53 +492,110 @@ class Prognosis
 
     function group() {
         #dd($this->dataH);
+        $this->initGroups();
+
+
         foreach($this->dataH as $assetname => $assetH) {
-            if(!$assetH['meta']['active']) continue; #Hopp over de inaktive
+            $meta = $assetH['meta'];
+            if(!$meta['active']) continue; #Hopp over de inaktive
 
             for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
                 #print "$year\n";
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "asset.amount");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "asset.amountLoanDeducted");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "income.amount");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "expence.amount");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountTaxableYearly");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountTaxableRealization");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountDeductableYearly");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountDeductableRealization");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "tax.amountFortune");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "cashflow.amount");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "cashflow.amountAccumulated");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.payment");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.paymentExtra");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.interestAmount");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.principal");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "mortgage.balance");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "potential.income"); #Beregnet potensiell inntekt slik bankene ser det.
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "potential.loan"); #Beregner maks potensielt lån på 5 x inntekt.
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "fire.amountIncome");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "fire.amountExpence");
-                $this->calculate($year, $assetH['meta'], $assetH[$year], "fire.amountDiff");
+                $this->addtogroup($year, $meta, $assetH[$year], "asset.amount");
+                $this->addtogroup($year, $meta, $assetH[$year], "asset.amountLoanDeducted");
+                $this->addtogroup($year, $meta, $assetH[$year], "income.amount");
+                $this->addtogroup($year, $meta, $assetH[$year], "expence.amount");
+                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountTaxableYearly");
+                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountTaxableRealization");
+                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountDeductableYearly");
+                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountDeductableRealization");
+                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountFortune");
+                $this->addtogroup($year, $meta, $assetH[$year], "cashflow.amount");
+                $this->addtogroup($year, $meta, $assetH[$year], "cashflow.amountAccumulated");
+                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.payment");
+                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.paymentExtra");
+                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.interestAmount");
+                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.principal");
+                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.balance");
+                $this->addtogroup($year, $meta, $assetH[$year], "potential.income"); #Beregnet potensiell inntekt slik bankene ser det.
+                $this->addtogroup($year, $meta, $assetH[$year], "potential.loan"); #Beregner maks potensielt lån på 5 x inntekt.
+                $this->addtogroup($year, $meta, $assetH[$year], "fire.amountIncome");
+                $this->addtogroup($year, $meta, $assetH[$year], "fire.amountExpence");
+                $this->addtogroup($year, $meta, $assetH[$year], "fire.cashFlow");
             }
         }
+
+        #More advanced calculations on numbers other than amount that can not just be added and all additions are done in advance so we work on complete numbers
+        #FireSavingrate as a calculation of totals,
+        #FIX: tax calculations/deductions where a fixed deduxtion is uses, or a deduction based on something
+
+        for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
+
+            $this->fireSaveRate($year);
+            $this->firePercentDiff($year);
+            #FIX, later correct tax handling on the totals ums including deductions
+        }
+
         #print "group\n";
         #print_r($this->groupH);
     }
 
-    function calculate($year, $meta, $data, $dotpath) {
+    #Calculates on data that is summed up in the group
+    #FIX: Much better if we could use calculus here to reduce number of methods, but to advanced for the moment.
+    function fireSaveRate($year){
+        if(Arr::get($this->totalH, "$year.fire.amountIncome", 0) > 0) {
+            Arr::set($this->totalH, "$year.fire.savingRate", Arr::get($this->totalH, "$year.fire.cashFlow", 0) / Arr::get($this->totalH, "$year.fire.amountIncome", 0));
+        }
+        if(Arr::get($this->companyH, "$year.fire.amountIncome", 0) > 0) {
+            Arr::set($this->companyH, "$year.fire.savingRate", Arr::get($this->companyH, "$year.fire.cashFlow", 0) / Arr::get($this->companyH, "$year.fire.amountIncome", 0));
+        }
+        if(Arr::get($this->privateH, "$year.fire.amountIncome", 0) > 0) {
+            Arr::set($this->privateH, "$year.fire.savingRate", Arr::get($this->privateH, "$year.fire.cashFlow", 0) / Arr::get($this->privateH, "$year.fire.amountIncome", 0));
+        }
+        #FIX: Loop this out for groups.
+        #foreach($this->groupH){
+            #$this->groupH;
+        #}
+    }
+
+    function firePercentDiff($year){
+
+
+        if(Arr::get($this->totalH, "$year.fire.amountExpence", 0) > 0) {
+            Arr::set($this->totalH, "$year.fire.percentDiff", Arr::get($this->totalH, "$year.fire.amountIncome", 0) / Arr::get($this->totalH, "$year.fire.amountExpence", 0));
+        }
+        if(Arr::get($this->companyH, "$year.fire.amountExpence", 0) > 0) {
+            Arr::set($this->companyH, "$year.fire.percentDiff", Arr::get($this->companyH, "$year.fire.amountIncome", 0) / Arr::get($this->companyH, "$year.fire.amountExpence", 0));
+        }
+        if(Arr::get($this->privateH, "$year.fire.amountExpence", 0) > 0) {
+            Arr::set($this->privateH, "$year.fire.percentDiff", Arr::get($this->privateH, "$year.fire.amountIncome", 0) / Arr::get($this->privateH, "$year.fire.amountExpence", 0));
+        }
+        #FIX: Loop this out for groups.
+        #foreach($this->groupH){
+        #$this->groupH;
+        #}
+    }
+
+    function addtogroup($year, $meta, $data, $dotpath) {
 
         if(Arr::get($data, $dotpath)) {
 
             #Just to create an empty object, if it has no values.
             Arr::set($this->totalH, "$year.$dotpath", Arr::get($this->totalH, "$year.$dotpath", 0) + Arr::get($data, $dotpath));
+            #print "Addtogroup:  " . Arr::get($this->totalH, "$year.$dotpath") . " = " . Arr::get($this->totalH, "$year.$dotpath", 0) . " + " . Arr::get($data, $dotpath) . "\n";
+
 
             #Company
             if (Arr::get($meta, 'group') == 'company') {
-                Arr::set($this->companyH, "total.$year.$dotpath", Arr::get($this->companyH, "$year.$dotpath", 0) + Arr::get($data, $dotpath));
+                #Skaper trøbbel med sorteringsrekkefølgen at vi hopper over rekkene
+                Arr::set($this->companyH, "$year.$dotpath", Arr::get($this->companyH, "$year.$dotpath", 0) + Arr::get($data, $dotpath));
             }
 
             #Private
             if (Arr::get($meta, 'group') == 'private') {
-                Arr::set($this->privateH, "total.$year.$dotpath", Arr::get($this->privateH, "$year.$dotpath", 0) + Arr::get($data, $dotpath));
+                #Skaper trøbbel med sorteringsrekkefølgen at vi hopper over rekkene.
+                Arr::set($this->privateH, "$year.$dotpath", Arr::get($this->privateH, "$year.$dotpath", 0) + Arr::get($data, $dotpath));
+                #print "private: $year.$dotpath :  " . Arr::get($this->privateH, "$year.$dotpath") . " = " . Arr::get($this->privateH, "$year.$dotpath", 0) . " + " . Arr::get($data, $dotpath) . "\n";
             }
 
             #Grouping
@@ -539,6 +604,17 @@ class Prognosis
             Arr::set($this->groupH, $grouppath, Arr::get($this->groupH, $grouppath, 0) + Arr::get($data, $dotpath));
             Arr::set($this->groupH, $typepath, Arr::get($this->groupH, $typepath, 0) + Arr::get($data, $dotpath));
         }
+    }
+
+    public function initGroups() {
+        #Just to get the sorting right, its bettert to start with an emplty structure in correct yearly order
+
+        for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
+            Arr::set($this->privateH, "$year.asset.amount", 0);
+            Arr::set($this->companyH, "$year.asset.amount", 0);
+        }
+
+        #FIX: Loop over groups also
     }
 
     public function replace_in_array($find, $replace, &$array) {

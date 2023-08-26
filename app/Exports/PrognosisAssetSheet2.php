@@ -66,9 +66,10 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("U$this->rowHeader","Rest evne");
         $this->worksheet->setCellValue("V$this->rowHeader","FIRE inntekt");
         $this->worksheet->setCellValue("W$this->rowHeader","FIRE utgift");
-        $this->worksheet->setCellValue("X$this->rowHeader","FIRE diff");
+        $this->worksheet->setCellValue("X$this->rowHeader","FIRE cashflow");
         $this->worksheet->setCellValue("Y$this->rowHeader","FIRE %");
-        $this->worksheet->setCellValue("Z$this->rowHeader","Description");
+        $this->worksheet->setCellValue("Z$this->rowHeader","FIRE sparerate");
+        $this->worksheet->setCellValue("AA$this->rowHeader","Description");
 
        #return;
 
@@ -99,9 +100,10 @@ class PrognosisAssetSheet2
             $this->worksheet->setCellValue("U$this->rows", Arr::get($data, "potential.loan") - Arr::get($data, "mortgage.balance"));
             $this->worksheet->setCellValue("V$this->rows", Arr::get($data, "fire.amountIncome"));
             $this->worksheet->setCellValue("W$this->rows", Arr::get($data, "fire.amountExpence"));
-            $this->worksheet->setCellValue("X$this->rows", Arr::get($data, "fire.amountDiff"));
+            $this->worksheet->setCellValue("X$this->rows", Arr::get($data, "fire.cashFlow"));
             $this->worksheet->setCellValue("Y$this->rows", Arr::get($data, "fire.percentDiff"));
-            $this->worksheet->setCellValue("Z$this->rows", Arr::get($data, "income.description") . Arr::get($data, "expence.description") . Arr::get($data, "asset.description"));
+            $this->worksheet->setCellValue("Z$this->rows", Arr::get($data, "fire.savingRate"));
+            $this->worksheet->setCellValue("AA$this->rows", Arr::get($data, "income.description") . Arr::get($data, "expence.description") . Arr::get($data, "asset.description"));
 
 
             $this->rows++;
