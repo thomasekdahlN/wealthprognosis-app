@@ -122,11 +122,15 @@ class Amortization extends Model
                     $this->dataH[$this->assettname][$year]['asset']['loanPercentage'] = $this->balance / $this->dataH[$this->assettname][$year]['asset']['amount'];  #Cashflow accumulated må reberegnes til slutt???
                 }
 
+                #FIRE
                 $this->dataH[$this->assettname][$year]['fire']['amountIncome'] += $this->principal + $amountDeductableYearly; #Vi legger til avdrag og rentefradrag som inntekt.
                 $this->dataH[$this->assettname][$year]['fire']['amountExpence'] += $interest; #Vi legger rentene av lånet som kostnad (ikke totalt innbetalt)
                 $this->dataH[$this->assettname][$year]['fire']['cashFlow'] = $this->dataH[$this->assettname][$year]['fire']['amountIncome'] - $this->dataH[$this->assettname][$year]['fire']['amountExpence'];
                 $this->dataH[$this->assettname][$year]['fire']['percentDiff'] = $this->dataH[$this->assettname][$year]['fire']['amountIncome'] / $this->dataH[$this->assettname][$year]['fire']['amountExpence'];
-                $this->dataH[$this->assettname][$year]['fire']['savingRate'] = ($this->dataH[$this->assettname][$year]['fire']['amountIncome'] - $this->dataH[$this->assettname][$year]['fire']['amountExpence']) / $this->dataH[$this->assettname][$year]['fire']['amountIncome'];
+                $this->dataH[$this->assettname][$year]['fire']['savingAmount'] = $this->principal; #FIRE sparing er bare det du bevisst sparer. Ikke all inntekt som er til overs.
+                $this->dataH[$this->assettname][$year]['fire']['savingRate'] = $this->dataH[$this->assettname][$year]['fire']['savingAmount'] / $this->dataH[$this->assettname][$year]['income']['amount'];
+
+                #print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
             #}
         }
     }

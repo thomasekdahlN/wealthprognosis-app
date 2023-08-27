@@ -26,7 +26,7 @@
     },
     "fond": {
         "yearly": 22,
-        "realization": 35.6,
+        "realization": 37.84,
         "fortune": 80
     },
     "inheritance": {
@@ -50,8 +50,9 @@
         "fortune": 100
     },
     "fortune": {
-        "yearly": 0.0095,
+        "yearly": 1,
         "realization": 0,
-        "fortune": 100
+        "fortune": 100,
+        "amount": 20000000
     }
 }

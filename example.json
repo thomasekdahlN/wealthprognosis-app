@@ -14,7 +14,7 @@
                 "group": "private",
                 "name": "Salary",
                 "description": "Salary",
-                "active": true,
+                "active": false,
                 "tax": "salary"
             },
             "income": {
@@ -49,7 +49,7 @@
                 "group": "private",
                 "name": "inheritance",
                 "description": "inheritance",
-                "active": true,
+                "active": false,
                 "tax": "inheritance"
             },
             "value": {
@@ -68,7 +68,7 @@
                 "group": "private",
                 "name": "Folketrygden",
                 "description": "Folketrygden",
-                "active": true,
+                "active": false,
                 "tax": "salary"
             },
             "income": {
@@ -87,7 +87,7 @@
                 "group": "private",
                 "name": "OTP",
                 "description": "OTP",
-                "active": true,
+                "active": false,
                 "tax": "fond"
             },
             "value": {
@@ -113,7 +113,7 @@
                 "group": "private",
                 "name": "My house",
                 "description": "Here I live",
-                "active" : true,
+                "active" : false,
                 "tax": "house"
             },
             "value": {
@@ -172,7 +172,7 @@
                 "group": "private",
                 "name": "My Crypto",
                 "description": "Coinbase private",
-                "active": true,
+                "active": false,
                 "tax": "fond"
             },
             "value": {
@@ -199,6 +199,18 @@
                     "changerate": "changerates.fond",
                     "description": "",
                     "repeat": true
+                },
+                "2023": {
+                    "name": "Monthly savings",
+                    "description": "Setter inn 6000,- pr år",
+                    "value": "+6000",
+                    "repeat": true
+                },
+                "2033": {
+                    "name": "Monthly savings",
+                    "description": "Slutter å sette inn 6000,- pr år",
+                    "value": "+0",
+                    "repeat": true
                 }
             }
         },
@@ -208,7 +220,7 @@
                 "group": "private",
                 "name": "Cash",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "cash"
             },
             "value": {
@@ -226,14 +238,14 @@
                 "group": "private",
                 "name": "Avensis",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "car"
             },
             "value": {
                 "2020": {
                     "value": 50000,
                     "changerate": "changerates.car",
-                    "description": "5% verditap",
+                    "description": "verditap",
                     "repeat": true
                 }
             },
@@ -253,14 +265,14 @@
                 "group": "private",
                 "name": "Boat",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "boat"
             },
             "value": {
                 "2022": {
                     "value": 200000,
-                    "changerate": -5,
-                    "description": "5% verditap",
+                    "changerate": "changerates.boat",
+                    "description": "verditap",
                     "repeat": true
                 }
             },
@@ -280,7 +292,7 @@
                 "group": "company",
                 "name": "KLP fond",
                 "description": "",
-                "active": true,
+                "active": false,
                 "tax": "fond"
             },
             "value": {
@@ -298,13 +310,13 @@
                 "group": "company",
                 "name": "Company AS",
                 "description": "I own stocks here",
-                "active": true,
+                "active": false,
                 "tax": "stock"
             },
             "value": {
                 "2022": {
                     "value": 2500000,
-                    "changerate": 3.5,
+                    "changerate": "changerates.stock",
                     "description": "Initielt kjøp",
                     "repeat": true
                 }

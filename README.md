@@ -5,7 +5,7 @@ Predicts your economic future and wealth taking into consideration all known par
 Note: This is just a hack and is not production ready.
 
 How to run
-php artisan ReadFile2 example.json example.xlsx
+php artisan ReadFile2 example.json example.xlsx all/private/company
 
 Reads your economic setup as a json file and provides a detail spreadsheet with analysis of your future economy.
 
@@ -18,12 +18,13 @@ Groups assets into groups for group overview
 Groups assets into total, company and private for a total overview of your economic future
 Estimates your max loan capasity from banks.
 - Calculate 4% retirement on asset cash flow (FIRE)
-- FIRE income = income + 4%asset value + deductable taxes
+- FIRE income = income + 4%asset value + deductable taxes + loan principal
 - FIRE expence = expence + mortgage + taxable taxes
-- FIRE diff = FIRE income - FIRE expence amount
+- FIRE cashflow = FIRE income - FIRE expence amount
 - FIRE % = FIRE income / FIRE expence = How close you are to fire
+- FIRE SavingRate = FIRE cashflow / FIRE income (in progress)
 
-On the wishlist:
+
 - Support for more sophisticated dynamics in income/expence/asset - 
 -- "1000" - Value is set to 1000.
 -- "+10%" - Adds 10% to value (Supported now, but syntax : 10)
@@ -32,15 +33,26 @@ On the wishlist:
 -- "-1000" - Subtracts 1000 from value (Supported now - same syntax)
 -- =+1/10" - Adds 1 tenth of the amount yearly
 -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10 years. Lile 1/10 first year, 1/9 next year, 1/8 the year after and the last year 1/1.
+
+ToDo
+- fond - innskudd akkumuleres ikke i formuen og fire blir feil om man setter det inn fra inntekt. Usikker på om det egentlig er en bug.
+- Beregning av skattbar formue og formuesskatt - trukket fra cash flow.
+- FIRE uttak beregnes fra wishPenison year inn i inntekt på person. Skatteberegnes også?
+- Er OTP uttak skattbart? Sjekk og juster.
+- Graf som viser formuen (fratrukket gjeld) i % fordelt på ulike grupper assets. Eiendom, fond, krypto, råvarer, aksjer, kontanter, pensjon
+- Realisert verdi etter skatt
+
+On the wishlist:
+- - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
+
 - Mortage calculation supporting extra downpayments each year (Need help here)
 - Configurable transfer of cash flow in % between assets (and mortages)
 - Support incremental amount addition of expences/income (not only %)
 - Showing % increase on assets, income and expences in asset spreadsheet
-- Showing all values compared to KPI index (relative value)
 - Central changerates configured pr year to make curve predictions
 - Retrieving asset values from API, like Crypto/Fond/stocks
 - FIRE asset usage is not deducted from the asset value, it probably should.
-- Fortune tax is not added to expences for the year calculated.
+- Fortune tax is not added to expences for the year calculated (but methods are ready now)
 - Refactoring and cleanup of code.
 
 {
@@ -52,37 +64,6 @@ On the wishlist:
 "period": {
 "start": 2005,
 "end": 2055
-},
-"tax": {
-"rental": {
-"yearly": 22,
-"realization": 22
-},
-"company": {
-"yearly": 0,
-"realization": 35.6
-},
-"salary": {
-"yearly": 46,
-"realization": 0
-},
-"house": {
-"yearly": 0,
-"realization": 22
-},
-"fond": {
-"yearly": 22,
-"realization": 35.6
-}
-},
-"changerates": {
-"kpi": 3.5,
-"crypto": 8,
-"fond": 6,
-"company": 15,
-"cash": 1,
-"house": 5,
-"interest": 4.5
 },
 "assets": {
 "house": {

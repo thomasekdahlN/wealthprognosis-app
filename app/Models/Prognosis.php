@@ -22,12 +22,34 @@ class Prognosis
     public $config;
     public $tax;
     public $changerate;
-    public $dataH = array();
-    public $assetH = array();
-    public $totalH = array();
-    public $groupH = array();
-    public $privateH = array();
-    public $companyH = array();
+    public $dataH = [];
+    public $assetH = [];
+    public $totalH = [];
+    public $groupH = [];
+    public $privateH = [];
+    public $companyH = [];
+
+    #FIX: Kanskje feil å regne inn otp her? Der kan man jo ikke velge.
+    public $firePartSalePossibleTypes = [
+        'crypto' => true,
+        'fond' => true,
+        'stock' => false,
+        'otp' => true,
+        'ask' => true,
+        'pension' => true,
+        ];
+
+    public $fireSavingTypes = [
+        'house' => true,
+        'rental' => true,
+        'cabin' => true,
+        'crypto' => true,
+        'fond' => true,
+        'stock' => true,
+        'otp' => false,
+        'ask' => true,
+        'pension' => true,
+        ];
 
     public function test() {
 
@@ -82,8 +104,9 @@ class Prognosis
             #print "$assetname: $taxtype: PercentTaxableYearly: $PercentTaxableYearly, PercentTaxableRealization: $PercentTaxableRealization\n";
 
             $assetValue = 0;
-            $firstAssetValue = 0;
-            $prevAssetValue = 0;
+            $firstAssetValue = null;
+            $firstAssetYear = null;
+            $prevAssetValue = null;
             $prevAssetRule = null;
             $prevAssetChangerate = 1;
             $prevAssetRepeat = false;
@@ -189,10 +212,21 @@ class Prognosis
                 }
 
                 $assetThis = Arr::get($asset, "value.$year.value", null); #Income is added as a monthly repeat in config
+                if($assetThis) { #FIX: Må sjekke asset repeat her
+                    $prevAssetThis = $assetThis;
+                } elseif($assetRepeat) {
+                    $assetThis = $prevAssetThis;
+                }
 
+                #print "Asset før: year: $year prevAssetValue:$prevAssetValue assetThis:$assetThis prevAssetRule:$prevAssetRule assetTransfer:$assetTransfer\n";
                 list($assetValue, $prevAssetRule, $explanation) = $this->valueAdjustment($assetname, $year, 'asset', $prevAssetValue, $assetThis, $prevAssetRule, $assetTransfer, 1);
-                if(!$firstAssetValue) {
-                    $firstAssetValue = $assetValue; #Ta vare på den første verdien vi ser på en asset, da den brukes til skatteberegning ved salg.
+                #print "Asset etter: year:$year assetValue:$assetValue, prevAssetRule:$prevAssetRule explanation:$explanation\n";
+
+                #FIX: The input diff has to be added to FIRE calculations.
+
+                if(!$firstAssetValue && $assetValue > 0) {
+                    $firstAssetValue = $assetValue; #FIX: Ta vare på den første verdien vi ser på en asset, da den brukes til skatteberegning ved salg. Må også akkumulere alle innskudd, men ikke verdiøkning.
+                    $firstAssetYear = $year; #Ta vare på den første året vi ser en asset, da den brukes til skatteberegning ved salg for å se hvor lenge man har eid den.
                 }
 
                $this->dataH[$assetname][$year]['asset'] = [
@@ -203,7 +237,29 @@ class Prognosis
                 ];
 
                 #Tax calculations
-                list($cashflow, $potentialIncome, $AmountTaxableYearly, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->taxCalculation($taxtype, $income, $expence, $assetValue, $firstAssetValue, $PercentTaxableYearly, $PercentTaxableRealization, $PercentDeductableYearly, $PercentDeductableRealization);
+                list($cashflow, $potentialIncome, $AmountTaxableYearly, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->taxCalculation($taxtype, $year, $income, $expence, $assetValue, $firstAssetValue, $firstAssetYear, $PercentTaxableYearly, $PercentTaxableRealization, $PercentDeductableYearly, $PercentDeductableRealization);
+
+                $this->dataH[$assetname][$year]['tax'] = [
+                    'amountTaxableYearly' => -$AmountTaxableYearly,
+                    'percentTaxableYearly' => $PercentTaxableYearly,
+                    'amountDeductableYearly' => -$AmountDeductableYearly,
+                    'percentDeductableYearly' => $PercentDeductableYearly,
+                    'amountTaxableRealization' => $AmountTaxableRealization,
+                    'percentTaxableRealization' => $PercentTaxableRealization,
+                    'amountDeductableRealization' => $AmountDeductableRealization,
+                    'percentDeductableRealization' => $PercentDeductableRealization,
+                ];
+
+                #Hmm. Fortune burde kanskje hete asset, men da blandes det med andre asset ting.....
+                $AmountTaxableFortune = $assetValue * $PercentTaxableFortune;
+                $fortuneTaxPercent = Arr::get($this->tax, "fortune.yearly", 0) / 100;
+                $fortuneTaxAmount = $AmountTaxableFortune * $fortuneTaxPercent;
+
+                $this->dataH[$assetname][$year]['fortune'] = [
+                    'taxableAmount' => $AmountTaxableFortune,
+                    'taxPercent' => $fortuneTaxPercent,
+                    'taxAmount' => $fortuneTaxAmount,
+                ];
 
                 #Calculate the potential max loan you can handle base on income, tax adjusted - as seen from the bank.
                 #print "$assetname - p:$potentialIncome = i:$income - t:$AmountTaxableYearly\n";
@@ -212,7 +268,8 @@ class Prognosis
                     'loan' => $potentialIncome * 5
                 ];
 
-                $AmountTaxableFortune = $assetValue * $PercentTaxableFortune;
+                #Vi må trekke fra formuesskatten fra cashflow
+                $cashflow -= $fortuneTaxAmount;
                 $restAccumulated += $cashflow;
 
                 #Free money to spend
@@ -226,16 +283,18 @@ class Prognosis
                 # amount = assetverdi - lån i beregningene + inntekt? (Hvor mye er 4% av de reelle kostnadene + inntekt (sannsynligvis kunn inntekt fra utleie)
                 # amountAchievement = amount - expences
                 #FIX: Something is wrong with this classification, and automatically calculating sales of everything not in this list.
-                if($taxtype == 'house' || $taxtype == 'rental' || $taxtype == 'cabin'|| $taxtype == 'car' || $taxtype == 'boat'|| $taxtype == 'salary') {
-                    #Kan ikke selge biter av en asset her, her regnes kun inntekt
-                    $ThisFirePercent = 0;
-                    $ThisFireIncome = 0; #Only asset value
-                } else {
+                if(Arr::get($this->firePartSalePossibleTypes, $meta['type'])) {
                     #Her kan vi selge biter av en asset (meta tagge opp det istedenfor tro?
-                    $ThisFirePercent = 0.04; #4% av en salgbar asset verdi
+                    $ThisFirePercent = 0.04; #4% av en salgbar asset verdi. FIX: Konfigurerbart FIRE tall.
                     $ThisFireIncome = $assetValue * $ThisFirePercent; #Only asset value
                     $AmountTaxableYearly        += $ThisFireIncome * $PercentTaxableYearly; #Legger til skatt på utbytte fra salg av en % av disse eiendelene her (De har neppe en inntekt, men det skal også fikses fint)
                     #print "ATY: $AmountTaxableYearly        += TFI:$ThisFireIncome * PTY:$PercentTaxableYearly;\n";
+                    #FIX: Det er ulik skatt på de ulike typene.
+
+                } else {
+                    #Kan ikke selge biter av en slik asset.
+                    $ThisFirePercent = 0;
+                    $ThisFireIncome = 0; #Only asset value
                 }
 
                 #NOTE - Deductable yarly blir bare satt i låneberegningen, så den må legges til globalt der.
@@ -252,9 +311,15 @@ class Prognosis
                 }
 
                 #Sparerate = Det du nedbetaler i gjeld + det du sparer eller investerer på andre måter / total inntekt (etter skatt).
+                $ThisFireSavingAmount = 0;
+                if(Arr::get($this->fireSavingTypes, $meta['type'])) {
+                    $ThisFireSavingAmount = $income; #If this asset is a valid saving asset, we add it to the saving amount.
+                }
+
                 $ThisFireSavingRate = 0;
-                if($ThisFireTotalIncome > 0) {
-                    $ThisFireSavingRate = ($ThisFireTotalIncome - $ThisFireTotalExpence) / $ThisFireTotalIncome;
+                #FIX: Should this be income adjusted for deductions and tax?
+                if($income > 0) {
+                    $ThisFireSavingRate = $ThisFireSavingAmount / $income;
                 }
 
                 $this->dataH[$assetname][$year]['fire'] = [
@@ -263,20 +328,13 @@ class Prognosis
                     'amountExpence' => $ThisFireTotalExpence,
                     'percentDiff' => $ThisFirePercentDiff,
                     'cashFlow' => $ThisFireCashFlow,
+                    'savingAmount' => $ThisFireSavingAmount,
                     'savingRate' => $ThisFireSavingRate,
                 ];
 
-                $this->dataH[$assetname][$year]['tax'] = [
-                    'amountTaxableYearly' => -$AmountTaxableYearly,
-                    'percentTaxableYearly' => $PercentTaxableYearly,
-                    'amountDeductableYearly' => -$AmountDeductableYearly,
-                    'percentDeductableYearly' => $PercentDeductableYearly,
-                    'amountTaxableRealization' => $AmountTaxableRealization,
-                    'percentTaxableRealization' => $PercentTaxableRealization,
-                    'amountDeductableRealization' => $AmountDeductableRealization,
-                    'percentDeductableRealization' => $PercentDeductableRealization,
-                    'amountFortune' => $AmountTaxableFortune
-                ];
+                #print "********\n";
+                #print_r($this->tax);
+                #print_r($this->dataH[$assetname][$year]['fortune']);
 
                 #print "i:$income - e:$expence, rest: $rest, restAccumulated: $restAccumulated\n";
 
@@ -378,7 +436,7 @@ class Prognosis
                 #Divison ex 1/12
                 list($value, $rule, $match) = $this->divisor($prevValue, $matches);
                 $diff = $prevValue - $value;
-                $explanation = "Adding: $rule";
+                $explanation = "Addingrule: $rule";
             }
         }
         elseif($thisValue == null) {
@@ -387,7 +445,7 @@ class Prognosis
             $diff = 0;
             if($value != null) {
                 #print "value: $value\n";
-                $explanation = "Using previous value: " . number_format($value, 2, ',', ' ');
+                $explanation = "Using previous value: '$value'";
             }
         } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
             #Percentages
@@ -402,13 +460,14 @@ class Prognosis
             #Divison ex 1/12
             list($value, $rule, $match) = $this->divisor($prevValue, $matches);
             $diff = $prevValue - $value;
-            $explanation = "Adding: $rule";
+            $explanation = "Addingrule: $rule";
 
         } elseif(preg_match('/(\+|\-)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
             #number that starts with + or - (to be added or subtracted
             $diff = $thisValue * $factor;
             $value = $prevValue + $diff; #Should fix both + and -
-            $explanation = "Adding: $diff";
+            #$rule = $thisValue; #New
+            $explanation = "Addingdiff: $diff";
 
         } elseif(preg_match('/(\=)(\d*)/i', $thisValue, $matches, PREG_OFFSET_CAPTURE)) {
             #number that starts with = Fixed number override
@@ -469,6 +528,10 @@ class Prognosis
         if($orgValue > 0) {
             #print "$assetname.$year.$type - Transfer: $transferValue, PV: $prevValue, TV: $thisValue,  value: $value, orgValue=$orgValue rule: $rule - match: $match\n";
         }
+
+        if($type != 'asset') {
+            #print "value:$value, rule:$rule thisValue:$thisValue prevValue:$prevValue diff:$diff factor:$factor type: $type, explanation:$explanation\n";
+        }
         return [$value, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
 
@@ -501,27 +564,30 @@ class Prognosis
 
             for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
                 #print "$year\n";
-                $this->addtogroup($year, $meta, $assetH[$year], "asset.amount");
-                $this->addtogroup($year, $meta, $assetH[$year], "asset.amountLoanDeducted");
-                $this->addtogroup($year, $meta, $assetH[$year], "income.amount");
-                $this->addtogroup($year, $meta, $assetH[$year], "expence.amount");
-                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountTaxableYearly");
-                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountTaxableRealization");
-                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountDeductableYearly");
-                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountDeductableRealization");
-                $this->addtogroup($year, $meta, $assetH[$year], "tax.amountFortune");
-                $this->addtogroup($year, $meta, $assetH[$year], "cashflow.amount");
-                $this->addtogroup($year, $meta, $assetH[$year], "cashflow.amountAccumulated");
-                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.payment");
-                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.paymentExtra");
-                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.interestAmount");
-                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.principal");
-                $this->addtogroup($year, $meta, $assetH[$year], "mortgage.balance");
-                $this->addtogroup($year, $meta, $assetH[$year], "potential.income"); #Beregnet potensiell inntekt slik bankene ser det.
-                $this->addtogroup($year, $meta, $assetH[$year], "potential.loan"); #Beregner maks potensielt lån på 5 x inntekt.
-                $this->addtogroup($year, $meta, $assetH[$year], "fire.amountIncome");
-                $this->addtogroup($year, $meta, $assetH[$year], "fire.amountExpence");
-                $this->addtogroup($year, $meta, $assetH[$year], "fire.cashFlow");
+                $this->additionToGroup($year, $meta, $assetH[$year], "asset.amount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "asset.amountLoanDeducted");
+                $this->additionToGroup($year, $meta, $assetH[$year], "income.amount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "expence.amount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountTaxableYearly");
+                $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountTaxableRealization");
+                $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountDeductableYearly");
+                $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountDeductableRealization");
+                $this->additionToGroup($year, $meta, $assetH[$year], "fortune.taxableAmount");
+                $this->setToGroup($year, $meta, $assetH[$year], "fortune.taxPercent");
+                $this->additionToGroup($year, $meta, $assetH[$year], "fortune.taxAmount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "cashflow.amount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "cashflow.amountAccumulated");
+                $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.payment");
+                $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.paymentExtra");
+                $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.interestAmount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.principal");
+                $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.balance");
+                $this->additionToGroup($year, $meta, $assetH[$year], "potential.income"); #Beregnet potensiell inntekt slik bankene ser det.
+                $this->additionToGroup($year, $meta, $assetH[$year], "potential.loan"); #Beregner maks potensielt lån på 5 x inntekt.
+                $this->additionToGroup($year, $meta, $assetH[$year], "fire.amountIncome");
+                $this->additionToGroup($year, $meta, $assetH[$year], "fire.amountExpence");
+                $this->additionToGroup($year, $meta, $assetH[$year], "fire.savingAmount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "fire.cashFlow");
             }
         }
 
@@ -531,8 +597,9 @@ class Prognosis
 
         for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
 
-            $this->fireSaveRate($year);
-            $this->firePercentDiff($year);
+            $this->groupFireSaveRate($year);
+            $this->groupFirePercentDiff($year);
+            $this->groupDebtCapacity($year);
             #FIX, later correct tax handling on the totals ums including deductions
         }
 
@@ -540,9 +607,18 @@ class Prognosis
         #print_r($this->groupH);
     }
 
+    private function groupDebtCapacity($year)
+    {
+        Arr::set($this->totalH, "$year.potential.debtCapacity", Arr::get($this->totalH, "$year.potential.loan", 0) - Arr::get($this->totalH, "$year.mortgage.balance", 0));
+
+        Arr::set($this->companyH, "$year.potential.debtCapacity", Arr::get($this->companyH, "$year.potential.loan", 0) - Arr::get($this->companyH, "$year.mortgage.balance", 0));
+
+        Arr::set($this->privateH, "$year.potential.debtCapacity", Arr::get($this->privateH, "$year.potential.loan", 0) - Arr::get($this->privateH, "$year.mortgage.balance", 0));
+    }
+
     #Calculates on data that is summed up in the group
     #FIX: Much better if we could use calculus here to reduce number of methods, but to advanced for the moment.
-    function fireSaveRate($year){
+    function groupFireSaveRate($year){
         if(Arr::get($this->totalH, "$year.fire.amountIncome", 0) > 0) {
             Arr::set($this->totalH, "$year.fire.savingRate", Arr::get($this->totalH, "$year.fire.cashFlow", 0) / Arr::get($this->totalH, "$year.fire.amountIncome", 0));
         }
@@ -558,7 +634,7 @@ class Prognosis
         #}
     }
 
-    function firePercentDiff($year){
+    private function groupFirePercentDiff($year){
 
 
         if(Arr::get($this->totalH, "$year.fire.amountExpence", 0) > 0) {
@@ -576,7 +652,7 @@ class Prognosis
         #}
     }
 
-    function addtogroup($year, $meta, $data, $dotpath) {
+    private function additionToGroup($year, $meta, $data, $dotpath) {
 
         if(Arr::get($data, $dotpath)) {
 
@@ -606,7 +682,37 @@ class Prognosis
         }
     }
 
-    public function initGroups() {
+    private function setToGroup($year, $meta, $data, $dotpath) {
+
+        if(Arr::get($data, $dotpath)) {
+
+            #Just to create an empty object, if it has no values.
+            Arr::set($this->totalH, "$year.$dotpath", Arr::get($data, $dotpath));
+            #print "Addtogroup:  " . Arr::get($this->totalH, "$year.$dotpath") . " = " . Arr::get($this->totalH, "$year.$dotpath", 0) . " + " . Arr::get($data, $dotpath) . "\n";
+
+
+            #Company
+            if (Arr::get($meta, 'group') == 'company') {
+                #Skaper trøbbel med sorteringsrekkefølgen at vi hopper over rekkene
+                Arr::set($this->companyH, "$year.$dotpath", Arr::get($data, $dotpath));
+            }
+
+            #Private
+            if (Arr::get($meta, 'group') == 'private') {
+                #Skaper trøbbel med sorteringsrekkefølgen at vi hopper over rekkene.
+                Arr::set($this->privateH, "$year.$dotpath", Arr::get($data, $dotpath));
+                #print "private: $year.$dotpath :  " . Arr::get($this->privateH, "$year.$dotpath") . " = " . Arr::get($this->privateH, "$year.$dotpath", 0) . " + " . Arr::get($data, $dotpath) . "\n";
+            }
+
+            #Grouping
+            $grouppath = Arr::get($meta, 'group') . ".$year.$dotpath";
+            $typepath = Arr::get($meta, 'type') . ".$year.$dotpath";
+            Arr::set($this->groupH, $grouppath, Arr::get($data, $dotpath));
+            Arr::set($this->groupH, $typepath, Arr::get($data, $dotpath));
+        }
+    }
+
+    private function initGroups() {
         #Just to get the sorting right, its bettert to start with an emplty structure in correct yearly order
 
         for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
@@ -629,7 +735,7 @@ class Prognosis
         return $array;
     }
 
-    public function taxCalculation($taxtype, $income, $expence, $assetValue, $firstAssetValue, $PercentTaxableYearly, $PercentTaxableRealization, $PercentDeductableYearly, $PercentDeductableRealization) {
+    private function taxCalculation($taxtype, $year, $income, $expence, $assetValue, $firstAssetValue, $firstAssetYear, $PercentTaxableYearly, $PercentTaxableRealization, $PercentDeductableYearly, $PercentDeductableRealization) {
         #Forskjell på hva man betaler skatt av
         $cashflow = 0;
         $potentialIncome = 0;
@@ -637,6 +743,9 @@ class Prognosis
         $AmountTaxableRealization = 0;
         $AmountDeductableYearly = 0;
         $AmountDeductableRealization = 0;
+        $numberOfYears = $year - $firstAssetYear;
+
+        #print "$year: numberOfYears: $numberOfYears\n";
 
         if ($taxtype == 'salary') {
             $AmountTaxableYearly = $income * $PercentTaxableYearly;
@@ -649,7 +758,7 @@ class Prognosis
             $AmountTaxableYearly = ($income - $expence) * $PercentTaxableYearly;
             $AmountTaxableRealization = 0;  #Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
             $cashflow = $income - $expence - $AmountTaxableYearly + $AmountDeductableYearly;
-            $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+            $potentialIncome = $income;
 
         } elseif ($taxtype == 'cabin') {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
