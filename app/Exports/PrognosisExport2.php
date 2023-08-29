@@ -56,6 +56,7 @@ class PrognosisExport2
             ->setCategory("Wealth prognosis");
 
         $this->spreadsheet->removeSheetByIndex(0); //Siden jeg ikke klarte å navne det første
+        print "Leser: '$configfile'\n";
         $content = file_get_contents($configfile);
         $this->config = json_decode($content, true);
 
