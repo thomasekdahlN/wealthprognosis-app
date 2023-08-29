@@ -56,7 +56,9 @@ class PrognosisExport2
             ->setCategory("Wealth prognosis");
 
         $this->spreadsheet->removeSheetByIndex(0); //Siden jeg ikke klarte å navne det første
-        $this->config = json_decode(file_get_contents($configfile), true);
+        $content = file_get_contents($configfile);
+        $this->config = json_decode($content, true);
+
         $this->tax = json_decode(Storage::disk('local')->get('tax.json'), true);
         $this->changerate = json_decode(Storage::disk('local')->get('changerate.json'), true);
 

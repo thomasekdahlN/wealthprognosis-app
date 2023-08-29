@@ -252,6 +252,11 @@ class Prognosis
 
                 #Hmm. Fortune burde kanskje hete asset, men da blandes det med andre asset ting.....
                 $AmountTaxableFortune = $assetValue * $PercentTaxableFortune;
+                if($AmountTaxableFortune <= 1700000) {
+                    $AmountTaxableFortune = 0; #Det betales ikke formuesskatt på skattbar formue under 1.7 mill. FIX lese fra confid, støtte årlige forskjeller.
+                } else {
+                    $AmountTaxableFortune = $AmountTaxableFortune - 1700000;
+                }
                 $fortuneTaxPercent = Arr::get($this->tax, "fortune.yearly", 0) / 100;
                 $fortuneTaxAmount = $AmountTaxableFortune * $fortuneTaxPercent;
 
@@ -574,7 +579,6 @@ class Prognosis
                 $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountDeductableRealization");
                 $this->additionToGroup($year, $meta, $assetH[$year], "fortune.taxableAmount");
                 $this->setToGroup($year, $meta, $assetH[$year], "fortune.taxPercent");
-                $this->additionToGroup($year, $meta, $assetH[$year], "fortune.taxAmount");
                 $this->additionToGroup($year, $meta, $assetH[$year], "cashflow.amount");
                 $this->additionToGroup($year, $meta, $assetH[$year], "cashflow.amountAccumulated");
                 $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.payment");
@@ -600,11 +604,30 @@ class Prognosis
             $this->groupFireSaveRate($year);
             $this->groupFirePercentDiff($year);
             $this->groupDebtCapacity($year);
+            $this->groupFortuneTax($year);
             #FIX, later correct tax handling on the totals ums including deductions
         }
 
         #print "group\n";
         #print_r($this->groupH);
+    }
+
+    private function groupFortuneTax($year)
+    {
+        Arr::set($this->totalH, "$year.fortune.taxAmount", $this->fortuneTaxCalculation(Arr::get($this->totalH, "$year.fortune.taxableAmount", 0)));
+
+        Arr::set($this->companyH, "$year.fortune.taxAmount", $this->fortuneTaxCalculation(Arr::get($this->companyH, "$year.fortune.taxableAmount", 0)));
+
+        Arr::set($this->privateH, "$year.fortune.taxAmount", $this->fortuneTaxCalculation(Arr::get($this->privateH, "$year.fortune.taxableAmount", 0)));
+    }
+
+    private function fortuneTaxCalculation($AmountTaxableFortune) {
+
+        if ($AmountTaxableFortune <= 1700000) {
+            return 0; #Det betales ikke formuesskatt på skattbar formue under 1.7 mill. FIX lese fra confid, støtte årlige forskjeller.
+        } else {
+            return $AmountTaxableFortune - 1700000;
+        }
     }
 
     private function groupDebtCapacity($year)

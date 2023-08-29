@@ -195,7 +195,7 @@
             },
             "value": {
                 "2022": {
-                    "value": 50000,
+                    "value": 2000000,
                     "changerate": "changerates.fond",
                     "description": "",
                     "repeat": true
