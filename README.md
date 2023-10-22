@@ -5,9 +5,18 @@ Predicts your economic future and wealth taking into consideration all known par
 Note: This is just a hack and is not production ready.
 
 How to run
-php artisan ReadFile2 example.json example.xlsx all/private/company
+php artisan ReadFile2 yourassetconfig.json realistic/positive/negative all/private/company
 
-Reads your economic setup as a json file and provides a detail spreadsheet with analysis of your future economy.
+php artisan ReadFile2 tests/Feature/config/example.json realistic private
+
+tests/Feature/config/example.json = path to your asset definition.
+realistic/positive/negative are standard prognosis. You can copy and make your own, just place them in the same directory.
+all/private/comapny - run the prognosis for only, private, only company or both.
+
+Output:
+The command will automatically generate excel files in the same directory as your config file, with the same name as the run config file.
+
+Reads your economic setup as a json file and provides a detail spreadsheet with analysis of your future economy until your death.
 
 Supports % changerates on expences, income and asset values
 Supports mortage calculations and new mortages taking over for a previous mortage
@@ -24,7 +33,6 @@ Estimates your max loan capasity from banks.
 - FIRE % = FIRE income / FIRE expence = How close you are to fire
 - FIRE SavingRate = FIRE cashflow / FIRE income (in progress)
 
-
 - Support for more sophisticated dynamics in income/expence/asset - 
 -- "1000" - Value is set to 1000.
 -- "+10%" - Adds 10% to value (Supported now, but syntax : 10)
@@ -35,6 +43,16 @@ Estimates your max loan capasity from banks.
 -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10 years. Lile 1/10 first year, 1/9 next year, 1/8 the year after and the last year 1/1.
 
 ToDo
+- KPI arkfane og beregning (må ikke summeres)
+- 
+- Positve eiendeler
+- Negative eiendeler
+- Klassifisere FIRE oppnåelse pr år
+- Prognose splittes i tre_ negativ, positiv, realistisk (genere 3 xls filer?). Prognose må settes pr år.
+- Arkfane som grupperer assets i verdi pr asset gruppe pr år (for å se spredning av assets)
+- Likvidering og skatt må beregnes mer riktig.
+- Skatteoppsettet må være pr år.
+
 - fond - innskudd akkumuleres ikke i formuen og fire blir feil om man setter det inn fra inntekt. Usikker på om det egentlig er en bug.
 - Beregning av skattbar formue og formuesskatt - trukket fra cash flow.
 - FIRE uttak beregnes fra wishPenison year inn i inntekt på person. Skatteberegnes også?

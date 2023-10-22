@@ -14,7 +14,7 @@
                 "group": "private",
                 "name": "Salary",
                 "description": "Salary",
-                "active": false,
+                "active": true,
                 "tax": "salary"
             },
             "income": {
@@ -43,13 +43,13 @@
                 }
             }
         },
-        "arv": {
+        "inheritance": {
             "meta": {
                 "type": "inheritance",
                 "group": "private",
                 "name": "inheritance",
                 "description": "inheritance",
-                "active": false,
+                "active": true,
                 "tax": "inheritance"
             },
             "value": {
@@ -62,13 +62,13 @@
                 }
             }
         },
-        "folketrygden": {
+        "pension": {
             "meta": {
                 "type": "pension",
                 "group": "private",
                 "name": "Folketrygden",
                 "description": "Folketrygden",
-                "active": false,
+                "active": true,
                 "tax": "salary"
             },
             "income": {
@@ -87,7 +87,7 @@
                 "group": "private",
                 "name": "OTP",
                 "description": "OTP",
-                "active": false,
+                "active": true,
                 "tax": "fond"
             },
             "value": {
@@ -113,7 +113,7 @@
                 "group": "private",
                 "name": "My house",
                 "description": "Here I live",
-                "active" : false,
+                "active" : true,
                 "tax": "house"
             },
             "value": {
@@ -172,7 +172,7 @@
                 "group": "private",
                 "name": "My Crypto",
                 "description": "Coinbase private",
-                "active": false,
+                "active": true,
                 "tax": "fond"
             },
             "value": {
@@ -220,7 +220,7 @@
                 "group": "private",
                 "name": "Cash",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "cash"
             },
             "value": {
@@ -238,7 +238,7 @@
                 "group": "private",
                 "name": "Avensis",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "car"
             },
             "value": {
@@ -265,7 +265,7 @@
                 "group": "private",
                 "name": "Boat",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "boat"
             },
             "value": {
@@ -292,7 +292,7 @@
                 "group": "company",
                 "name": "KLP fond",
                 "description": "",
-                "active": false,
+                "active": true,
                 "tax": "fond"
             },
             "value": {
@@ -310,7 +310,7 @@
                 "group": "company",
                 "name": "Company AS",
                 "description": "I own stocks here",
-                "active": false,
+                "active": true,
                 "tax": "stock"
             },
             "value": {

@@ -31,7 +31,7 @@ class PrognosisRealizationSheet2
         $this->totalH = $totalH;
 
         $this->spreadsheet = $spreadsheet;
-        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear', 1970);
+        $this->birthYear  = (integer) Arr::get($this->config, 'meta.birthYear', 1990);
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
         $this->deathYear  = (integer) $this->birthYear + Arr::get($this->config, 'meta.deathYear', 82);
 

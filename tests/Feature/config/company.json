@@ -8,22 +8,20 @@
         "deathYear": "82"
     },
     "assets": {
-
-        "folketrygden": {
+        "company": {
             "meta": {
-                "type": "pension",
-                "group": "private",
-                "name": "Folketrygden",
-                "description": "Folketrygden",
-                "active": false,
-                "tax": "salary"
+                "type": "stock",
+                "group": "company",
+                "name": "Company AS",
+                "description": "I own stocks here",
+                "active": true,
+                "tax": "stock"
             },
-            "income": {
-                "$pensionOfficialYear": {
-                    "name": "Folketrygden",
-                    "description": "Folketrygden fra $pensionOfficialYear",
-                    "value": 15000,
-                    "changerate": "changerates.kpi",
+            "value": {
+                "2022": {
+                    "value": 2500000,
+                    "changerate": "changerates.stock",
+                    "description": "Initielt kjøp",
                     "repeat": true
                 }
             }

@@ -1,6 +1,8 @@
 <?php
 namespace App\Exports;
 
+use App\Models\Tax;
+use App\Models\Changerate;
 use App\Models\Prognosis;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -38,7 +40,7 @@ class PrognosisExport2
     public $cashflowColor = 'ADD8E6';
 
 
-    public function __construct($configfile, $exportfile, $generate)
+    public function __construct($configfile, $exportfile, $prognosis, $generate)
     {
         $this->configfile = $configfile;
 
@@ -60,8 +62,6 @@ class PrognosisExport2
         $content = file_get_contents($configfile);
         $this->config = json_decode($content, true);
 
-        $this->tax = json_decode(Storage::disk('local')->get('tax.json'), true);
-        $this->changerate = json_decode(Storage::disk('local')->get('changerate.json'), true);
 
         $this->birthYear = (integer)Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; #We look at economy from 16 years of age
@@ -85,7 +85,7 @@ class PrognosisExport2
         $this->untilPensionYears = $this->pensionYear - $this->thisYear + 1; #The number of years until pension, used i divisor calculations
         $this->totalYears = $this->deathYear - $this->economyStartYear + 1; #Antall år vi gjør beregningen over
 
-        #Variable replacement before start
+        #Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
         $content = str_replace(
             ['$birthYear', '$economyStartYear', '$thisYear', '$prognoseYear', '$pensionOfficialYear', '$pensionWishYear', '$otpStartYear', '$otpEndYear', '$otpYears', '$deathYear', '$pensionYears', '$leftYears', '$untilPensionYears'],
             [$this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionOfficialYear, $this->pensionWishYear, $this->otpStartYear, $this->otpEndYear, $this->otpYears, $this->deathYear, $this->pensionYears, $this->leftYears, $this->untilPensionYears],
@@ -95,6 +95,11 @@ class PrognosisExport2
 
         $this->config = json_decode($content, true);
 
+        $this->tax = new Tax('tax', $this->economyStartYear, $this->deathYear);
+        $this->changerate = new Changerate($prognosis, $this->economyStartYear, $this->deathYear);
+
+        #print $this->changerate->getChangeratePercent('otp', '2024') . "\n";
+        #print $this->changerate->getChangerateDecimal('otp', '2024') . "\n";
 
         $prognosis = (new Prognosis($this->config, $this->tax, $this->changerate));
         #dd($prognosis->privateH);
@@ -151,12 +156,17 @@ class PrognosisExport2
         $sheet->getStyle("B6:Z80")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
 
         #Kolonner med prosenter i innhold
+        $sheet->getStyle("D6:D80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
         $sheet->getStyle("F6:F80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("J6:J80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+
+        $sheet->getStyle("H6:H80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
         $sheet->getStyle("L6:L80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("P6:P80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("T6:T80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("Z6:Z80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("N6:N80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("Q6:Q80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+
+        $sheet->getStyle("S6:S80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("W6:W80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("AC6:AC80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
 
         for ($column = 1; $column <= 20+6; $column++) {
@@ -165,7 +175,7 @@ class PrognosisExport2
 
         $verticaloffsett = 6;
         #Grå Kolonne header
-        $sheet->getStyle('A5:Z5')->getFill()
+        $sheet->getStyle('A5:AE5')->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('CCCCCC');
 
@@ -175,48 +185,48 @@ class PrognosisExport2
             ->getStartColor()->setARGB($this->incomeColor);
 
         #Utgift - vertikal
-        $sheet->getStyle("D6:D" . $this->totalYears + $verticaloffsett - 1)->getFill()
+        $sheet->getStyle("E6:E" . $this->totalYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->expenceColor);
 
-        #cashflow blå - vertikal
-        $sheet->getStyle("N6:N" . $this->totalYears + $verticaloffsett - 1)->getFill()
+        #Formue blå - vertikal
+        $sheet->getStyle("P6:P" . $this->totalYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->cashflowColor);
 
 
         #cashflow blå - vertikal
-        $sheet->getStyle("R6:R" . $this->totalYears + $verticaloffsett - 1)->getFill()
+        $sheet->getStyle("U6:U" . $this->totalYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->cashflowColor);
 
         #I år - horozontal
         $row = $this->thisYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:Z$row")->getFill()
+        $sheet->getStyle("A$row:AD$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->thisYearRowColor);
 
         #Prognosis year - horizontal
         $row = $this->prognoseYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:Z$row")->getFill()
+        $sheet->getStyle("A$row:AD$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
         #Pension official - horizontal
         $row = $this->pensionOfficialYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:Z$row")->getFill()
+        $sheet->getStyle("A$row:AD$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
 
         #Pension wish - horizontal
         $row = $this->pensionWishYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:Z$row")->getFill()
+        $sheet->getStyle("A$row:AD$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
 
         #Deathyear - horizontal
         $row = $this->deathYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A" . $row . ":Z" . $row)->getFill()
+        $sheet->getStyle("A" . $row . ":AD" . $row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->deathYearRowColor);
     }
