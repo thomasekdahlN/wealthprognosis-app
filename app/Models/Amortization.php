@@ -89,7 +89,7 @@ class Amortization extends Model
         $interestConverted = $interestPercent / 100;
 
         $deno = 1 - (1 / pow((1+ $interestConverted), $this->period));
-        print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestConverted), $this->period))\n";
+        #print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestConverted), $this->period))\n";
 
         if($deno > 0) {
             $this->term_pay = ($this->loan_amount * $interestConverted) / $deno;
@@ -103,7 +103,7 @@ class Amortization extends Model
 
             #if($this->balance > 0) {
 
-                print "$year: $this->period : deno: $deno : $interestPercent% = $interestConverted : loanamount: " . round($this->loan_amount)  . " terminbelop: " . round($this->term_pay)  . " : renter " . round($interestAmount) . " : avdrag: " . round($this->principal) . " : balance: " . round($this->balance) . "\n";
+                #print "$year: $this->period : deno: $deno : $interestPercent% = $interestConverted : loanamount: " . round($this->loan_amount)  . " terminbelop: " . round($this->term_pay)  . " : renter " . round($interestAmount) . " : avdrag: " . round($this->principal) . " : balance: " . round($this->balance) . "\n";
                 $this->dataH[$this->assettname][$year]['mortgage'] = [
                         'payment' => $this->term_pay,
                         'interestPercent' => $interestPercent / 100,

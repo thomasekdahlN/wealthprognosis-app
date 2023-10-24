@@ -51,6 +51,19 @@ class Prognosis
         'pension' => true,
         ];
 
+
+    public $assetSpreadTypes = [
+        'house' => true,
+        'rental' => true,
+        'cabin' => true,
+        'crypto' => true,
+        'fond' => true,
+        'stock' => true,
+        'otp' => false,
+        'ask' => true,
+        'pension' => true,
+    ];
+
     public function __construct(array $config, object $tax, object $changerate)
     {
         #$this->test();
@@ -559,7 +572,38 @@ class Prognosis
         }
 
         #print "group\n";
-        #print_r($this->groupH);
+        $this->assetTypeSpread();
+    }
+
+    private function assetTypeSpread() {
+
+        $statistics = [];
+
+        foreach ($this->groupH as $type => $asset) {
+            if(Arr::get($this->assetSpreadTypes, $type)) {
+                #print "$type\n";
+                foreach ($asset as $year => $data) {
+                    $amount = round(Arr::get($data, "asset.amount", 0));
+                    #print "$type:$year:$amount\n";
+                    $statistics[$year][$type]['amount'] = $amount;
+                    $statistics[$year]['total']['amount'] = Arr::get($statistics, "$year.total.amount", 0) + $amount;
+                }
+
+                #Generate % spread
+                foreach ($statistics as $year => $typeH) {
+                    foreach ($typeH as $typename => $data) {
+                        if($typeH['total']['amount'] > 0) {
+                            $statistics[$year][$typename]['percent'] = round(($data['amount'] / $typeH['total']['amount'])*100);
+                        } else {
+                            $statistics[$year][$typename]['percent'] = 0;
+                        }
+                        #print_r($data);
+                        print "$year=" . $data['amount'] . "\n";
+                    }
+                }
+            }
+        }
+        print_r($statistics);
     }
 
     private function groupFortuneTax(int $year)
