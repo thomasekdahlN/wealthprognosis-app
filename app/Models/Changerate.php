@@ -15,7 +15,7 @@ class Changerate extends Model
 
     #All chanegrates are stored as percentages, as this is the same as input. Can be retrieved as Decimal for easier calculation
     #Fill the changerate structure with prognosis for all years, so we never get an empty answer.
-    public function __construct($prognosis, $startYear, $stopYear)
+    public function __construct(string $prognosis, int $startYear, int $stopYear)
     {
 
         $startYear = 1970; #Since its so much trouble if we miss a sequenze
@@ -27,7 +27,7 @@ class Changerate extends Model
         foreach($configH as $type => $typeH) {
             $prevChangerate = 0;
             for ($year = $startYear; $year <= $stopYear; $year++) {
-                print "$type.$year = " . Arr::get($configH, "$type.$year", null) . "\n";
+                #print "$type.$year = " . Arr::get($configH, "$type.$year", null) . "\n";
 
                 $changerate = Arr::get($configH, "$type.$year", null);
                 if(isset($changerate)) {
@@ -40,14 +40,14 @@ class Changerate extends Model
          }
     }
 
-    public function getChangerate($type, $year)
+    public function getChangerate(string $type, int $year)
     {
         $percent = $this->changerateH[$type][$year];
         $decimal = $this->convertPercentToDecimal($percent);
         return [$percent, $decimal];
     }
 
-    public function convertPercentToDecimal($percent) {
+    public function convertPercentToDecimal(int $percent) {
 
         if($percent > 0) {
             $explanation = 'percent > 0';
@@ -66,7 +66,7 @@ class Changerate extends Model
     }
 
     #Really to Excel.
-    public function decimalToDecimal($value){
+    public function decimalToDecimal(int $value){
 
         if($value > 0) {
             $value = $value - 1;
@@ -78,7 +78,7 @@ class Changerate extends Model
 
     #Should be moved to helper?
     #Percent is either a percentage integer 7 or a text refering to the chanegrate structure dynamically like "fond" - It will look up fond changerates for that year.
-    public function convertChangerate($debug, $original, $year, $variablename){
+    public function convertChangerate(bool $debug, ?string $original, int $year, ?string $variablename){
 
         $percent = 0;
         $decimal = 1;

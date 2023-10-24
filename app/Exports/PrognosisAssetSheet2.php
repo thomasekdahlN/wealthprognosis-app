@@ -101,8 +101,8 @@ class PrognosisAssetSheet2
 
             $this->worksheet->setCellValue("G$this->rows", Arr::get($data, "mortgage.payment"));
 
-            if(Arr::get($data, "mortgage.interest") != 0) {
-                $this->worksheet->setCellValue("H$this->rows", Arr::get($data, "mortgage.interest",));
+            if(Arr::get($data, "mortgage.interestPercent") != 0) {
+                $this->worksheet->setCellValue("H$this->rows", Arr::get($data, "mortgage.interestPercent",));
             }
             $this->worksheet->setCellValue("I$this->rows", Arr::get($data, "mortgage.interestAmount"));
             $this->worksheet->setCellValue("J$this->rows", Arr::get($data, "mortgage.principal"));

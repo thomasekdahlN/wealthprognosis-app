@@ -304,3 +304,56 @@ On the wishlist:
 }
 }
 }
+
+
+
+Algoritme for å beregne ny årlig betaling med ekstra avdrag:
+
+Start med det opprinnelige lånebeløpet
+�
+L.
+Beregn den årlige betalingen
+�
+P for lånet uten ekstra avdrag ved hjelp av annuitetsformelen.
+Hvert år, trekk fra den ekstra betalingen fra lånebeløpet før du beregner renten.
+Trekk den årlige betalingen
+�
+P fra den nye lånesummen.
+Gjenta trinn 3 og 4 inntil lånebeløpet er 0 eller negativt.
+Eksempel:
+
+Gitt:
+
+�
+L (lånebeløpet) = 1,000,000
+�
+r (den årlige rentesatsen i desimalform) = 6% = 0.06
+�
+n (antall år) = 20
+�
+≈
+87
+,
+247.01
+P≈87,247.01 (som vi beregnet tidligere)
+Ekstra årlig betaling = 10,000
+La oss bruke algoritmen:
+
+Start med
+�
+L = 1,000,000.
+Første års rente =
+�
+×
+�
+L×r = 1,000,000 × 0.06 = 60,000.
+Betal ned lånet med
+�
+P + 10,000 = 97,247.01.
+Nytt lånebeløp = 1,000,000 + 60,000 - 97,247.01 = 962,752.99.
+Gjenta trinn 2-4 for det nye lånebeløpet.
+Ved å følge denne prosessen vil du se at lånet blir betalt ned raskere enn 20 år.
+
+For å finne ut nøyaktig hvor mye raskere du vil bli ferdig med lånet ved å betale 10,000 ekstra hvert år, vil det være mest effektivt å lage en iterativ beregning (for eksempel i et regneark eller ved hjelp av en programmeringsskript).
+
+Men generelt, ved å betale ekstra ned på hovedstolen hvert år, reduserer du mengden renter som akkumuleres, og dermed reduserer du den totale tiden det tar å betale tilbake lånet.

@@ -51,7 +51,7 @@ class Prognosis
         'pension' => true,
         ];
 
-    public function __construct($config, $tax, $changerate)
+    public function __construct(array $config, object $tax, object $changerate)
     {
         #$this->test();
         $this->config = $config;
@@ -184,7 +184,7 @@ class Prognosis
                 }
 
                 #print "Asset før: year: $year prevAssetValue:$prevAssetValue assetCurrent:$assetCurrent prevAssetRule:$prevAssetRule assetTransfer:$assetTransfer\n";
-                list($assetValue, $prevAssetRule, $explanation) = $this->valueAdjustment(1, $assetname, $year, 'asset', $prevAssetValue, $assetCurrent, $prevAssetRule, $assetTransfer, 1);
+                list($assetValue, $prevAssetRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'asset', $prevAssetValue, $assetCurrent, $prevAssetRule, $assetTransfer, 1);
                 #print "Asset etter: year:$year assetValue:$assetValue, prevAssetRule:$prevAssetRule explanation:$explanation\n";
 
                 #FIX: The input diff has to be added to FIRE calculations.
@@ -334,7 +334,6 @@ class Prognosis
             #Loan
             //$this->collections = $this->collections->keyBy('year');
             #dd($this->dataH);
-
             $mortgage = Arr::get($asset, "mortgage", false);
 
             #print_r($mortgage);
@@ -354,7 +353,7 @@ class Prognosis
         $this->group();
     }
 
-    public function add($assettname, $year, $type, $dataH){
+    public function add(string $assettname, int $year, string $type, array $dataH){
         #$this->dataH[$assettname][$year][$type] = $dataH;
     }
 
@@ -368,7 +367,7 @@ class Prognosis
         -- =+1/10" - Adds 1 tenth of the amount yearly
         -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10
          */
-    public function valueAdjustment($debug, $assetname, $year, $type, $prevValue, $currentValue, $rule = NULL, $transfer, $factor = 1){
+    public function valueAdjustment(bool $debug, string $assetname, int $year, string $type, ?string $prevValue, ?string $currentValue, string $rule = NULL, ?string  $transfer, int $factor = 1){
         #Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor has memory for now.
         $value = null;
         $match = null;
@@ -487,7 +486,7 @@ class Prognosis
         return [$value, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
 
-    public function divisor($prevValue, $matches) {
+    public function divisor(?string $prevValue, array $matches) {
 
         $rule = null;
 
@@ -563,7 +562,7 @@ class Prognosis
         #print_r($this->groupH);
     }
 
-    private function groupFortuneTax($year)
+    private function groupFortuneTax(int $year)
     {
         #ToDo - fortune tax sybtraction level support.
 
@@ -579,7 +578,7 @@ class Prognosis
 
 
 
-    private function groupDebtCapacity($year)
+    private function groupDebtCapacity(int $year)
     {
         Arr::set($this->totalH, "$year.potential.debtCapacity", Arr::get($this->totalH, "$year.potential.loan", 0) - Arr::get($this->totalH, "$year.mortgage.balance", 0));
 
@@ -590,7 +589,7 @@ class Prognosis
 
     #Calculates on data that is summed up in the group
     #FIX: Much better if we could use calculus here to reduce number of methods, but to advanced for the moment.
-    function groupFireSaveRate($year){
+    function groupFireSaveRate(int $year){
         if(Arr::get($this->totalH, "$year.fire.amountIncome", 0) > 0) {
             Arr::set($this->totalH, "$year.fire.savingRate", Arr::get($this->totalH, "$year.fire.cashFlow", 0) / Arr::get($this->totalH, "$year.fire.amountIncome", 0));
         }
@@ -606,7 +605,7 @@ class Prognosis
         #}
     }
 
-    private function groupFirePercentDiff($year){
+    private function groupFirePercentDiff(int $year){
 
 
         if(Arr::get($this->totalH, "$year.fire.amountExpence", 0) > 0) {
@@ -624,7 +623,7 @@ class Prognosis
         #}
     }
 
-    private function additionToGroup($year, $meta, $data, $dotpath) {
+    private function additionToGroup(int $year, array $meta, array $data, string $dotpath) {
         #"fortune.taxableAmount"
         #if(Arr::get($data, $dotpath)) {
 
@@ -656,7 +655,7 @@ class Prognosis
         #}
     }
 
-    private function setToGroup($year, $meta, $data, $dotpath) {
+    private function setToGroup(int $year, array $meta, array $data, string $dotpath) {
 
         if(Arr::get($data, $dotpath)) {
 
