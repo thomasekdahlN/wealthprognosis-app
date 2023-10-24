@@ -138,6 +138,11 @@ class PrognosisExport2
             }
         }
 
+        $assetSpreadSheet = new AssetSpreadSheet($this->spreadsheet, $prognosis->statisticsH);
+        $this->spreadsheet->addSheet($assetSpreadSheet->worksheet);
+        $this->spreadsheet->setActiveSheetIndexByName('Statistics');
+        $sheet = $this->spreadsheet->getActiveSheet();
+
         #Fix - hva skal vi sette som default når det er totalt dynamisk?
         #$this->spreadsheet->setActiveSheetIndexByName('Total');
 
