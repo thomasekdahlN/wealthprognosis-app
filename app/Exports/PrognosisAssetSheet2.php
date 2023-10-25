@@ -91,11 +91,11 @@ class PrognosisAssetSheet2
             $this->worksheet->setCellValue("A$this->rows", $year);
             $this->worksheet->setCellValue("B$this->rows",(int) $year-Arr::get($this->config, 'meta.birthYear'));
             $this->worksheet->setCellValue("C$this->rows", Arr::get($data, "income.amount"));
-            if(Arr::get($data, "income.changerate") != 0) {
+            if(Arr::get($data, "income.changerate") != 0 && Arr::get($data, "income.amount") > 0) {
                 $this->worksheet->setCellValue("D$this->rows", Arr::get($data, "income.changerate"));
             }
             $this->worksheet->setCellValue("E$this->rows", Arr::get($data, "expence.amount"));
-            if(Arr::get($data, "expence.changerate") != 0) {
+            if(Arr::get($data, "expence.changerate") != 0 && Arr::get($data, "expence.amount") > 0) {
                 $this->worksheet->setCellValue("F$this->rows", Arr::get($data, "expence.changerate"));
             }
 

@@ -8,7 +8,7 @@
         "deathYear": "82"
     },
     "assets": {
-        "salary": {
+        "income": {
             "meta": {
                 "type": "salary",
                 "group": "private",
@@ -47,13 +47,13 @@
                 "2023": {
                     "value": "=500000",
                     "changerate": "changerates.otp",
-                    "transfer": "salary.$year.income.amount*0.05",
+                    "transfer": "income.$year.income.amount*0.05",
                     "description": "OTP Sparing frem til pensjonsår",
                     "repeat": true
                 },
                 "$otpStartYear": {
                     "value": "-1/$otpYears",
-                    "transfer": "salary.$year.income.amount=diff",
+                    "transfer": "income.$year.income.amount=diff",
                     "changerate": "changerates.otp",
                     "description": "OTP fra $otpStartYear, -1/$otpYears av formuen fra pensjonsåret",
                     "repeat": true

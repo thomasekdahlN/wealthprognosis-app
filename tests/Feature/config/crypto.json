@@ -23,6 +23,13 @@
                     "changerate": "changerates.crypto",
                     "description": "",
                     "repeat": true
+                },
+                "$pensionWishYear": {
+                    "value": "-1/$pensionWishYears",
+                    "transfer": "income.$year.income.amount=diff",
+                    "changerate": "changerates.fond",
+                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+                    "repeat": true
                 }
             }
         }

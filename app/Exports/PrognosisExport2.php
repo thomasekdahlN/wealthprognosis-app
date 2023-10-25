@@ -80,15 +80,16 @@ class PrognosisExport2
         $this->otpYears = $this->otpEndYear - $this->otpStartYear;
 
         $this->deathYear = (integer)$this->birthYear + Arr::get($this->config, 'meta.deathYear', 82);
-        $this->pensionYears = $this->deathYear - $this->pensionWishYear + 1; #The number of years you vil live with pension, used i divisor calculations
+        $this->pensionWishYears = $this->deathYear - $this->pensionWishYear + 1; #The number of years you vil live with pension, used i divisor calculations
+        $this->pensionOfficialYears = $this->deathYear - $this->pensionOfficialYear + 1; #The number of years you vil live with pension, used i divisor calculations
         $this->leftYears = $this->deathYear - $this->thisYear + 1; #The number of years until you die, used i divisor calculations
         $this->untilPensionYears = $this->pensionYear - $this->thisYear + 1; #The number of years until pension, used i divisor calculations
         $this->totalYears = $this->deathYear - $this->economyStartYear + 1; #Antall år vi gjør beregningen over
 
         #Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
         $content = str_replace(
-            ['$birthYear', '$economyStartYear', '$thisYear', '$prognoseYear', '$pensionOfficialYear', '$pensionWishYear', '$otpStartYear', '$otpEndYear', '$otpYears', '$deathYear', '$pensionYears', '$leftYears', '$untilPensionYears'],
-            [$this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionOfficialYear, $this->pensionWishYear, $this->otpStartYear, $this->otpEndYear, $this->otpYears, $this->deathYear, $this->pensionYears, $this->leftYears, $this->untilPensionYears],
+            ['$birthYear', '$economyStartYear', '$thisYear', '$prognoseYear', '$pensionOfficialYears', '$pensionWishYears', '$pensionOfficialYear', '$pensionWishYear', '$otpStartYear', '$otpEndYear', '$otpYears', '$deathYear', '$leftYears', '$untilPensionYears'],
+            [$this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionOfficialYears, $this->pensionWishYears, $this->pensionOfficialYear, $this->pensionWishYear, $this->otpStartYear, $this->otpEndYear, $this->otpYears, $this->deathYear, $this->leftYears, $this->untilPensionYears],
             file_get_contents($configfile));
 
         #print $content;

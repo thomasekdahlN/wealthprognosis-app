@@ -8,19 +8,19 @@
         "deathYear": "82"
     },
     "assets": {
-        "salary": {
+        "income": {
             "meta": {
-                "type": "salary",
+                "type": "income",
                 "group": "private",
-                "name": "Salary",
-                "description": "Salary",
+                "name": "Income",
+                "description": "Income",
                 "active": true,
-                "tax": "salary"
+                "tax": "income"
             },
             "income": {
                 "2022": {
-                    "name": "Salary",
-                    "description": "Salary",
+                    "name": "Income",
+                    "description": "Income",
                     "value": 40000,
                     "changerate": "changerates.kpi",
                     "repeat": true

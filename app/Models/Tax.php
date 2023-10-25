@@ -81,13 +81,17 @@ class Tax extends Model
         return [$fortuneTaxAmount, $fortuneTaxPercent];
     }
 
-    public function fortuneTaxTypeCalculation($taxtype, $fortuneAmount, $year) {
+    public function fortuneTaxTypeCalculation(string $taxtype, int $value, ?int $taxValue, int $year)
+    {
 
         $fortuneTaxPercent = $this->getFortuneTax($year);
         $fortuneTaxablePercent = $this->getTaxableFortune($taxtype, $year);
 
-        $fortuneTaxableAmount = $fortuneAmount * $fortuneTaxablePercent; #Calculate the amount from wich the tax is calculated
-
+        if ($taxValue > 0) {
+            $fortuneTaxableAmount = $taxValue; #If the taxable fortune is different than the marketprice, we adjust it accordingly
+        } else {
+            $fortuneTaxableAmount = $value * $fortuneTaxablePercent; #Calculate the amount from wich the tax is calculated from the market value
+        }
         $fortuneTaxAmount = $fortuneTaxableAmount * $fortuneTaxPercent; #Calculate the tax you shall pay from the taxable fortune
 
         #print "$AmountTaxableFortune, $fortuneTaxAmount, $fortuneTaxPercent\n";
@@ -95,7 +99,7 @@ class Tax extends Model
         return [$fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent];
     }
 
-    public function taxCalculation($debug, $taxtype, $year, $income, $expence, $assetValue, $firstAssetValue, $firstAssetYear) {
+    public function taxCalculation($debug, $taxtype, $year, $income, $expence, $assetValue, $taxValue, $firstAssetValue, $firstAssetYear) {
 
         $PercentCashflowTaxableYearly = $this->getTaxYearly($taxtype, $year);
         $PercentCashflowTaxableRealization = $this->getTaxRealization($taxtype, $year);
@@ -114,10 +118,16 @@ class Tax extends Model
         $numberOfYears = $year - $firstAssetYear;
 
         if($debug) {
-            print "\n$taxtype.$year: income: $income, expence: $expence, assetValue: $assetValue, firstAssetValue: $firstAssetValue, firstAssetYear: $firstAssetYear, PercentTaxableYearly: $PercentCashflowTaxableYearly, PercentTaxableRealization: $PercentCashflowTaxableRealization,PercentDeductableYearly: $PercentCashflowDeductableYearly, PercentDeductableRealization: $PercentCashflowDeductableRealization \n";
+            print "\n$taxtype.$year: income: $income, expence: $expence, assetValue: $assetValue,  taxValue: $taxValue, firstAssetYear: $firstAssetYear, PercentTaxableYearly: $PercentCashflowTaxableYearly, PercentTaxableRealization: $PercentCashflowTaxableRealization,PercentDeductableYearly: $PercentCashflowDeductableYearly, PercentDeductableRealization: $PercentCashflowDeductableRealization \n";
         }
 
         if ($taxtype == 'salary') {
+            $CashflowTaxableAmount = $income * $PercentCashflowTaxableYearly;
+            $AmountTaxableRealization = 0;
+            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
+            $potentialIncome = $income;
+        }
+        elseif ($taxtype == 'income') {
             $CashflowTaxableAmount = $income * $PercentCashflowTaxableYearly;
             $AmountTaxableRealization = 0;
             $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
@@ -195,7 +205,7 @@ class Tax extends Model
 
         ################################################################################################################
         #Beregning av formuesskatt
-        list($fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent) = $this->fortuneTaxTypeCalculation($taxtype, $assetValue, $year);
+        list($fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent) = $this->fortuneTaxTypeCalculation($taxtype, $assetValue, $taxValue, $year);
 
         #Vi må trekke fra formuesskatten fra cashflow
         $cashflow -= $fortuneTaxAmount;

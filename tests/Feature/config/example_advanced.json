@@ -181,6 +181,13 @@
                     "changerate": "changerates.crypto",
                     "description": "",
                     "repeat": true
+                },
+                "$pensionWishYear": {
+                    "value": "-1/$pensionWishYears",
+                    "transfer": "income.$year.income.amount=diff",
+                    "changerate": "changerates.fond",
+                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+                    "repeat": true
                 }
             }
         },
@@ -211,6 +218,13 @@
                     "description": "Slutter å sette inn 6000,- pr år",
                     "value": "+0",
                     "repeat": true
+                },
+                "$pensionWishYear": {
+                    "value": "-1/$pensionWishYears",
+                    "transfer": "income.$year.income.amount=diff",
+                    "changerate": "changerates.fond",
+                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+                    "repeat": true
                 }
             }
         },
@@ -228,6 +242,13 @@
                     "value": 50000,
                     "changerate": "changerates.cash",
                     "description": "Kontanter p.t.",
+                    "repeat": true
+                },
+                "$pensionWishYear": {
+                    "value": "-1/$pensionWishYears",
+                    "transfer": "income.$year.income.amount=diff",
+                    "changerate": "changerates.fond",
+                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
                     "repeat": true
                 }
             }
@@ -300,6 +321,13 @@
                     "description": "",
                     "value": 1000000,
                     "changerate": "changerates.fond",
+                    "repeat": true
+                },
+                "$pensionWishYear": {
+                    "value": "-1/$pensionWishYears",
+                    "transfer": "income.$year.income.amount=diff",
+                    "changerate": "changerates.fond",
+                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
                     "repeat": true
                 }
             }

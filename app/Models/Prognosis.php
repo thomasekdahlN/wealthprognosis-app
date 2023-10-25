@@ -85,33 +85,33 @@ class Prognosis
             if(!$meta['active']) continue; #Hopp over de inaktive
             $taxtype = Arr::get($meta, "tax", null);
 
-            #print "$assetname: $taxtype: DecimalTaxableYearly: $DecimalTaxableYearly, DecimalTaxableRealization: $DecimalTaxableRealization\n";
-
-            $assetValue = 0;
-            $firstAssetValue = null;
-            $firstAssetYear = null;
-            $prevAssetValue = null;
-            $prevAssetRule = null;
+            $assetFirstValue = null;
+            $assetFirstYear = null;
+            $assetPrevValue = null;
+            $assetCurrentValue = 0;
+            $assetRule = null;
             $assetChangerateDecimal = 0;
             $assetChangerateValue = "";
+            $assetCurrentRepeat= false;
+            $assetPrevRepeat= false;
+            $assetCurrentTransfer = null;
+            $assetPrevTransfer = null;
 
-            $prevAssetRepeat = false;
-            $assetTransfer = null;
-            $prevAssetTransfer = null;
-
-            $income = 0;
-            $prevIncome = 0;
+            $incomeCurrentValue = 0;
+            $incomePrevValue = 0;
             $incomeChangerateDecimal = 0;
             $incomeChangerateValue = "";
-            $prevIncomeRule = null;
-            $prevIncomeRepeat = false;
+            $incomeRule = null;
+            $incomePrevRepeat = false;
+            $incomeCurrentRepeat = false;
 
-            $expence = 0;
-            $prevExpence = 0;
+            $expenceCurrentValue = 0;
+            $expencePrevValue = 0;
             $expenceChangerateDecimal = 0;
             $expenceChangerateValue = "";
-            $prevExpenceRule = null;
-            $prevExpenceRepeat = false;
+            $expenceRule = null;
+            $expenceCurrentRepeat = false;
+            $expencePrevRepeat = false;
 
             $restAccumulated = 0;
 
@@ -128,22 +128,22 @@ class Prognosis
                 #####################################################
                 #expence
 
-                $expenceRepeat = Arr::get($asset, "expence.$year.repeat", null);
-                if(isset($expenceRepeat)) {
-                    $prevExpenceRepeat = $expenceRepeat;
+                $expenceCurrentRepeat = Arr::get($asset, "expence.$year.repeat", null);
+                if(isset($expenceCurrentRepeat)) {
+                    $expencePrevRepeat = $expenceCurrentRepeat;
                 } else {
-                    $expenceRepeat = $prevExpenceRepeat;
+                    $expenceCurrentRepeat = $expencePrevRepeat;
                 }
 
                 list($expenceChangeratePercent, $expenceChangerateDecimal, $expenceChangerateValue, $explanation) = $this->changerate->convertChangerate(0, Arr::get($asset, "expence.$year.changerate", null), $year, $expenceChangerateValue);
 
-                $expenceThis = Arr::get($asset, "expence.$year.value", null); #Expence is added as a monthly repeat in config
+                $expenceCurrentValue = Arr::get($asset, "expence.$year.value", null); #Expence is added as a monthly repeat in config
 
-                list($expence, $prevExpenceRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'expence',$prevExpence, $expenceThis, $prevExpenceRule, null,12);
+                list($expenceCurrentValue, $expenceRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'expence',$expencePrevValue, $expenceCurrentValue, $expenceRule, null,12);
 
                 $this->dataH[$assetname][$year]['expence'] = [
                     'changerate' => $expenceChangeratePercent / 100,
-                    'amount' => $expence,
+                    'amount' => $expenceCurrentValue,
                     'description' => Arr::get($asset, "expence.$year.description") . $explanation,
                 ];
 
@@ -151,73 +151,78 @@ class Prognosis
 
                 #####################################################
                 #income
-                $incomeRepeat = Arr::get($asset, "income.$year.repeat", null);
-                if(isset($incomeRepeat)) {
-                    $prevIncomeRepeat = $incomeRepeat;
+                $incomeCurrentRepeat = Arr::get($asset, "income.$year.repeat", null);
+                if(isset($incomeCurrentRepeat)) {
+                    $incomePrevRepeat = $incomeCurrentRepeat;
                 } else {
-                    $incomeRepeat = $prevIncomeRepeat;
+                    $incomeCurrentRepeat = $incomePrevRepeat;
                 }
 
                 list($incomeChangeratePercent, $incomeChangerateDecimal, $incomeChangerateValue, $explanation) =  $this->changerate->convertChangerate(0, Arr::get($asset, "income.$year.changerate", null), $year, $incomeChangerateValue);
 
-                $incomeThis = Arr::get($asset, "income.$year.value", null); #Income is added as a yearly repeat in config
+                $incomeCurrentValue = Arr::get($asset, "income.$year.value", null); #Income is added as a yearly repeat in config
 
-                list($income, $prevIncomeRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'income', $prevIncome, $incomeThis, $prevIncomeRule, null, 12);
+                list($incomeCurrentValue, $incomeRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'income', $incomePrevValue, $incomeCurrentValue, $incomeRule, null, 12);
 
                 $this->dataH[$assetname][$year]['income'] = [
                     'changerate' => $incomeChangeratePercent / 100,
-                    'amount' => $income,
+                    'amount' => $incomeCurrentValue,
                     'description' => Arr::get($asset, "income.$year.description") . $explanation,
                     ];
 
                 ########################################################################################################
                 #Assett
-                $assetTransfer = Arr::get($asset, "value.$year.transfer", null);
-                if(isset($assetTransfer)) {
-                    $prevAssetTransfer = $assetTransfer;
+                $assetCurrentTransfer = Arr::get($asset, "value.$year.transfer", null);
+                if(isset($assetCurrentTransfer)) {
+                    $assetPrevTransfer = $assetCurrentTransfer;
                 } else {
-                    $assetTransfer = $prevAssetTransfer; #Remembers a transfer until zeroed out in config.
+                    $assetCurrentTransfer = $assetPrevTransfer; #Remembers a transfer until zeroed out in config.
                 }
 
-                $assetRepeat = Arr::get($asset, "value.$year.repeat", null);
-                if(isset($assetRepeat)) {
-                    $prevAssetRepeat = $assetRepeat;
+                $assetCurrentRepeat = Arr::get($asset, "value.$year.repeat", null);
+                if(isset($assetCurrentRepeat)) {
+                    $assetPrevRepeat= $assetCurrentRepeat;
                 } else {
-                    $assetRepeat = $prevAssetRepeat;
+                    $assetCurrentRepeat = $assetPrevRepeat;
                 }
 
                 list($assetChangeratePercent, $assetChangerateDecimal, $assetChangerateValue, $explanation) = $this->changerate->convertChangerate(0, Arr::get($asset, "value.$year.changerate", null), $year, $assetChangerateValue);
                 #print "$year: " . $this->changerate->decimalToDecimal($assetChangerateDecimal) . "\n";
 
-                $assetCurrent = Arr::get($asset, "value.$year.value", null); #Income is added as a monthly repeat in config
-                if($assetCurrent && !str_contains($assetCurrent, '/')) {
-                    #$prevAssetValue can not be a divisor config, if the current $assetCurrent is a config, it will be put in $prevAssetRule to calculate on the numeric value of the current asset.
-                    $prevAssetValue = $assetCurrent;
-                } elseif($assetRepeat && !$assetCurrent) {
+                $assetCurrentValue = Arr::get($asset, "value.$year.value", null);
+                $assetCurrentTaxValue = Arr::get($asset, "value.$year.taxvalue", null);
+
+                if($assetCurrentValue && !str_contains($assetCurrentValue, '/')) {
+                    #$assetPrevValue can not be a divisor config, if the current $assetCurrentValue is a config, it will be put in $assetRule to calculate on the numeric value of the current asset.
+                    $assetPrevValue = $assetCurrentValue;
+                    $assetPrevTaxValue = $assetCurrentTaxValue;
+
+                } elseif($assetCurrentRepeat && !$assetCurrentValue) {
                     #We can not overwrite current value with previous if it is currently set (logical but confusing)
-                    $assetCurrent = $prevAssetValue;
+                    $assetCurrentValue = $assetPrevValue;
+                    $assetCurrentTaxValue = $assetPrevTaxValue;
                 }
 
-                #print "Asset før: year: $year prevAssetValue:$prevAssetValue assetCurrent:$assetCurrent prevAssetRule:$prevAssetRule assetTransfer:$assetTransfer\n";
-                list($assetValue, $prevAssetRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'asset', $prevAssetValue, $assetCurrent, $prevAssetRule, $assetTransfer, 1);
-                #print "Asset etter: year:$year assetValue:$assetValue, prevAssetRule:$prevAssetRule explanation:$explanation\n";
+                print "Asset før: year: $year assetPrevValue:$assetPrevValue assetCurrentValue:$assetCurrentValue assetRule:$assetRule assetCurrentTransfer:$assetCurrentTransfer\n";
+                list($assetCurrentValue, $assetRule, $explanation) = $this->valueAdjustment(false, $assetname, $year, 'asset', $assetPrevValue, $assetCurrentValue, $assetRule, $assetCurrentTransfer, 1);
+                print "Asset etter: year:$year assetCurrentValue: $assetCurrentValue, assetRule:$assetRule explanation: $explanation\n";
 
                 #FIX: The input diff has to be added to FIRE calculations.
 
-                if(!$firstAssetValue && $assetValue > 0) {
-                    $firstAssetValue = $assetValue; #FIX: Ta vare på den første verdien vi ser på en asset, da den brukes til skatteberegning ved salg. Må også akkumulere alle innskudd, men ikke verdiøkning.
-                    $firstAssetYear = $year; #Ta vare på den første året vi ser en asset, da den brukes til skatteberegning ved salg for å se hvor lenge man har eid den.
+                if(!$assetFirstValue && $assetCurrentValue > 0) {
+                    $assetFirstValue = $assetCurrentValue; #FIX: Ta vare på den første verdien vi ser på en asset, da den brukes til skatteberegning ved salg. Må også akkumulere alle innskudd, men ikke verdiøkning.
+                    $assetFirstYear = $year; #Ta vare på den første året vi ser en asset, da den brukes til skatteberegning ved salg for å se hvor lenge man har eid den.
                 }
                $this->dataH[$assetname][$year]['asset'] = [
-                    'amount' => $assetValue,
-                    'amountLoanDeducted' => $assetValue,
+                    'amount' => $assetCurrentValue,
+                    'amountLoanDeducted' => $assetCurrentValue,
                     'changerate' => $assetChangeratePercent / 100,
-                    'description' => Arr::get($asset, "value.$year.description") . " Asset rule " . $prevAssetRule . $explanation,
+                    'description' => Arr::get($asset, "value.$year.description") . " Asset rule " . $assetRule . $explanation,
                 ];
 
                 ########################################################################################################
                 #Tax calculations
-                list($cashflow, $potentialIncome, $CashflowTaxableAmount, $fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->tax->taxCalculation(false, $taxtype, $year, $income, $expence, $assetValue, $firstAssetValue, $firstAssetYear);
+                list($cashflow, $potentialIncome, $CashflowTaxableAmount, $fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->tax->taxCalculation(true, $taxtype, $year, $incomeCurrentValue, $expenceCurrentValue, $assetCurrentValue, $assetCurrentTaxValue, $assetFirstValue, $assetFirstYear);
 
                 $this->dataH[$assetname][$year]['tax'] = [
                     'amountTaxableYearly' => -$CashflowTaxableAmount,
@@ -238,7 +243,7 @@ class Prognosis
                 ];
 
                 #Calculate the potential max loan you can handle base on income, tax adjusted - as seen from the bank.
-                #print "$assetname - p:$potentialIncome = i:$income - t:$CashflowTaxableAmount\n";
+                #print "$assetname - p:$potentialIncome = i:$incomeCurrentValue - t:$CashflowTaxableAmount\n";
                 $this->dataH[$assetname][$year]['potential'] = [
                     'income' => $potentialIncome,
                     'loan' => $potentialIncome * 5
@@ -259,73 +264,65 @@ class Prognosis
                 #FIX: Something is wrong with this classification, and automatically calculating sales of everything not in this list.
                 if(Arr::get($this->firePartSalePossibleTypes, $meta['type'])) {
                     #Her kan vi selge biter av en asset (meta tagge opp det istedenfor tro?
-                    $ThisFirePercent = 0.04; #4% av en salgbar asset verdi. FIX: Konfigurerbart FIRE tall.
-                    $ThisFireIncome = $assetValue * $ThisFirePercent; #Only asset value
-                    $CashflowTaxableAmount        += $ThisFireIncome * $DecimalTaxableYearly; #Legger til skatt på utbytte fra salg av en % av disse eiendelene her (De har neppe en inntekt, men det skal også fikses fint)
-                    #print "ATY: $CashflowTaxableAmount        += TFI:$ThisFireIncome * PTY:$DecimalTaxableYearly;\n";
+                    $fireCurrentPercent = 0.04; #4% av en salgbar asset verdi. FIX: Konfigurerbart FIRE tall.
+                    $fireCurrentIncome = $assetCurrentValue * $fireCurrentPercent; #Only asset value
+                    $CashflowTaxableAmount        += $fireCurrentIncome * $DecimalTaxableYearly; #Legger til skatt på utbytte fra salg av en % av disse eiendelene her (De har neppe en inntekt, men det skal også fikses fint)
+                    #print "ATY: $CashflowTaxableAmount        += TFI:$fireCurrentIncome * PTY:$DecimalTaxableYearly;\n";
                     #FIX: Det er ulik skatt på de ulike typene.
 
                 } else {
                     #Kan ikke selge biter av en slik asset.
-                    $ThisFirePercent = 0;
-                    $ThisFireIncome = 0; #Only asset value
+                    $fireCurrentPercent = 0;
+                    $fireCurrentIncome = 0; #Only asset value
                 }
 
                 #NOTE - Deductable yarly blir bare satt i låneberegningen, så den må legges til globalt der.
-                $ThisFireTotalIncome = $ThisFireIncome + $income + $AmountDeductableYearly; #Percent of asset value + income from asset. HUSK KUN INNTEKTER her
-                $ThisFireTotalExpence = $expence + $CashflowTaxableAmount;
-                #print "$assetname - FTI: $ThisFireTotalIncome = FI:$ThisFireIncome + I:$income + D:$AmountDeductableYearly\n"; #Percent of asset value + income from asset
+                $fireCurrentTotalIncome = $fireCurrentIncome + $incomeCurrentValue + $AmountDeductableYearly; #Percent of asset value + income from asset. HUSK KUN INNTEKTER her
+                $fireCurrentTotalExpence = $expenceCurrentValue + $CashflowTaxableAmount;
+                #print "$assetname - FTI: $fireCurrentTotalIncome = FI:$fireCurrentIncome + I:$incomeCurrentValue + D:$AmountDeductableYearly\n"; #Percent of asset value + income from asset
 
-                $ThisFireCashFlow = $ThisFireTotalIncome - $ThisFireTotalExpence; #Hvor lang er man unna fire målet
+                $ThisFireCashFlow = $fireCurrentTotalIncome - $fireCurrentTotalExpence; #Hvor lang er man unna fire målet
 
-                if($expence > 0) {
-                    $ThisFirePercentDiff = $ThisFireTotalIncome / $ThisFireTotalExpence; #Hvor mange % unna er inntektene å dekke utgiftene.
+                if($expenceCurrentValue > 0) {
+                    $fireCurrentPercentDiff = $fireCurrentTotalIncome / $fireCurrentTotalExpence; #Hvor mange % unna er inntektene å dekke utgiftene.
                 } else {
-                    $ThisFirePercentDiff = 1;
+                    $fireCurrentPercentDiff = 1;
                 }
 
                 #Sparerate = Det du nedbetaler i gjeld + det du sparer eller investerer på andre måter / total inntekt (etter skatt).
                 $ThisFireSavingAmount = 0;
                 if(Arr::get($this->fireSavingTypes, $meta['type'])) {
-                    $ThisFireSavingAmount = $income; #If this asset is a valid saving asset, we add it to the saving amount.
+                    $ThisFireSavingAmount = $incomeCurrentValue; #If this asset is a valid saving asset, we add it to the saving amount.
                 }
 
                 $ThisFireSavingRate = 0;
                 #FIX: Should this be income adjusted for deductions and tax?
-                if($income > 0) {
-                    $ThisFireSavingRate = $ThisFireSavingAmount / $income;
+                if($incomeCurrentValue > 0) {
+                    $ThisFireSavingRate = $ThisFireSavingAmount / $incomeCurrentValue;
                 }
 
                 $this->dataH[$assetname][$year]['fire'] = [
-                    'percent' => $ThisFirePercent,
-                    'amountIncome' => $ThisFireTotalIncome,
-                    'amountExpence' => $ThisFireTotalExpence,
-                    'percentDiff' => $ThisFirePercentDiff,
+                    'percent' => $fireCurrentPercent,
+                    'amountIncome' => $fireCurrentTotalIncome,
+                    'amountExpence' => $fireCurrentTotalExpence,
+                    'percentDiff' => $fireCurrentPercentDiff,
                     'cashFlow' => round($ThisFireCashFlow),
                     'savingAmount' => round($ThisFireSavingAmount),
                     'savingRate' => $ThisFireSavingRate,
                 ];
 
-                #print "********\n";
-                #print_r($this->tax);
-                #print_r($this->dataH[$assetname][$year]['fortune']);
-
-                #print "i:$income - e:$expence, rest: $rest, restAccumulated: $restAccumulated\n";
-
-                #print_r($this->dataH[$assetname][$year]['cashflow']);
-
                 ########################################################################################################
-                if($expenceRepeat) {
-                    $prevExpence      = $expence * $expenceChangerateDecimal;
+                if($expenceCurrentRepeat) {
+                    $expencePrevValue      = $expenceCurrentValue * $expenceChangerateDecimal;
                 } else {
-                    $prevExpence                = null;
+                    $expencePrevValue           = null;
                     $expenceChangerateValue     = null;
                     $expenceChangerateDecimal   = null;
                     $expenceChangeratePercent   = null;
                 }
 
-                if($incomeRepeat) {
-                    $prevIncome       = $income * $incomeChangerateDecimal;
+                if($incomeCurrentRepeat) {
+                    $prevIncome       = $incomeCurrentValue * $incomeChangerateDecimal;
                 } else {
                     $prevIncome                 = null;
                     $incomeChangerateValue      = null;
@@ -333,15 +330,17 @@ class Prognosis
                     $incomeChangeratePercent    = null;
                 }
 
-                if($assetRepeat) {
-                    $prevAssetValue   = $assetValue * $assetChangerateDecimal;
+                if($assetCurrentRepeat) {
+                    $assetPrevValue   = round($assetCurrentValue * $assetChangerateDecimal);
+                    $assetPrevTaxValue = round($assetCurrentTaxValue * $assetChangerateDecimal);
                 } else {
-                    $prevAssetValue         = null;
+                    $assetPrevValue         = null;
+                    $assetPrevTaxValue      = null;
                     $assetChangerateValue   = null;
                     $assetChangerateDecimal = null;
                     $assetChangeratePercent = null;
-                    $prevAssetRule          = null;
-                    $assetTransfer          = null;
+                    $assetRule              = null;
+                    $assetCurrentTransfer   = null;
                 }
             }
 
@@ -391,7 +390,7 @@ class Prognosis
         $explanation = '';
 
         if($debug) {
-            print "INPUT( $assetname.$year.$type, PV: $prevValue, CV: $currentValue, rule: $rule, transfer: $transfer, factor: $factor)\n";
+            print "INPUT( $assetname.$year.$type, PV: $prevValue, CV: $currentValue, fortune, $fortune, rule: $rule, transfer: $transfer, factor: $factor)\n";
         }
 
         if($rule){
@@ -532,6 +531,7 @@ class Prognosis
             for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
                 #print "$year\n";
                 $this->additionToGroup($year, $meta, $assetH[$year], "asset.amount");
+                $this->additionToGroup($year, $meta, $assetH[$year], "asset.fortune");
                 $this->additionToGroup($year, $meta, $assetH[$year], "asset.amountLoanDeducted");
                 $this->additionToGroup($year, $meta, $assetH[$year], "income.amount");
                 $this->additionToGroup($year, $meta, $assetH[$year], "expence.amount");
