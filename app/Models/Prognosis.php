@@ -192,8 +192,8 @@ class Prognosis
                 $assetCurrentValue = Arr::get($asset, "value.$year.value", null);
                 $assetCurrentTaxValue = Arr::get($asset, "value.$year.taxvalue", null);
 
-                if($assetCurrentValue && !str_contains($assetCurrentValue, '/')) {
-                    #$assetPrevValue can not be a divisor config, if the current $assetCurrentValue is a config, it will be put in $assetRule to calculate on the numeric value of the current asset.
+                if($assetCurrentValue && !str_contains($assetCurrentValue, '/') && !str_contains($assetCurrentValue, '+') && !str_contains($assetCurrentValue, '-')) {
+                    #$assetPrevValue can only be a number, not a rule, if the current $assetCurrentValue is a config, it will be put in $assetRule to calculate on the numeric value of the current asset.
                     $assetPrevValue = $assetCurrentValue;
                     $assetPrevTaxValue = $assetCurrentTaxValue;
 
@@ -203,9 +203,9 @@ class Prognosis
                     $assetCurrentTaxValue = $assetPrevTaxValue;
                 }
 
-                print "Asset før: year: $year assetPrevValue:$assetPrevValue assetCurrentValue:$assetCurrentValue assetRule:$assetRule assetCurrentTransfer:$assetCurrentTransfer\n";
+                #print "Asset før: year: $year assetPrevValue:$assetPrevValue assetCurrentValue:$assetCurrentValue assetRule:$assetRule assetCurrentTransfer:$assetCurrentTransfer\n";
                 list($assetCurrentValue, $assetRule, $explanation) = $this->valueAdjustment(false, $assetname, $year, 'asset', $assetPrevValue, $assetCurrentValue, $assetRule, $assetCurrentTransfer, 1);
-                print "Asset etter: year:$year assetCurrentValue: $assetCurrentValue, assetRule:$assetRule explanation: $explanation\n";
+                #print "Asset etter: year:$year assetCurrentValue: $assetCurrentValue, assetRule:$assetRule explanation: $explanation\n";
 
                 #FIX: The input diff has to be added to FIRE calculations.
 
@@ -222,7 +222,7 @@ class Prognosis
 
                 ########################################################################################################
                 #Tax calculations
-                list($cashflow, $potentialIncome, $CashflowTaxableAmount, $fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->tax->taxCalculation(true, $taxtype, $year, $incomeCurrentValue, $expenceCurrentValue, $assetCurrentValue, $assetCurrentTaxValue, $assetFirstValue, $assetFirstYear);
+                list($cashflow, $potentialIncome, $CashflowTaxableAmount, $fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->tax->taxCalculation(false, $taxtype, $year, $incomeCurrentValue, $expenceCurrentValue, $assetCurrentValue, $assetCurrentTaxValue, $assetFirstValue, $assetFirstYear);
 
                 $this->dataH[$assetname][$year]['tax'] = [
                     'amountTaxableYearly' => -$CashflowTaxableAmount,
@@ -394,12 +394,30 @@ class Prognosis
         }
 
         if($rule){
+            //Rules has priority if it is set.
             if(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #Divison ex 1/12
                 list($value, $rule, $match) = $this->divisor($prevValue, $matches);
-                $explanation = "Adding previous divisor rule: $rule";
+                $explanation = "Adding divisor rule: $rule";
                 $diff = $prevValue - $value;
+
+            } elseif(preg_match('/(\+|\-)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+                #number that starts with + or - (to be added or subtracted
+                $diff = $rule * $factor;
+                $value = $prevValue + $diff; #Should fix both + and -
+                $explanation = "Adding diff rule: $diff";
+
+            } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+                #Percentages
+                if ($matches[1][0] == '-') {
+                    $value = $prevValue * $factor * ((-$matches[2][0] / 100) + 1);
+                } else {
+                    $value = $prevValue * $factor * (($matches[2][0] / 100) + 1);
+                }
+                $diff = $value - $prevValue;
+                $explanation = "Percent: " . $matches[2][0] . "%";
             }
+            $explanation = "Error rule: $rule";
         }
         elseif($currentValue == null) {
             #Set it to the previous value
@@ -409,6 +427,7 @@ class Prognosis
                 #print "value: $value\n";
                 $explanation = "Using previous value: " . round($value);
             }
+
         } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)) {
             #Percentages
             if($matches[1][0] == '-') {
@@ -417,7 +436,9 @@ class Prognosis
                 $value = $prevValue * $factor * (($matches[2][0] / 100) + 1);
             }
             $diff = $value - $prevValue;
+            $rule = $currentValue;
             $explanation = "Percent: " . $matches[2][0] . "%";
+
         } elseif(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)){
             #Divison ex 1/12
             list($value, $rule, $match) = $this->divisor($prevValue, $matches);
@@ -428,7 +449,7 @@ class Prognosis
             #number that starts with + or - (to be added or subtracted
             $diff = $currentValue * $factor;
             $value = $prevValue + $diff; #Should fix both + and -
-            #$rule = $currentValue; #New
+            $rule = $currentValue;
             $explanation = "Addingdiff: $diff";
 
         } elseif(preg_match('/(\=)(\d*)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)) {
