@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "John Doe",
-        "birthYear": "1974",
+        "birthYear": "2005",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
@@ -60,8 +60,8 @@
                     "repeat": true
                 },
                 "$pensionWishYear": {
-                    "value": "-1/$pensionWishYears",
-                    "transfer": "income.$year.income.amount=diff",
+                    "transferTo": "income.$year.income.amount",
+                    "transferRule": "-1/$pensionWishYears",
                     "changerate": "changerates.fond",
                     "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
                     "repeat": true

@@ -85,8 +85,8 @@ class Prognosis
             if(!$meta['active']) continue; #Hopp over de inaktive
             $taxtype = Arr::get($meta, "tax", null);
 
-            $assetFirstValue = null;
-            $assetFirstYear = null;
+            $assetFirstValue = 0;
+            $assetFirstYear = 0;
             $assetPrevValue = null;
             $assetCurrentValue = 0;
             $assetRule = null;
@@ -94,8 +94,10 @@ class Prognosis
             $assetChangerateValue = "";
             $assetCurrentRepeat= false;
             $assetPrevRepeat= false;
-            $assetCurrentTransfer = null;
-            $assetPrevTransfer = null;
+            $assetCurrentTransferTo = null;
+            $assetPrevTransferTo = null;
+            $assetCurrentTransferRule = null;
+            $assetPrevTransferRule = null;
 
             $incomeCurrentValue = 0;
             $incomePrevValue = 0;
@@ -137,9 +139,9 @@ class Prognosis
 
                 list($expenceChangeratePercent, $expenceChangerateDecimal, $expenceChangerateValue, $explanation) = $this->changerate->convertChangerate(0, Arr::get($asset, "expence.$year.changerate", null), $year, $expenceChangerateValue);
 
-                $expenceCurrentValue = Arr::get($asset, "expence.$year.value", null); #Expence is added as a monthly repeat in config
+                $expenceCurrentValue = Arr::get($asset, "expence.$year.value", 0); #Expence is added as a monthly repeat in config
 
-                list($expenceCurrentValue, $expenceRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'expence',$expencePrevValue, $expenceCurrentValue, $expenceRule, null,12);
+                list($expenceCurrentValue, $expenceRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'expence',$expencePrevValue, $expenceCurrentValue, $expenceRule,12);
 
                 $this->dataH[$assetname][$year]['expence'] = [
                     'changerate' => $expenceChangeratePercent / 100,
@@ -158,11 +160,11 @@ class Prognosis
                     $incomeCurrentRepeat = $incomePrevRepeat;
                 }
 
-                list($incomeChangeratePercent, $incomeChangerateDecimal, $incomeChangerateValue, $explanation) =  $this->changerate->convertChangerate(0, Arr::get($asset, "income.$year.changerate", null), $year, $incomeChangerateValue);
+                list($incomeChangeratePercent, $incomeChangerateDecimal, $incomeChangerateValue, $explanation) =  $this->changerate->convertChangerate(false, Arr::get($asset, "income.$year.changerate", null), $year, $incomeChangerateValue);
 
-                $incomeCurrentValue = Arr::get($asset, "income.$year.value", null); #Income is added as a yearly repeat in config
+                $incomeCurrentValue = Arr::get($asset, "income.$year.value", 0); #Income is added as a yearly repeat in config
 
-                list($incomeCurrentValue, $incomeRule, $explanation) = $this->valueAdjustment(0, $assetname, $year, 'income', $incomePrevValue, $incomeCurrentValue, $incomeRule, null, 12);
+                list($incomeCurrentValue, $incomeRule, $explanation) = $this->valueAdjustment(true, $assetname, $year, 'income', $incomePrevValue, $incomeCurrentValue, $incomeRule, 12);
 
                 $this->dataH[$assetname][$year]['income'] = [
                     'changerate' => $incomeChangeratePercent / 100,
@@ -172,11 +174,18 @@ class Prognosis
 
                 ########################################################################################################
                 #Assett
-                $assetCurrentTransfer = Arr::get($asset, "value.$year.transfer", null);
-                if(isset($assetCurrentTransfer)) {
-                    $assetPrevTransfer = $assetCurrentTransfer;
+                $assetCurrentTransferTo = Arr::get($asset, "value.$year.transferTo", null);
+                if(isset($assetCurrentTransferTo)) {
+                    $assetPrevTransferTo = $assetCurrentTransferTo;
                 } else {
-                    $assetCurrentTransfer = $assetPrevTransfer; #Remembers a transfer until zeroed out in config.
+                    $assetCurrentTransferTo = $assetPrevTransferTo; #Remembers a transfer until zeroed out in config.
+                }
+
+                $assetCurrentTransferRule = Arr::get($asset, "value.$year.transferRule", null);
+                if(isset($assetCurrentTransferRule)) {
+                    $assetPrevTransferRule = $assetCurrentTransferRule;
+                } else {
+                    $assetCurrentTransferRule = $assetPrevTransferRule; #Remembers a transfer until zeroed out in config.
                 }
 
                 $assetCurrentRepeat = Arr::get($asset, "value.$year.repeat", null);
@@ -189,10 +198,10 @@ class Prognosis
                 list($assetChangeratePercent, $assetChangerateDecimal, $assetChangerateValue, $explanation) = $this->changerate->convertChangerate(0, Arr::get($asset, "value.$year.changerate", null), $year, $assetChangerateValue);
                 #print "$year: " . $this->changerate->decimalToDecimal($assetChangerateDecimal) . "\n";
 
-                $assetCurrentValue = Arr::get($asset, "value.$year.value", null);
-                $assetCurrentTaxValue = Arr::get($asset, "value.$year.taxvalue", null);
+                $assetCurrentValue = Arr::get($asset, "value.$year.value", 0);
+                $assetCurrentTaxValue = Arr::get($asset, "value.$year.taxvalue", 0);
 
-                if($assetCurrentValue && !str_contains($assetCurrentValue, '/') && !str_contains($assetCurrentValue, '+') && !str_contains($assetCurrentValue, '-')) {
+                if($this->isRule($assetCurrentValue)) {
                     #$assetPrevValue can only be a number, not a rule, if the current $assetCurrentValue is a config, it will be put in $assetRule to calculate on the numeric value of the current asset.
                     $assetPrevValue = $assetCurrentValue;
                     $assetPrevTaxValue = $assetCurrentTaxValue;
@@ -203,9 +212,13 @@ class Prognosis
                     $assetCurrentTaxValue = $assetPrevTaxValue;
                 }
 
-                #print "Asset før: year: $year assetPrevValue:$assetPrevValue assetCurrentValue:$assetCurrentValue assetRule:$assetRule assetCurrentTransfer:$assetCurrentTransfer\n";
-                list($assetCurrentValue, $assetRule, $explanation) = $this->valueAdjustment(false, $assetname, $year, 'asset', $assetPrevValue, $assetCurrentValue, $assetRule, $assetCurrentTransfer, 1);
+                #print "Asset før: year: $year assetPrevValue:$assetPrevValue assetCurrentValue:$assetCurrentValue assetRule:$assetRule\n";
+                list($assetCurrentValue, $assetRule, $explanation) = $this->valueAdjustment(false, $assetname, $year, 'asset', $assetPrevValue, $assetCurrentValue, $assetRule, 1);
                 #print "Asset etter: year:$year assetCurrentValue: $assetCurrentValue, assetRule:$assetRule explanation: $explanation\n";
+
+                #print "Transfer before: $assetname.$year, assetCurrentValue:$assetCurrentValue, assetCurrentTransferTo:$assetCurrentTransferTo, AssetCurrentTransferRule:$assetCurrentTransferRule\n";
+                list($assetCurrentValue, $assetTransferedValue, $assetPrevTransferRule, $explanation) = $this->valueTransfer(false, $assetname, $year, $assetCurrentValue, $assetCurrentTransferTo, $assetCurrentTransferRule);
+                #print "Transfer after: $assetname.$year, assetCurrentValue:$assetCurrentValue, assetTransferedValue:$assetTransferedValue, assetPrevTransferRule:$assetPrevTransferRule, explanation: $explanation\n";
 
                 #FIX: The input diff has to be added to FIRE calculations.
 
@@ -222,6 +235,7 @@ class Prognosis
 
                 ########################################################################################################
                 #Tax calculations
+                #print "$taxtype.$year incomeCurrentValue: $incomeCurrentValue, expenceCurrentValue: $expenceCurrentValue\n";
                 list($cashflow, $potentialIncome, $CashflowTaxableAmount, $fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->tax->taxCalculation(false, $taxtype, $year, $incomeCurrentValue, $expenceCurrentValue, $assetCurrentValue, $assetCurrentTaxValue, $assetFirstValue, $assetFirstYear);
 
                 $this->dataH[$assetname][$year]['tax'] = [
@@ -322,7 +336,7 @@ class Prognosis
                 }
 
                 if($incomeCurrentRepeat) {
-                    $prevIncome       = $incomeCurrentValue * $incomeChangerateDecimal;
+                    $incomePrevValue       = $incomeCurrentValue * $incomeChangerateDecimal;
                 } else {
                     $prevIncome                 = null;
                     $incomeChangerateValue      = null;
@@ -334,13 +348,15 @@ class Prognosis
                     $assetPrevValue   = round($assetCurrentValue * $assetChangerateDecimal);
                     $assetPrevTaxValue = round($assetCurrentTaxValue * $assetChangerateDecimal);
                 } else {
-                    $assetPrevValue         = null;
-                    $assetPrevTaxValue      = null;
-                    $assetChangerateValue   = null;
-                    $assetChangerateDecimal = null;
-                    $assetChangeratePercent = null;
-                    $assetRule              = null;
-                    $assetCurrentTransfer   = null;
+                    $assetPrevValue             = null;
+                    $assetPrevTaxValue          = null;
+                    $assetChangerateValue       = null;
+                    $assetChangerateDecimal     = null;
+                    $assetChangeratePercent     = null;
+                    $assetRule                  = null;
+                    $assetCurrentTransferTo     = null;
+                    $assetCurrentTransferRule   = null;
+
                 }
             }
 
@@ -363,8 +379,30 @@ class Prognosis
 
         } #End loop over assets
 
-        #dd($this->dataH['nordnet']);
         $this->group();
+    }
+
+    public function isRule(?string $value)
+    {
+        #print "isRule: $value : ";
+        if (preg_match('/(\+|\-|\%|\/|\=)/i', $value, $matches, PREG_OFFSET_CAPTURE)) {
+            #print "yes\n";
+            return true;
+        } elseif(!is_numeric($value)) {
+            #Catches text strings, like variable confirguration
+            #print "yes\n";
+            return true;
+        }
+
+        #print "no\n";
+        return false;
+    }
+
+    public function isTransfer(?string $transfer) {
+        if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)(\*|=)([0-9]*[.]?[0-9]+|value|diff)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
+            return $matches;
+        }
+        return false;
     }
 
     public function add(string $assettname, int $year, string $type, array $dataH){
@@ -381,163 +419,202 @@ class Prognosis
         -- =+1/10" - Adds 1 tenth of the amount yearly
         -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10
          */
-    public function valueAdjustment(bool $debug, string $assetname, int $year, string $type, ?string $prevValue, ?string $currentValue, string $rule = NULL, ?string  $transfer, int $factor = 1){
-        #Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor has memory for now.
-        $value = null;
-        $match = null;
-        $diff = 0; #The difference between old and new value, used for transfer
-        $transferValue = null; #Rules on how to transfer value from other assets, is added after new value is calculated
+    public function valueAdjustment(bool $debug, string $assetname, int $year, string $type, ?string $prevValue, ?string $currentValue, string $rule = NULL, int $factor = 1){
+        #Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor should have memory.
+
+        $newValue = 0;
         $explanation = '';
 
         if($debug) {
-            print "INPUT( $assetname.$year.$type, PV: $prevValue, CV: $currentValue, fortune, $fortune, rule: $rule, transfer: $transfer, factor: $factor)\n";
+            print "INPUT( $assetname.$year.$type, PV: $prevValue, CV: $currentValue, rule: $rule, factor: $factor)\n";
         }
 
-        if($rule){
-            //Rules has priority if it is set.
-            if(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
-                #Divison ex 1/12
-                list($value, $rule, $match) = $this->divisor($prevValue, $matches);
-                $explanation = "Adding divisor rule: $rule";
-                $diff = $prevValue - $value;
+        if($this->isRule($currentValue)) {
+            print "** Value looks like rule\n";
 
-            } elseif(preg_match('/(\+|\-)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
-                #number that starts with + or - (to be added or subtracted
-                $diff = $rule * $factor;
-                $value = $prevValue + $diff; #Should fix both + and -
-                $explanation = "Adding diff rule: $diff";
+            #Previous value has to be an integer from a previous calculation in this case. Only divisor should remember a rule
+            list($newValue, $rule, $explanation) = $this->calculateRule($debug, $prevValue, $currentValue);
 
-            } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
-                #Percentages
-                if ($matches[1][0] == '-') {
-                    $value = $prevValue * $factor * ((-$matches[2][0] / 100) + 1);
-                } else {
-                    $value = $prevValue * $factor * (($matches[2][0] / 100) + 1);
-                }
-                $diff = $value - $prevValue;
-                $explanation = "Percent: " . $matches[2][0] . "%";
-            }
-            $explanation = "Error rule: $rule";
-        }
-        elseif($currentValue == null) {
+        } elseif($rule){
+                print "** rule is set\n";
+                list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $prevValue, $rule);
+
+        } elseif($currentValue == null) {
+
             #Set it to the previous value
-            $value = $prevValue; #Previous value is already factored, only new values has to be factored
-            $diff = 0;
-            if($value != null) {
+            $newValue = $prevValue; #Previous value is already factored, only new values has to be factored
+            if ($newValue != null) {
                 #print "value: $value\n";
-                $explanation = "Using previous value: " . round($value);
+                $explanation = "Using previous value: " . round($newValue);
             }
-
-        } elseif(preg_match('/(\+|\-)(\d*)(\%)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)) {
-            #Percentages
-            if($matches[1][0] == '-') {
-                $value = $prevValue * $factor * ((-$matches[2][0] / 100) + 1);
-            } else {
-                $value = $prevValue * $factor * (($matches[2][0] / 100) + 1);
-            }
-            $diff = $value - $prevValue;
-            $rule = $currentValue;
-            $explanation = "Percent: " . $matches[2][0] . "%";
-
-        } elseif(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)){
-            #Divison ex 1/12
-            list($value, $rule, $match) = $this->divisor($prevValue, $matches);
-            $explanation = "Adding divisor rule: $rule";
-            $diff = $prevValue - $value;
-
-        } elseif(preg_match('/(\+|\-)(\d*)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)) {
-            #number that starts with + or - (to be added or subtracted
-            $diff = $currentValue * $factor;
-            $value = $prevValue + $diff; #Should fix both + and -
-            $rule = $currentValue;
-            $explanation = "Addingdiff: $diff";
-
-        } elseif(preg_match('/(\=)(\d*)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)) {
-            #number that starts with = Fixed number override
-            $value = round($matches[2][0] * $factor); #Should fix both + and -
-            $diff = 0;
-            $explanation = "Fixed number override = detected: $value";
-
-        } elseif(is_numeric($currentValue) && !preg_match('/(\+|\-)(\d*)/i', $currentValue, $matches, PREG_OFFSET_CAPTURE)){
-            #A normal value will override all logic from earlier years, also rules and divisors. A normal number is a number without leading + or -, it will just be set to the number
-
-            #Its a normal number
-            $value = round($currentValue * $factor); #Set it to the given value
-            $diff = 0;
-            $explanation = "Normal: " . round($value);
+        } elseif(is_numeric($currentValue)) {
+            $newValue = $currentValue;
         } else {
             print "ERROR: currentValue: $currentValue not catched by logic\n";
-            exit;
-        }
-
-        #Check if any value transfers should be done between assets
-        if($transfer) {
-            #print "$transfer\n";
-        }
-        if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)(\*|=)([0-9]*[.]?[0-9]+|value|diff)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
-        #if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)\*|=(value|amount)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
-
-            #match this pattern:         "transfer": "salary.$year.income.value*0.05",
-            $dotpath = str_replace(
-                ['$year'],
-                [$year],
-                $matches[1][0]);
-
-            #dd($matches);
-            #print "PV: $prevValue, TV: $currentValue,  value: $value = rule: $rule - match: $match\n";
-
-            if($matches[2][0] == '=') {
-                #Add the value deducted here to the dotpath (transfers value from an value asset to typical income)
-
-                if($matches[3][0] == 'diff' && $diff <> 0) { #Transfer the deducted diff from the amount
-                    $explanation .= " transfer diff " . number_format($diff, 2, ',', ' ') . " to $dotpath\n";
-
-                    Arr::set($this->dataH, $dotpath, Arr::get($this->dataH, $dotpath, 0) + $diff); #The real transfer from this asset to another takes place here
-
-                } elseif($matches[3][0] == 'value' && $value <> 0)  { #Tramsfer the entire value
-                    $explanation .= " transfer value " . number_format($value, 2, ',', ' ') . " to $dotpath, exisiting value: " . Arr::get($this->dataH, $dotpath, 0)  . "\n";
-                    Arr::set($this->dataH, $dotpath, Arr::get($this->dataH, $dotpath, 0) + $value); #The real transfer from this asset to another takes place here
-                    $value = 0; #We have moved it, nothing left here.
-                }
-            } else {
-                #Just calculate a value to be added (nothing subtracted)
-                $transferValue = round(Arr::get($this->dataH, $dotpath, 0) * $matches[3][0]);
-                $explanation .=  " increasing value with " . $matches[3][0] . " of $dotpath $transferValue";
-            }
-            #print "$year - $explanation\n";
-        }
-
-        #Note: This only works correctly if the value we are retrieving from is processed before the one we are calculationg, so ut realy should check if it was processed before or not, for correct handling.
-        $orgValue = Arr::get($this->dataH, $assetname . "." . $year . "." . $type . ".amount", 0); #We have to add values transferred in the datahH structure from earlier. The original stored value. Note this is sequenze sensitive.
-        $value += round($transferValue + $orgValue);
-
-        if($orgValue > 0) {
-            #print "$assetname.$year.$type - Transfer: $transferValue, PV: $prevValue, CV: $currentValue,  value: $value, orgValue=$orgValue rule: $rule - match: $match\n";
         }
 
         if($debug) {
-            print "OUTPUT( value: $value, rule: $rule, explanation: $explanation)\n";
+            print "OUTPUT( newValue: $newValue, rule: $rule, explanation: $explanation)\n";
         }
-        return [$value, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
+        return [$newValue, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
 
-    public function divisor(?string $prevValue, array $matches) {
 
+    #Either creates an amount based on another amount or transfers parts of an amount to another amount.
+    #Example
+    #transferTo": "salary.$year.income.value",  #Example OPT creatwes 5% of income as OTP without reducing OTP
+    #tranferRule: +5%. Plus does not reduce the asset, it just adds to the asset you are transferring to.
+    #transferTo": "income.$year.income.amount",  #Example using OTP until death reduces the OTP value accordingly
+    #tranferRule: -1/12 (always compared to the asset you are in). Minus reduces the asset.
+
+    public function valueTransfer(bool $debug, string $assetname, int $year,  $assetValue, $transferTo, $transferRule)
+    {
+
+        $newAssetValue = 0;
+        $transferedValue = 0;
+        $explanation = null;
         $rule = null;
 
-        if($matches[1][0] == '-') {
-            #print "#### prevValue: #$prevValue# - #" . $matches[3][0] . "\n";
-            $value = $prevValue - ($prevValue / $matches[3][0]);
+        if ($transferTo) {
+
+            $transferTo = str_replace(
+                ['$year'],
+                [$year],
+                $transferTo);
+
+            if($debug) {
+                print "**** $assetname.$year: assetValue: $assetValue, transferTo: $transferTo, transferRule: $transferRule\n";
+            }
+
+            list($newAssetValue, $rule, $explanation) = $this->calculateRule(true, $assetValue, $transferRule);
+            $transferedValue = round($assetValue - $newAssetValue); #This is the amount that is reduced or increased
+            if($debug) {
+                print "#### $assetname.$year: assetValue: $assetValue, newAssetValue: $newAssetValue, transferedValue: $transferedValue, rule: $rule, explanation: $explanation\n";
+            }
+
+            #ToDo check that an asset can not go into negative value?
+
+            ############################################################################################################
+            #Transfer value to another asset, has to update the datastructure of this asset directly
+            if ($transferedValue > 0) {
+                $explanation .= " transfer $transferedValue to $transferTo with $transferRule";
+                Arr::set($this->dataH, $transferTo, Arr::get($this->dataH, $transferTo, 0) + $transferedValue); #The real transfer from this asset to another takes place here
+            }
+
+            ############################################################################################################
+            #reduce value from this assetValue (Only if minus sign in rule)
+            if(preg_match('/(\-)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+                $explanation .= " reduce $assetname.$year\n";
+                $newAssetValue = $assetValue - $transferedValue;
+            }
+
         } else {
-            $value = $prevValue + ($prevValue / $matches[3][0]);
+            $newAssetValue = $assetValue;
+        }
+
+        return [$newAssetValue, $transferedValue, $rule, $explanation];
+    }
+
+    //$rule has to be a rule, plus, minus, percent, divisor
+    public function calculateRule(bool $debug, int $value, string $rule) {
+
+        if(preg_match('/(\+|\-)(\d*)(\%)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+            #Percentages
+            list($newValue, $rule, $explanation) = $this->calculationPercentage($debug, $value, $matches);
+
+        } elseif(preg_match('/(\+|\-)(\d*)\/(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)){
+            #Divison ex 1/12
+            #NOTE: Only division should have the rule remembered!!!!
+            list($newValue, $rule, $explanation) = $this->calculationDivisor($debug, $value, $matches);
+            #print "--- divisor: ( $newValue, $rule, $explanation ) \n";
+
+        } elseif(preg_match('/(\+)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+            #number that starts with + to be added
+            list($newValue, $rule, $explanation) = $this->calculationAddition($debug, $value, $rule);
+
+        } elseif(preg_match('/(\-)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+            #number that starts with - to be subtracted
+            list($newValue, $rule, $explanation) = $this->calculationSubtraction($debug, $value, $rule);
+
+        } elseif(preg_match('/(\=)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
+            #number that starts with = Fixed number override
+            list($newValue, $rule, $explanation) = $this->calculationFixed($debug, $value, $matches);
+        } elseif(is_numeric($rule)) {
+            #number that is positive, really starts with a + and should be added when it ends up in rule
+            list($newValue, $rule, $explanation) = $this->calculationAddition($debug, $value, $rule);
+        } else {
+            print "ERROR: calculateRule $rule not supported\n";
+        }
+
+        return [$newValue, $rule, $explanation];
+    }
+
+    public function calculationDivisor(bool $debug, string $value, array $matches) {
+        $rule = null;
+
+        $divisorValue = $value / $matches[3][0];
+
+        if($matches[1][0] == '-') {
+            $newValue = $value - $divisorValue;
+        } else {
+            $newValue = $value + $divisorValue;
         }
         $matches[3][0]--; #We reduce the divisor each time we run it, so its the same as the remaining runs.
         if($matches[3][0] > 0) {
-            $rule = $matches[1][0] . $matches[2][0] . "/" . $matches[3][0];
+            $rule = $matches[1][0] . $matches[2][0] . "/" . $matches[3][0]; #ToDo: Note rule is rewritten for each iteration, will make problems.....
         }
-        $match = "Divisor";
+        $explanation = "divisorValue: $divisorValue, Adjusted divisor rule: $rule";
 
-        return [$value, $rule, $match];
+        return [$newValue, $rule, $explanation];
+    }
+
+    public function calculationPercentage(bool $debug, string $value, array $matches) {
+
+        $percent = $matches[2][0];
+        if($matches[1][0] == '-') {
+            $newValue = $value  * ((-$percent  / 100) + 1);
+            $rule = "-$percent%";
+        } else {
+            $newValue = $value *  (($percent  / 100) + 1);
+            $rule = "+$percent%";
+        }
+
+        $explanation = "Percent: " . $percent  . "%";
+
+
+        return [$newValue, $rule, $explanation];
+    }
+
+    public function calculationAddition(bool $debug, int $value, int $add) {
+        $rule = $add;
+
+        $newValue = $value + $add; #Should fix both + and -
+        $explanation = "Adding: $add";
+
+        return [$newValue, $rule, $explanation];
+    }
+
+    public function calculationSubtraction(bool $debug, int $value, int $subtract) {
+        $rule = $subtract;
+
+        $newValue = $value + $subtract; #Should fix both + and -
+        $explanation = "Subtracting: $subtract";
+
+        if($newValue < 0) {
+            $newValue = $value;
+            $explanation = "Not subtracting asset gets negative";
+        }
+
+        return [$newValue, $rule, $explanation];
+    }
+
+    public function calculationFixed(bool $debug, string $value, array $matches) {
+        $rule = null;
+
+        $newValue = round($matches[2][0]); #Should fix both + and -
+        $explanation = "Fixed number override =$newValue";
+
+        return [$newValue, $rule, $explanation];
     }
 
     function group() {

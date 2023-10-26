@@ -81,7 +81,7 @@ class Tax extends Model
         return [$fortuneTaxAmount, $fortuneTaxPercent];
     }
 
-    public function fortuneTaxTypeCalculation(string $taxtype, int $value, ?int $taxValue, int $year)
+    public function fortuneTaxTypeCalculation(string $taxtype, int $year, ?int $value = 0, ?int $taxValue = 0)
     {
 
         $fortuneTaxPercent = $this->getFortuneTax($year);
@@ -99,7 +99,7 @@ class Tax extends Model
         return [$fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent];
     }
 
-    public function taxCalculation($debug, $taxtype, $year, $income, $expence, $assetValue, $taxValue, $firstAssetValue, $firstAssetYear) {
+    public function taxCalculation(bool $debug = false, string $taxtype, int $year, ?int $income, ?int $expence, ?int $assetValue, ?int $taxValue = 0, ?int $firstAssetValue = 0, ?int $firstAssetYear = 0) {
 
         $PercentCashflowTaxableYearly = $this->getTaxYearly($taxtype, $year);
         $PercentCashflowTaxableRealization = $this->getTaxRealization($taxtype, $year);
@@ -205,7 +205,10 @@ class Tax extends Model
 
         ################################################################################################################
         #Beregning av formuesskatt
-        list($fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent) = $this->fortuneTaxTypeCalculation($taxtype, $assetValue, $taxValue, $year);
+        if($debug) {
+            print "Before fortuneTaxTypeCalculation($taxtype, $assetValue, $taxValue, $year)\n";
+        }
+        list($fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent) = $this->fortuneTaxTypeCalculation($taxtype, $year, $assetValue, $taxValue);
 
         #Vi må trekke fra formuesskatten fra cashflow
         $cashflow -= $fortuneTaxAmount;
