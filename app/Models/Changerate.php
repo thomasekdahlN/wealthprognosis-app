@@ -103,7 +103,7 @@ class Changerate extends Model
                     $explanation = "original er satt til en variabel: $original = $percent% = $decimal";
 
                 }
-            } elseif ($variablename != null) {
+            } elseif ($variablename) {
                 #Hvis original ikke er satt men variablename er satt, da bruker vi den inntil end repeat
                 #Her er vi sikre på at det er et variabelnavn og ikke en integer.
                 preg_match('/changerates.(\w*)/i', $variablename, $matches, PREG_OFFSET_CAPTURE);

@@ -60,7 +60,7 @@
                     "repeat": true
                 },
                 "$pensionWishYear": {
-                    "transferTo": "income.$year.income.amount",
+                    "transferResource": "income.$year.income.amount",
                     "transferRule": "-1/$pensionWishYears",
                     "changerate": "changerates.fond",
                     "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",

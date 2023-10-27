@@ -23,6 +23,8 @@
                     "description": "Salary",
                     "value": 40000,
                     "changerate": "changerates.kpi",
+                    "transferRule": "add&5%",
+                    "transferResource": "otp.$year.value.value",
                     "repeat": true
                 },
                 "$pensionWishYear": {
@@ -47,13 +49,12 @@
                 "2023": {
                     "value": "=500000",
                     "changerate": "changerates.otp",
-                    "transfer": "income.$year.income.amount*0.05",
                     "description": "OTP Sparing frem til pensjonsår",
                     "repeat": true
                 },
                 "$otpStartYear": {
-                    "value": "-1/$otpYears",
-                    "transfer": "income.$year.income.amount=diff",
+                    "transferRule": "transfer&1/$otpYears",
+                    "transferResource": "income.$year.income.amount",
                     "changerate": "changerates.otp",
                     "description": "OTP fra $otpStartYear, -1/$otpYears av formuen fra pensjonsåret",
                     "repeat": true
