@@ -20,7 +20,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(110, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals('+10%', $rule);
     }
 
     public function testCalculateRuleNegativePercentCalculation()
@@ -33,7 +33,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(90, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals('-10%', $rule);
     }
 
     public function testCalculateRulePercentCalculation()
@@ -46,7 +46,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(50, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals('50%', $rule);
     }
 
     public function testCalculateRuleAdditionCalculation()
@@ -59,7 +59,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(125, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals('+25', $rule);
     }
 
     public function testCalculateRuleSubtractionCalculation()
@@ -72,7 +72,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(75, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals('-25', $rule);
     }
 
     public function testCalculateRulePositiveDivisorCalculation()
@@ -98,7 +98,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(25, $newValue);
-        $this->assertEquals('1/4', $rule);
+        $this->assertEquals('1/3', $rule);
     }
 
 
@@ -112,7 +112,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(75, $newValue);
-        $this->assertEquals('-1/3', $rule);
+        $this->assertEquals('-1/4', $rule);
     }
 
     public function testCalculateRuleFixedCalculation()
@@ -140,7 +140,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculationPercentage($debug, $value, $matches);
 
         $this->assertEquals(110, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals("+10%", $rule);
     }
 
     public function testNegativePercentageCalculation()
@@ -154,7 +154,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculationPercentage($debug, $value, $matches);
 
         $this->assertEquals(90, $newValue);
-            $this->assertEquals(null, $rule);
+            $this->assertEquals("-10%", $rule);
     }
     public function testNegativeDivisorCalculation()
     {
@@ -167,7 +167,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculationDivisor($debug, $value, $matches);
 
         $this->assertEquals(75, $newValue);
-        $this->assertEquals('-1/3', $rule);
+        $this->assertEquals('-1/4', $rule);
     }
 
     public function testPositiveDivisorCalculation()
@@ -195,7 +195,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculationAddition($debug, $value, $rule);
 
         $this->assertEquals(150, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals('+50', $rule);
     }
 
     public function testSubtractionCalculation()
@@ -209,7 +209,7 @@ class CalculationTest extends TestCase
         list($newValue, $rule, $explanation) = $calculation->calculationSubtraction($debug, $value, $rule);
 
         $this->assertEquals(50, $newValue);
-        $this->assertEquals(null, $rule);
+        $this->assertEquals('-50', $rule);
     }
 
     public function testFixedCalculation()

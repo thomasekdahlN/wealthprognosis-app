@@ -36,9 +36,13 @@ class Helper extends Model
             #Previous value has to be an integer from a previous calculation in this case. Only divisor should remember a rule
             list($newValue, $rule, $explanation) = $this->calculateRule($debug, $prevValue, $currentValue);
 
-        } elseif($rule){
-            #print "** rule is set\n";
+        } elseif($rule && is_numeric($currentValue) && $currentValue != 0){
+            #print "** rule is set: $rule using current value $currentValue\n";
             list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $currentValue, $rule);
+
+        } elseif($rule && is_numeric($prevValue) && $prevValue != 0){
+            #print "** rule is set: $rule using prev value $prevValue\n";
+            list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $prevValue, $rule);
 
         } elseif(!$currentValue) {
 
@@ -160,7 +164,7 @@ class Helper extends Model
     }
 
     public function calculationAddition(bool $debug, int $value, int $add) {
-        $rule = $add;
+        $rule = "+$add";
 
         $newValue = $value + $add; #Should fix both + and -
         $explanation = "Adding: add";

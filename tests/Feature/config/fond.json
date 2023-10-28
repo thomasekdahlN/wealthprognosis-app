@@ -54,16 +54,21 @@
             },
             "value": {
                 "2023": {
-                    "value": 100000,
+                    "value": "=100000",
                     "changerate": "changerates.fond",
                     "description": "",
                     "repeat": true
                 },
+                "2024": {
+                    "value": "+5000",
+                    "changerate": "changerates.kpi",
+                    "repeat": true
+                },
                 "$pensionWishYear": {
                     "transferResource": "income.$year.income.amount",
-                    "transferRule": "-1/$pensionWishYears",
+                    "transferRule": "transfer&1/$pensionWishYears",
                     "changerate": "changerates.fond",
-                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+                    "description": "Uttak fra $pensionWishYear, 1/$pensionWishYears",
                     "repeat": true
                 }
             }
