@@ -187,4 +187,32 @@ class ValueChangeTest extends TestCase
         $this->assertEquals('+5000', $rule);
     }
 
+    public function testIncomeFactorAmountChange(): void
+    {
+        $calculation = new Helper();
+        $debug = true;
+        $prevValue = 0;
+        $currentValue = 40000; #salary pr mont
+        $rule = null;
+
+        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 12);
+
+        $this->assertEquals(480000, $newValue); #return salary pr year
+        $this->assertEquals(null, $rule);
+    }
+
+    public function testFactorAdditionRuleToExistingAmountChange(): void
+    {
+        $calculation = new Helper();
+        $debug = true;
+        $prevValue = 100000;
+        $currentValue = 0;
+        $rule = "+5000";
+
+        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 12);
+
+        $this->assertEquals(160000, $newValue);
+        $this->assertEquals('+5000', $rule);
+    }
+
 }

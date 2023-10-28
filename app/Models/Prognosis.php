@@ -199,7 +199,7 @@ class Prognosis
                 #Maybe the asset is added to late, but it is at least not multiplied by 12
                 $this->dataH[$assetname][$year]['income'] = [
                     'changerate' => $incomeChangeratePercent / 100,
-                    'amount' => $incomeCurrentValue * 12 + Arr::get($this->dataH, "$assetname.$year.income.amount", 0),
+                    'amount' => $incomeCurrentValue + Arr::get($this->dataH, "$assetname.$year.income.amount", 0),
                     'description' => Arr::get($asset, "income.$year.description") . $explanation,
                     ];
 

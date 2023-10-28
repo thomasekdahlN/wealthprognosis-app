@@ -34,15 +34,15 @@ class Helper extends Model
             #print "** Value looks like rule\n";
 
             #Previous value has to be an integer from a previous calculation in this case. Only divisor should remember a rule
-            list($newValue, $rule, $explanation) = $this->calculateRule($debug, $prevValue, $currentValue);
+            list($newValue, $rule, $explanation) = $this->calculateRule($debug, $prevValue, $currentValue, $factor);
 
         } elseif($rule && is_numeric($currentValue) && $currentValue != 0){
             #print "** rule is set: $rule using current value $currentValue\n";
-            list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $currentValue, $rule);
+            list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $currentValue, $rule, $factor);
 
         } elseif($rule && is_numeric($prevValue) && $prevValue != 0){
             #print "** rule is set: $rule using prev value $prevValue\n";
-            list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $prevValue, $rule);
+            list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $prevValue, $rule, $factor);
 
         } elseif(!$currentValue) {
 
@@ -53,7 +53,8 @@ class Helper extends Model
                 $explanation = "Using previous value: " . round($newValue);
             }
         } elseif(is_numeric($currentValue)) {
-            $newValue = $currentValue;
+            $explanation = "Using current value: " . round($currentValue) . " * $factor";
+            $newValue = $currentValue * 12;
         } else {
             print "ERROR: currentValue: $currentValue not catched by logic";
         }
@@ -68,7 +69,7 @@ class Helper extends Model
     }
 
     //$rule has to be a rule, plus, minus, percent, divisor
-    public function calculateRule(bool $debug, int $value, string $rule) {
+    public function calculateRule(bool $debug, int $value, string $rule, int $factor = 1) {
 
         $newValue = 0;
         $explanation = null;
@@ -86,11 +87,11 @@ class Helper extends Model
 
             } elseif (preg_match('/(\+)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #number that starts with + to be added
-                list($newValue, $rule, $explanation) = $this->calculationAddition($debug, $value, $rule);
+                list($newValue, $rule, $explanation) = $this->calculationAddition($debug, $value, $rule, $factor);
 
             } elseif (preg_match('/(\-)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #number that starts with - to be subtracted
-                list($newValue, $rule, $explanation) = $this->calculationSubtraction($debug, $value, $rule);
+                list($newValue, $rule, $explanation) = $this->calculationSubtraction($debug, $value, $rule, $factor);
 
             } elseif (preg_match('/(\=)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #number that starts with = Fixed number override
@@ -163,19 +164,18 @@ class Helper extends Model
         return [$newValue, $rule, $explanation];
     }
 
-    public function calculationAddition(bool $debug, int $value, int $add) {
+    public function calculationAddition(bool $debug, int $value, int $add, int $factor = 1) {
         $rule = "+$add";
 
-        $newValue = $value + $add; #Should fix both + and -
-        $explanation = "Adding: add";
-
+        $newValue = $value + ($add * $factor); #Should fix both + and -
+        $explanation = "Adding: add $newValue = $value + ($add * $factor)";
         return [$newValue, $rule, $explanation];
     }
 
-    public function calculationSubtraction(bool $debug, int $value, int $subtract) {
+    public function calculationSubtraction(bool $debug, int $value, int $subtract, int $factor = 1) {
         $rule = $subtract;
 
-        $newValue = $value + $subtract; #Should fix both + and -
+        $newValue = $value + ($subtract * $factor); #Should fix both + and -
         $explanation = "Subtracting: $subtract";
 
         if($newValue < 0) {
