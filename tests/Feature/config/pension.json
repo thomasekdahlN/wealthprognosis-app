@@ -22,7 +22,7 @@
                 "$pensionOfficialYear": {
                     "name": "Folketrygden",
                     "description": "Folketrygden fra $pensionOfficialYear",
-                    "value": 15000,
+                    "amount": 15000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }

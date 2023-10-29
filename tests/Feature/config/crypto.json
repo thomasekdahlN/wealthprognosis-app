@@ -17,9 +17,9 @@
                 "active": true,
                 "tax": "fond"
             },
-            "value": {
+            "asset": {
                 "2022": {
-                    "value": 5000,
+                    "amount": 5000,
                     "changerate": "changerates.crypto",
                     "description": "",
                     "repeat": true

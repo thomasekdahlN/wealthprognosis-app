@@ -11,121 +11,121 @@ class Helper extends Model
 
 
     /**
-    -- "=1000" - Sets the value equal to this value
-    -- "1000" - Adds 1000 to the value (evaluates to same as +1000
-    -- "+10%" - Adds 10% to value (Supported now, but syntax : 10)
-    -- "+1000" - Adds 1000 to value
-    -- "-10%" - Subtracts 10% from value
-    -- "-1000" - Subtracts 1000 from value (Supported now - same syntax)
+    -- "=1000" - Sets the amount equal to this amount
+    -- "1000" - Adds 1000 to the amount (evaluates to same as +1000
+    -- "+10%" - Adds 10% to amount (Supported now, but syntax : 10)
+    -- "+1000" - Adds 1000 to amount
+    -- "-10%" - Subtracts 10% from amount
+    -- "-1000" - Subtracts 1000 from amount (Supported now - same syntax)
     -- =+1/10" - Adds 1 tenth of the amount yearly
     -- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10
      */
-    public function valueAdjustment(bool $debug, ?string $prevValue, ?string $currentValue, string $rule = NULL, int $factor = 1){
+    public function adjustAmount(bool $debug, ?string $prevAmount, ?string $currentAmount, string $rule = NULL, int $factor = 1){
         #Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor should have memory.
 
-        $newValue = 0;
+        $newAmount = 0;
         $explanation = '';
 
         if($debug) {
-            print "INPUT( PV: $prevValue, CV: $currentValue, rule: $rule, factor: $factor)\n";
+            print "INPUT( PV: $prevAmount, CV: $currentAmount, rule: $rule, factor: $factor)\n";
         }
 
-        if($this->isRule($currentValue)) {
-            #print "** Value looks like rule\n";
+        if($this->isRule($currentAmount)) {
+            #print "** Amount looks like rule\n";
 
-            #Previous value has to be an integer from a previous calculation in this case. Only divisor should remember a rule
-            list($newValue, $rule, $explanation) = $this->calculateRule($debug, $prevValue, $currentValue, $factor);
+            #Previous amount has to be an integer from a previous calculation in this case. Only divisor should remember a rule
+            list($newAmount, $rule, $explanation) = $this->calculateRule($debug, $prevAmount, $currentAmount, $factor);
 
-        } elseif($rule && is_numeric($currentValue) && $currentValue != 0){
-            #print "** rule is set: $rule using current value $currentValue\n";
-            list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $currentValue, $rule, $factor);
+        } elseif($rule && is_numeric($currentAmount) && $currentAmount != 0){
+            #print "** rule is set: $rule using current amount $currentAmount\n";
+            list($newAmount, $rule, $explanation) = $this->calculateRule( $debug, $currentAmount, $rule, $factor);
 
-        } elseif($rule && is_numeric($prevValue) && $prevValue != 0){
-            #print "** rule is set: $rule using prev value $prevValue\n";
-            list($newValue, $rule, $explanation) = $this->calculateRule( $debug, $prevValue, $rule, $factor);
+        } elseif($rule && is_numeric($prevAmount) && $prevAmount != 0){
+            #print "** rule is set: $rule using prev amount $prevAmount\n";
+            list($newAmount, $rule, $explanation) = $this->calculateRule( $debug, $prevAmount, $rule, $factor);
 
-        } elseif(!$currentValue) {
+        } elseif(!$currentAmount) {
 
-            #Set it to the previous value
-            $newValue = $prevValue; #Previous value is already factored, only new values has to be factored
-            if ($newValue != null) {
-                #print "value: $value\n";
-                $explanation = "Using previous value: " . round($newValue);
+            #Set it to the previous amount
+            $newAmount = $prevAmount; #Previous amount is already factored, only new amounts has to be factored
+            if ($newAmount != null) {
+                #print "amount: $amount\n";
+                $explanation = "Using previous amount: " . round($newAmount);
             }
-        } elseif(is_numeric($currentValue)) {
-            $explanation = "Using current value: " . round($currentValue) . " * $factor";
-            $newValue = $currentValue * $factor;
+        } elseif(is_numeric($currentAmount)) {
+            $explanation = "Using current amount: " . round($currentAmount) . " * $factor";
+            $newAmount = $currentAmount * $factor;
         } else {
-            print "ERROR: currentValue: $currentValue not catched by logic";
+            print "ERROR: currentAmount: $currentAmount not catched by logic";
         }
 
         if($debug) {
-            print "OUTPUT( newValue: $newValue, rule: $rule, explanation: $explanation)\n";
+            print "OUTPUT( newAmount: $newAmount, rule: $rule, explanation: $explanation)\n";
         }
 
-        #$newValue = intval($newValue * $factor);
-        #print "return valueAdjustment($newValue, $rule, $explanation)\n";
-        return [$newValue, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
+        #$newAmount = intval($newAmount * $factor);
+        #print "return amountAdjustment($newAmount, $rule, $explanation)\n";
+        return [$newAmount, $rule, $explanation]; #Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
 
     //$rule has to be a rule, plus, minus, percent, divisor
-    public function calculateRule(bool $debug, int $value, string $rule, int $factor = 1) {
+    public function calculateRule(bool $debug, int $amount, string $rule, int $factor = 1) {
 
-        $newValue = 0;
+        $newAmount = 0;
         $explanation = null;
 
         if($rule) {
             if (preg_match('/(\+?|\-?)(\d*)(\%)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #Percentages
-                list($newValue, $rule, $explanation) = $this->calculationPercentage($debug, $value, $matches);
+                list($newAmount, $rule, $explanation) = $this->calculationPercentage($debug, $amount, $matches);
 
             } elseif (preg_match('/(\+?|\-?)(\d*)\/(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #Divison ex 1/12
                 #NOTE: Only division should have the rule remembered!!!!
-                list($newValue, $rule, $explanation) = $this->calculationDivisor($debug, $value, $matches);
-                #print "--- divisor: ( $newValue, $rule, $explanation ) \n";
+                list($newAmount, $rule, $explanation) = $this->calculationDivisor($debug, $amount, $matches);
+                #print "--- divisor: ( $newAmount, $rule, $explanation ) \n";
 
             } elseif (preg_match('/(\+)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #number that starts with + to be added
-                list($newValue, $rule, $explanation) = $this->calculationAddition($debug, $value, $rule, $factor);
+                list($newAmount, $rule, $explanation) = $this->calculationAddition($debug, $amount, $rule, $factor);
 
             } elseif (preg_match('/(\-)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #number that starts with - to be subtracted
-                list($newValue, $rule, $explanation) = $this->calculationSubtraction($debug, $value, $rule, $factor);
+                list($newAmount, $rule, $explanation) = $this->calculationSubtraction($debug, $amount, $rule, $factor);
 
             } elseif (preg_match('/(\=)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE)) {
                 #number that starts with = Fixed number override
 
-                list($newValue, $rule, $explanation) = $this->calculationFixed($debug, $value, $matches);
+                list($newAmount, $rule, $explanation) = $this->calculationFixed($debug, $amount, $matches, $factor);
             } elseif (is_numeric($rule)) {
                 #number that is positive, really starts with a + and should be added when it ends up in rule
-                $newValue = $rule;
-                $explanation = 'rule is numeric so value is set to rule';
+                $newAmount = $rule;
+                $explanation = 'rule is numeric so amount is set to rule';
             } else {
                 print "ERROR: calculateRule #$rule# not supported";
             }
         }
 
-        #print "return calculateRule($newValue, $rule, $explanation)\n";
-        return [$newValue, $rule, $explanation];
+        #print "return calculateRule($newAmount, $rule, $explanation)\n";
+        return [$newAmount, $rule, $explanation];
     }
 
-    public function calculationDivisor(bool $debug, string $value, array $matches) {
+    public function calculationDivisor(bool $debug, string $amount, array $matches) {
         $rule = null;
 
-        $divisorValue = round($value / $matches[3][0]);
+        $divisorAmount = round($amount / $matches[3][0]);
 
         if($matches[1][0] == '-') {
-            $newValue = $value - $divisorValue;
-            $explanation = "Subtracting divisor: " . $divisorValue;
+            $newAmount = $amount - $divisorAmount;
+            $explanation = "Subtracting divisor: " . $divisorAmount;
 
         } elseif($matches[1][0] == '+') {
-            $newValue = $value + $divisorValue;
-            $explanation = "Adding divisor: " . $divisorValue;
+            $newAmount = $amount + $divisorAmount;
+            $explanation = "Adding divisor: " . $divisorAmount;
         } else {
-            #No sign, just give the divisor of the value
-            $newValue = $divisorValue;
-            $explanation = "Divisor is: " . $divisorValue;
+            #No sign, just give the divisor of the amount
+            $newAmount = $divisorAmount;
+            $explanation = "Divisor is: " . $divisorAmount;
 
             #ToDo - maybe not the correct behaviour in all instances? But great for countdown
             $matches[3][0]--; #We reduce the divisor each time we run it, so its the same as the remaining runs.
@@ -137,71 +137,71 @@ class Helper extends Model
 
         $explanation .= " new rule: $rule";
 
-        return [$newValue, $rule, $explanation];
+        return [$newAmount, $rule, $explanation];
     }
 
-    public function calculationPercentage(bool $debug, string $value, array $matches) {
+    public function calculationPercentage(bool $debug, string $amount, array $matches) {
 
         $rule = null; #percentage should not have rule memory
         $percent = $matches[2][0];
         if($matches[1][0] == '-') {
-            $newValue = round($value  * ((-$percent  / 100) + 1));
+            $newAmount = round($amount  * ((-$percent  / 100) + 1));
             $rule = "-$percent%";
-            $explanation = "Subtracting percent: $newValue";
+            $explanation = "Subtracting percent: $newAmount";
 
         } elseif($matches[1][0] == '+') {
-            $newValue = round($value *  (($percent  / 100) + 1));
+            $newAmount = round($amount *  (($percent  / 100) + 1));
             $rule = "+$percent%";
-            $explanation = "Adding percent: $newValue";
+            $explanation = "Adding percent: $newAmount";
 
         } else {
-            #No sign, just give the percentage of the value
-            $newValue = round($value *  ($percent  / 100));
+            #No sign, just give the percentage of the amount
+            $newAmount = round($amount *  ($percent  / 100));
             $rule = "$percent%";
-            $explanation = "Percent is: $newValue";
+            $explanation = "Percent is: $newAmount";
         }
 
-        return [$newValue, $rule, $explanation];
+        return [$newAmount, $rule, $explanation];
     }
 
-    public function calculationAddition(bool $debug, int $value, int $add, int $factor = 1) {
+    public function calculationAddition(bool $debug, int $amount, int $add, int $factor = 1) {
         $rule = "+$add";
 
-        $newValue = $value + ($add * $factor); #Should fix both + and -
-        $explanation = "Adding: add $newValue = $value + ($add * $factor)";
-        return [$newValue, $rule, $explanation];
+        $newAmount = round($amount + ($add * $factor)); #Should fix both + and -
+        $explanation = "Adding: add $newAmount = $amount + ($add * $factor)";
+        return [$newAmount, $rule, $explanation];
     }
 
-    public function calculationSubtraction(bool $debug, int $value, int $subtract, int $factor = 1) {
+    public function calculationSubtraction(bool $debug, int $amount, int $subtract, int $factor = 1) {
         $rule = $subtract;
 
-        $newValue = $value + ($subtract * $factor); #Should fix both + and -
+        $newAmount = round($amount + ($subtract * $factor)); #Should fix both + and -
         $explanation = "Subtracting: $subtract";
 
-        if($newValue < 0) {
-            $newValue = $value;
+        if($newAmount < 0) {
+            $newAmount = $amount;
             $explanation = "Not subtracting asset gets negative";
         }
 
-        return [$newValue, $rule, $explanation];
+        return [$newAmount, $rule, $explanation];
     }
 
-    public function calculationFixed(bool $debug, string $value, array $matches) {
+    public function calculationFixed(bool $debug, string $amount, array $matches, int $factor = 1) {
         $rule = null;
 
-        $newValue = round($matches[2][0]); #Should fix both + and -
-        $explanation = "Fixed number override =$newValue";
+        $newAmount = round($matches[2][0] * $factor); #Should fix both + and -
+        $explanation = "Fixed number override " . $matches[2][0] . " * $factor=$newAmount";
 
-        return [$newValue, $rule, $explanation];
+        return [$newAmount, $rule, $explanation];
     }
 
-    public function isRule(?string $value)
+    public function isRule(?string $amount)
     {
-        #print "isRule: $value : ";
-        if (preg_match('/(\+|\-|\%|\/|\=)/i', $value, $matches, PREG_OFFSET_CAPTURE)) {
+        #print "isRule: $amount : ";
+        if (preg_match('/(\+|\-|\%|\/|\=)/i', $amount, $matches, PREG_OFFSET_CAPTURE)) {
             #print "yes\n";
             return true;
-        } elseif(!is_numeric($value)) {
+        } elseif(!is_numeric($amount)) {
             #Catches text strings, like variable confirguration
             #print "yes\n";
             return true;
@@ -212,7 +212,7 @@ class Helper extends Model
     }
 
     public function isTransfer(?string $transfer) {
-        if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)(\*|=)([0-9]*[.]?[0-9]+|value|diff)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
+        if(preg_match('/(\w+\.\$\w+\.\w+\.\w+)(\*|=)([0-9]*[.]?[0-9]+|amount|diff)/i', $transfer, $matches, PREG_OFFSET_CAPTURE)) {
             return $matches;
         }
         return false;

@@ -17,9 +17,9 @@
                 "active": true,
                 "tax": "car"
             },
-            "value": {
+            "asset": {
                 "2023": {
-                    "value": 100000,
+                    "amount": 100000,
                     "changerate": "changerates.car",
                     "description": "verditap",
                     "repeat": true
@@ -29,7 +29,7 @@
                 "2023": {
                     "name": "Utgifter",
                     "description": "Drivstoff/Forsikring/Vedlikehold/Bompenger 4000,- pr mnd",
-                    "value": 4000,
+                    "amount": 4000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }

@@ -17,9 +17,9 @@
                 "active": true,
                 "tax": "cash"
             },
-            "value": {
+            "asset": {
                 "2023": {
-                    "value": 100000,
+                    "amount": 100000,
                     "changerate": "changerates.kpi",
                     "description": "Kontanter p.t.",
                     "repeat": true

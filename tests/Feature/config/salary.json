@@ -21,14 +21,14 @@
                 "2022": {
                     "name": "Income",
                     "description": "Income",
-                    "value": 40000,
+                    "amount": 40000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 },
                 "$pensionWishYear": {
                     "name": "Salary",
                     "description": "Pensioned, no more salary from here",
-                    "value": "=0",
+                    "amount": "=0",
                     "changerate": "changerates.zero",
                     "repeat": false
                 }
@@ -37,7 +37,7 @@
                 "2022": {
                     "name": "Expences",
                     "description": "",
-                    "value": 15000,
+                    "amount": 15000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }

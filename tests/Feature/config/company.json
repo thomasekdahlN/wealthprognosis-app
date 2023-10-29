@@ -17,9 +17,9 @@
                 "active": true,
                 "tax": "stock"
             },
-            "value": {
+            "asset": {
                 "2022": {
-                    "value": 2500000,
+                    "amount": 2500000,
                     "changerate": "changerates.stock",
                     "description": "Initielt kjøp",
                     "repeat": true

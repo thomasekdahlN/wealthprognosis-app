@@ -21,21 +21,21 @@
                 "2007": {
                     "name": "Barnetrygd",
                     "description": "Barnetrygd",
-                    "value": 1766,
+                    "amount": 1766,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 },
                 "2013": {
                     "name": "Barnetrygd beløp redusert etter 6 år",
                     "description": "Barnetrygd",
-                    "value": 1310,
+                    "amount": 1310,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 },
                 "2024": {
                     "name": "Barnetrygd slutt",
                     "description": "Barnetrygd",
-                    "value": 1310,
+                    "amount": 1310,
                     "changerate": "changerates.kpi",
                     "repeat": false
                 }
@@ -44,14 +44,14 @@
                 "2007": {
                     "name": "Expences",
                     "description": "",
-                    "value": 3000,
+                    "amount": 3000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 },
                 "2029": {
                     "name": "Expences",
                     "description": "Slutt på sponsing av barn",
-                    "value": 0,
+                    "amount": 0,
                     "changerate": "changerates.kpi",
                     "repeat": false
                 }

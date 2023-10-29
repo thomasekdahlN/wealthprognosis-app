@@ -17,11 +17,11 @@
                 "active": true,
                 "tax": "inheritance"
             },
-            "value": {
+            "asset": {
                 "2037": {
                     "name": "inheritance",
                     "description": "",
-                    "value": 1000000,
+                    "amount": 1000000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }

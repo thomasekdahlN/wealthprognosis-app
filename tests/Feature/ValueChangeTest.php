@@ -23,7 +23,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "-50%";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals($currentValue, $rule);
@@ -38,7 +38,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "+50%";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(1500, $newValue);
         $this->assertEquals($currentValue, $rule);
@@ -54,7 +54,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "50%";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals($currentValue, $rule);
@@ -70,7 +70,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "-1/4"; #Note that this should count down until 1/1 to use up the rest
 
-        list($newValue1, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue1, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(750, $newValue1);
         $this->assertEquals('-1/4', $rule);
@@ -78,7 +78,7 @@ class ValueChangeTest extends TestCase
         $prevValue      = 500; #Check that prev value is ignored when rule is set
         $currentValue   = 1000;
 
-        list($newValue2, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue2, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(750, $newValue2);
         $this->assertEquals('-1/4', $rule);
@@ -94,7 +94,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "+1/4";
 
-        list($newValue1, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue1, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(1250, $newValue1);
         $this->assertEquals('+1/4', $rule);
@@ -102,7 +102,7 @@ class ValueChangeTest extends TestCase
         $prevValue      = 500; #Check that prev value is ignored when rule is set
         $currentValue   = 1000;
 
-        list($newValue2, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue2, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(1250, $newValue2);
         $this->assertEquals('+1/4', $rule);
@@ -118,12 +118,12 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "1/4";
 
-        list($newValue1, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue1, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(250, $newValue1);
         $this->assertEquals('1/3', $rule);
 
-        list($newValue2, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue2, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(250, $newValue2);
         $this->assertEquals('1/2', $rule);
@@ -139,7 +139,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "+500";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(1500, $newValue);
         $this->assertEquals($currentValue, $rule);
@@ -152,7 +152,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "-500";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals($currentValue, $rule);
@@ -167,7 +167,7 @@ class ValueChangeTest extends TestCase
         $prevValue = 1000;
         $currentValue = "=500";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals(null, $rule);
@@ -181,7 +181,7 @@ class ValueChangeTest extends TestCase
         $currentValue = 0;
         $rule = "+5000";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(110000, $newValue);
         $this->assertEquals('+5000', $rule);
@@ -195,7 +195,7 @@ class ValueChangeTest extends TestCase
         $currentValue = 40000; #salary pr mont
         $rule = null;
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 12);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
 
         $this->assertEquals(480000, $newValue); #return salary pr year
         $this->assertEquals(null, $rule);
@@ -209,7 +209,7 @@ class ValueChangeTest extends TestCase
         $currentValue = 0;
         $rule = "+5000";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 12);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
 
         $this->assertEquals(160000, $newValue);
         $this->assertEquals('+5000', $rule);
@@ -223,7 +223,7 @@ class ValueChangeTest extends TestCase
         $currentValue = 0;
         $rule = "-5000";
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 12);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
 
         $this->assertEquals(40000, $newValue);
         $this->assertEquals('-5000', $rule);
@@ -237,9 +237,22 @@ class ValueChangeTest extends TestCase
         $currentValue = 100000;
         $rule = null;
 
-        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
 
         $this->assertEquals(100000, $newValue);
+        #$this->assertEquals('-5000', $rule);
+    }
+    public function testEqualsFactoredAmountChange(): void
+    {
+        $calculation = new Helper();
+        $debug = true;
+        $prevValue = 0;
+        $currentValue = '=40000'; #Example, salary 40K pr month
+        $rule = null;
+
+        list($newValue, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
+
+        $this->assertEquals(480000, $newValue);
         #$this->assertEquals('-5000', $rule);
     }
 }

@@ -21,16 +21,16 @@
                 "2023": {
                     "name": "Income",
                     "description": "Income",
-                    "value": 40000,
+                    "asset": 40000,
                     "transferRule": "add&5%",
-                    "transferResource": "otp.$year.value.value",
+                    "transferResource": "otp.$year.asset.amount",
                     "changerate": "changerates.kpi",
                     "repeat": true
                 },
                 "$pensionWishYear": {
                     "name": "Income",
                     "description": "Pensioned, no more income from here",
-                    "value": "=0",
+                    "asset": "=0",
                     "changerate": "changerates.zero",
                     "repeat": false
                 }
@@ -39,7 +39,7 @@
                 "2023": {
                     "name": "Expences",
                     "description": "",
-                    "value": 15000,
+                    "asset": 15000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
@@ -54,11 +54,11 @@
                 "active": true,
                 "tax": "inheritance"
             },
-            "value": {
+            "asset": {
                 "2037": {
                     "name": "inheritance",
                     "description": "",
-                    "value": 1000000,
+                    "asset": 1000000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
@@ -77,7 +77,7 @@
                 "$pensionOfficialYear": {
                     "name": "Folketrygden",
                     "description": "Folketrygden fra $pensionOfficialYear",
-                    "value": 15000,
+                    "amount": 15000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
@@ -92,9 +92,9 @@
                 "active": true,
                 "tax": "fond"
             },
-            "value": {
+            "asset": {
                 "2023": {
-                    "value": "=500000",
+                    "amount": "=500000",
                     "changerate": "changerates.otp",
                     "description": "OTP Sparing frem til pensjonsår",
                     "repeat": true
@@ -117,9 +117,9 @@
                 "active" : true,
                 "tax": "house"
             },
-            "value": {
+            "asset": {
                 "2023": {
-                    "value": "3000000",
+                    "amount": "3000000",
                     "changerate": "changerates.house",
                     "description": "",
                     "repeat": true
@@ -129,14 +129,14 @@
                 "2023": {
                     "name": "Utgifter",
                     "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                    "value": 7300,
+                    "amount": 7300,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
             },
             "mortgage": {
                 "2023": {
-                    "value": 1500000,
+                    "amount": 1500000,
                     "interest": "changerates.interest",
                     "gebyr": 600,
                     "tax": 22,
@@ -154,9 +154,9 @@
                 "active": true,
                 "tax": "fond"
             },
-            "value": {
+            "asset": {
                 "2022": {
-                    "value": 2000000,
+                    "amount": 2000000,
                     "changerate": "changerates.fond",
                     "description": "Første innskudd på 2 millioner",
                     "repeat": true
@@ -164,13 +164,13 @@
                 "2023": {
                     "name": "Monthly savings",
                     "description": "Setter inn 6000,- pr år",
-                    "value": "+6000",
+                    "amount": "+6000",
                     "repeat": true
                 },
                 "2033": {
                     "name": "Monthly savings",
                     "description": "Slutter å sette inn 6000,- pr år",
-                    "value": "+0",
+                    "amount": "+0",
                     "repeat": true
                 },
                 "$pensionWishYear": {
@@ -191,9 +191,9 @@
                 "active": true,
                 "tax": "cash"
             },
-            "value": {
+            "asset": {
                 "2022": {
-                    "value": 50000,
+                    "amount": 50000,
                     "changerate": "changerates.cash",
                     "description": "Kontanter p.t.",
                     "repeat": true
@@ -216,9 +216,9 @@
                 "active": true,
                 "tax": "car"
             },
-            "value": {
+            "asset": {
                 "2020": {
-                    "value": 50000,
+                    "amount": 50000,
                     "changerate": "changerates.car",
                     "description": "verditap",
                     "repeat": true
@@ -228,7 +228,7 @@
                 "2019": {
                     "name": "Utgifter",
                     "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
-                    "value": 3000,
+                    "amount": 3000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }

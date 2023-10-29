@@ -66,14 +66,14 @@ class Changerate extends Model
     }
 
     #Really to Excel.
-    public function decimalToDecimal(int $value){
+    public function decimalToDecimal(int $amount){
 
-        if($value > 0) {
-            $value = $value - 1;
+        if($amount > 0) {
+            $amount = $amount - 1;
         } else {
-            $value = null;
+            $amount = null;
         }
-        return $value;
+        return $amount;
     }
 
     #Should be moved to helper?
@@ -95,7 +95,7 @@ class Changerate extends Model
                     $decimal = $this->convertPercentToDecimal($percent);
                     $explanation = "original er satt til percent: $original, decimal: $decimal";
 
-                } else { #Allow to read the changerate from the changerate yearly config as a variable name subsituted for its value
+                } else { #Allow to read the changerate from the changerate yearly config as a variable name subsituted for its amount
                     #print "Remove the changerates from the text: $original\n";
                     $variablename = $original; #THis is a variable name, not a number, wee keep it to repeat
                     preg_match('/changerates.(\w*)/i', $original, $matches, PREG_OFFSET_CAPTURE);

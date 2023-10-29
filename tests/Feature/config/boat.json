@@ -17,9 +17,9 @@
                 "active": true,
                 "tax": "boat"
             },
-            "value": {
+            "asset": {
                 "2022": {
-                    "value": 200000,
+                    "amount": 200000,
                     "changerate": "changerates.boat",
                     "description": "verditap",
                     "repeat": true
@@ -29,7 +29,7 @@
                 "2022": {
                     "name": "Utgifter",
                     "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
-                    "value": 2000,
+                    "amount": 2000,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
