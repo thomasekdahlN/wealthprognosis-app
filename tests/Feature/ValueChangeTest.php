@@ -176,7 +176,7 @@ class ValueChangeTest extends TestCase
     public function testAdditionRuleToExistingAmountChange(): void
     {
         $calculation = new Helper();
-        $debug = true;
+        $debug = false;
         $prevValue = 105000;
         $currentValue = 0;
         $rule = "+5000";
@@ -190,7 +190,7 @@ class ValueChangeTest extends TestCase
     public function testIncomeFactorAmountChange(): void
     {
         $calculation = new Helper();
-        $debug = true;
+        $debug = false;
         $prevValue = 0;
         $currentValue = 40000; #salary pr mont
         $rule = null;
@@ -204,7 +204,7 @@ class ValueChangeTest extends TestCase
     public function testFactorAdditionRuleToExistingAmountChange(): void
     {
         $calculation = new Helper();
-        $debug = true;
+        $debug = false;
         $prevValue = 100000;
         $currentValue = 0;
         $rule = "+5000";
@@ -215,4 +215,31 @@ class ValueChangeTest extends TestCase
         $this->assertEquals('+5000', $rule);
     }
 
+    public function testFactorSubtractionRuleToExistingAmountChange(): void
+    {
+        $calculation = new Helper();
+        $debug = false;
+        $prevValue = 100000;
+        $currentValue = 0;
+        $rule = "-5000";
+
+        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 12);
+
+        $this->assertEquals(40000, $newValue);
+        $this->assertEquals('-5000', $rule);
+    }
+
+    public function testAssetNotFactoredAmountChange(): void
+    {
+        $calculation = new Helper();
+        $debug = true;
+        $prevValue = 0;
+        $currentValue = 100000;
+        $rule = null;
+
+        list($newValue, $rule, $explanation) = $calculation->valueAdjustment($debug, $prevValue, $currentValue, $rule, 1);
+
+        $this->assertEquals(100000, $newValue);
+        #$this->assertEquals('-5000', $rule);
+    }
 }

@@ -54,7 +54,7 @@ class Helper extends Model
             }
         } elseif(is_numeric($currentValue)) {
             $explanation = "Using current value: " . round($currentValue) . " * $factor";
-            $newValue = $currentValue * 12;
+            $newValue = $currentValue * $factor;
         } else {
             print "ERROR: currentValue: $currentValue not catched by logic";
         }

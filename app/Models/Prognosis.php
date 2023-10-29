@@ -151,11 +151,13 @@ class Prognosis
 
                 $expenceCurrentValue = Arr::get($asset, "expence.$year.value", 0); #Expence is added as a monthly repeat in config
 
+                #print "Expence transfer before: $assetname.$year, expencePrevValue:$expencePrevValue, expenceCurrentValue:$expenceCurrentValue\n";
                 list($expenceCurrentValue, $expenceRule, $explanation) = $this->helper->valueAdjustment(0, $expencePrevValue, $expenceCurrentValue, $expenceRule,12);
+                #print "Expence transfer after: $assetname.$year, expencePrevValue:$expencePrevValue, expenceCurrentValue:$expenceCurrentValue\n";
 
                 $this->dataH[$assetname][$year]['expence'] = [
                     'changerate' => $expenceChangeratePercent / 100,
-                    'amount' => $expenceCurrentValue * 12,
+                    'amount' => $expenceCurrentValue,
                     'description' => Arr::get($asset, "expence.$year.description") . $explanation,
                 ];
 
