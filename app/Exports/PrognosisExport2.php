@@ -170,9 +170,9 @@ class PrognosisExport2
         $sheet->getStyle("N6:N80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
         $sheet->getStyle("Q6:Q80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
-        $sheet->getStyle("S6:S80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("W6:W80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("AC6:AC80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("T6:S80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("X6:W80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("AD6:AC80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
 
         for ($column = 1; $column <= 20+6; $column++) {

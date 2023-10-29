@@ -152,7 +152,7 @@ class Prognosis
                 $expenceCurrentAmount = Arr::get($assetconfig, "expence.$year.amount", 0); #Expence is added as a monthly repeat in config
 
                 #print "Expence transfer before: $assetname.$year, expencePrevAmount:$expencePrevAmount, expenceCurrentAmount:$expenceCurrentAmount\n";
-                list($expenceCurrentAmount, $expenceRule, $explanation) = $this->helper->adjustAmount(0, $expencePrevAmount, $expenceCurrentAmount, $expenceRule,12);
+                list($expenceCurrentAmount, $expenceDepositedAmount, $expenceRule, $explanation) = $this->helper->adjustAmount(0, $expencePrevAmount, $expenceCurrentAmount, $expenceRule,12);
                 #print "Expence transfer after: $assetname.$year, expencePrevAmount:$expencePrevAmount, expenceCurrentAmount:$expenceCurrentAmount\n";
 
                 $this->dataH[$assetname][$year]['expence'] = [
@@ -192,11 +192,11 @@ class Prognosis
 
                 $incomeCurrentAmount = Arr::get($assetconfig, "income.$year.amount", 0); #Income is added as a yearly repeat in config
 
-                list($incomeCurrentAmount, $incomeRule, $explanation) = $this->helper->adjustAmount(false, $incomePrevAmount, $incomeCurrentAmount, $incomeRule, 12);
+                list($incomeCurrentAmount, $incomeDepositedAmount, $incomeRule, $explanation) = $this->helper->adjustAmount(false, $incomePrevAmount, $incomeCurrentAmount, $incomeRule, 12);
 
-                print "Income transfer before: $assetname.$year, incomeCurrentAmount:$incomeCurrentAmount, incomeCurrentTransferResource:$incomeCurrentTransferResource, incomeCurrentTransferRule:$incomeCurrentTransferRule\n";
-                list($incomeCurrentAmount, $incomeTransferedAmount, $incomePrevTransferRule, $explanation) = $this->transferAmount(true, $assetname, $year, $incomeCurrentAmount, $incomeCurrentTransferResource, $incomeCurrentTransferRule, 12);
-                print "Income transfer after: $assetname.$year, incomeCurrentAmount:$incomeCurrentAmount, incomeTransferedAmount:$incomeTransferedAmount, incomePrevTransferRule:$incomePrevTransferRule, explanation: $explanation\n";
+                #print "Income transfer before: $assetname.$year, incomeCurrentAmount:$incomeCurrentAmount, incomeCurrentTransferResource:$incomeCurrentTransferResource, incomeCurrentTransferRule:$incomeCurrentTransferRule\n";
+                list($incomeCurrentAmount, $incomeTransferedAmount, $incomePrevTransferRule, $explanation) = $this->transferAmount(false, $assetname, $year, $incomeCurrentAmount, $incomeCurrentTransferResource, $incomeCurrentTransferRule, 12);
+                #print "Income transfer after: $assetname.$year, incomeCurrentAmount:$incomeCurrentAmount, incomeTransferedAmount:$incomeTransferedAmount, incomePrevTransferRule:$incomePrevTransferRule, explanation: $explanation\n";
 
                 $this->dataH[$assetname][$year]['income'] = [
                     'changerate' => $incomeChangeratePercent / 100,
@@ -234,7 +234,7 @@ class Prognosis
                 $assetCurrentTaxAmount = Arr::get($assetconfig, "asset.$year.taxvalue", 0);
 
                 #print "Asset før: year: $year assetPrevAmount:$assetPrevAmount assetCurrentAmount:$assetCurrentAmount assetRule:$assetRule\n";
-                list($assetCurrentAmount, $assetRule, $explanation) = $this->helper->adjustAmount(false, $assetPrevAmount, $assetCurrentAmount, $assetRule, 1);
+                list($assetCurrentAmount, $assetDepositedAmount, $assetRule, $explanation) = $this->helper->adjustAmount(false, $assetPrevAmount, $assetCurrentAmount, $assetRule, 1);
                 #print "Asset etter: year:$year assetCurrentAmount: $assetCurrentAmount, assetRule:$assetRule explanation: $explanation\n";
 
                 #We must check if values has been set in the structure already and add them
@@ -252,19 +252,26 @@ class Prognosis
                     $assetFirstYear = $year; #Ta vare på den første året vi ser en asset, da den brukes til skatteberegning ved salg for å se hvor lenge man har eid den.
                 };
 
-                #FIX: Why is it called asset.amount here anf not value? Why does this work?
-               $this->dataH[$assetname][$year]['asset'] = [
-                    'amount' => $assetCurrentAmount,
-                    'amountDeposited' => $assetCurrentAmount,
-                    'amountLoanDeducted' => $assetCurrentAmount,
-                    'changerate' => $assetChangeratePercent / 100,
-                    'description' => Arr::get($assetconfig, "asset.$year.description") . " Asset rule " . $assetRule . $explanation,
-                ];
 
                 ########################################################################################################
                 #Tax calculations
                 #print "$taxtype.$year incomeCurrentAmount: $incomeCurrentAmount, expenceCurrentAmount: $expenceCurrentAmount\n";
                 list($cashflow, $potentialIncome, $CashflowTaxableAmount, $fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization) = $this->tax->taxCalculation(false, $taxtype, $year, $incomeCurrentAmount, $expenceCurrentAmount, $assetCurrentAmount, $assetCurrentTaxAmount, $assetFirstAmount, $assetFirstYear);
+
+
+                #FIX: Why is it called asset.amount here anf not value? Why does this work?
+                $this->dataH[$assetname][$year]['asset'] = [
+                    'amount' => $assetCurrentAmount,
+                    'amountDeposited' => $assetDepositedAmount,
+                    'amountLoanDeducted' => $assetCurrentAmount,
+                    'changerate' => $assetChangeratePercent / 100,
+                    'percentTaxable' => $fortuneTaxablePercent,
+                    'amountTaxable' => $fortuneTaxableAmount,
+                    'percentTax' => $fortuneTaxPercent,
+                    'amountTax' => $fortuneTaxAmount,
+                    'description' => Arr::get($assetconfig, "asset.$year.description") . " Asset rule " . $assetRule . $explanation,
+                ];
+
 
                 $this->dataH[$assetname][$year]['tax'] = [
                     'amountTaxableYearly' => -$CashflowTaxableAmount,
@@ -275,13 +282,6 @@ class Prognosis
                     'percentTaxableRealization' => $DecimalTaxableRealization,
                     'amountDeductableRealization' => $AmountDeductableRealization,
                     'percentDeductableRealization' => $DecimalDeductableRealization,
-                ];
-
-                $this->dataH[$assetname][$year]['fortune'] = [
-                    'taxablePercent' => $fortuneTaxablePercent,
-                    'taxableAmount' => $fortuneTaxableAmount,
-                    'taxPercent' => $fortuneTaxPercent,
-                    'taxAmount' => $fortuneTaxAmount,
                 ];
 
                 #Calculate the potential max loan you can handle base on income, tax adjusted - as seen from the bank.
@@ -535,17 +535,18 @@ class Prognosis
             for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
                 #print "$year\n";
                 $this->additionToGroup($year, $meta, $assetH[$year], "asset.amount");
-                $this->additionToGroup($year, $meta, $assetH[$year], "asset.fortune");
                 $this->additionToGroup($year, $meta, $assetH[$year], "asset.amountLoanDeducted");
+                $this->additionToGroup($year, $meta, $assetH[$year], "asset.amountTaxable");
+                $this->additionToGroup($year, $meta, $assetH[$year], "asset.amountDeposited");
+
+                $this->setToGroup($year, $meta, $assetH[$year], "asset.percentTax");
+
                 $this->additionToGroup($year, $meta, $assetH[$year], "income.amount");
                 $this->additionToGroup($year, $meta, $assetH[$year], "expence.amount");
                 $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountTaxableYearly");
                 $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountTaxableRealization");
                 $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountDeductableYearly");
                 $this->additionToGroup($year, $meta, $assetH[$year], "tax.amountDeductableRealization");
-                $this->additionToGroup($year, $meta, $assetH[$year], "fortune.taxableAmount");
-
-                $this->setToGroup($year, $meta, $assetH[$year], "fortune.taxPercent");
                 $this->additionToGroup($year, $meta, $assetH[$year], "cashflow.amount");
                 $this->additionToGroup($year, $meta, $assetH[$year], "cashflow.amountAccumulated");
 
@@ -554,6 +555,7 @@ class Prognosis
                 $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.interestAmount");
                 $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.principal");
                 $this->additionToGroup($year, $meta, $assetH[$year], "mortgage.balance");
+
                 $this->additionToGroup($year, $meta, $assetH[$year], "potential.income"); #Beregnet potensiell inntekt slik bankene ser det.
                 $this->additionToGroup($year, $meta, $assetH[$year], "potential.loan"); #Beregner maks potensielt lån på 5 x inntekt.
 

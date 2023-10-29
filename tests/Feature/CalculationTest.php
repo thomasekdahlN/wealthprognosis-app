@@ -17,7 +17,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '+10%';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(110, $newValue);
         $this->assertEquals('+10%', $rule);
@@ -30,7 +30,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '-10%';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(90, $newValue);
         $this->assertEquals('-10%', $rule);
@@ -43,7 +43,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '50%';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(50, $newValue);
         $this->assertEquals('50%', $rule);
@@ -56,7 +56,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '+25';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(125, $newValue);
         $this->assertEquals('+25', $rule);
@@ -69,7 +69,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '-25';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(75, $newValue);
         $this->assertEquals('-25', $rule);
@@ -82,7 +82,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '+1/4';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(125, $newValue);
         $this->assertEquals('+1/4', $rule);
@@ -95,7 +95,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '1/4';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(25, $newValue);
         $this->assertEquals('1/3', $rule);
@@ -109,7 +109,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '-1/4';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(75, $newValue);
         $this->assertEquals('-1/4', $rule);
@@ -122,7 +122,7 @@ class CalculationTest extends TestCase
         $value = 100;
         $rule = '=25';
 
-        list($newValue, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculateRule($debug, $value, $rule);
 
         $this->assertEquals(25, $newValue);
         $this->assertEquals(null, $rule);
@@ -192,7 +192,7 @@ class CalculationTest extends TestCase
         $rule = '+50';
 
         preg_match('/(\+)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE);
-        list($newValue, $rule, $explanation) = $calculation->calculationAddition($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculationAddition($debug, $value, $rule);
 
         $this->assertEquals(150, $newValue);
         $this->assertEquals('+50', $rule);
@@ -206,7 +206,7 @@ class CalculationTest extends TestCase
         $rule = '-50';
 
         preg_match('/(\-)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE);
-        list($newValue, $rule, $explanation) = $calculation->calculationSubtraction($debug, $value, $rule);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculationSubtraction($debug, $value, $rule);
 
         $this->assertEquals(50, $newValue);
         $this->assertEquals('-50', $rule);
@@ -220,7 +220,7 @@ class CalculationTest extends TestCase
         $rule = '=50';
 
         preg_match('/(\=)(\d*)/i', $rule, $matches, PREG_OFFSET_CAPTURE);
-        list($newValue, $rule, $explanation) = $calculation->calculationFixed($debug, $value, $matches);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->calculationFixed($debug, $value, $matches);
 
         $this->assertEquals(50, $newValue);
         $this->assertEquals(null, $rule);
