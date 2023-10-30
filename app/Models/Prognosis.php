@@ -100,6 +100,7 @@ class Prognosis
             $assetPrevTransferResource = null;
             $assetCurrentTransferRule = null;
             $assetPrevTransferRule = null;
+            $assetAggregatedDepositedAmount = 0;
 
             $incomeCurrentAmount = 0;
             $incomePrevAmount = 0;
@@ -152,7 +153,7 @@ class Prognosis
                 $expenceCurrentAmount = Arr::get($assetconfig, "expence.$year.amount", 0); #Expence is added as a monthly repeat in config
 
                 #print "Expence transfer before: $assetname.$year, expencePrevAmount:$expencePrevAmount, expenceCurrentAmount:$expenceCurrentAmount\n";
-                list($expenceCurrentAmount, $expenceDepositedAmount, $expenceRule, $explanation) = $this->helper->adjustAmount(0, $expencePrevAmount, $expenceCurrentAmount, $expenceRule,12);
+                list($expenceCurrentAmount, $expenceDepositedAmount, $expenceRule, $explanation) = $this->helper->adjustAmount(0, $expencePrevAmount, $expenceCurrentAmount, 0, $expenceRule,12);
                 #print "Expence transfer after: $assetname.$year, expencePrevAmount:$expencePrevAmount, expenceCurrentAmount:$expenceCurrentAmount\n";
 
                 $this->dataH[$assetname][$year]['expence'] = [
@@ -192,10 +193,10 @@ class Prognosis
 
                 $incomeCurrentAmount = Arr::get($assetconfig, "income.$year.amount", 0); #Income is added as a yearly repeat in config
 
-                list($incomeCurrentAmount, $incomeDepositedAmount, $incomeRule, $explanation) = $this->helper->adjustAmount(false, $incomePrevAmount, $incomeCurrentAmount, $incomeRule, 12);
+                list($incomeCurrentAmount, $incomeDepositedAmount, $incomeRule, $explanation) = $this->helper->adjustAmount(false, $incomePrevAmount, $incomeCurrentAmount, 0, $incomeRule, 12);
 
                 #print "Income transfer before: $assetname.$year, incomeCurrentAmount:$incomeCurrentAmount, incomeCurrentTransferResource:$incomeCurrentTransferResource, incomeCurrentTransferRule:$incomeCurrentTransferRule\n";
-                list($incomeCurrentAmount, $incomeTransferedAmount, $incomePrevTransferRule, $explanation) = $this->transferAmount(false, $assetname, $year, $incomeCurrentAmount, $incomeCurrentTransferResource, $incomeCurrentTransferRule, 12);
+                list($incomeCurrentAmount, $incomeTransferedAmount, $incomePrevTransferRule, $explanation) = $this->transferAmount(false, $assetname, $year, $incomeCurrentAmount, 0, $incomeCurrentTransferResource, $incomeCurrentTransferRule, 12);
                 #print "Income transfer after: $assetname.$year, incomeCurrentAmount:$incomeCurrentAmount, incomeTransferedAmount:$incomeTransferedAmount, incomePrevTransferRule:$incomePrevTransferRule, explanation: $explanation\n";
 
                 $this->dataH[$assetname][$year]['income'] = [
@@ -233,17 +234,16 @@ class Prognosis
                 $assetCurrentAmount = Arr::get($assetconfig, "asset.$year.amount", 0);
                 $assetCurrentTaxAmount = Arr::get($assetconfig, "asset.$year.taxvalue", 0);
 
-                #print "Asset før: year: $year assetPrevAmount:$assetPrevAmount assetCurrentAmount:$assetCurrentAmount assetRule:$assetRule\n";
-                list($assetCurrentAmount, $assetDepositedAmount, $assetRule, $explanation) = $this->helper->adjustAmount(false, $assetPrevAmount, $assetCurrentAmount, $assetRule, 1);
-                #print "Asset etter: year:$year assetCurrentAmount: $assetCurrentAmount, assetRule:$assetRule explanation: $explanation\n";
+                #print "Asset før: year: $year assetPrevAmount:$assetPrevAmount assetCurrentAmount:$assetCurrentAmount, assetAggregatedDepositedAmount: $assetAggregatedDepositedAmount assetRule:$assetRule\n";
+                list($assetCurrentAmount, $assetAggregatedDepositedAmount, $assetRule, $explanation) = $this->helper->adjustAmount(false, $assetPrevAmount, $assetCurrentAmount, $assetAggregatedDepositedAmount, $assetRule, 1);
+                #print "Asset etter: year:$year assetCurrentAmount: $assetCurrentAmount, assetAggregatedDepositedAmount: $assetAggregatedDepositedAmount, assetRule:$assetRule explanation: $explanation\n";
 
                 #We must check if values has been set in the structure already and add them
-
                 $assetCurrentAmount += Arr::get($this->dataH, "$assetname.$year.asset.amount", 0); #If current value is not an amount at this point, this will crash
 
-                #print "Asset transfer before: $assetname.$year, assetCurrentAmount:$assetCurrentAmount, assetCurrenttransferResource:$assetCurrentTransferResource, AssetCurrentTransferRule:$assetCurrentTransferRule\n";
-                list($assetCurrentAmount, $assetTransferedAmount, $assetPrevTransferRule, $explanation) = $this->transferAmount(false, $assetname, $year, $assetCurrentAmount, $assetCurrentTransferResource, $assetCurrentTransferRule, 1);
-                #print "Asset transfer after: $assetname.$year, assetCurrentAmount:$assetCurrentAmount, assetTransferedAmount:$assetTransferedAmount, assetPrevTransferRule:$assetPrevTransferRule, explanation: $explanation\n";
+                #print "Asset transfer before: $assetname.$year, assetCurrentAmount:$assetCurrentAmount, assetAggregatedDepositedAmount: $assetAggregatedDepositedAmount, assetCurrenttransferResource:$assetCurrentTransferResource, AssetCurrentTransferRule:$assetCurrentTransferRule\n";
+                list($assetCurrentAmount, $assetTransferedAmount, $assetAggregatedDepositedAmount, $assetPrevTransferRule, $explanation) = $this->transferAmount(false, $assetname, $year, $assetCurrentAmount, $assetAggregatedDepositedAmount, $assetCurrentTransferResource, $assetCurrentTransferRule, 1);
+                #print "Asset transfer after: $assetname.$year, assetCurrentAmount:$assetCurrentAmount, assetAggregatedDepositedAmount: $assetAggregatedDepositedAmount, assetTransferedAmount:$assetTransferedAmount, assetPrevTransferRule:$assetPrevTransferRule, explanation: $explanation\n";
 
                 #FIX: The input diff has to be added to FIRE calculations.
 
@@ -262,7 +262,7 @@ class Prognosis
                 #FIX: Why is it called asset.amount here anf not value? Why does this work?
                 $this->dataH[$assetname][$year]['asset'] = [
                     'amount' => $assetCurrentAmount,
-                    'amountDeposited' => $assetDepositedAmount,
+                    'amountDeposited' => $assetAggregatedDepositedAmount,
                     'amountLoanDeducted' => $assetCurrentAmount,
                     'changerate' => $assetChangeratePercent / 100,
                     'percentTaxable' => $fortuneTaxablePercent,
@@ -398,6 +398,7 @@ class Prognosis
                     $assetCurrentTransferRule     = null;
                     $assetPrevTransferResource = null;
                     $assetPrevTransferRule     = null;
+                    $assetAggregatedDepositedAmount = 0;
 
                 }
             }
@@ -437,7 +438,7 @@ class Prognosis
     #transfer=adds to the resource calculated from the current value, and subtracts this value from the current resource
 
     #calculations are always done on value input into the function
-    public function transferAmount(bool $debug, string $assetname, int $year,  int $amount, ?string $transferResource, ?string $transferRule, int $factor = 1)
+    public function transferAmount(bool $debug, string $assetname, int $year,  int $amount, ?int $depositedAmount, ?string $transferResource, ?string $transferRule, int $factor = 1)
     {
 
         $newAmount = 0;
@@ -460,7 +461,7 @@ class Prognosis
                 #print " rule: " . $ruleH[0] . " " . $ruleH[1] . "\n";
             }
 
-            list($newAmount, $rulepart, $explanation) = $this->helper->calculateRule(true, $amount, $ruleH[1]);
+            list($newAmount, $depositedAmount, $rulepart, $explanation) = $this->helper->calculateRule(true, $amount, $depositedAmount, $ruleH[1]);
             $rule = $ruleH[0] . "&$rulepart";
             #ToDo check that an asset can not go into negative value?
 
@@ -474,6 +475,28 @@ class Prognosis
                         print "Transfer before: $transferResource: " . Arr::get($this->dataH, $transferResource, 0) . "\n";
                     }
                     Arr::set($this->dataH, $transferResource, Arr::get($this->dataH, $transferResource, 0) + ($newAmount * $factor)); #The real transfer from this asset to another takes place here
+
+                    $depositedAmount - ($newAmount * $factor);
+                    if($depositedAmount < 0) {
+                        $depositedAmount = 0; #Deposited amount can not go negative.
+                    }
+
+                    #Reduce deposited amount until zero
+                    /*$transferDeposit = str_replace(
+                        ['amount'],
+                        ['amountDeposit'],
+                        $transferResource);
+                    print "transferDeposit: $transferDeposit\n";
+                    $currentAmountDeposited = Arr::get($this->dataH, $transferDeposit, 0);
+                    $amountDeposited = $currentAmountDeposited - ($newAmount * $factor);
+                    if($amountDeposited > 0) {
+                        #FIX: Should it fix all years after also??
+                        Arr::set($this->dataH, $transferDeposit, Arr::get($this->dataH, $transferResource, 0) + ($newAmount * $factor));
+                    } else {
+                        Arr::set($this->dataH, $transferDeposit, 0); #Deposited amount can not go below zero
+                    }
+                    */
+
                     if ($debug) {
                         print "Transfer after: $transferResource: " . Arr::get($this->dataH, $transferResource, 0) . "\n";
                     }
@@ -519,7 +542,7 @@ class Prognosis
             print "####--- explanation: $explanation\n";
         }
 
-        return [$newAssetAmount, $newAmount, $rule, $explanation];
+        return [$newAssetAmount, $newAmount, $depositedAmount, $rule, $explanation];
     }
 
 

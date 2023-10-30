@@ -18,12 +18,13 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
+        $depositedAmount = 0;
 
         #Just for testing. Should be moved to Laravel unit test
         $prevValue = 1000;
         $currentValue = "-50%";
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals(0, $depositedAmount);
@@ -34,12 +35,13 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
+        $depositedAmount = 0;
 
         #Just for testing. Should be moved to Laravel unit test
         $prevValue = 1000;
         $currentValue = "+50%";
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1500, $newValue);
         $this->assertEquals(0, $depositedAmount);
@@ -51,12 +53,13 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
+        $depositedAmount = 0;
 
         #Just for testing. Should be moved to Laravel unit test
         $prevValue = 1000;
         $currentValue = "50%";
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals(0, $depositedAmount);
@@ -68,12 +71,13 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
+        $depositedAmount = 0;
 
         #Just for testing. Should be moved to Laravel unit test
         $prevValue = 1000;
         $currentValue = "-1/4"; #Note that this should count down until 1/1 to use up the rest
 
-        list($newValue1, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue1, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(750, $newValue1);
         $this->assertEquals(0, $depositedAmount);
@@ -82,7 +86,7 @@ class ValueChangeTest extends TestCase
         $prevValue      = 500; #Check that prev value is ignored when rule is set
         $currentValue   = 1000;
 
-        list($newValue2, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue2, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(750, $newValue2);
         $this->assertEquals(0, $depositedAmount);
@@ -94,12 +98,13 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
+        $depositedAmount = 0;
 
         #Just for testing. Should be moved to Laravel unit test
         $prevValue = 1000;
         $currentValue = "+1/4";
 
-        list($newValue1, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue1, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1250, $newValue1);
         $this->assertEquals(0, $depositedAmount);
@@ -108,7 +113,7 @@ class ValueChangeTest extends TestCase
         $prevValue      = 500; #Check that prev value is ignored when rule is set
         $currentValue   = 1000;
 
-        list($newValue2, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue2, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1250, $newValue2);
         $this->assertEquals(0, $depositedAmount);
@@ -120,18 +125,19 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
+        $depositedAmount = 0;
 
         #Just for testing. Should be moved to Laravel unit test
         $prevValue = 1000;
         $currentValue = "1/4";
 
-        list($newValue1, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue1, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(250, $newValue1);
         $this->assertEquals(0, $depositedAmount);
         $this->assertEquals('1/3', $rule);
 
-        list($newValue2, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue2, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(250, $newValue2);
         $this->assertEquals(0, $depositedAmount);
@@ -143,12 +149,13 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
+        $depositedAmount = 0;
 
         #Just for testing. Should be moved to Laravel unit test
         $prevValue = 1000;
         $currentValue = "+500";
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1500, $newValue);
         $this->assertEquals(500, $depositedAmount);
@@ -161,8 +168,9 @@ class ValueChangeTest extends TestCase
         $rule = null;
         $prevValue = 1000;
         $currentValue = "-500";
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals(-500, $depositedAmount);
@@ -174,11 +182,11 @@ class ValueChangeTest extends TestCase
         $calculation = new Helper();
         $debug = false;
         $rule = null;
-
         $prevValue = 1000;
         $currentValue = "=500";
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug,$prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals(500, $depositedAmount);
@@ -192,8 +200,9 @@ class ValueChangeTest extends TestCase
         $prevValue = 105000;
         $currentValue = 0;
         $rule = "+5000";
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(110000, $newValue);
         $this->assertEquals(5000, $depositedAmount);
@@ -207,8 +216,9 @@ class ValueChangeTest extends TestCase
         $prevValue = 0;
         $currentValue = 40000; #salary pr mont
         $rule = null;
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 12);
 
         $this->assertEquals(480000, $newValue, 'verdi'); #return salary pr year
         $this->assertEquals(480000, $depositedAmount, 'deposit');
@@ -222,8 +232,9 @@ class ValueChangeTest extends TestCase
         $prevValue = 100000;
         $currentValue = 0;
         $rule = "+5000";
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 12);
 
         $this->assertEquals(160000, $newValue);
         $this->assertEquals(60000, $depositedAmount);
@@ -237,8 +248,9 @@ class ValueChangeTest extends TestCase
         $prevValue = 100000;
         $currentValue = 0;
         $rule = "-5000";
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 12);
 
         $this->assertEquals(40000, $newValue);
         $this->assertEquals(-60000, $depositedAmount);
@@ -252,8 +264,9 @@ class ValueChangeTest extends TestCase
         $prevValue = 0;
         $currentValue = 100000;
         $rule = null;
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 1);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 1);
 
         $this->assertEquals(100000, $newValue);
         $this->assertEquals(100000, $depositedAmount);
@@ -266,8 +279,9 @@ class ValueChangeTest extends TestCase
         $prevValue = 0;
         $currentValue = '=40000'; #Example, salary 40K pr month
         $rule = null;
+        $depositedAmount = 0;
 
-        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $rule, 12);
+        list($newValue, $depositedAmount, $rule, $explanation) = $calculation->adjustAmount($debug, $prevValue, $currentValue, $depositedAmount, $rule, 12);
 
         $this->assertEquals(480000, $newValue);
         $this->assertEquals(480000, $depositedAmount);
