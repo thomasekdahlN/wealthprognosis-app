@@ -46,7 +46,7 @@ class Amortization extends Model
                 #Reset for each loop
                 $this->year_start   = (int) $year;
                 $this->term_years   = (int) Arr::get($mortgages, "$year.years");
-                $this->loan_amount  = (float) Arr::get($mortgages, "$year.value");
+                $this->loan_amount  = (float) Arr::get($mortgages, "$year.amount");
                 $this->terms        = 1; //1 termin i året pga visningen her
                 $this->period       = (int) $this->terms * $this->term_years;
                 $this->balance      = 0;
@@ -113,6 +113,8 @@ class Amortization extends Model
                         'gebyr' => 0,
                         'description' => '',
                     ];
+
+                #print_r($this->dataH[$this->assettname][$year]['mortgage']);
 
                 #Tax calculations
                 $amountDeductableYearly = $interestAmount * 0.22; #ToDo: Remove hardcoded percentage later to read from ta x config

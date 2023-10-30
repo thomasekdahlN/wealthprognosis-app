@@ -159,7 +159,7 @@ class PrognosisExport2
         $this->spreadsheet->setActiveSheetIndexByName($meta['name']);
         $sheet = $this->spreadsheet->getActiveSheet();
 
-        $sheet->getStyle("B6:Z80")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
+        $sheet->getStyle("B6:AC80")->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
 
         #Kolonner med prosenter i innhold
         $sheet->getStyle("D6:D80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
