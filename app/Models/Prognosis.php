@@ -425,6 +425,7 @@ class Prognosis
         $this->group();
     }
 
+
     #Either creates an amount based on another amount or transfers parts of an amount to another amount.
     #Example
     #transferResource": "salary.$year.income.amount",  #Example OPT creatwes 5% of income as OTP without reducing OTP

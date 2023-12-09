@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Class Changerate
+ *
+ * @package App\Models
+ */
 class Changerate extends Model
 {
     use HasFactory;
@@ -40,6 +45,13 @@ class Changerate extends Model
          }
     }
 
+    /**
+     * Retrieves the change rate and its decimal equivalent for a given type and year.
+     *
+     * @param string $type The type of change for which to retrieve the rate.
+     * @param int $year The year for which to retrieve the rate.
+     * @return array An array containing the percentage rate and its decimal equivalent.
+     */
     public function getChangerate(string $type, int $year)
     {
         $percent = $this->changerateH[$type][$year];
@@ -78,11 +90,25 @@ class Changerate extends Model
 
     #Should be moved to helper?
     #Percent is either a percentage integer 7 or a text refering to the chanegrate structure dynamically like "fond" - It will look up fond changerates for that year.
+    /**
+     * Converts the change rate to its decimal equivalent and retrieves associated information.
+     *
+     * @param bool $debug Indicates whether to enable debug mode.
+     * @param string|null $original The original value to be converted.
+     * @param int $year The year for which to retrieve the rate.
+     * @param string|null $variablename The variable name to be used for substitution.
+     * @return array An array containing the percentage rate, its decimal equivalent, the variable name, and an explanation.
+     */
     public function convertChangerate(bool $debug, ?string $original, int $year, ?string $variablename){
 
         $percent = 0;
         $decimal = 1;
         $explanation = '';
+
+        if ($debug) {
+            print "-- convertChangerate($debug, $original,$year, $variablename)\n";
+            #exit;
+        }
 
         #Hvis den originale verdien er satt, da må vi ikke huske eller bruke $variablename lenger
         if($original != null || $variablename != null) {

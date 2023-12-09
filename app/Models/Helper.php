@@ -180,7 +180,17 @@ class Helper extends Model
         return [$newAmount, $depositedAmount, $rule, $explanation];
     }
 
-    public function calculationSubtraction(bool $debug, int $amount, int $depositedAmount,  int $subtract, int $factor = 1) {
+    /**
+     * Perform subtraction calculation on the given amount.
+     *
+     * @param bool $debug Specifies whether to enable debug mode.
+     * @param int $amount The original amount.
+     * @param int $depositedAmount The amount that has been deposited.
+     * @param int $subtract The amount to subtract from the original amount.
+     * @param int $factor The factor to multiply by. Defaults to 1.
+     * @return array An array containing the new amount, deposited amount, rule, and explanation.
+     */
+    public function calculationSubtraction(bool $debug, int $amount, int $depositedAmount, int $subtract, int $factor = 1) {
         $rule = $subtract;
 
         $subtractAmount = round($subtract * $factor);

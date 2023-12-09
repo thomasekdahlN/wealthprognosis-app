@@ -85,25 +85,22 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 * salary
 
 ### On the wishlist:
-- Arkfane som grupperer assets i verdi pr asset gruppe pr år (for å se spredning av assets)
+- Support for skjermingsfradrag
+- Support for correct taxt calculation on sale and part sale or transfer of assets
+- Support for extra downpayments for loans, also reducing the length of the loan
+- Fortune tax - check that it is correct
 - F.I.R.E - Use up percentage of partly sellable assets from wishPensionYear to DeathYear
 - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
-- Mortage calculation supporting extra downpayments each year (Need help here)
-- Configurable transfer of cash flow in % between assets (and mortages)
 
 - FIRE uttak beregnes fra wishPenison year inn i inntekt på person. Skatteberegnes også?
 - Er OTP uttak skattbart? Sjekk og juster.
 - Graf som viser formuen (fratrukket gjeld) i % fordelt på ulike grupper assets. Eiendom, fond, krypto, råvarer, aksjer, kontanter, pensjon
 - F.I.R.E Sparerate
-- Support incremental amount addition of expences/income (not only %)
-- Retrieving asset values from API, like Crypto/Fond/stocks
 - FIRE asset usage is not deducted from the asset value, it probably should.
 - Klassifisere F.I.R.E oppnåelse pr år
-- Realisering og skatt må beregnes mer riktig.
 - Tax configuration pr year and for different countries
 - Refactoring and cleanup of code - its ugly as hell.
-- Fortune tax - check that it is correct
-- Fixed naming convention: income (salary calc) and holding (company calc)
+- Retrieving asset values from API, like Crypto/Fond/stocks
 
 ### Example config
 
