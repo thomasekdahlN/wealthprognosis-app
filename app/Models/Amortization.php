@@ -115,43 +115,10 @@ public function getSchedule()
                 'description' => '',
             ];
 
-            print_r($this->dataH[$this->assettname][$year]['mortgage']);
-            print "#####\n";
+            #print_r($this->dataH[$this->assettname][$year]['mortgage']);
+            #print "#####\n";
 
-            #Tax calculations
-            $amountDeductableYearly = $interestAmount * 0.22; #ToDo: Remove hardcoded percentage later to read from ta x config
-            $this->dataH[$this->assettname][$year]['tax']['amountDeductableYearly'] = $amountDeductableYearly;
-            if (isset($this->dataH[$this->assettname][$year]['cashflow'])) {
-                $this->dataH[$this->assettname][$year]['cashflow']['amount'] = $this->dataH[$this->assettname][$year]['cashflow']['amount'] + $amountDeductableYearly - $this->term_pay;
-                $this->dataH[$this->assettname][$year]['cashflow']['amountAccumulated'] = $this->dataH[$this->assettname][$year]['cashflow']['amountAccumulated'] + $amountDeductableYearly - $this->term_pay;  #Cashflow accumulated må reberegnes til slutt???
-            }
-            print "#####\n";
 
-            if (isset($this->dataH[$this->assettname][$year]['asset'])) {
-                $this->dataH[$this->assettname][$year]['asset']['amountLoanDeducted'] -= $this->balance;  #Cashflow accumulated må reberegnes til slutt???
-            }
-            print "#####$$\n";
-
-            if (isset($this->dataH[$this->assettname][$year]['asset']['amount']) && $this->dataH[$this->assettname][$year]['asset']['amount'] > 0) {
-                print "****\n";
-
-                $this->dataH[$this->assettname][$year]['asset']['loanPercentage'] = $this->balance / $this->dataH[$this->assettname][$year]['asset']['amount'];  #Cashflow accumulated må reberegnes til slutt???
-            }
-
-            print "#####\n";
-
-            #FIRE
-            Arr::set($$this->dataH, "$this->assettname.$year.fire.amountIncome", Arr::get($$this->dataH, "$this->assettname.$year.fire.amountIncome") + $this->principal + $amountDeductableYearly); #Vi legger til avdrag og rentefradrag som inntekt.
-            print "****\n";
-            Arr::set($$this->dataH, "$this->assettname.$year.fire.amountExpence", Arr::get($$this->dataH, "$this->assettname.$year.fire.amountExpence") + $interestAmount); #Vi legger rentene av lånet som kostnad (ikke totalt innbetalt)
-            Arr::set($$this->dataH, "$this->assettname.$year.fire.cashFlow", Arr::get($this->dataH, "$this->assettname.$year.fire.amountIncome") - Arr::get($this->dataH, "$this->assettname.$year.fire.amountExpence"));
-            Arr::set($$this->dataH, "$this->assettname.$year.fire.percentDiff", Arr::get($this->dataH, "$this->assettname.$year.fire.amountIncome") / Arr::get($this->dataH, "$this->assettname.$year.fire.amountExpence"));
-            Arr::set($$this->dataH, "$this->assettname.$year.fire.savingAmount",$this->principal); #FIRE sparing er bare det du bevisst sparer. Ikke all inntekt som er til overs.
-
-            if (isset($this->dataH[$this->assettname][$year]['income']['amount']) && $this->dataH[$this->assettname][$year]['income']['amount'] > 0) {
-                print "****\n";
-                $this->dataH[$this->assettname][$year]['fire']['savingRate'] = $this->dataH[$this->assettname][$year]['fire']['savingAmount'] / $this->dataH[$this->assettname][$year]['income']['amount'];
-            }
             #print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
             #}
         }

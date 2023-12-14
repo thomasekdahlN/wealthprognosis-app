@@ -102,6 +102,66 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 - Refactoring and cleanup of code - its ugly as hell.
 - Retrieving asset values from API, like Crypto/Fond/stocks
 
+### Datasettet vi regner på pr år
+
+#### income - Inntekt
+- income.amount
+- income.changerate
+- income.description
+
+#### expence - Utgift
+- expence.amount
+- expence.changerate
+- expence.description
+
+#### mortgage - Lån
+- mortgage.payment
+- mortgage.paymentExtra
+- mortgage.interestPercent
+- mortgage.interestAmount
+- mortgage.principal
+- mortgage.balance
+- mortgage.gebyr
+- mortgage.description
+
+#### asset
+- asset.amount - Verdien på asset
+- asset.amountLoanDeducted - Verdien på asset minus lån
+- asset.amountDeposited; - Innbetalt beløp på asset
+- opprinnelig verdi - asset.amountDeposited - asset.amountLoanDeducted
+- asset.loanPercentage
+- asset.changerate
+- asset.percentTaxable
+- asset.amountTaxable
+- asset.percentTax
+- asset.amountTax
+- asset.description
+
+#### cashflow
+- cashflow.amount
+- cashflow.amountAccumulated
+
+#### tax (skatt) - beregnes på income, expence, asset, mortgage, cashflow
+                    'amountTaxableYearly' => -$CashflowTaxableAmount,
+                    'percentTaxableYearly' => $DecimalTaxableYearly,
+                    'amountDeductableYearly' => -$AmountDeductableYearly,
+                    'percentDeductableYearly' => $DecimalDeductableYearly,
+                    'amountTaxableRealization' => $AmountTaxableRealization,
+                    'percentTaxableRealization' => $DecimalTaxableRealization,
+                    'amountDeductableRealization' => $AmountDeductableRealization,
+                    'percentDeductableRealization' => $DecimalDeductableRealization,
+
+#### fortune (formue) - beregnes på income, expence, asset, mortgage, cashflow, tax
+
+#### fire (F.I.R.E) - beregnes på income, expence, asset, mortgage, cashflow, tax, fortune
+- fire.percent
+- fire.amountIncome
+- fire.amountExpence
+- fire.percentDiff
+- fire.cashFlow
+- fire.savingAmount
+- fire.savingRate      
+
 ### Example config
 
     {

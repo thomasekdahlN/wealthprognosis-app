@@ -291,68 +291,6 @@ class Prognosis
                     'loan' => $potentialIncome * 5
                 ];
 
-                $restAccumulated += $cashflow;
-
-                #Free money to spend
-                $this->dataH[$assetname][$year]['cashflow'] = [
-                    'amount' => $cashflow,
-                    'amountAccumulated' => $restAccumulated,
-                ];
-
-                #FIRE - Financial Independence Retire Early - beregninger på assets
-                #Achievement er hvor mye du mangler for å nå målet? Feil navn?
-                # amount = assetverdi - lån i beregningene + inntekt? (Hvor mye er 4% av de reelle kostnadene + inntekt (sannsynligvis kunn inntekt fra utleie)
-                # amountAchievement = amount - expences
-                #FIX: Something is wrong with this classification, and automatically calculating sales of everything not in this list.
-                if(Arr::get($this->firePartSalePossibleTypes, $meta['type'])) {
-                    #Her kan vi selge biter av en asset (meta tagge opp det istedenfor tro?
-                    $fireCurrentPercent = 0.04; #4% av en salgbar asset verdi. FIX: Konfigurerbart FIRE tall.
-                    $fireCurrentIncome = $assetCurrentAmount * $fireCurrentPercent; #Only asset value
-                    $CashflowTaxableAmount        += $fireCurrentIncome * $DecimalTaxableYearly; #Legger til skatt på utbytte fra salg av en % av disse eiendelene her (De har neppe en inntekt, men det skal også fikses fint)
-                    #print "ATY: $CashflowTaxableAmount        += TFI:$fireCurrentIncome * PTY:$DecimalTaxableYearly;\n";
-                    #FIX: Det er ulik skatt på de ulike typene.
-
-                } else {
-                    #Kan ikke selge biter av en slik asset.
-                    $fireCurrentPercent = 0;
-                    $fireCurrentIncome = 0; #Only asset value
-                }
-
-                #NOTE - Deductable yarly blir bare satt i låneberegningen, så den må legges til globalt der.
-                $fireCurrentTotalIncome = $fireCurrentIncome + $incomeCurrentAmount + $AmountDeductableYearly; #Percent of asset value + income from asset. HUSK KUN INNTEKTER her
-                $fireCurrentTotalExpence = $expenceCurrentAmount + $CashflowTaxableAmount;
-                #print "$assetname - FTI: $fireCurrentTotalIncome = FI:$fireCurrentIncome + I:$incomeCurrentAmount + D:$AmountDeductableYearly\n"; #Percent of asset value + income from asset
-
-                $ThisFireCashFlow = $fireCurrentTotalIncome - $fireCurrentTotalExpence; #Hvor lang er man unna fire målet
-
-                if($expenceCurrentAmount > 0) {
-                    $fireCurrentPercentDiff = $fireCurrentTotalIncome / $fireCurrentTotalExpence; #Hvor mange % unna er inntektene å dekke utgiftene.
-                } else {
-                    $fireCurrentPercentDiff = 1;
-                }
-
-                #Sparerate = Det du nedbetaler i gjeld + det du sparer eller investerer på andre måter / total inntekt (etter skatt).
-                $ThisFireSavingAmount = 0;
-                if(Arr::get($this->fireSavingTypes, $meta['type'])) {
-                    $ThisFireSavingAmount = $incomeCurrentAmount; #If this asset is a valid saving asset, we add it to the saving amount.
-                }
-
-                $ThisFireSavingRate = 0;
-                #FIX: Should this be income adjusted for deductions and tax?
-                if($incomeCurrentAmount > 0) {
-                    $ThisFireSavingRate = $ThisFireSavingAmount / $incomeCurrentAmount;
-                }
-
-                $this->dataH[$assetname][$year]['fire'] = [
-                    'percent' => $fireCurrentPercent,
-                    'amountIncome' => $fireCurrentTotalIncome,
-                    'amountExpence' => $fireCurrentTotalExpence,
-                    'percentDiff' => $fireCurrentPercentDiff,
-                    'cashFlow' => round($ThisFireCashFlow),
-                    'savingAmount' => round($ThisFireSavingAmount),
-                    'savingRate' => $ThisFireSavingRate,
-                ];
-
                 ########################################################################################################
                 if($expenceCurrentRepeat) {
                     $expencePrevAmount      = $expenceCurrentAmount * $expenceChangerateDecimal;
@@ -401,7 +339,7 @@ class Prognosis
                     $assetAggregatedDepositedAmount = 0;
 
                 }
-            }
+            } #Year loop finished here.
 
             #####################################################
             #Loan
@@ -419,9 +357,11 @@ class Prognosis
             }
 
             //return $this->collections; #??????
+            $this->postProcess();
 
         } #End loop over assets
 
+        $this->postProcess();
         $this->group();
     }
 
@@ -546,6 +486,151 @@ class Prognosis
         return [$newAssetAmount, $newAmount, $depositedAmount, $rule, $explanation];
     }
 
+    #Do all post processing on already calculated data
+    function postProcess() {
+        foreach($this->dataH as $assetname => $assetH) {
+
+            print_r($assetH);
+            $meta = $assetH['meta'];
+            if(!$meta['active']) continue; #Hopp over de inaktive
+
+            for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
+
+                $datapath = "$assetname.$year";
+                $this->postProcessTaxYearly($datapath);
+                $this->postProcessCashFlowYearly($datapath);
+                $this->postProcessAssetYearly($datapath);
+                $this->postProcessFireYearly($assetname, $year, $meta);
+            }
+        }
+    }
+
+    #Do all calculations that should be done as the last thing, and requires that all other calculations is already done.
+    #Special Arr get that onlye gets data from dataH to make cleaner code.
+    function ArrGet(string $path){
+        return Arr::get($this->dataH, $path, 0);
+    }
+
+    /**
+     * Performs post-processing for the tax calculation of a given year and assett name.
+     *
+     * @param int $year The year for which the tax calculation is being processed.
+     * @param string $assettname The name of the assett for which the tax is being calculated.
+     *
+     * @return void
+     */
+    function postProcessTaxYearly(string $path)
+    {
+        Arr::set($this->dataH, "$path.tax.amountDeductableYearly", $this->ArrGet("$path.tax.interestAmount") * 0.22); #ToDo: Remove hardcoded percentage later to read from tax config
+    }
+
+    /**
+     * Modifies the yearly cash flow for a given asset and year.
+     *
+     * @param int $year The year for which to modify the cash flow.
+     * @param string $assetName The name of the asset for which to modify the cash flow.
+     *
+     * @return void
+     */
+    function postProcessCashFlowYearly(string $path)
+    {
+        #Free money to spend
+        $cashflowAmount = $this->ArrGet("$path.income.amount") - $this->ArrGet("$path.expence.amount") + $this->ArrGet("$path.tax.amountDeductableYearly") - $this->ArrGet("$path.mortgage.payment");
+
+        Arr::set($this->dataH, "$path.cashflow.amount", $cashflowAmount);
+        Arr::set($this->dataH, "$path.cashflow.amountAccumulated",$cashflowAmount);  #ToDo: Cashflow is not accumulated now
+    }
+
+    /**
+     * Post-processes asset yearly data.
+     *
+     * @param int $year The year of the asset.
+     * @param string $assetname The name of the asset.
+     *
+     * @return void
+     */
+    function postProcessAssetYearly(string $path) {
+
+        Arr::set($this->dataH,"$path.asset.amountLoanDeducted",  $this->ArrGet("$path.tax.amountLoanDeducted") - $this->ArrGet("$path.mortgage.balance"));  #Cashflow accumulated må reberegnes til slutt???
+        Arr::set($this->dataH,"$path.asset.amountDeposited",     $this->ArrGet("$path.asset.amount") - $this->ArrGet("$path.mortgage.balance"));
+
+        if ($this->ArrGet("$path.mortgage.balance") > 0 && $this->ArrGet("$path.asset.amount") > 0) {
+            Arr::set($this->dataH,"$path.asset.loanPercentage", $this->ArrGet("$path.mortgage.balance") / $this->ArrGet("$path.asset.amount"));  #Cashflow accumulated må reberegnes til slutt???
+        } else {
+            Arr::set($this->dataH,"$path.asset.loanPercentage", 0);
+        }
+    }
+
+    /**
+     * Perform post-processing calculations for the FIRE (Financial Independence, Retire Early) calculation on a yearly basis.
+     * Achievement er hvor mye du mangler for å nå målet? Feil navn?
+     * amount = assetverdi - lån i beregningene + inntekt? (Hvor mye er 4% av de reelle kostnadene + inntekt (sannsynligvis kunn inntekt fra utleie)
+     * @param int $year The year for which the calculations are performed.
+     * @param string $assetname The name of the asset for which the calculations are performed.
+     * @return void
+     */
+    function postProcessFireYearly(string $assetname, int $year, array $meta) {
+
+        $firePercent            = 0;
+        $fireAssetIncomeAmount  = 0; #Only asset value
+        $CashflowTaxableAmount  = 0;
+
+        $path = "$assetname.$year";
+        $assetAmount = $this->ArrGet("$path.asset.amount");
+        $incomeAmount = $this->ArrGet("$path.income.amount");
+        $expenceAmount = $this->ArrGet("$path.expence.amount");
+
+        #FIX: Something is wrong with this classification, and automatically calculating sales of everything not in this list.
+        if(Arr::get($this->firePartSalePossibleTypes, $meta['type'])) {
+            #Her kan vi selge biter av en asset (meta tagge opp det istedenfor tro?
+            $firePercent            = 0.04; #ToDo: 4% av en salgbar asset verdi. FIX: Konfigurerbart FIRE tall.
+            $fireAssetIncomeAmount  = $assetAmount * $firePercent; #Only asset value
+            $CashflowTaxableAmount  = $fireAssetIncomeAmount * $this->ArrGet("$path.tax.percentTaxableYearly"); #ToDo: Legger til skatt på utbytte fra salg av en % av disse eiendelene her (De har neppe en inntekt, men det skal også fikses fint)
+            #print "ATY: $CashflowTaxableAmount        += TFI:$fireAssetIncomeAmount * PTY:$DecimalTaxableYearly;\n";
+            #ToDo: Det er ulik skatt på de ulike typene.
+        }
+
+        #NOTE - Lån telles som FIRE inntekt.
+        $fireIncomeAmount   = $fireAssetIncomeAmount + $incomeAmount + $this->ArrGet("$path.mortgage.principal") + $this->ArrGet("$path.tax.amountDeductableYearly");; #Percent of asset value + income from asset. HUSK KUN INNTEKTER her
+        $fireExpenceAmount  = $expenceAmount + $CashflowTaxableAmount + $this->ArrGet("$path.mortgage.interestAmount");
+        $fireCashFlowAmount = round($fireIncomeAmount - $fireExpenceAmount); #Hvor lang er man unna fire målet
+
+        #print "$assetname - FTI: $fireIncomeAmount = FI:$fireCurrentIncome + I:$incomeCurrentAmount + D:$AmountDeductableYearly\n"; #Percent of asset value + income from asset
+
+        ###############################################################
+        #Calculate FIRE percent diff
+        if($fireExpenceAmount > 0) {
+            $firePercentDiff = $fireIncomeAmount / $fireExpenceAmount; #Hvor mange % unna er inntektene å dekke utgiftene.
+        } else {
+            $firePercentDiff = 1;
+        }
+
+        ###############################################################
+        #Calculate FIRE Savings amount
+        $fireSavingsAmount = 0;
+        if(Arr::get($this->fireSavingTypes, $meta['type'])) {
+            $fireSavingsAmount = $incomeAmount; #If this asset is a valid saving asset, we add it to the saving amount.
+        }
+
+        ###############################################################
+        #Calculate FIRE Savings rate
+        #Sparerate = Det du nedbetaler i gjeld + det du sparer eller investerer på andre måter / total inntekt (etter skatt).
+        $fireSavingsRate = 0;
+        #ToDo: Should this be income adjusted for deductions and tax?
+        if($incomeAmount > 0) {
+            $fireSavingsRate = $fireSavingsAmount / $incomeAmount;
+        }
+
+        $this->dataH[$assetname][$year]['fire'] = [
+            'percent' => $firePercent,
+            'amountIncome' => $fireIncomeAmount,
+            'amountExpence' => $fireExpenceAmount,
+            'percentDiff' => $firePercentDiff,
+            'cashFlow' => $fireCashFlowAmount,
+            'savingAmount' => $fireSavingsAmount,
+            'savingRate' => $fireSavingsRate,
+        ];
+    }
 
     function group() {
         #dd($this->dataH);
@@ -553,6 +638,7 @@ class Prognosis
 
 
         foreach($this->dataH as $assetname => $assetH) {
+            print_r($assetH);
             $meta = $assetH['meta'];
             if(!$meta['active']) continue; #Hopp over de inaktive
 
