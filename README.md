@@ -133,48 +133,52 @@ Calculationrule
 
 ### Datasettet vi regner på pr år
 
-#### cashflow
-Inntekter, utgifter og skatteberegninger på dette.
+#### Income
+- income.amount - beløp før skatt
+- income.changerate - endring i prosent
+- income.rule - regler for hvordan inntekten skal behandles
+- income.transfer - overføring av inntekt til en annen asset
+- income.repeat - gjenta konfigurasjonen for kommende år
+- income.description - beskrivelse av inntekten
 
-- cashflow.incomeAmount - beløp før skatt
-- cashflow.incomeChangerate - endring i prosent
-- cashflow.incomeRule - regler for hvordan inntekten skal behandles
-- cashflow.incomeTransfer - overføring av inntekt til en annen asset
-- cashflow.incomeRepeat - gjenta konfigurasjonen for kommende år
-- cashflow.incomeTaxDecimal - skatt prosent
-- cashflow.incomeTaxAmount - skatt beløp
-- cashflow.incomeDescription - beskrivelse av inntekten
+#### Expence
+- expence.amount - beløp før skatt
+- expence.changerate - endring i prosent
+- expence.rule - regler for hvordan utgiften skal behandles
+- expence.transfer - overføring av inntekt til en annen asset
+- expence.repeat - gjenta konfigurasjonen for kommende år
+- expence.description - beskrivelse av utgiften
 
-- cashflow.expenceAmount - beløp før skatt
-- cashflow.expenceChangerate - endring i prosent
-- cashflow.expenceRule - regler for hvordan utgiften skal behandles
-- cashflow.expenceTransfer - overføring av inntekt til en annen asset
-- cashflow.incomeRepeat - gjenta konfigurasjonen for kommende år
-- cashflow.expenceDeductableDecimal - fradrag i prosent
-- cashflow.expenceDeductableAmount - fradrag
-- cashflow.expenceDescription - beskrivelse av utgiften
-
-- cashflow.beforeTaxAmount = cashflow.incomeAmount - cashflow.expenceAmount
-- cashflow.afterTaxAmount = cashflow.beforeTaxAmount - cashflow.incomeTaxableYearlyAmount + cashflow.expenceDeductableYearlyAmount
+#### Cashflow
+- cashflow.beforeTaxAmount = income.amount - expence.amount
+- cashflow.afterTaxAmount = cashflow.beforeTaxAmount - cashflow.taxYearlyAmount
 - cashflow.beforeTaxAggregatedAmount += cashflow.beforeTaxAccumulatedAmount
 - cashflow.afterTaxAggregatedAmount += cashflow.afterTaxAccumulatedAmount
+- cashflow.taxAmount - skatt beløp (could be positive or negative, deponds on income positive opr negative)
+- cashflow.taxDecimal - skatt prosent
+- cashflow.description - beskrivelse av cashflow
 
 #### mortgage - Lån
-- mortgage.amount - Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount
+#- mortgage.amount - Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount (NOT USED)
+- mortgage.termAmount - Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount
 - mortgage.interestAmount - renter - i kroner pr år
 - mortgage.principalAmount - Avdrag - i kroner pr år (det er dette som nedbetaler lånet)
 - mortgage.balanceAmount - gjenstående lån i kroner
 - mortgage.extraDownpaymentAmount - ekstra nedbetaling av lån pr år
 - mortgage.interestDecimal - rente i prosent
 - mortgage.gebyrAmount - gebyr pr år
+- mortgage.taxDeductableAmount - fradrag
+- mortgage.taxDeductableDecimal - fradrag i prosent
+
 - mortgage.description - beskrivelse av lånet
 
 #### asset
-- asset.amount - Markedsverdien på en asset
-- asset.mortgageBalanceDeductedAmount - Markedsverdien på asset minus lån = asset.amount - mortgage.balanceAmount 
-- asset.aggregatedDepositedAmount - Hva du faktisk har betalt for en asset, både inngangspris + avdrag + ekstra kjøp underveis - salg. Dvs når du selger trekker vi fra salget i dette beløpet slik at vi kan bruke det til skatteberegning.
-- asset.originalAmount - Hva den opprinnelige verdien til en Asset er, settes til førstegangs asset verdi? Trenger man bare depositedAmount
-- asset.mortageDecimal- Hvor mye av en asset som er lånt
+- asset.marketAmount - Markedsverdien på en asset
+- asset.marketMortgageDeductedAmount - Markedsverdien ved salg hensyntatt restlån men ikke skatt : asset.amount - mortgage.balanceAmount 
+- asset.acquisitionAmount - Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.
+- asset.equityAmount - Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
+- asset.paidAmount - Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.
+- asset.mortageRateDecimal- Hvor mye av en asset som er lånt
 - asset.taxableDecimal - Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av
 - asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av
 - asset.taxDecimal - Prosent skatt på asset op en assets skattbare verdi
@@ -186,14 +190,14 @@ Inntekter, utgifter og skatteberegninger på dette.
 - asset.realizationTaxableAmount - Skattbart beløp ved realisering av asset = asset.amount - asset.originalAmount
 - asset.realizationTaxAmount - Skattbart beløp ved realisering av asset
 - asset.realizationTaxDecimal - Skattbar prosent ved realisering av asset
-- asset.realizationDeductableAmount - Fradrag ved realisering av asset
-- asset.realizationDeductableDecimal - Fradrag prosent ved realisering av asset
+- asset.realizationTaxDeductableAmount - Fradrag ved realisering av asset
+- asset.realizationTaxDeductableDecimal - Fradrag prosent ved realisering av asset
 - asset.description - Beskrivelse av asset/liability
 
 #### Potential
 How much potential the bank sees in your income - expences
 - potential.incomeAmount
-- potential.mortgageAmount - Hvor mye du potensielt kan låne
+- potential.mortgageAmount - Hvor mye du potensielt kan låne. debtCapacity?
 
 
 #### fire (F.I.R.E) - beregnes på income, expence, asset, mortgage, cashflow

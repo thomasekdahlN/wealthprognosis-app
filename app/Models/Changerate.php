@@ -77,17 +77,6 @@ class Changerate extends Model
         return $decimal;
     }
 
-    #Really to Excel.
-    public function decimalToDecimal(int $amount){
-
-        if($amount > 0) {
-            $amount = $amount - 1;
-        } else {
-            $amount = null;
-        }
-        return $amount;
-    }
-
     #Should be moved to helper?
     #Percent is either a percentage integer 7 or a text refering to the chanegrate structure dynamically like "fond" - It will look up fond changerates for that year.
     /**

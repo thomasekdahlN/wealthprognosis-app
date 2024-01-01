@@ -48,8 +48,8 @@ class AssetSpreadSheet
 
                 if ($typeH['total']['amount'] > 0) {
 
-                    if (Arr::get($statistics, "$year.$typename.percent") != 0) {
-                        $this->worksheet->setCellValue($this->alphabet[$this->letter] . $this->rows, Arr::get($statistics, "$year.$typename.percent"));
+                    if (Arr::get($statistics, "$year.$typename.decimal") != 0) {
+                        $this->worksheet->setCellValue($this->alphabet[$this->letter] . $this->rows, Arr::get($statistics, "$year.$typename.decimal"));
                     }
 
                 }

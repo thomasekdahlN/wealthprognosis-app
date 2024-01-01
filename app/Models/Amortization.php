@@ -11,7 +11,7 @@ class Amortization extends Model
 {
     use HasFactory;
 
-    private int $loan_amount;
+    private int $amount;
     private $year_start;
     private $year_end;
     private int $term_years;
@@ -38,7 +38,7 @@ class Amortization extends Model
  * @param array $mortgages Array containing the mortgage details for the loan.
  * @param string $assettname Name of the asset associated with the loan.
  */
-public function __construct(array $config, object $changerate, array $dataH, array $mortgages, string $assettname)
+public function __construct(array $config, object $changerate, array $dataH, array $mortgage, string $assettname, int $year)
 {
     $this->dataH = $dataH;
     $this->config = $config;
@@ -46,21 +46,19 @@ public function __construct(array $config, object $changerate, array $dataH, arr
     $this->changerate = $changerate;
     $this->assetChangerateValue = null;
 
-    foreach ($mortgages as $year => $mortgage) {
-        $this->year_start = (int)$year;
-        $this->term_years = (int)$mortgage['years'];
-        $this->loan_amount = (float)$mortgage['amount'];
-        $this->terms = 1;
-        $this->period = $this->terms * $this->term_years;
-        $this->balance = 0;
-        $this->year_end = $year + $this->term_years;
+    $this->year_start = (int) $year;
+    $this->term_years = (int) Arr::get($mortgage, 'years');
+    $this->totalMortgageAmount = (float) Arr::get($mortgage, 'amount');
+    $this->terms = 1;
+    $this->period = $this->terms * $this->term_years;
+    $this->balanceAmount = 0;
+    $this->year_end = $year + $this->term_years;
 
-        if (isset($mortgages[$year + 1]) && $year + 1 < $this->year_end) {
-            $this->year_end = $year;
-        }
-
-        $this->getSchedule();
+    if (isset($mortgages[$year + 1]) && $year + 1 < $this->year_end) {
+        $this->year_end = $year;
     }
+
+    $this->getSchedule();
 }
 
 /**
@@ -73,9 +71,9 @@ public function __construct(array $config, object $changerate, array $dataH, arr
  */
 public function getSchedule()
 {
-    while ($this->balance >= 0 && $this->year_start <= $this->year_end) {
+    while ($this->balanceAmount >= 0 && $this->year_start <= $this->year_end) {
         $this->calculate($this->year_start++);
-        $this->loan_amount = $this->balance;
+        $this->totalMortgageAmount = $this->balanceAmount;
         $this->period--;
     }
     $this->assetChangerateValue = null;
@@ -83,42 +81,39 @@ public function getSchedule()
     private function calculate(int $year)
     {
         #handle extra payment
-        #$paymentExtra = Arr::get($this->mortgageH,"$this->assettname.$year.cashflow.amount", 0); #Håndterer ikke ekstra innbetalinger pr nå
+        $extraDownpaymentAmount = 0;
+        #$extraDownpaymentAmount = Arr::get($this->mortgageH,"$this->assettname.$year.cashflow.amount", 0); #Håndterer ikke ekstra innbetalinger pr nå
 
         #New: Retrieving interest pr year.
-        list($interestPercent, $interestDecimal, $this->assetChangerateValue, $explanation) = $this->changerate->convertChangerate(true, Arr::get($this->config, "assets.$this->assettname.mortgage.$year.interest"), $year, $this->assetChangerateValue);
-        $interestConverted = $interestPercent / 100;
+        list($interestPercent, $interestDecimal, $this->assetChangerateValue, $explanation) = $this->changerate->convertChangerate(false, Arr::get($this->config, "$this->assettname.$year.mortgage.interest"), $year, $this->assetChangerateValue);
+        $interestDecimal = $interestPercent / 100;
 
-        $deno = 1 - (1 / pow((1 + $interestConverted), $this->period));
-        print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestConverted), $this->period))\n";
+        $deno = 1 - (1 / pow((1 + $interestDecimal), $this->period));
+        #print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
 
         if ($deno > 0) {
-            $this->term_pay = ($this->loan_amount * $interestConverted) / $deno;
-            $interestAmount = $this->loan_amount * $interestConverted;
+            $this->termAmount = ($this->totalMortgageAmount * $interestDecimal) / $deno;
+            $interestAmount = $this->totalMortgageAmount * $interestDecimal;
 
-            #$this->principal = $this->term_pay + $paymentExtra - $interestAmount ; //Experimental
-            $this->principal = $this->term_pay - $interestAmount; //Normal
+            #$this->principalAmount = $this->termAmount + $paymentExtra - $interestAmount ; //Experimental
+            $this->principalAmount = $this->termAmount - $interestAmount; //Normal
 
-            #$this->balance = $this->loan_amount - $this->principal - $paymentExtra;
-            $this->balance = $this->loan_amount - $this->principal;
+            #$this->balanceAmount = $this->totalMortgageAmount - $this->principalAmount - $paymentExtra;
+            $this->balanceAmount = $this->totalMortgageAmount - $this->principalAmount;
 
-            #if($this->balance > 0) {
-
-            print "$year: $this->period : deno: $deno : $interestPercent% = $interestConverted : loanamount: " . round($this->loan_amount)  . " terminbelop: " . round($this->term_pay)  . " : renter " . round($interestAmount) . " : avdrag: " . round($this->principal) . " : balance: " . round($this->balance) . "\n";
+            #print "$year: $this->period : deno: $deno : $interestDecimal% = $interestDecimal : totalMortgageAmount: " . round($this->totalMortgageAmount)  . " termAmount: " . round($this->termAmount)  . " : interestAmount " . round($interestAmount) . " : principalAmount: " . round($this->principalAmount) . " : balanceAmount: " . round($this->balanceAmount) . "\n";
             $this->dataH[$this->assettname][$year]['mortgage'] = [
-                'payment' => $this->term_pay,
-                'interestPercent' => $interestPercent / 100,
+                'termAmount' => $this->termAmount,
+                'interestDecimal' => $interestPercent / 100,
                 'interestAmount' => $interestAmount,
-                'principal' => $this->principal,
-                'balance' => $this->balance,
-                'gebyr' => 0,
+                'principalAmount' => $this->principalAmount,
+                'balanceAmount' => $this->balanceAmount,
+                'extraDownpaymentAmount' => $extraDownpaymentAmount,
+                'gebyrAmount' => 0,
                 'description' => '',
             ];
 
             #print_r($this->dataH[$this->assettname][$year]['mortgage']);
-            #print "#####\n";
-
-
             #print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
             #}
         }
@@ -127,8 +122,8 @@ public function getSchedule()
     public function getSummary()
     {
         $this->calculate(0);
-        $total_pay = $this->term_pay * $this->period;
-        $total_interest = $total_pay - $this->loan_amount;
+        $total_pay = $this->termAmount * $this->period;
+        $total_interest = $total_pay - $this->totalMortgageAmount;
 
         return array(
             'total_pay' => $total_pay,

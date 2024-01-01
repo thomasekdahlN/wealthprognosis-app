@@ -81,7 +81,7 @@ class Tax extends Model
         return [$fortuneTaxAmount, $fortuneTaxPercent];
     }
 
-    public function fortuneTaxTypeCalculation(string $taxtype, int $year, ?int $amount = 0, ?int $taxAmount = 0)
+    public function taxCalculationFortune(string $taxtype, int $year, ?int $amount = 0, ?int $taxAmount = 0)
     {
 
         $fortuneTaxPercent = $this->getFortuneTax($year);
@@ -99,125 +99,160 @@ class Tax extends Model
         return [$fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent];
     }
 
-    public function taxCalculation(bool $debug = false, string $taxtype, int $year, ?int $income, ?int $expence, ?int $assetAmount, ?int $taxAmount = 0, ?int $firstAssetAmount = 0, ?int $firstAssetYear = 0) {
+    public function taxCalculationCashflow(bool $debug = false, string $taxtype, int $year, ?int $income, ?int $expence) {
 
-        $PercentCashflowTaxableYearly = $this->getTaxYearly($taxtype, $year);
-        $PercentCashflowTaxableRealization = $this->getTaxRealization($taxtype, $year);
-        $PercentCashflowDeductableYearly = $this->getTaxYearly($taxtype, $year);
-        $PercentCashflowDeductableRealization = $this->getTaxRealization($taxtype, $year);
-
+        #FIX - should probably not be pairs, but the same thing.
+        $cashflowTaxPercent = $this->getTaxYearly($taxtype, $year); #FIX
 
         #Forskjell på hva man betaler skatt av
         $cashflow = 0;
-        $potentialIncome = 0;
-        $CashflowTaxableAmount = 0;
-        $FortuneTaxableYearly = 0;
-        $AmountTaxableRealization = 0;
-        $AmountDeductableYearly = 0;
-        $AmountDeductableRealization = 0;
-        $numberOfYears = $year - $firstAssetYear;
-
+        $cashflowTaxAmount = 0;
+        $potentialIncomeAmount = 0;
         if($debug) {
-            print "\n$taxtype.$year: income: $income, expence: $expence, assetAmount: $assetAmount,  taxAmount: $taxAmount, firstAssetYear: $firstAssetYear, PercentTaxableYearly: $PercentCashflowTaxableYearly, PercentTaxableRealization: $PercentCashflowTaxableRealization,PercentDeductableYearly: $PercentCashflowDeductableYearly, PercentDeductableRealization: $PercentCashflowDeductableRealization \n";
+            print "\n$taxtype.$year: income: $income, expence: $expence, cashflowTaxPercent: $cashflowTaxPercent\n";
         }
 
         if ($taxtype == 'salary') {
-            $CashflowTaxableAmount = $income * $PercentCashflowTaxableYearly;
-            $AmountTaxableRealization = 0;
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = $income;
+            $cashflowTaxAmount = $income * $cashflowTaxPercent;
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = $income;
         }
         elseif ($taxtype == 'income') {
-            $CashflowTaxableAmount = $income * $PercentCashflowTaxableYearly;
-            $AmountTaxableRealization = 0;
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = $income;
+            $cashflowTaxAmount = $income * $cashflowTaxPercent;
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = $income;
 
         } elseif ($taxtype == 'house') {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-            $CashflowTaxableAmount = ($income - $expence) * $PercentCashflowTaxableYearly;
-            $AmountTaxableRealization = 0;  #Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = $income;
+            $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = $income;
 
         } elseif ($taxtype == 'cabin') {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-            $CashflowTaxableAmount = ($income - 10000) * $PercentCashflowTaxableYearly; #Airbnb skatten
-            $AmountTaxableRealization = 0;  #Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+            $cashflowTaxAmount = ($income - 10000) * $cashflowTaxPercent; #Airbnb skatten
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
 
         } elseif ($taxtype == 'rental') {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-            $CashflowTaxableAmount = ($income - $expence) * $PercentCashflowTaxableYearly;
-            if($assetAmount > 0) {
-                $AmountTaxableRealization = ($assetAmount - $firstAssetAmount) * $PercentCashflowTaxableRealization;  #verdien nå minus inngangsverdien skal skattes ved salg
-            }
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            #$potentialIncome = (($income - $CashflowTaxableAmount) / 12) * 10; #Bank beregning, ikke sunn fornuft, ikke med skatt
-            $potentialIncome = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+            $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            #$potentialIncomeAmount = (($income - $cashflowTaxAmount) / 12) * 10; #Bank beregning, ikke sunn fornuft, ikke med skatt
+            $potentialIncomeAmount = $income; #Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
 
         } elseif ($taxtype == 'stock') {
             #Hm. Aksjer som selges skattes bare som formuesskatt og ved realisasjon
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             #NOTE: Skjermingsfradrag
             #NOTE: Stor forskjell på skattlegging mot privat 35.2%vs bedrift 0%?.
-            $CashflowTaxableAmount = 0;
-            if($assetAmount > 0) {
-                $AmountTaxableRealization = ($assetAmount - $firstAssetAmount) * $PercentCashflowTaxableRealization;  #verdien nå minus inngangsverdien skal skattes ved salg?
-            }
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = $income - $CashflowTaxableAmount;
+            $cashflowTaxAmount = 0;
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = $income - $cashflowTaxAmount;
 
         } elseif ($taxtype == 'fond') {
             #Hm. fond i praksis bare eid i firmaer, alt privat i ASK og skattes bare ved realisasjon + formuesskatt
-            $CashflowTaxableAmount = 0;
-            if($assetAmount > 0) {
-                $AmountTaxableRealization = ($assetAmount - $firstAssetAmount) * $PercentCashflowTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
+            $cashflowTaxAmount = 0;
 
         } elseif ($taxtype == 'ask') {
             #Aksjesparekonto. TODO Fix. Kun skatt ved salg??? Ikke årlig
-            $CashflowTaxableAmount = 0; #Ikke årlig skatt på ASK
-            if($assetAmount > 0) {
-                $AmountTaxableRealization = ($assetAmount - $firstAssetAmount) * $PercentCashflowTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = $income;
-
+            $cashflowTaxAmount = 0; #Ikke årlig skatt på ASK
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = $income;
 
         } elseif ($taxtype == 'cash') {
             #ToDo: Man skal bare betale skatt av rentene
-            $CashflowTaxableAmount = $income * $PercentCashflowTaxableYearly; #ToDO FIX
-            $AmountTaxableRealization = 0;  #Ingen skatt ved salg.
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = $income - $CashflowTaxableAmount;
+            $cashflowTaxAmount = $income * $cashflowTaxPercent; #ToDO FIX
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = $income - $cashflowTaxAmount;
 
         } else {
             #Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-            $CashflowTaxableAmount = ($income - $expence) * $PercentCashflowTaxableYearly;
-            if($assetAmount > 0) {
-                $AmountTaxableRealization = ($assetAmount - $firstAssetAmount) * $PercentCashflowTaxableRealization;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
-            $cashflow = $income - $expence - $CashflowTaxableAmount + $AmountDeductableYearly;
-            $potentialIncome = 0;  #For nå antar vi ingen inntekt fra annet enn lønn eller utleie, men utbytte vil også telle.
+            $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
+            $cashflow = $income - $expence - $cashflowTaxAmount;
+            $potentialIncomeAmount = 0;  #For nå antar vi ingen inntekt fra annet enn lønn eller utleie, men utbytte vil også telle.
         }
 
-        ################################################################################################################
-        #Beregning av formuesskatt
         if($debug) {
-            print "Before fortuneTaxTypeCalculation($taxtype, $assetAmount, $taxAmount, $year)\n";
-        }
-        list($fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent) = $this->fortuneTaxTypeCalculation($taxtype, $year, $assetAmount, $taxAmount);
-
-        #Vi må trekke fra formuesskatten fra cashflow
-        $cashflow -= $fortuneTaxAmount;
-
-        if($debug) {
-            print "$taxtype.$year: cashflow: $cashflow, potentialIncome: $potentialIncome, CashflowTaxableYearly: $CashflowTaxableAmount, fortuneTaxableAmount: $fortuneTaxableAmount, fortuneTaxAmount: $fortuneTaxAmount, fortuneTaxablePercent: $fortuneTaxablePercent, fortuneTaxPercent: $fortuneTaxPercent, AmountTaxableRealization: $AmountTaxableRealization, AmountDeductableYearly: $AmountDeductableYearly, AmountDeductableRealization: $AmountDeductableRealization\n";
+            print "$taxtype.$year: cashflow: $cashflow, cashflowTaxAmount: $cashflowTaxAmount, cashflowTaxPercent: $cashflowTaxPercent, potentialIncomeAmount: $potentialIncomeAmount\n";
         }
 
         #V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
-        return [$cashflow, $potentialIncome, $CashflowTaxableAmount, $fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent, $AmountTaxableRealization, $AmountDeductableYearly, $AmountDeductableRealization];
+        return [$cashflow, $cashflowTaxAmount, $cashflowTaxPercent, $potentialIncomeAmount];
+    }
+
+    public function taxCalculationRealization(bool $debug = false, string $taxtype, int $year, int $assetMarketAmount, int $acquisitionAmount = 0, ?int $acquisitionYear = 0) {
+
+        #FIX - should probably not be pairs, but the same thing.
+        $realizationTaxPercent = $this->getTaxRealization($taxtype, $year); #FIX
+        $realizationDeductablePercent = $this->getTaxRealization($taxtype, $year); #FIX
+
+        #Forskjell på hva man betaler skatt av
+        $realizationTaxableAmount = 0; #The amount to pay tax from. Often calculated as taxof(MarketAmount - acquisitionAmount). We assume we always sell to market value
+        $realizationTaxAmount = 0;
+        $numberOfYears = $year - $acquisitionYear;
+
+        if($debug) {
+            print "\n$taxtype.$year: assetMarketAmount: $assetMarketAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent\n";
+        }
+
+        if ($taxtype == 'salary') {
+            $realizationTaxableAmount = 0;
+            $realizationTaxAmount = 0;
+
+        } elseif ($taxtype == 'income') {
+            $realizationTaxableAmount = 0;
+            $realizationTaxAmount = 0;
+
+        } elseif ($taxtype == 'house') {
+            $realizationTaxableAmount = 0;
+            $realizationTaxAmount = 0;  #Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
+
+        } elseif ($taxtype == 'cabin') {
+            $realizationTaxableAmount = 0;
+            $realizationTaxAmount = 0;  #Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+
+        } elseif ($taxtype == 'rental') {
+            if($assetMarketAmount > 0) {
+                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  #verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  #verdien nå minus inngangsverdien skal skattes ved salg
+            }
+
+        } elseif ($taxtype == 'stock') {
+            if($assetMarketAmount > 0) {
+                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  #verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  #verdien nå minus inngangsverdien skal skattes ved salg?
+            }
+
+        } elseif ($taxtype == 'fond') {
+            if($assetMarketAmount > 0) {
+                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  #verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
+
+        } elseif ($taxtype == 'ask') {
+            if($assetMarketAmount > 0) {
+                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  #verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
+
+        } elseif ($taxtype == 'cash') {
+            $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  #verdien nå minus inngangsverdien skal skattes ved salg
+            $realizationTaxAmount = 0;  #Ingen skatt ved salg.
+
+        } else {
+
+            if($assetMarketAmount > 0) {
+                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  #verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  #verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
+        }
+
+        if($debug) {
+            print "$taxtype.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationTaxAmount: $realizationTaxAmount, realizationTaxPercent: $realizationTaxPercent\n";
+        }
+
+        #V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
+        return [$realizationTaxableAmount, $realizationTaxAmount, $realizationTaxPercent];
     }
 }

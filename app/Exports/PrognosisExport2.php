@@ -166,13 +166,15 @@ class PrognosisExport2
         $sheet->getStyle("F6:F80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
         $sheet->getStyle("H6:H80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("L6:L80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("N6:N80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("J6:J80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("O6:O80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
         $sheet->getStyle("Q6:Q80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
-        $sheet->getStyle("T6:S80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("X6:W80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
-        $sheet->getStyle("AD6:AC80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("V6:V80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("X6:X80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+        $sheet->getStyle("Z6:Z80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
+
+        $sheet->getStyle("AD6:AD80")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); #% styling
 
 
         for ($column = 1; $column <= 20+6; $column++) {

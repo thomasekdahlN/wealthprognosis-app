@@ -1,48 +1,42 @@
 {
     "meta": {
         "name": "John Doe",
-        "birthYear": "1975",
+        "birthYear": "1995",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "62"
     },
-    "assets": {
-        "house": {
-            "meta" : {
-                "type": "house",
-                "group": "private",
-                "name": "My house",
-                "description": "Here I live",
-                "active" : true,
-                "tax": "house"
-            },
+    "house": {
+        "meta": {
+            "type": "house",
+            "group": "private",
+            "name": "My house",
+            "description": "Here I live",
+            "active": true,
+            "tax": "house"
+        },
+        "2023": {
             "asset": {
-                "2023": {
-                    "amount": "3000000",
-                    "changerate": "changerates.house",
-                    "description": "",
-                    "repeat": true
-                }
+                "marketAmount": "3000000",
+                "changerate": "changerates.house",
+                "description": "",
+                "repeat": true
             },
             "expence": {
-                "2023": {
-                    "name": "Utgifter",
-                    "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                    "amount": 7300,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Utgifter",
+                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+                "amount": 7300,
+                "changerate": "changerates.kpi",
+                "repeat": true
             },
             "mortgage": {
-                "2023": {
-                    "amount": 1500000,
-                    "interest": "changerates.interest",
-                    "gebyr": 600,
-                    "tax": 22,
-                    "paymentExtra": "home.$year.cashflow.amount",
-                    "years": 20
-                }
+                "amount": 1500000,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "tax": 22,
+                "paymentExtra": "home.$year.cashflow.amount",
+                "years": 20
             }
         }
     }
