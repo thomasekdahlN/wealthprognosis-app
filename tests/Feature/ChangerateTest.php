@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use PHPUnit\Framework\TestCase;
 use App\Models\Changerate;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\TestCase;
 
 class ChangerateTest extends TestCase
 {
@@ -12,7 +12,7 @@ class ChangerateTest extends TestCase
 
     protected function setUp(): void
     {
-        $prognosis = "testPrognosis";
+        $prognosis = 'testPrognosis';
         $startYear = 2000;
         $stopYear = 2022;
 

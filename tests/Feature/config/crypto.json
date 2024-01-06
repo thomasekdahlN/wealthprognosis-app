@@ -7,30 +7,28 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "crypto": {
-            "meta" : {
-                "type": "crypto",
-                "group": "private",
-                "name": "My Crypto",
-                "description": "Coinbase private",
-                "active": true,
-                "tax": "fond"
-            },
+    "crypto": {
+        "meta" : {
+            "type": "crypto",
+            "group": "private",
+            "name": "My Crypto",
+            "description": "Coinbase private",
+            "active": true,
+            "tax": "fond"
+        },
+        "2022": {
             "asset": {
-                "2022": {
-                    "amount": 5000,
-                    "changerate": "changerates.crypto",
-                    "description": "",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "transferTo": "income.$year.income.amount",
-                    "transferRule": "-1/$pensionWishYears",
-                    "changerate": "changerates.fond",
-                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
-                    "repeat": true
-                }
+                "marketAmount": 5000,
+                "changerate": "changerates.crypto",
+                "description": "",
+                "repeat": true
+            },
+            "$pensionWishYear": {
+                "rule": "1|$pensionWishYears",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.fond",
+                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
+                "repeat": true
             }
         }
     }

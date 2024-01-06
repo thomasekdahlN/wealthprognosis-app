@@ -7,24 +7,22 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "inheritance": {
-            "meta": {
-                "type": "inheritance",
-                "group": "private",
-                "name": "inheritance",
-                "description": "inheritance",
-                "active": true,
-                "tax": "inheritance"
-            },
+    "inheritance": {
+        "meta": {
+            "type": "inheritance",
+            "group": "private",
+            "name": "inheritance",
+            "description": "inheritance",
+            "active": true,
+            "tax": "inheritance"
+        },
+        "2037": {
             "asset": {
-                "2037": {
-                    "name": "inheritance",
-                    "description": "",
-                    "amount": 1000000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "inheritance",
+                "description": "",
+                "marketAmount": 1000000,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         }
     }

@@ -1,3 +1,4 @@
 <?php
-$file = file_get_contents("example.json");
-print $file;
+
+$file = file_get_contents('example.json');
+echo $file;

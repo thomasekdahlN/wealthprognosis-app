@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Exports\PrognosisExport1;
-use App\Models\Prognosis;
 use Illuminate\Console\Command;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -30,7 +29,7 @@ class ReadFile1 extends Command
      */
     public function handle()
     {
-        #new PrognosisExport($this->argument('configfile'));
+        //new PrognosisExport($this->argument('configfile'));
 
         Excel::store(new PrognosisExport1($this->argument('configfile')), $this->argument('exportfile'));
     }

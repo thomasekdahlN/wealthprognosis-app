@@ -3,9 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Exports\PrognosisExport2;
-use App\Models\Prognosis;
 use Illuminate\Console\Command;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ReadFile2 extends Command
 {
@@ -30,7 +28,7 @@ class ReadFile2 extends Command
      */
     public function handle()
     {
-        $exportfile  = dirname($this->argument('configfile')) . '/' . basename($this->argument('configfile'), '.json') . '_'. $this->argument('prognosis') . ".xlsx";
+        $exportfile = dirname($this->argument('configfile')).'/'.basename($this->argument('configfile'), '.json').'_'.$this->argument('prognosis').'.xlsx';
 
         new PrognosisExport2($this->argument('configfile'), $exportfile, $this->argument('prognosis'), $this->argument('generate'));
     }

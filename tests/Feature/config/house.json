@@ -27,6 +27,7 @@
                 "name": "Utgifter",
                 "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
                 "amount": 7300,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             },

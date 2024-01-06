@@ -7,23 +7,21 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "kpi": {
-            "meta" : {
-                "type": "kpi",
-                "group": "private",
-                "name": "Cash",
-                "description": "",
-                "active": true,
-                "tax": "cash"
-            },
+    "kpi": {
+        "meta" : {
+            "type": "kpi",
+            "group": "private",
+            "name": "Cash",
+            "description": "",
+            "active": true,
+            "tax": "cash"
+        },
+        "2023": {
             "asset": {
-                "2023": {
-                    "amount": 100000,
-                    "changerate": "changerates.kpi",
-                    "description": "Kontanter p.t.",
-                    "repeat": true
-                }
+                "marketAmount": 100000,
+                "changerate": "changerates.kpi",
+                "description": "Kontanter p.t.",
+                "repeat": true
             }
         }
     }

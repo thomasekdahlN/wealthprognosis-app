@@ -7,32 +7,28 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "boat": {
-            "meta" : {
-                "type": "boat",
-                "group": "private",
-                "name": "Boat",
-                "description": "",
-                "active": true,
-                "tax": "boat"
-            },
+    "boat": {
+        "meta" : {
+            "type": "boat",
+            "group": "private",
+            "name": "Boat",
+            "description": "",
+            "active": true,
+            "tax": "boat"
+        },
+        "2022": {
             "asset": {
-                "2022": {
-                    "amount": 200000,
-                    "changerate": "changerates.boat",
-                    "description": "verditap",
-                    "repeat": true
-                }
+                "marketAmount": 200000,
+                "changerate": "changerates.boat",
+                "description": "verditap",
+                "repeat": true
             },
             "expence": {
-                "2022": {
-                    "name": "Utgifter",
-                    "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
-                    "amount": 2000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Utgifter",
+                "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
+                "amount": 2000,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         }
     }

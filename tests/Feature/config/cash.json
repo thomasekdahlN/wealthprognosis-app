@@ -7,30 +7,28 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "cash": {
-            "meta" : {
-                "type": "cash",
-                "group": "private",
-                "name": "Cash",
-                "description": "",
-                "active": true,
-                "tax": "cash"
-            },
+    "cash": {
+        "meta" : {
+            "type": "cash",
+            "group": "private",
+            "name": "Cash",
+            "description": "",
+            "active": true,
+            "tax": "cash"
+        },
+        "2022": {
             "asset": {
-                "2022": {
-                    "amount": 100000,
-                    "changerate": "changerates.cash",
-                    "description": "Kontanter p.t.",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "transferTo": "income.$year.income.amount",
-                    "transferRule": "-1/$pensionWishYears",
-                    "changerate": "changerates.fond",
-                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
-                    "repeat": true
-                }
+                "marketAmount": 100000,
+                "changerate": "changerates.cash",
+                "description": "Kontanter p.t.",
+                "repeat": true
+            },
+            "$pensionWishYear": {
+                "rule": "1|$pensionWishYear",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.fond",
+                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen",
+                "repeat": true
             }
         }
     }

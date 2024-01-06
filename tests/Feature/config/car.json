@@ -7,32 +7,28 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "car": {
-            "meta" : {
-                "type": "car",
-                "group": "private",
-                "name": "Avensis",
-                "description": "",
-                "active": true,
-                "tax": "car"
-            },
+    "car": {
+        "meta" : {
+            "type": "car",
+            "group": "private",
+            "name": "Avensis",
+            "description": "",
+            "active": true,
+            "tax": "car"
+        },
+        "2023": {
             "asset": {
-                "2023": {
-                    "amount": 100000,
-                    "changerate": "changerates.car",
-                    "description": "verditap",
-                    "repeat": true
-                }
+                "marketAmount": 100000,
+                "changerate": "changerates.car",
+                "description": "verditap",
+                "repeat": true
             },
             "expence": {
-                "2023": {
-                    "name": "Utgifter",
-                    "description": "Drivstoff/Forsikring/Vedlikehold/Bompenger 4000,- pr mnd",
-                    "amount": 4000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Utgifter",
+                "description": "Drivstoff/Forsikring/Vedlikehold/Bompenger 4000,- pr mnd",
+                "amount": 4000,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         }
     }

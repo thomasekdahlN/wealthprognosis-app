@@ -60,13 +60,27 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 - F.I.R.E SavingRate = FIRE cashflow / FIRE income (in progress)
 
 ### Support for more sophisticated dynamics in income/expence/asset - 
--- "1000" - Value is set to 1000.
--- "+10%" - Adds 10% to value (Supported now, but syntax : 10)
--- "+1000" - Adds 1000 to value
--- "-10%" - Subtracts 10% from value
--- "-1000" - Subtracts 1000 from value (Supported now - same syntax)
--- =+1/10" - Adds 1 tenth of the amount yearly
--- =-1/10" - Subtracts 1 tenth of the amount yearly (To simulate i.e OTP payment). The rest amount will be zero after 10 years. Lile 1/10 first year, 1/9 next year, 1/8 the year after and the last year 1/1.
+
+rule - support:
+-- +10% - Adds 10% to amount
+-- -10% - Subtracts 10% from amount
+-- +1000 - Adds 1000 to amount
+-- -1000 - Subtracts 1000 from amount
+-- +1/10 - Adds 1 tenth of the amount yearly
+-- -1/10 - Subtracts 1 tenth of the amount yearly 
+-- +1|10 - Adds 1 tenth of the amount yearly, and subtracts nevner with one(so next value is 1/9, then 1/8, 1/7 etc)
+-- -1|10 - Subtracts 1 tenth of the amount yearly. Then subtracts nevner with one. (so next value is 1/9, then 1/8, 1/7 etc). Perfect for usage to i.e empty an asset over 10 years.
+
+**source**
+
+Default den asset man står på, medmindre annet er spesifisert. Brukes for å beregne beløpet basert på verdiene i en annen asset enn den man står på. Will not reduce the value of the source asset,
+
+**transfer**
+
+Overføring av beløp fra den asset regelen er på til den asset som er spesifisert i regelen,
+Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal sende beløpet, hvis ikke blir beløpet lagt til den asset man står på.
+
+
 
 ### Supported assets for prognosis and tax calculation
 * boat
@@ -159,7 +173,7 @@ Calculationrule
 - cashflow.description - beskrivelse av cashflow
 
 #### mortgage - Lån
-#- mortgage.amount - Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount (NOT USED)
+- mortgage.amount - The original mortgage amount (the same for every year, for reference and easy calculation)
 - mortgage.termAmount - Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount
 - mortgage.interestAmount - renter - i kroner pr år
 - mortgage.principalAmount - Avdrag - i kroner pr år (det er dette som nedbetaler lånet)
@@ -213,230 +227,244 @@ Før eller etter skatt her?
 
 ### Example config
 
-    {
-    "meta": {
-    "name": "John Doe",
-    "birthYear": "1975",
-    "prognoseYear": "50",
-    "pensionOfficialYear": "67",
-    "pensionWishYear": "63",
-    "deathYear": "82"
-    },
-    "assets": {
-    "salary": {
-    "meta": {
-    "type": "salary",
-    "group": "private",
-    "name": "Salary",
-    "description": "Salary",
-    "active": true,
-    "tax": "salary"
-    },
-    "income": {
-    "2022": {
-    "name": "Salary",
-    "description": "Salary",
-    "value": 40000,
-    "changerate": "changerates.kpi",
-    "repeat": true
-    },
-    "$pensionWishYear": {
-    "name": "Salary",
-    "description": "Pensioned, no more salary from here",
-    "value": "=0",
-    "changerate": "changerates.zero",
-    "repeat": false
-    }
-    },
-    "expence": {
-    "2022": {
-    "name": "Expences",
-    "description": "",
-    "value": 15000,
-    "changerate": "changerates.kpi",
-    "repeat": true
-    }
-    }
-    },
-    "inheritance": {
-    "meta": {
-    "type": "inheritance",
-    "group": "private",
-    "name": "inheritance",
-    "description": "inheritance",
-    "active": true,
-    "tax": "inheritance"
-    },
-    "value": {
-    "2037": {
-    "name": "inheritance",
-    "description": "",
-    "value": 1000000,
-    "changerate": "changerates.kpi",
-    "repeat": true
-    }
-    }
-    },
-    "pension": {
-    "meta": {
-    "type": "pension",
-    "group": "private",
-    "name": "Folketrygden",
-    "description": "Folketrygden",
-    "active": true,
-    "tax": "salary"
-    },
-    "income": {
-    "$pensionOfficialYear": {
-    "name": "Folketrygden",
-    "description": "Folketrygden fra $pensionOfficialYear",
-    "value": 15000,
-    "changerate": "changerates.kpi",
-    "repeat": true
-    }
-    }
-    },
-    "otp": {
-    "meta" : {
-    "type": "fond",
-    "group": "private",
-    "name": "OTP",
-    "description": "OTP",
-    "active": true,
-    "tax": "fond"
-    },
-    "value": {
-    "2022": {
-    "value": "=500000",
-    "changerate": "changerates.otp",
-    "transfer": "salary.$year.income.amount*0.05",
-    "description": "OTP Sparing frem til pensjonsår",
-    "repeat": true
-    },
-    "$otpStartYear": {
-    "value": "-1/$otpYears",
-    "transfer": "salary.$year.income.amount=diff",
-    "changerate": "changerates.otp",
-    "description": "OTP fra $otpStartYear, -1/$otpYears av formuen fra pensjonsåret",
-    "repeat": true
-    }
-    }
-    },
-    "house": {
-    "meta" : {
-    "type": "house",
-    "group": "private",
-    "name": "My house",
-    "description": "Here I live",
-    "active" : true,
-    "tax": "house"
-    },
-    "value": {
-    "2023": {
-    "value": "-1/3",
-    "changerate": "changerates.house",
-    "description": "Selling part of the house",
-    "repeat": true
-    }
-    },
-    "expence": {
-    "2023": {
-    "name": "Utgifter",
-    "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-    "value": 7300,
-    "changerate": "changerates.kpi",
-    "repeat": true
-    }
-    },
-    "mortgage": {
-    "2023": {
-    "value": 1500000,
-    "interest": "changerates.interest",
-    "gebyr": 600,
-    "tax": 22,
-    "paymentExtra": "home.$year.cashflow.amount",
-    "years": 20
-    }
-    }
-    },
-    "fond": {
-    "meta" : {
-    "type": "fond",
-    "group": "private",
-    "name": "fond privat",
-    "description": "",
-    "active": true,
-    "tax": "fond"
-    },
-    "value": {
-    "2022": {
-    "value": 2000000,
-    "changerate": "changerates.fond",
-    "description": "",
-    "repeat": true
-    },
-    "2023": {
-    "name": "Monthly savings",
-    "description": "Setter inn 6000,- pr år",
-    "value": "+6000",
-    "repeat": true
-    },
-    "2033": {
-    "name": "Monthly savings",
-    "description": "Slutter å sette inn 6000,- pr år",
-    "value": "+0",
-    "repeat": true
-    }
-    }
-    },
-    "cash": {
-    "meta" : {
-    "type": "cash",
-    "group": "private",
-    "name": "Cash",
-    "description": "",
-    "active": true,
-    "tax": "cash"
-    },
-    "value": {
-    "2022": {
-    "value": 50000,
-    "changerate": "changerates.cash",
-    "description": "Kontanter p.t.",
-    "repeat": true
-    }
-    }
-    },
-    "car": {
-    "meta" : {
-    "type": "car",
-    "group": "private",
-    "name": "Avensis",
-    "description": "",
-    "active": true,
-    "tax": "car"
-    },
-    "value": {
-    "2020": {
-    "value": 50000,
-    "changerate": "changerates.car",
-    "description": "verditap",
-    "repeat": true
-    }
-    },
-    "expence": {
-    "2019": {
-    "name": "Utgifter",
-    "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
-    "value": 3000,
-    "changerate": "changerates.kpi",
-    "repeat": true
-    }
-    }
-    }
-    }
-    }
-
+{
+"meta": {
+"name": "John Doe",
+"birthYear": "1975",
+"prognoseYear": "50",
+"pensionOfficialYear": "67",
+"pensionWishYear": "63",
+"deathYear": "82"
+},
+"assets": {
+"income": {
+"meta": {
+"type": "income",
+"group": "private",
+"name": "Income",
+"description": "Income",
+"active": true,
+"tax": "income"
+},
+"income": {
+"2023": {
+"name": "Income",
+"description": "Income",
+"asset": 40000,
+"transferRule": "add&5%",
+"transferResource": "otp.$year.asset.amount",
+"changerate": "changerates.kpi",
+"repeat": true
+},
+"$pensionWishYear": {
+"name": "Income",
+"description": "Pensioned, no more income from here",
+"asset": "=0",
+"changerate": "changerates.zero",
+"repeat": false
+}
+},
+"expence": {
+"2023": {
+"name": "Expences",
+"description": "",
+"asset": 15000,
+"changerate": "changerates.kpi",
+"repeat": true
+}
+}
+},
+"inheritance": {
+"meta": {
+"type": "inheritance",
+"group": "private",
+"name": "inheritance",
+"description": "inheritance",
+"active": true,
+"tax": "inheritance"
+},
+"asset": {
+"2037": {
+"name": "inheritance",
+"description": "",
+"asset": 1000000,
+"changerate": "changerates.kpi",
+"repeat": true
+}
+}
+},
+"pension": {
+"meta": {
+"type": "pension",
+"group": "private",
+"name": "Folketrygden",
+"description": "Folketrygden",
+"active": true,
+"tax": "income"
+},
+"income": {
+"$pensionOfficialYear": {
+"name": "Folketrygden",
+"description": "Folketrygden fra $pensionOfficialYear",
+"amount": 15000,
+"changerate": "changerates.kpi",
+"repeat": true
+}
+}
+},
+"otp": {
+"meta" : {
+"type": "fond",
+"group": "private",
+"name": "OTP",
+"description": "OTP",
+"active": true,
+"tax": "fond"
+},
+"asset": {
+"2023": {
+"amount": "=500000",
+"changerate": "changerates.otp",
+"description": "OTP Sparing frem til pensjonsår",
+"repeat": true
+},
+"$otpStartYear": {
+"transferRule": "transfer&1/$otpYears",
+"transferResource": "income.$year.income.amount",
+"changerate": "changerates.otp",
+"description": "OTP fra $otpStartYear, -1/$otpYears av formuen fra pensjonsåret",
+"repeat": true
+}
+}
+},
+"house": {
+"meta" : {
+"type": "house",
+"group": "private",
+"name": "My house",
+"description": "Here I live",
+"active" : true,
+"tax": "house"
+},
+"asset": {
+"2023": {
+"amount": "3000000",
+"changerate": "changerates.house",
+"description": "",
+"repeat": true
+}
+},
+"expence": {
+"2023": {
+"name": "Utgifter",
+"description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+"amount": 7300,
+"changerate": "changerates.kpi",
+"repeat": true
+}
+},
+"mortgage": {
+"2023": {
+"amount": 1500000,
+"interest": "changerates.interest",
+"gebyr": 600,
+"tax": 22,
+"paymentExtra": "home.$year.cashflow.amount",
+"years": 20
+}
+}
+},
+"fond": {
+"meta" : {
+"type": "fond",
+"group": "private",
+"name": "fond privat",
+"description": "",
+"active": true,
+"tax": "fond"
+},
+"asset": {
+"2022": {
+"amount": 2000000,
+"changerate": "changerates.fond",
+"description": "Første innskudd på 2 millioner",
+"repeat": true
+},
+"2023": {
+"name": "Monthly savings",
+"description": "Setter inn 6000,- pr år",
+"amount": "+6000",
+"repeat": true
+},
+"2033": {
+"name": "Monthly savings",
+"description": "Slutter å sette inn 6000,- pr år",
+"amount": "+0",
+"repeat": true
+},
+"$pensionWishYear": {
+"transferRule": "transfer&1/$pensionWishYears",
+"transferResource": "income.$year.income.amount",
+"changerate": "changerates.fond",
+"description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+"repeat": true
+}
+}
+},
+"cash": {
+"meta" : {
+"type": "cash",
+"group": "private",
+"name": "Cash",
+"description": "",
+"active": true,
+"tax": "cash"
+},
+"asset": {
+"2022": {
+"amount": 50000,
+"changerate": "changerates.cash",
+"description": "Kontanter p.t.",
+"repeat": true
+},
+"$pensionWishYear": {
+"transferRule": "transfer&1/$pensionWishYears",
+"transferResource": "income.$year.income.amount",
+"changerate": "changerates.fond",
+"description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+"repeat": true
+}
+}
+},
+"car": {
+"meta" : {
+"type": "car",
+"group": "private",
+"name": "Avensis",
+"description": "",
+"active": true,
+"tax": "car"
+},
+"asset": {
+"2020": {
+"amount": 50000,
+"changerate": "changerates.car",
+"description": "verditap",
+"repeat": true
+}
+},
+"expence": {
+"2019": {
+"name": "Utgifter",
+"description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
+"amount": 3000,
+"changerate": "changerates.kpi",
+"repeat": true
+}
+}
+}
+}
+}
 
 
 Algoritme for å beregne ny årlig betaling med ekstra avdrag:

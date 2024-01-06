@@ -7,70 +7,74 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "income": {
-            "meta": {
-                "type": "income",
-                "group": "private",
+    "income": {
+        "meta": {
+            "type": "income",
+            "group": "private",
+            "name": "Income",
+            "description": "Income",
+            "active": true,
+            "tax": "salary"
+        },
+        "2022": {
+            "income": {
                 "name": "Income",
                 "description": "Income",
-                "active": true,
-                "tax": "income"
-            },
-            "income": {
-                "2022": {
-                    "name": "Income",
-                    "description": "Income",
-                    "amount": 40000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "name": "Pension",
-                    "description": "Pensioned, no more salary from here",
-                    "amount": "=0",
-                    "changerate": "changerates.zero",
-                    "repeat": false
-                }
+                "amount": 40000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             },
             "expence": {
-                "2022": {
-                    "name": "Expences",
-                    "description": "",
-                    "amount": 15000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Expences",
+                "description": "",
+                "amount": 15000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         },
-        "fond": {
-            "meta" : {
-                "type": "fond",
-                "group": "private",
-                "name": "fond",
-                "description": "",
-                "active": true,
-                "tax": "fond"
-            },
+        "$pensionWishYear": {
+            "income" : {
+                "name": "Pension",
+                "description": "Pensioned, no more salary from here",
+                "amount": 0,
+                "changerate": "changerates.zero",
+                "repeat": false
+            }
+        }
+    },
+    "fond": {
+        "meta" : {
+            "type": "fond",
+            "group": "private",
+            "name": "fond",
+            "description": "",
+            "active": true,
+            "tax": "fond"
+        },
+        "2023": {
             "asset": {
-                "2023": {
-                    "amount": "=100000",
-                    "changerate": "changerates.fond",
-                    "description": "",
-                    "repeat": true
-                },
-                "2024": {
-                    "amount": "+5000",
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "transferResource": "income.$year.income.amount",
-                    "transferRule": "transfer&1/$pensionWishYears",
-                    "changerate": "changerates.fond",
-                    "description": "Uttak fra $pensionWishYear, 1/$pensionWishYears",
-                    "repeat": true
-                }
+                "marketAmount": 100000,
+                "changerate": "changerates.fond",
+                "description": "",
+                "repeat": true
+            }
+        },
+        "2024": {
+            "asset": {
+                "rule": "+5000",
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        },
+        "2084": {
+            "asset": {
+                "transfer": "income.$year.income.amount",
+                "rule": "1|3",
+                "changerate": "changerates.fond",
+                "description": "Uttak fra $pensionWishYear, 1|3",
+                "repeat": true
             }
         }
     }

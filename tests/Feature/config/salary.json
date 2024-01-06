@@ -7,40 +7,71 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "income": {
-            "meta": {
-                "type": "income",
-                "group": "private",
+    "income": {
+        "meta": {
+            "type": "income",
+            "group": "private",
+            "name": "Income",
+            "description": "Income",
+            "active": true,
+            "tax": "income"
+        },
+        "2022": {
+            "income": {
                 "name": "Income",
                 "description": "Income",
-                "active": true,
-                "tax": "income"
-            },
-            "income": {
-                "2022": {
-                    "name": "Income",
-                    "description": "Income",
-                    "amount": 40000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "name": "Salary",
-                    "description": "Pensioned, no more salary from here",
-                    "amount": "=0",
-                    "changerate": "changerates.zero",
-                    "repeat": false
-                }
+                "amount": 40000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             },
             "expence": {
                 "2022": {
                     "name": "Expences",
                     "description": "",
                     "amount": 15000,
+                    "factor": 12,
                     "changerate": "changerates.kpi",
                     "repeat": true
                 }
+            }
+        },
+        "$pensionWishYear": {
+            "income": {
+                "name": "Salary",
+                "description": "Pensioned, no more salary from here",
+                "amount": "0",
+                "changerate": "changerates.zero",
+                "repeat": false
+            }
+        }
+    },
+    "otp": {
+        "meta" : {
+            "type": "otp",
+            "group": "private",
+            "name": "OTP",
+            "description": "OTP",
+            "active": true,
+            "tax": "fond"
+        },
+        "2022": {
+            "asset": {
+                "rule": "5%",
+                "source": "income.$year.income.amount",
+                "marketAmount": 1080000,
+                "changerate": "changerates.otp",
+                "description": "OTP Sparing frem til pensjonsår",
+                "repeat": true
+            }
+        },
+        "$pensionWishYear": {
+            "asset": {
+                "rule": "1|$pensionWishYear",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.otp",
+                "description": "OTP fra $pensionWishYear, 1|$pensionWishYear av formuen",
+                "repeat": true
             }
         }
     }

@@ -7,25 +7,23 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-
-        "pension": {
-            "meta": {
-                "type": "pension",
-                "group": "private",
-                "name": "Folketrygden",
-                "description": "Folketrygden",
-                "active": true,
-                "tax": "salary"
-            },
+    "pension": {
+        "meta": {
+            "type": "pension",
+            "group": "private",
+            "name": "Folketrygden",
+            "description": "Folketrygden",
+            "active": true,
+            "tax": "salary"
+        },
+        "$pensionOfficialYear": {
             "income": {
-                "$pensionOfficialYear": {
-                    "name": "Folketrygden",
-                    "description": "Folketrygden fra $pensionOfficialYear",
-                    "amount": 15000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Folketrygden",
+                "description": "Folketrygden fra $pensionOfficialYear",
+                "factor": 12,
+                "amount": 15000,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         }
     }

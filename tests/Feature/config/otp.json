@@ -7,58 +7,61 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "income": {
-            "meta": {
-                "type": "income",
-                "group": "private",
-                "name": "income",
-                "description": "income",
-                "active": true,
-                "tax": "income"
-            },
+    "income": {
+        "meta": {
+            "type": "income",
+            "group": "private",
+            "name": "income",
+            "description": "income",
+            "active": true,
+            "tax": "income"
+        },
+        "2023": {
             "income": {
-                "2023": {
-                    "name": "Income",
-                    "description": "Income",
-                    "value": "=40000",
-                    "changerate": "changerates.kpi",
-                    "transferRule": "add&5%",
-                    "transferResource": "otp.$year.asset.amount",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "name": "Income",
-                    "description": "Pensioned, no more salary from here",
-                    "value": "=0",
-                    "changerate": "changerates.zero",
-                    "repeat": false
-                }
+                "name": "Income",
+                "description": "Income",
+                "amount": 40000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         },
-        "otp": {
-            "meta" : {
-                "type": "fond",
-                "group": "private",
-                "name": "OTP",
-                "description": "OTP",
-                "active": true,
-                "tax": "fond"
-            },
+        "$pensionWishYear": {
+            "income": {
+                "name": "Income",
+                "description": "Pensioned, no more salary from here",
+                "amount": 0,
+                "changerate": "changerates.zero",
+                "repeat": false
+            }
+        }
+    },
+    "otp": {
+        "meta" : {
+            "type": "fond",
+            "group": "private",
+            "name": "OTP",
+            "description": "OTP",
+            "active": true,
+            "tax": "fond"
+        },
+        "2022": {
             "asset": {
-                "2022": {
-                    "amount": "=1080000",
-                    "changerate": "changerates.otp",
-                    "description": "OTP Sparing frem til pensjonsår",
-                    "repeat": true
-                },
-                "$otpStartYear": {
-                    "transferRule": "transfer&1/$otpYears",
-                    "transferResource": "income.$year.income.amount",
-                    "changerate": "changerates.otp",
-                    "description": "OTP fra $otpStartYear, 1/$otpYears av formuen fra pensjonsåret",
-                    "repeat": true
-                }
+                "marketAmount": 1080000,
+                "rule": "5%",
+                "source": "income.$year.income.amount",
+                "changerate": "changerates.otp",
+                "description": "OTP Sparing frem til pensjonsår",
+                "repeat": true
+            }
+        },
+        "$otpStartYear": {
+            "asset": {
+                "rule": "1|$otpYears",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.otp",
+                "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
+                "repeat": true
             }
         }
     }

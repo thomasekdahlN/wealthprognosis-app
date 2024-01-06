@@ -7,231 +7,237 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "income": {
-            "meta": {
-                "type": "income",
-                "group": "private",
+    "income": {
+        "meta": {
+            "type": "income",
+            "group": "private",
+            "name": "Income",
+            "description": "Income",
+            "active": true,
+            "tax": "income"
+        },
+        "2023": {
+            "income": {
                 "name": "Income",
                 "description": "Income",
-                "active": true,
-                "tax": "income"
-            },
-            "income": {
-                "2023": {
-                    "name": "Income",
-                    "description": "Income",
-                    "asset": 40000,
-                    "transferRule": "add&5%",
-                    "transferResource": "otp.$year.asset.amount",
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "name": "Income",
-                    "description": "Pensioned, no more income from here",
-                    "asset": "=0",
-                    "changerate": "changerates.zero",
-                    "repeat": false
-                }
+                "asset": 40000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             },
             "expence": {
-                "2023": {
-                    "name": "Expences",
-                    "description": "",
-                    "asset": 15000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Expences",
+                "description": "",
+                "amount": 15000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         },
-        "inheritance": {
-            "meta": {
-                "type": "inheritance",
-                "group": "private",
+        "$pensionWishYear": {
+            "income": {
+                "name": "Income",
+                "description": "Pensioned, no more income from here",
+                "amount": 0,
+                "changerate": "changerates.zero",
+                "repeat": false
+            }
+        }
+    },
+    "inheritance": {
+        "meta": {
+            "type": "inheritance",
+            "group": "private",
+            "name": "inheritance",
+            "description": "inheritance",
+            "active": true,
+            "tax": "inheritance"
+        },
+        "2037": {
+            "asset": {
                 "name": "inheritance",
-                "description": "inheritance",
-                "active": true,
-                "tax": "inheritance"
-            },
-            "asset": {
-                "2037": {
-                    "name": "inheritance",
-                    "description": "",
-                    "asset": 1000000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "description": "",
+                "amount": 1000000,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
+        }
+    },
+    "pension": {
+        "meta": {
+            "type": "pension",
+            "group": "private",
+            "name": "Folketrygden",
+            "description": "Folketrygden",
+            "active": true,
+            "tax": "income"
         },
-        "pension": {
-            "meta": {
-                "type": "pension",
-                "group": "private",
-                "name": "Folketrygden",
-                "description": "Folketrygden",
-                "active": true,
-                "tax": "income"
-            },
+        "$pensionOfficialYear": {
             "income": {
-                "$pensionOfficialYear": {
-                    "name": "Folketrygden",
-                    "description": "Folketrygden fra $pensionOfficialYear",
-                    "amount": 15000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Folketrygden",
+                "description": "Folketrygden fra $pensionOfficialYear",
+                "amount": 15000,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        }
+    },
+    "otp": {
+        "meta" : {
+            "type": "fond",
+            "group": "private",
+            "name": "OTP",
+            "description": "OTP",
+            "active": true,
+            "tax": "fond"
+        },
+        "2023": {
+            "asset": {
+                "amount": 500000,
+                "rule": "5%",
+                "source": "income.$year.income.amount",
+                "changerate": "changerates.otp",
+                "description": "OTP Sparing frem til pensjonsår",
+                "repeat": true
             }
         },
-        "otp": {
-            "meta" : {
-                "type": "fond",
-                "group": "private",
-                "name": "OTP",
-                "description": "OTP",
-                "active": true,
-                "tax": "fond"
-            },
+        "$otpStartYear": {
             "asset": {
-                "2023": {
-                    "amount": "=500000",
-                    "changerate": "changerates.otp",
-                    "description": "OTP Sparing frem til pensjonsår",
-                    "repeat": true
-                },
-                "$otpStartYear": {
-                    "transferRule": "transfer&1/$otpYears",
-                    "transferResource": "income.$year.income.amount",
-                    "changerate": "changerates.otp",
-                    "description": "OTP fra $otpStartYear, -1/$otpYears av formuen fra pensjonsåret",
-                    "repeat": true
-                }
+                "rule": "1|$otpYears",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.otp",
+                "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
+                "repeat": true
             }
+        }
+    },
+    "house": {
+        "meta" : {
+            "type": "house",
+            "group": "private",
+            "name": "My house",
+            "description": "Here I live",
+            "active" : true,
+            "tax": "house"
         },
-        "house": {
-            "meta" : {
-                "type": "house",
-                "group": "private",
-                "name": "My house",
-                "description": "Here I live",
-                "active" : true,
-                "tax": "house"
-            },
+        "2023": {
             "asset": {
-                "2023": {
-                    "amount": "3000000",
-                    "changerate": "changerates.house",
-                    "description": "",
-                    "repeat": true
-                }
+                "marketAmount": "3000000",
+                "changerate": "changerates.house",
+                "description": "",
+                "repeat": true
             },
             "expence": {
-                "2023": {
-                    "name": "Utgifter",
-                    "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                    "amount": 7300,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Utgifter",
+                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+                "amount": 7300,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             },
             "mortgage": {
-                "2023": {
-                    "amount": 1500000,
-                    "interest": "changerates.interest",
-                    "gebyr": 600,
-                    "tax": 22,
-                    "paymentExtra": "home.$year.cashflow.amount",
-                    "years": 20
-                }
+                "amount": 1500000,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "tax": 22,
+                "paymentExtra": "home.$year.cashflow.amount",
+                "years": 20
+            }
+        }
+    },
+    "fond": {
+        "meta" : {
+            "type": "fond",
+            "group": "private",
+            "name": "fond privat",
+            "description": "",
+            "active": true,
+            "tax": "fond"
+        },
+        "2022": {
+            "asset": {
+                "amount": 2000000,
+                "changerate": "changerates.fond",
+                "description": "Første innskudd på 2 millioner",
+                "repeat": true
             }
         },
-        "fond": {
-            "meta" : {
-                "type": "fond",
-                "group": "private",
-                "name": "fond privat",
-                "description": "",
-                "active": true,
-                "tax": "fond"
-            },
+        "2023": {
             "asset": {
-                "2022": {
-                    "amount": 2000000,
-                    "changerate": "changerates.fond",
-                    "description": "Første innskudd på 2 millioner",
-                    "repeat": true
-                },
-                "2023": {
-                    "name": "Monthly savings",
-                    "description": "Setter inn 6000,- pr år",
-                    "amount": "+6000",
-                    "repeat": true
-                },
-                "2033": {
-                    "name": "Monthly savings",
-                    "description": "Slutter å sette inn 6000,- pr år",
-                    "amount": "+0",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "transferRule": "transfer&1/$pensionWishYears",
-                    "transferResource": "income.$year.income.amount",
-                    "changerate": "changerates.fond",
-                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
-                    "repeat": true
-                }
+                "name": "Monthly savings",
+                "description": "Setter inn 6000,- pr år",
+                "rule": "+6000",
+                "repeat": true
             }
         },
-        "cash": {
-            "meta" : {
-                "type": "cash",
-                "group": "private",
-                "name": "Cash",
-                "description": "",
-                "active": true,
-                "tax": "cash"
-            },
+        "2033": {
             "asset": {
-                "2022": {
-                    "amount": 50000,
-                    "changerate": "changerates.cash",
-                    "description": "Kontanter p.t.",
-                    "repeat": true
-                },
-                "$pensionWishYear": {
-                    "transferRule": "transfer&1/$pensionWishYears",
-                    "transferResource": "income.$year.income.amount",
-                    "changerate": "changerates.fond",
-                    "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
-                    "repeat": true
-                }
+                "name": "Monthly savings",
+                "description": "Slutter å sette inn 6000,- pr år",
+                "rule": "",
+                "repeat": true
             }
         },
-        "car": {
-            "meta" : {
-                "type": "car",
-                "group": "private",
-                "name": "Avensis",
-                "description": "",
-                "active": true,
-                "tax": "car"
-            },
+        "$pensionWishYear": {
             "asset": {
-                "2020": {
-                    "amount": 50000,
-                    "changerate": "changerates.car",
-                    "description": "verditap",
-                    "repeat": true
-                }
+                "rule": "1|$pensionWishYears",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.fond",
+                "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+                "repeat": true
+            }
+        }
+    },
+    "cash": {
+        "meta" : {
+            "type": "cash",
+            "group": "private",
+            "name": "Cash",
+            "description": "",
+            "active": true,
+            "tax": "cash"
+        },
+        "2022": {
+            "asset": {
+                "marketAmount": 50000,
+                "changerate": "changerates.cash",
+                "description": "Kontanter p.t.",
+                "repeat": true
+            }
+        },
+        "$pensionWishYear": {
+            "asset": {
+                "rule": "1|$pensionWishYears",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.fond",
+                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
+                "repeat": true
+            }
+        }
+    },
+    "car": {
+        "meta" : {
+            "type": "car",
+            "group": "private",
+            "name": "Avensis",
+            "description": "",
+            "active": true,
+            "tax": "car"
+        },
+        "2020": {
+            "asset": {
+                "marketAmount": 50000,
+                "changerate": "changerates.car",
+                "description": "verditap",
+                "repeat": true
             },
             "expence": {
-                "2019": {
-                    "name": "Utgifter",
-                    "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
-                    "amount": 3000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Utgifter",
+                "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
+                "amount": 3000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         }
     }

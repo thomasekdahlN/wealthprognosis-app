@@ -7,23 +7,21 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
-    "assets": {
-        "company": {
-            "meta": {
-                "type": "stock",
-                "group": "company",
-                "name": "Company AS",
-                "description": "I own stocks here",
-                "active": true,
-                "tax": "stock"
-            },
+    "company": {
+        "meta": {
+            "type": "stock",
+            "group": "company",
+            "name": "Company AS",
+            "description": "I own stocks here",
+            "active": true,
+            "tax": "stock"
+        },
+        "2022": {
             "asset": {
-                "2022": {
-                    "amount": 2500000,
-                    "changerate": "changerates.stock",
-                    "description": "Initielt kjøp",
-                    "repeat": true
-                }
+                "marketAmount": 2500000,
+                "changerate": "changerates.stock",
+                "description": "Initielt kjøp",
+                "repeat": true
             }
         }
     }
