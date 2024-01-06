@@ -68,12 +68,12 @@
                 "repeat": true
             }
         },
-        "2084": {
+        "$pensionWishYear": {
             "asset": {
                 "transfer": "income.$year.income.amount",
-                "rule": "1|3",
+                "rule": "1|$pensionWishYears",
                 "changerate": "changerates.fond",
-                "description": "Uttak fra $pensionWishYear, 1|3",
+                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }
         }

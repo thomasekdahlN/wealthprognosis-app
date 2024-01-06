@@ -440,10 +440,7 @@ class Prognosis
             #This is not a deposit
         }
 
-        if ($rule) {
-            //print "** rule is set: $rule using current amount $currentAmount\n";
-            [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $depositedAmount, $rule, $factor);
-        }
+
 
         if ($debug) {
             echo "  applyRule (year: $year, newAmount: $newAmount, diffAmount: $diffAmount, transferTo: $transferTo, source: $source)\n";
@@ -452,7 +449,11 @@ class Prognosis
 
         //##############################################################################################################
         //Transfer value to another asset, has to update the datastructure of this asset directly
-        if ($transferTo && $diffAmount != 0) {
+        if ($transferTo) {
+
+            if ($rule) {
+                [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $depositedAmount, $rule, $factor);
+            }
 
             #Have to switch signs on $diffAmount
             $transferAmount = -$diffAmount;
@@ -464,12 +465,17 @@ class Prognosis
             }
         } elseif($source && $rule) {
             #If we are not transfering the values to another resoruce, then we are adding it to the current resource
+            #Do not run calculateRule here since it changes the rule, and are run in the sub procedure
             //###########################################################################################################
 
             [$diffAmount, $explanation] = $this->source(false, $source, $rule);
             $newAmount = $newAmount + $diffAmount;
         } else {
             //No transfers or sourcing involved
+            if ($rule) {
+                [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $depositedAmount, $rule, $factor);
+            }
+
             $newAmount = $amount;
             $diffAmount = 0;
             $rule = null;

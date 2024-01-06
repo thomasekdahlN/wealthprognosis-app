@@ -64,12 +64,15 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 rule - support:
 -- +10% - Adds 10% to amount
 -- -10% - Subtracts 10% from amount
+-- 10% - Calculates 10% of the amount
 -- +1000 - Adds 1000 to amount
 -- -1000 - Subtracts 1000 from amount
 -- +1/10 - Adds 1 tenth of the amount yearly
--- -1/10 - Subtracts 1 tenth of the amount yearly 
+-- -1/10 - Subtracts 1 tenth of the amount yearly
+-- 1/10 - Calculates 1/10 of the amount. Does not change the amount
 -- +1|10 - Adds 1 tenth of the amount yearly, and subtracts nevner with one(so next value is 1/9, then 1/8, 1/7 etc)
 -- -1|10 - Subtracts 1 tenth of the amount yearly. Then subtracts nevner with one. (so next value is 1/9, then 1/8, 1/7 etc). Perfect for usage to i.e empty an asset over 10 years.
+-- 1|10 - Calculates 1|10 of the amount. Does not change the amount.
 
 **source**
 
@@ -80,20 +83,20 @@ Default den asset man står på, medmindre annet er spesifisert. Brukes for å b
 Overføring av beløp fra den asset regelen er på til den asset som er spesifisert i regelen,
 Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal sende beløpet, hvis ikke blir beløpet lagt til den asset man står på.
 
-
-
 ### Supported assets for prognosis and tax calculation
 * boat
+* cabin
 * car
 * cash
 * child
-* company
+* company => stock
 * crypto
 * fond
 * inheritance
+* income
 * kpi
 * otp
-* pension
+* pension - public pension
 * property
 * rental
 * salary
@@ -113,37 +116,16 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 - FIRE asset usage is not deducted from the asset value, it probably should.
 - Klassifisere F.I.R.E oppnåelse pr år
 - Tax configuration pr year and for different countries
-- Refactoring and cleanup of code - its ugly as hell.
+- Refactoring and cleanup of code
 - Retrieving asset values from API, like Crypto/Fond/stocks
 
 Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med)
 
-Beregningstyper
-
-- [ ] Initiell verdi - kan erstattes av rule
-- [ ] Value change i % / prognosis
-- [ ] Rule. En av reglene som tilfører eller fjerner verdi av en asset uten å påvirke andre assets,
-- [ ] Transfer - flytter penger mellom assets. Reduserer verdien på asset det flyttes fra, øker på den det flyttes til. Samme regneregler som rule ellers.
-- [ ] Calculate - beregner en verdi som skal legges til en asset basert på en annen asset eller en annen type beregning. Er det egentlig en rule?
-
-Ikke lagre prev verdier i variabler, men i dataH med oppslag på year - 1. Vil huske alt hele tiden, state.
-Lagre rules og transfers og calculations i dataH. Må man lagre mer repeterende ting.
-
-Regnerekkefølge: calclulate, transfer, rule, value change
-
 Hvis en transfer blir gjort, må alt regnes på nytt på både fra og til asset siden verdi er påvirket, En transfer må også gjøre skatteberegninger som en realisasjon.
 
-Summere riktige verdier på hva man faktisk har gitt for en assset,
 Summere riktige verdier for hva man har gitt minus det man tar ut - for riktig skatteberegning (separat felt)
 Summere riktig skattefradrag basert på rente og alder.
 Riktig skatt på realisasjon
-
-Hvordan skal skatten struktureres? Sammen med typene eller i egen skatteestruktur
-
-Changerate - changepercent
-Changerule
-Transferrule
-Calculationrule
 
 ### Datasettet vi regner på pr år
 
