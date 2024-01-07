@@ -95,7 +95,7 @@ class Tax extends Model
 
         if ($taxableAmountOverride && $fortuneTaxableAmount > 0) {
             $fortuneTaxablePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
-            //echo "   fortuneTaxableAmount ovveride: $fortuneTaxableAmount\n";
+        //echo "   fortuneTaxableAmount ovveride: $fortuneTaxableAmount\n";
         } else {
             $fortuneTaxableAmount = $amount * $fortuneTaxablePercent; //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
             //echo "   fortuneTaxableAmount normal: $fortuneTaxableAmount\n";
@@ -106,8 +106,8 @@ class Tax extends Model
             //$fortuneTaxableAmount = 0; //FIX: Ikke skatt på OTP formue. Sjekk.
         }
 
-        #Only fortune tax on more than 1.7million pr 2023
-        if($fortuneTaxableAmount > $fortuneTaxLimit) { #FIX: Should be read from config
+        //Only fortune tax on more than 1.7million pr 2023
+        if ($fortuneTaxableAmount > $fortuneTaxLimit) { //FIX: Should be read from config
             $fortuneTaxAmount = ($fortuneTaxableAmount - $fortuneTaxLimit) * $fortuneTaxPercent; //Calculate the tax you shall pay from the taxable fortune
         }
         //print "$AmountTaxableFortune, $fortuneTaxAmount, $fortuneTaxPercent\n";

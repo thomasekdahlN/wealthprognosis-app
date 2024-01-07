@@ -9,8 +9,6 @@ class Helper extends Model
 {
     use HasFactory;
 
-
-
     public function calculateRule(bool $debug, int $amount, int $depositedAmount, string $rule, int $factor = 1)
     {
         $totalAmount = 0;
@@ -42,6 +40,7 @@ class Helper extends Model
         }
 
         $totalAmount = $diffAmount + $amount;
+
         return [$totalAmount, $diffAmount, $rule, $explanation];
     }
 
@@ -54,17 +53,17 @@ class Helper extends Model
         if ($ruleH[1][0] == '-') {
             $newAmount = $amount - $diffAmount;
             $explanation = 'Subtracting divisor: '.$diffAmount;
-            $ruleH[3][0]--; #Dynamic divisor
+            $ruleH[3][0]--; //Dynamic divisor
 
         } elseif ($ruleH[1][0] == '+') {
             $newAmount = $amount + $diffAmount;
             $explanation = 'Adding divisor: '.$diffAmount;
-            $ruleH[3][0]--; #Dynamic divisor
+            $ruleH[3][0]--; //Dynamic divisor
         } else {
             //When no sign is given, we reduce the amount. Its lake taking this divisor out of the amount.
             $newAmount = $amount - $diffAmount;
             $explanation = 'Adding divisor: '.$diffAmount;
-            $ruleH[3][0]--; #Dynamic divisor
+            $ruleH[3][0]--; //Dynamic divisor
         }
 
         if ($ruleH[3][0] > 0) {
@@ -73,12 +72,13 @@ class Helper extends Model
 
         $explanation .= " rewritten rule: $rule";
 
-        if($debug) {
+        if ($debug) {
             echo "  calculationDynamicDivisor OUTPUT(amount: $amount, diffAmount: $diffAmount, rule: $rule, explanation: $explanation)\n";
         }
 
         $diffAmount = $newAmount - $amount;
-        return [$diffAmount, $rule, $explanation]; #Returns rewritten rule, has to be remembered
+
+        return [$diffAmount, $rule, $explanation]; //Returns rewritten rule, has to be remembered
     }
 
     public function calculationDivisor(bool $debug, int $amount, array $ruleH)
@@ -95,10 +95,11 @@ class Helper extends Model
         } else {
             //When no sign is given, we reduce the amount. Its lake taking this divisor out of the amount.
             $newAmount = $amount - $divisorAmount;
-            $explanation = 'Subtracting divisor: ' . $divisorAmount;
+            $explanation = 'Subtracting divisor: '.$divisorAmount;
         }
 
         $diffAmount = $newAmount - $amount;
+
         return [$diffAmount, $explanation];
     }
 
@@ -119,6 +120,7 @@ class Helper extends Model
         }
 
         $diffAmount = $newAmount - $amount;
+
         return [$diffAmount, $explanation];
     }
 
@@ -138,6 +140,7 @@ class Helper extends Model
         }
 
         $diffAmount = $newAmount - $amount;
+
         return [$diffAmount, $explanation];
     }
 }

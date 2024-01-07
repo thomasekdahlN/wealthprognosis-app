@@ -109,14 +109,14 @@ class Changerate extends Model
                 if (is_numeric($original)) { //Just a percentage integer, use it directly
                     $percent = $original;
                     $decimal = $this->convertPercentToDecimal($percent);
-                    #$explanation = "original er satt til percent: $original, decimal: $decimal";
+                //$explanation = "original er satt til percent: $original, decimal: $decimal";
 
                 } else { //Allow to read the changerate from the changerate yearly config as a variable name subsituted for its amount
                     //print "Remove the changerates from the text: $original\n";
                     $variablename = $original; //THis is a variable name, not a number, wee keep it to repeat
                     preg_match('/changerates.(\w*)/i', $original, $matches, PREG_OFFSET_CAPTURE);
                     [$percent, $decimal] = $this->getChangerateValues($matches[1][0], $year);
-                    #$explanation = "original er satt til en variabel: $original = $percent% = $decimal";
+                    //$explanation = "original er satt til en variabel: $original = $percent% = $decimal";
 
                 }
             } elseif ($variablename) {
@@ -124,7 +124,7 @@ class Changerate extends Model
                 //Her er vi sikre på at det er et variabelnavn og ikke en integer.
                 preg_match('/changerates.(\w*)/i', $variablename, $matches, PREG_OFFSET_CAPTURE);
                 [$percent, $decimal] = $this->getChangerateValues($matches[1][0], $year);
-                #$explanation = "variablename er satt: $variablename = $percent% = $decimal";
+                //$explanation = "variablename er satt: $variablename = $percent% = $decimal";
             }
 
             if ($debug) {

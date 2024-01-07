@@ -102,7 +102,7 @@ class Amortization extends Model
         $interestDecimal = $interestPercent / 100;
 
         $deno = 1 - (1 / pow((1 + $interestDecimal), $this->period));
-        #print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
+        //print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
 
         if ($deno > 0) {
             $this->termAmount = ($this->remainingMortgageAmount * $interestDecimal) / $deno;
@@ -127,9 +127,9 @@ class Amortization extends Model
                 'description' => '',
             ];
 
-            #print_r($this->dataH[$this->assettname][$year]['mortgage']);
-            //print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
-            //}
+        //print_r($this->dataH[$this->assettname][$year]['mortgage']);
+        //print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
+        //}
         } else {
             echo "Problems with Amortization deno: $deno, interest is probably 0 in config or changerates\n";
         }

@@ -124,7 +124,6 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(-500, $depositedAmount);
     }
 
-
     public function testAdditionRuleToExistingAmountChange(): void
     {
         $calculation = new Helper();

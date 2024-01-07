@@ -165,9 +165,9 @@ class Prognosis
                 $expenceRepeat = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'repeat');
                 $expenceChangerate = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'changerate');
 
-                print "Expence adjust before: $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
+                echo "Expence adjust before: $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
                 [$expenceAmount, $expenceDepositedAmount, $expenceRule, $explanation] = $this->applyRule(true, $year, $expenceAmount, 0, $expenceRule, $expenceTransfer, $expenceSource, $expenceFactor);
-                print "Expence adjust after : $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
+                echo "Expence adjust after : $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
                 //print "$year: expenceChangeratePercent = $expenceChangerateDecimal - expence * $expence\n";
 
                 [$expenceChangeratePercent, $expenceChangerateDecimal, $expenceChangerateAmount, $expenceExplanation] = $this->changerate->getChangerate(false, $expenceChangerate, $year, $expenceChangerateAmount);
@@ -183,9 +183,9 @@ class Prognosis
                 $incomeRepeat = $this->configOrPrevValue(false, $assetname, $year, 'income', 'repeat');
                 $incomeChangerate = $this->configOrPrevValue(false, $assetname, $year, 'income', 'changerate');
 
-                #print "Income adjust before: $assetname.$year, incomeAmount:$incomeAmount, incomeRule:$incomeRule, incomeTransfer:$incomeTransfer, incomeSource: $incomeSource, incomeRepeat: #incomeRepeat\n";
+                //print "Income adjust before: $assetname.$year, incomeAmount:$incomeAmount, incomeRule:$incomeRule, incomeTransfer:$incomeTransfer, incomeSource: $incomeSource, incomeRepeat: #incomeRepeat\n";
                 [$incomeAmount, $incomeDepositedAmount, $incomeRule, $explanation] = $this->applyRule(false, $year, $incomeAmount, 0, $incomeRule, $incomeTransfer, $incomeSource, $incomeFactor);
-                #print "Income adjust after: $assetname.$year, incomeAmount:$incomeAmount\n";
+                //print "Income adjust after: $assetname.$year, incomeAmount:$incomeAmount\n";
 
                 [$incomeChangeratePercent, $incomeChangerateDecimal, $incomeChangerateAmount, $incomeExplanation] = $this->changerate->getChangerate(false, $incomeChangerate, $year, $incomeChangerateAmount);
                 $incomeAmount = $incomeAmount * $incomeChangerateDecimal;
@@ -214,7 +214,7 @@ class Prognosis
                 $assetRepeat = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'repeat');
                 $assetChangerate = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'changerate');
 
-                if($this->ArrGet("$assetname.$prevYear.asset.marketAmount") <= 0  && $assetMarketAmount > 0) {
+                if ($this->ArrGet("$assetname.$prevYear.asset.marketAmount") <= 0 && $assetMarketAmount > 0) {
                     $assetFirstYear = $year;
                     $firsttime = true;
                     echo "\n\nFirst time: $assetname.$year\n";
@@ -225,11 +225,11 @@ class Prognosis
                 [$assetChangeratePercent, $assetChangerateDecimal, $assetChangerateAmount, $assetExplanation1] = $this->changerate->getChangerate(false, $assetChangerate, $year, $assetChangerateAmount);
                 //print "$year: " . $this->changerate->decimalToDecimal($assetChangerateDecimal) . "\n";
 
-                #print "\nAsset før: $assetname.$year assetPrevAmount:$assetMarketPrevAmount assetMarketAmount:$assetMarketAmount, assetRule:$assetRule\n";
+                //print "\nAsset før: $assetname.$year assetPrevAmount:$assetMarketPrevAmount assetMarketAmount:$assetMarketAmount, assetRule:$assetRule\n";
                 [$assetMarketAmount, $assetDiffAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(true, $year, $assetMarketAmount, 0, $assetRule, $assetTransfer, $assetSource, 1);
-                #print "Asset etter: $assetname.$year assetMarketAmount: $assetMarketAmount, paidExtraAmount: $paidExtraAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
+                //print "Asset etter: $assetname.$year assetMarketAmount: $assetMarketAmount, paidExtraAmount: $paidExtraAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
 
-                if($firsttime) {
+                if ($firsttime) {
                     //default values we only set on the first run
 
                     if ($assetAcquisitionAmount <= 0) {
@@ -237,19 +237,18 @@ class Prognosis
                         $assetAcquisitionAmount = $assetMarketAmount;
                     }
 
-                    print "*** $year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount\n";
-
+                    echo "*** $year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount\n";
 
                     if ($assetEquityAmount <= 0) {
                         //Only to be set on first run here, not to be recalculated. But if rules or transfers add money, they are added to $assetAcquisitionAmount (not changerates), only real money.
                         $assetEquityAmount = round($assetAcquisitionAmount - $this->ArrGet("$assetname.$year.mortgage.amount"));
-                        print "    Equity: $assetname.$year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
+                        echo "    Equity: $assetname.$year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: ".$this->ArrGet("$assetname.$year.mortgage.termAmount")."\n";
                     }
 
                     if ($assetPaidAmount <= 0) {
                         //Only to be set on first run here, not to be recalculated. But if rules or transfers add money, they are added to $assetAcquisitionAmount (not changerates), only real money.
                         $assetPaidAmount = $assetEquityAmount;
-                        print "    Paid: $assetname.$year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
+                        echo "    Paid: $assetname.$year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: ".$this->ArrGet("$assetname.$year.mortgage.termAmount")."\n";
                     }
 
                     //If a mortgage is involved, the termAmount is a part of the Paid amount, since you also paid the term amount. The amount pais is usually the same ass the $assetEquityAmount
@@ -290,7 +289,7 @@ class Prognosis
                     $assetTaxableAmount = 0; //Can not be negative
                 }
 
-                #print "$year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
+                //print "$year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
                 //print "PAID: $assetname.$year.asset.paidAmount: " . $assetPaidAmount . " + curPaid: " . $this->ArrGet("$assetname.$year.asset.paidAmount") . " + prevPaid: " . $this->ArrGet("$assetname.$prevYear.asset.paidAmount") . " - assetEquityAmount: $assetEquityAmount\n";
 
@@ -327,7 +326,6 @@ class Prognosis
                     'description' => $this->ArrGetConfig("$assetname.$year.expence.description").$expenceExplanation,
                 ];
 
-
                 //print_r($this->dataH[$assetname][$year]['income']);
                 //Fix before and after tax cashflow calculations.
 
@@ -350,7 +348,7 @@ class Prognosis
                     'realizationTaxableAmount' => $realizationTaxableAmount,
                     'realizationTaxAmount' => $realizationTaxAmount,
                     'realizationTaxDecimal' => $realizationTaxPercent,
-                    'description' => $this->ArrGetConfig("$assetname.$year.asset.description").' Asset rule:'.$assetRule . ' ' . $assetExplanation1.$assetExplanation2,
+                    'description' => $this->ArrGetConfig("$assetname.$year.asset.description").' Asset rule:'.$assetRule.' '.$assetExplanation1.$assetExplanation2,
                 ];
 
             } //Year loop finished here.
@@ -363,7 +361,6 @@ class Prognosis
         $this->group();
         //print_r($this->dataH);
     }
-
 
     /**
      * rule can contain:
@@ -385,7 +382,7 @@ class Prognosis
         $diffAmount = 0;
         $explanation = '';
 
-        if(!$factor) {
+        if (! $factor) {
             $factor = 1;
         }
 
@@ -399,12 +396,11 @@ class Prognosis
             [$year],
             $source);
 
-
-        #This is really just a fixed number, but it can appear at the same time as a rule.
+        //This is really just a fixed number, but it can appear at the same time as a rule.
         if (is_numeric($amount) && $amount != 0) {
             $explanation = 'Using current amount: '.round($amount)." * $factor";
-            $amount = $calculatedNumericAmount = round( $amount * $factor);
-            #This is not a deposit
+            $amount = $calculatedNumericAmount = round($amount * $factor);
+            //This is not a deposit
         }
 
         if ($debug) {
@@ -417,21 +413,21 @@ class Prognosis
 
             //$debug = true;
 
-            if($rule) {
+            if ($rule) {
                 [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $depositedAmount, $rule, $factor);
             }
 
-            #Have to switch signs on $diffAmount
+            //Have to switch signs on $diffAmount
             $transferAmount = -$diffAmount;
 
-            if($transferAmount > 0) {
+            if ($transferAmount > 0) {
                 $this->transfer($debug, $transferAmount, $transferTo);
                 //$calculatedAmount = $amount - $newAmount; //Removes the transferred amount from this asset.
                 //$depositedAmount = round($newAmount - $amount);
             }
-        } elseif($source && $rule) {
-            #If we are not transfering the values to another resoruce, then we are adding it to the current resource
-            #Do not run calculateRule here since it changes the rule, and are run in the sub procedure
+        } elseif ($source && $rule) {
+            //If we are not transfering the values to another resoruce, then we are adding it to the current resource
+            //Do not run calculateRule here since it changes the rule, and are run in the sub procedure
             //###########################################################################################################
 
             [$diffAmount, $explanation] = $this->source($debug, $source, $rule);
@@ -446,7 +442,7 @@ class Prognosis
             } else {
                 $newAmount = $amount;
                 $diffAmount = 0;
-                $rule = "";
+                $rule = '';
             }
         }
 
@@ -459,14 +455,15 @@ class Prognosis
     }
 
     //Transferes the amount to another asset.
-    public function transfer(bool $debug, float $amount, string $path) {
+    public function transfer(bool $debug, float $amount, string $path)
+    {
         $paidAmount = 0;
         $explanation = " transfer $amount to $path";
         if ($debug) {
             echo "Transferto before: $path: ".Arr::get($this->dataH, $path, 0)."\n";
         }
 
-        #FIX: Tax calculations here.
+        //FIX: Tax calculations here.
         Arr::set($this->dataH, $path, Arr::get($this->dataH, $path, 0) + $amount); //The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
         //Arr::set($this->dataH, $path, Arr::get($this->dataH, $path, 0) + $amount); //FIX: Register the transferred amount on both sides.
 
@@ -484,12 +481,12 @@ class Prognosis
         //reduce value from this assetAmount
         $explanation .= " reduce by $amount\n";
 
-
         return [$paidAmount, $explanation];
     }
 
     //Calculates an amount based on the value of another asset
-    public function source(bool $debug, string $path, string $rule) {
+    public function source(bool $debug, string $path, string $rule)
+    {
         $paidAmount = 0;
         $amount = $this->ArrGet($path); //Retrive the amount from another asset. Do not change the other asset.
 
@@ -507,11 +504,11 @@ class Prognosis
      * This function retrieves a value from the configuration or from the previous year's data.
      * It checks if the value is an amount and if so, it adds any transferred amount to this year to the previous year's amount.
      *
-     * @param bool $debug Indicates whether debugging is enabled.
-     * @param string $assetname The name of the asset.
-     * @param int $year The year for which the value is being retrieved.
-     * @param string $type The type of the value being retrieved (e.g., 'income', 'expense', etc.).
-     * @param string $variable The specific variable within the type being retrieved.
+     * @param  bool  $debug Indicates whether debugging is enabled.
+     * @param  string  $assetname The name of the asset.
+     * @param  int  $year The year for which the value is being retrieved.
+     * @param  string  $type The type of the value being retrieved (e.g., 'income', 'expense', etc.).
+     * @param  string  $variable The specific variable within the type being retrieved.
      * @return mixed The retrieved value.
      */
     public function configOrPrevValue(bool $debug, string $assetname, int $year, string $type, string $variable)
@@ -520,7 +517,7 @@ class Prognosis
         $value = $this->ArrGetConfig("$assetname.$year.$type.$variable");
 
         $repeat = $this->ArrGetConfig("$assetname.$year.$type.repeat");
-        if(!isset($repeat)) { //Check if repeat is set in the config
+        if (! isset($repeat)) { //Check if repeat is set in the config
             $repeat = $this->ArrGet("$assetname.$prevYear.$type.repeat"); //Check if we stopped repeating the previous year.
         }
         if ($debug) {
@@ -529,16 +526,16 @@ class Prognosis
 
         //Trouble with bool handling here, and with amounts that are 0.0 (since amounts is set default to 0 so calculations shall work.
         //Isset is false if value is null, but it is true if value is 0 - thats why we need to check it it is numeric, and then check if it is 0.- then we try to get data from the dataH
-        if ((!isset($value) && $repeat) || (is_numeric($value) && $value == 0 && $repeat)) {
+        if ((! isset($value) && $repeat) || (is_numeric($value) && $value == 0 && $repeat)) {
             $value = $this->ArrGet("$assetname.$prevYear.$type.$variable"); //Retrive value from dataH previous year only if repeat is true
             if ($debug) {
                 echo "      configOrPrevValueData prev year: $assetname.$year.$type.$variable: $value\n";
             }
         }
 
-        if(Str::contains("$assetname.$year.$type.$variable", ['Amount', 'amount'])) {
-            #If it is an amount, we check if we have a transferred amount to this year, and add it to the previous years amount
-            #$value += $this->ArrGet("$assetname.$year.$type.$variable");
+        if (Str::contains("$assetname.$year.$type.$variable", ['Amount', 'amount'])) {
+            //If it is an amount, we check if we have a transferred amount to this year, and add it to the previous years amount
+            //$value += $this->ArrGet("$assetname.$year.$type.$variable");
         }
 
         if ($debug) {
@@ -578,10 +575,10 @@ class Prognosis
     public function ArrGet(string $path)
     {
         $default = null;
-        if(Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
+        if (Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
             $default = 0;
         }
-        #print "ArrGet: $path - default: $default\n";
+        //print "ArrGet: $path - default: $default\n";
 
         return Arr::get($this->dataH, $path, $default);
     }
@@ -590,7 +587,7 @@ class Prognosis
     public function ArrGetConfig(string $path)
     {
         $default = null;
-        if(Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
+        if (Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
             $default = 0;
         }
 
@@ -633,9 +630,9 @@ class Prognosis
             $year = $matchesH[2][0];
             $assetname = $matchesH[1][0];
             $taxtype = $this->ArrGet("$assetname.meta.tax");
-            #print_r($this->ArrGet("$assetname.meta"));
+            //print_r($this->ArrGet("$assetname.meta"));
 
-            #print "$assetname.taxtype: $taxtype\n";
+            //print "$assetname.taxtype: $taxtype\n";
             //Free money to spend
             [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxtype, $year, $this->ArrGet("$path.income.amount"), $this->ArrGet("$path.expence.amount"));
 
@@ -649,16 +646,16 @@ class Prognosis
                     - $cashflowTaxAmount //Minus skatt på cashflow (Kan være både positiv og negativ)
                     - $this->ArrGet("$path.asset.taxAmount") //Minus formuesskatt
                     - $this->ArrGet("$path.mortgage.termAmount"); //Minus terminbetaling på lånet
-                    + $this->ArrGet("$path.mortgage.taxDeductableAmount"); //Plus skattefradrag på renter
+            +$this->ArrGet("$path.mortgage.taxDeductableAmount"); //Plus skattefradrag på renter
 
             Arr::set($this->dataH, "$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
-            Arr::set($this->dataH, "$path.cashflow.afterTaxAmount",$cashflowAfterTaxAmount);
-            Arr::set($this->dataH, "$path.cashflow.beforeTaxAggregatedAmount",$cashflowBeforeTaxAmount);  #FIX: Cashflow is not accumulated now
-            Arr::set($this->dataH, "$path.cashflow.afterTaxAggregatedAmount",$cashflowAfterTaxAmount);  #FIX: Cashflow is not accumulated now
+            Arr::set($this->dataH, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
+            Arr::set($this->dataH, "$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount);  //FIX: Cashflow is not accumulated now
+            Arr::set($this->dataH, "$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount);  //FIX: Cashflow is not accumulated now
             Arr::set($this->dataH, "$path.cashflow.taxAmount", $cashflowTaxAmount);
             Arr::set($this->dataH, "$path.cashflow.taxDecimal", $cashflowTaxPercent);
         } else {
-            print "ERROR with path\n";
+            echo "ERROR with path\n";
         }
     }
 

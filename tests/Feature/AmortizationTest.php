@@ -34,8 +34,8 @@ class AmortizationTest extends TestCase
         $dataH = [];
 
         $mortgages = [
-                'years' => 10,
-                'amount' => 1000000,
+            'years' => 10,
+            'amount' => 1000000,
         ];
         $assettname = 'test';
 
