@@ -75,7 +75,7 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("Q$this->rowHeader", '%Endr');
         $this->worksheet->setCellValue("R$this->rowHeader", 'Markedsverdi fratrukket lån');
         $this->worksheet->setCellValue("S$this->rowHeader", 'Anskaffelsesverdi');
-        $this->worksheet->setCellValue("T$this->rowHeader", 'Betalt (inkl kostnader)');
+        $this->worksheet->setCellValue("T$this->rowHeader", 'Finans kostnader)');
         $this->worksheet->setCellValue("U$this->rowHeader", 'Skattbar');
         $this->worksheet->setCellValue("V$this->rowHeader", '% skattbar');
         $this->worksheet->setCellValue("W$this->rowHeader", 'Skatt');
@@ -138,7 +138,7 @@ class PrognosisAssetSheet2
             $this->worksheet->setCellValue("T$this->rows", Arr::get($data, 'asset.paidAmount'));
             $this->worksheet->setCellValue("U$this->rows", Arr::get($data, 'asset.taxableAmount'));
 
-            if (Arr::get($data, 'asset.marketAmount') != 0) {
+            if (Arr::get($data, 'asset.taxableDecimal') > 0 && Arr::get($data, 'asset.marketAmount') != 0) {
                 $this->worksheet->setCellValue("V$this->rows", Arr::get($data, 'asset.taxableDecimal'));
             }
             $this->worksheet->setCellValue("W$this->rows", Arr::get($data, 'asset.taxAmount'));

@@ -1,11 +1,11 @@
 {
     "meta": {
         "name": "John Doe",
-        "birthYear": "1975",
+        "birthYear": "1985",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "70"
     },
     "income": {
         "meta": {
@@ -43,14 +43,14 @@
             "name": "OTP",
             "description": "OTP",
             "active": true,
-            "tax": "fond"
+            "tax": "otp"
         },
-        "2022": {
+        "2023": {
             "asset": {
-                "marketAmount": 1080000,
+                "marketAmount": 2000000,
+                "changerate": "changerates.otp",
                 "rule": "5%",
                 "source": "income.$year.income.amount",
-                "changerate": "changerates.otp",
                 "description": "OTP Sparing frem til pensjonsår",
                 "repeat": true
             }
@@ -59,8 +59,9 @@
             "asset": {
                 "rule": "1|$otpYears",
                 "transfer": "income.$year.income.amount",
+                "source": "",
                 "changerate": "changerates.otp",
-                "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
+                "description": "",
                 "repeat": true
             }
         }

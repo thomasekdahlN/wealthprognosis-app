@@ -55,16 +55,10 @@
         },
         "2023": {
             "asset": {
-                "marketAmount": 100000,
+                "marketAmount": 1500000,
+                "rule": "+5000",
                 "changerate": "changerates.fond",
                 "description": "",
-                "repeat": true
-            }
-        },
-        "2024": {
-            "asset": {
-                "rule": "+5000",
-                "changerate": "changerates.kpi",
                 "repeat": true
             }
         },
@@ -72,7 +66,6 @@
             "asset": {
                 "transfer": "income.$year.income.amount",
                 "rule": "1|$pensionWishYears",
-                "changerate": "changerates.fond",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }

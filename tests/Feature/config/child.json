@@ -13,6 +13,7 @@
                 "name": "Barnetrygd",
                 "description": "Barnetrygd",
                 "amount": 1766,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -20,6 +21,7 @@
                 "name": "Expences",
                 "description": "",
                 "amount": 3000,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -29,6 +31,7 @@
                 "name": "Barnetrygd beløp redusert etter 6 år",
                 "description": "Barnetrygd",
                 "amount": 1310,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -38,6 +41,7 @@
                 "name": "Barnetrygd slutt",
                 "description": "Barnetrygd",
                 "amount": 1310,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": false
             }
@@ -47,6 +51,7 @@
                 "name": "Expences",
                 "description": "Slutt på sponsing av barn",
                 "amount": 0,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": false
             }

@@ -19,25 +19,33 @@
         "2023": {
             "asset": {
                 "marketAmount": 10000000,
-                "paidAmount": 0,
-                "taxvalue": 350000,
+                "acquisitionAmount": 6000000,
+                "paiddAmount": 300000,
+                "taxableAmount": 200000,
                 "changerate": "changerates.cabin",
                 "description": "Fortune sets the value from the tax authorities, which is different from marketprice",
                 "repeat": true
             },
             "income": {
-                    "name": "rental",
-                    "description": "Rental AirBNB",
-                    "amount": 0,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
+                "name": "rental",
+                "description": "Rental AirBNB",
+                "amount": 0,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             },
             "expence": {
-                    "name": "Expences",
-                    "description": "Expences",
-                    "amount": 2000,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
+                "name": "Expences",
+                "description": "Expences",
+                "amount": 2000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 5000000,
+                "interest": "changerates.interest",
+                "years": 20
             }
         }
     }

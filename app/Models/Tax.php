@@ -86,19 +86,30 @@ class Tax extends Model
         return [$fortuneTaxAmount, $fortuneTaxPercent];
     }
 
-    public function taxCalculationFortune(string $taxtype, int $year, ?int $amount = 0, ?int $taxAmount = 0)
+    public function taxCalculationFortune(string $taxtype, int $year, ?int $amount = 0, ?int $fortuneTaxableAmount = 0, ?bool $taxableAmountOverride = false)
     {
-
+        $fortuneTaxAmount = 0;
+        $fortuneTaxLimit = 1700000; //FIX: Should be read from config
         $fortuneTaxPercent = $this->getFortuneTax($year);
         $fortuneTaxablePercent = $this->getTaxableFortune($taxtype, $year);
 
-        if ($taxAmount > 0) {
-            $fortuneTaxableAmount = $taxAmount; //If the taxable fortune is different than the marketprice, we adjust it accordingly
+        if ($taxableAmountOverride && $fortuneTaxableAmount > 0) {
+            $fortuneTaxablePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
+            //echo "   fortuneTaxableAmount ovveride: $fortuneTaxableAmount\n";
         } else {
-            $fortuneTaxableAmount = $amount * $fortuneTaxablePercent; //Calculate the amount from wich the tax is calculated from the market value
+            $fortuneTaxableAmount = $amount * $fortuneTaxablePercent; //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
+            //echo "   fortuneTaxableAmount normal: $fortuneTaxableAmount\n";
         }
-        $fortuneTaxAmount = $fortuneTaxableAmount * $fortuneTaxPercent; //Calculate the tax you shall pay from the taxable fortune
 
+        //Consider the different tax types taxable values.
+        if ($taxtype == 'otp') {
+            //$fortuneTaxableAmount = 0; //FIX: Ikke skatt på OTP formue. Sjekk.
+        }
+
+        #Only fortune tax on more than 1.7million pr 2023
+        if($fortuneTaxableAmount > $fortuneTaxLimit) { #FIX: Should be read from config
+            $fortuneTaxAmount = ($fortuneTaxableAmount - $fortuneTaxLimit) * $fortuneTaxPercent; //Calculate the tax you shall pay from the taxable fortune
+        }
         //print "$AmountTaxableFortune, $fortuneTaxAmount, $fortuneTaxPercent\n";
 
         return [$fortuneTaxableAmount, $fortuneTaxAmount, $fortuneTaxablePercent, $fortuneTaxPercent];
@@ -111,49 +122,45 @@ class Tax extends Model
         $cashflowTaxPercent = $this->getTaxYearly($taxtype, $year); //FIX
 
         //Forskjell på hva man betaler skatt av
-        $cashflow = 0;
+        $cashflowBeforeTaxAmount = 0;
+        $cashflowAfterTaxAmount = 0;
+
         $cashflowTaxAmount = 0;
-        $potentialIncomeAmount = 0;
+
         if ($debug) {
             echo "\ntaxtype: $taxtype.$year: income: $income, expence: $expence, cashflowTaxPercent: $cashflowTaxPercent\n";
         }
 
         if ($taxtype == 'salary') {
             $cashflowTaxAmount = $income * $cashflowTaxPercent;
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = $income;
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
+
         } elseif ($taxtype == 'income') {
             $cashflowTaxAmount = $income * $cashflowTaxPercent;
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = $income;
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxtype == 'house') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = $income;
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxtype == 'cabin') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - 10000) * $cashflowTaxPercent; //Airbnb skatten
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = $income; //Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxtype == 'rental') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            //$potentialIncomeAmount = (($income - $cashflowTaxAmount) / 12) * 10; #Bank beregning, ikke sunn fornuft, ikke med skatt
-            $potentialIncomeAmount = $income; //Bank beregning, ikke sunn fornuft, kan bare bergne inn 10 av 12 mnd som utleie. Usikker på om skatt trekkes fra
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxtype == 'stock') {
             //Hm. Aksjer som selges skattes bare som formuesskatt og ved realisasjon
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-            //NOTE: Skjermingsfradrag
-            //NOTE: Stor forskjell på skattlegging mot privat 35.2%vs bedrift 0%?.
+            //FIX: Skjermingsfradrag
+            //FIX: Stor forskjell på skattlegging mot privat 35.2%vs bedrift 0%?.
             $cashflowTaxAmount = 0;
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = $income - $cashflowTaxAmount;
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxtype == 'fond') {
             //Hm. fond i praksis bare eid i firmaer, alt privat i ASK og skattes bare ved realisasjon + formuesskatt
@@ -162,28 +169,31 @@ class Tax extends Model
         } elseif ($taxtype == 'ask') {
             //Aksjesparekonto. TODO Fix. Kun skatt ved salg??? Ikke årlig
             $cashflowTaxAmount = 0; //Ikke årlig skatt på ASK
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = $income;
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
+
+        } elseif ($taxtype == 'otp') {
+            //Pensjonssparing fra arbeidsgiver
+            $cashflowTaxAmount = 0; //Ikke årlig skatt på ASK
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxtype == 'cash') {
             //ToDo: Man skal bare betale skatt av rentene
             $cashflowTaxAmount = $income * $cashflowTaxPercent; //ToDO FIX
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = $income - $cashflowTaxAmount;
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } else {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
-            $cashflow = $income - $expence - $cashflowTaxAmount;
-            $potentialIncomeAmount = 0;  //For nå antar vi ingen inntekt fra annet enn lønn eller utleie, men utbytte vil også telle.
+            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
         }
 
         if ($debug) {
             echo "$taxtype.$year: cashflow: $cashflow, cashflowTaxAmount: $cashflowTaxAmount, cashflowTaxPercent: $cashflowTaxPercent, potentialIncomeAmount: $potentialIncomeAmount\n";
         }
+        $cashflowBeforeTaxAmount = $income - $expence;
 
         //V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
-        return [$cashflow, $cashflowTaxAmount, $cashflowTaxPercent, $potentialIncomeAmount];
+        return [$cashflowTaxAmount, $cashflowTaxPercent];
     }
 
     public function taxCalculationRealization(bool $debug, string $taxtype, int $year, int $assetMarketAmount, int $acquisitionAmount = 0, ?int $acquisitionYear = 0)

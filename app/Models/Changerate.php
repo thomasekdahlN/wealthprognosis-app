@@ -96,7 +96,7 @@ class Changerate extends Model
         $explanation = '';
 
         if ($debug) {
-            echo "-- convertChangerate($debug, $original,$year, $variablename)\n";
+            echo "    getChangerateStart($original, $year, $variablename)\n";
             //exit;
         }
 
@@ -128,7 +128,7 @@ class Changerate extends Model
             }
 
             if ($debug) {
-                echo "-- convertChangerate($original, $year, $variablename) = $percent% = $decimal, $variablename, $explanation\n";
+                echo "    getChangerateReturn($percent, $decimal, $variablename, $explanation)\n";
                 //exit;
             }
         }

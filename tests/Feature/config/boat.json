@@ -27,6 +27,7 @@
                 "name": "Utgifter",
                 "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
                 "amount": 2000,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }

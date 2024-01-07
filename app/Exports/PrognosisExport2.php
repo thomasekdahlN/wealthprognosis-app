@@ -84,12 +84,12 @@ class PrognosisExport2
         if ($this->pensionWishYear >= $this->birthYear + 63 && $this->pensionWishYear <= $this->birthYear + 67) {
             $this->otpStartYear = $this->pensionWishYear; //OTP begynner tidligst ved 63, senest ved 67 - men slutter på 77 uansett.
         } elseif ($this->pensionWishYear <= $this->birthYear + 63) {
-            $this->otpStartYear = $this->birthYear + 63;
+            $this->otpStartYear = $this->birthYear + 62;
         } elseif ($this->pensionWishYear >= $this->birthYear + 67) {
             $this->otpStartYear = $this->birthYear + 67;
         }
         $this->otpEndYear = $this->birthYear + 77; //OTP slutter ved 77 uansett
-        $this->otpYears = $this->otpEndYear - $this->otpStartYear;
+        $this->otpYears = $this->otpEndYear - $this->otpStartYear + 1;
 
         $this->deathYear = (int) $this->birthYear + Arr::get($this->config, 'meta.deathYear', 82);
         $this->pensionWishYears = $this->deathYear - $this->pensionWishYear + 1; //The number of years you vil live with pension, used i divisor calculations

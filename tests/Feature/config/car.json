@@ -18,7 +18,7 @@
         },
         "2023": {
             "asset": {
-                "marketAmount": 100000,
+                "marketAmount": 200000,
                 "changerate": "changerates.car",
                 "description": "verditap",
                 "repeat": true
@@ -27,6 +27,7 @@
                 "name": "Utgifter",
                 "description": "Drivstoff/Forsikring/Vedlikehold/Bompenger 4000,- pr mnd",
                 "amount": 4000,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }

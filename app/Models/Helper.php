@@ -71,7 +71,11 @@ class Helper extends Model
             $rule = $ruleH[1][0].$ruleH[2][0].'|'.$ruleH[3][0]; //ToDo: Note rule is rewritten for each iteration
         }
 
-        $explanation .= " new rule: $rule";
+        $explanation .= " rewritten rule: $rule";
+
+        if($debug) {
+            echo "  calculationDynamicDivisor OUTPUT(amount: $amount, diffAmount: $diffAmount, rule: $rule, explanation: $explanation)\n";
+        }
 
         $diffAmount = $newAmount - $amount;
         return [$diffAmount, $rule, $explanation]; #Returns rewritten rule, has to be remembered

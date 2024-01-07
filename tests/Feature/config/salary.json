@@ -26,14 +26,12 @@
                 "repeat": true
             },
             "expence": {
-                "2022": {
-                    "name": "Expences",
-                    "description": "",
-                    "amount": 15000,
-                    "factor": 12,
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
+                "name": "Expences",
+                "description": "",
+                "amount": 15000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         },
         "$pensionWishYear": {
@@ -69,6 +67,7 @@
             "asset": {
                 "rule": "1|$pensionWishYear",
                 "transfer": "income.$year.income.amount",
+                "source" : "",
                 "changerate": "changerates.otp",
                 "description": "OTP fra $pensionWishYear, 1|$pensionWishYear av formuen",
                 "repeat": true

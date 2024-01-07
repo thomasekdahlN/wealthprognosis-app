@@ -34,9 +34,6 @@
             "mortgage": {
                 "amount": 1500000,
                 "interest": "changerates.interest",
-                "gebyr": 600,
-                "tax": 22,
-                "paymentExtra": "home.$year.cashflow.amount",
                 "years": 20
             }
         }

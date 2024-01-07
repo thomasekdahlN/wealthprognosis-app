@@ -102,7 +102,7 @@ class Amortization extends Model
         $interestDecimal = $interestPercent / 100;
 
         $deno = 1 - (1 / pow((1 + $interestDecimal), $this->period));
-        //print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
+        #print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
 
         if ($deno > 0) {
             $this->termAmount = ($this->remainingMortgageAmount * $interestDecimal) / $deno;
@@ -116,20 +116,22 @@ class Amortization extends Model
 
             //print "$year: $this->period : deno: $deno : $interestDecimal% = $interestDecimal : remainingMortgageAmount: " . round($this->remainingMortgageAmount)  . " termAmount: " . round($this->termAmount)  . " : interestAmount " . round($interestAmount) . " : principalAmount: " . round($this->principalAmount) . " : balanceAmount: " . round($this->balanceAmount) . "\n";
             $this->dataH[$this->assettname][$year]['mortgage'] = [
-                'amount' => $this->amount,
-                'termAmount' => $this->termAmount,
+                'amount' => round($this->amount),
+                'termAmount' => round($this->termAmount),
                 'interestDecimal' => $interestPercent / 100,
-                'interestAmount' => $interestAmount,
-                'principalAmount' => $this->principalAmount,
-                'balanceAmount' => $this->balanceAmount,
+                'interestAmount' => round($interestAmount),
+                'principalAmount' => round($this->principalAmount),
+                'balanceAmount' => round($this->balanceAmount),
                 'extraDownpaymentAmount' => $extraDownpaymentAmount,
                 'gebyrAmount' => 0,
                 'description' => '',
             ];
 
-            //print_r($this->dataH[$this->assettname][$year]['mortgage']);
+            #print_r($this->dataH[$this->assettname][$year]['mortgage']);
             //print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
             //}
+        } else {
+            echo "Problems with Amortization deno: $deno, interest is probably 0 in config or changerates\n";
         }
     }
 

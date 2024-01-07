@@ -18,7 +18,7 @@
         },
         "2022": {
             "asset": {
-                "marketAmount": 5000,
+                "marketAmount": 1500000,
                 "changerate": "changerates.crypto",
                 "description": "",
                 "repeat": true

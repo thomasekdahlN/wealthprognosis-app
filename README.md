@@ -127,7 +127,71 @@ Summere riktige verdier for hva man har gitt minus det man tar ut - for riktig s
 Summere riktig skattefradrag basert på rente og alder.
 Riktig skatt på realisasjon
 
-### Datasettet vi regner på pr år
+## Config
+
+### meta - top level - reserved keyword
+- meta.name - Required. Your name or an alias for you
+- meta.birthYear - Required. When you are born
+- meta.prognoseYear - Just visualizes this year extra with a colored line in excel
+- meta.pensionOfficialYear - Official pension year in your country (67 in noprway)
+- meta.pensionWishYear - When you wish to retire. Maybe you want to retire earlier because of F.I.R.E
+- meta.deathYear - Required. How long do you think you live.
+
+Your pensionOfficialYear/pensionWishYear will be used to calculate equal payments (like 1/14 of your assets) from your assets until deathYear. So if you live longer, you get less pr year.
+
+### Assets configurations
+
+NOTE: Asset name has to be unique, and is used to identify the asset in all calculations.
+
+#### meta - asset level - reserved keyword
+
+- meta.type - Required. What kind of asset this is. Valid values income|expence|mortgage|asset|pension|otp|fond|cash|house|car|inheritance|boat|cabin|crypto|pension|property|rental|salary
+- meta.group - Required. Valid values private|company asset
+- meta.name - Required. Shor description of the asset, used in excel tabs
+- meta.description - Optional. Longer description of your asset.
+- meta.active - Required. Valid values true|false. If false, the asset will not be calculated.
+- meta.tax - Required. How this asset is taxed. Valid values income|fond|cash|house|car|inheritance|boat|cabin|crypto|pension|property|rental|salary. What kind of tax is this asset subject to.
+
+#### Income
+- income.amount - beløp før skatt
+- income.changerate - endring i prosent eller variabel hentet fra config fil for prosent f.eks changerates.kpi, changerates.fond, changerates.otp, changerates.house, changerates.car, changerates.cash
+- income.rule - regler for hvordan inntekten skal behandles. Se eget kapittel for syntax
+- income.transfer - overføring av inntekt til en annen asset, dvs den flytter pengene fra denne asset til den asset som er oppgitt i transfer. Merk at en transfer må beregnes før asset den overføres til.
+- income.source - rule beregning av et beløp i en annen asset, som skal legges til denne. Merk at en source må beregnes etter asset den henter verdier fra. Endrer ikke verdien i source.
+- income.repeat - true/false - Hvis true gjenta konfigurasjonen inntil den blir overskrevet av en annen konfigurasjon et senere år.
+- income.description - beskrivelse av inntekten
+
+#### Expence
+- expence.amount - beløp før skatt
+- expence.changerate - endring i prosent eller variabel hentet fra config fil for prosent f.eks changerates.kpi, changerates.fond, changerates.otp, changerates.house, changerates.car, changerates.cash
+- expence.rule - regler for hvordan inntekten skal behandles. Se eget kapittel for syntax
+- expence.transfer - overføring av inntekt til en annen asset, dvs den flytter pengene fra denne asset til den asset som er oppgitt i transfer. Merk at en transfer må beregnes før asset den overføres til.
+- expence.source - rule beregning av et beløp i en annen asset, som skal legges til denne. Merk at en source må beregnes etter asset den henter verdier fra. Endrer ikke verdien i source.
+- expence.repeat - true/false - Hvis true gjenta konfigurasjonen inntil den blir overskrevet av en annen konfigurasjon et senere år.
+- expence.description - beskrivelse av utgiften
+
+#### mortgage - Lån
+- mortgage.amount - Required. The original mortgage amount
+- mortgage.interest - Required. rente i prosent. Recommended to use "changerates.interest" to get the interst prediction pr year and not hardcode it.
+- mortgage.years - Required. Hvor mange år skal lånet være
+- mortgage.gebyr - gebyr pr år
+- mortgage.paymentExtra - fradrag
+- mortgage.description - beskrivelse av lånet
+
+#### asset
+- asset.marketAmount - Required. Markedsverdien på en asset. This is the main value we use when talking about an asset.
+- asset.acquisitionAmount - Optional. Anskaffelsesverdi. Blir default satt. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.
+- asset.equityAmount - Optional. Egenkapital : Blir default satt til asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
+- asset.paidAmount - Optional. Blir default satt til asset.marketAmount hvis ikke angitt. Brukes hvsi du har betalt noe annet enn makredsverdi, f.eks ved arv.
+- asset.taxableAmount - Optional. Skattbart beløp. Blir default satt til asset.marketAmount. Antall kroner av markedsverdien til en asset det skal skattes av. F.eks en hytte kan ha mye lavere skattbar verdi enn markedsverdien minus verdsettelsesrabatt.
+- asset.changerate - endring i prosent eller variabel hentet fra config fil for prosent f.eks changerates.kpi, changerates.fond, changerates.otp, changerates.house, changerates.car, changerates.cash
+- asset.rule - regler for hvordan inntekten skal behandles. Se eget kapittel for syntax
+- asset.transfer - overføring av inntekt til en annen asset, dvs den flytter pengene fra denne asset til den asset som er oppgitt i transfer. Merk at en transfer bør beregnes før asset den overføres til. Hvis du overfører til en som allerede er beregnet, så blir den ikke reberegnet
+- asset.source - rule beregning av et beløp i en annen asset, som skal legges til denne. Merk at en source må beregnes etter asset den henter verdier fra. Endrer ikke verdien i source.
+- asset.repeat - true/false - Hvis true gjenta konfigurasjonen inntil den blir overskrevet av en annen konfigurasjon et senere år.
+- asset.description - Beskrivelse av asset/liability
+
+### Output: Datasettet vi regner på pr år
 
 #### Income
 - income.amount - beløp før skatt
@@ -136,6 +200,7 @@ Riktig skatt på realisasjon
 - income.transfer - overføring av inntekt til en annen asset
 - income.repeat - gjenta konfigurasjonen for kommende år
 - income.description - beskrivelse av inntekten
+- income.transferedAmount - Hva du har overført til/fra income
 
 #### Expence
 - expence.amount - beløp før skatt
@@ -144,6 +209,7 @@ Riktig skatt på realisasjon
 - expence.transfer - overføring av inntekt til en annen asset
 - expence.repeat - gjenta konfigurasjonen for kommende år
 - expence.description - beskrivelse av utgiften
+- expence.transferedAmount - Hva du har overført til/fra expence
 
 #### Cashflow
 - cashflow.beforeTaxAmount = income.amount - expence.amount
@@ -174,9 +240,11 @@ Riktig skatt på realisasjon
 - asset.acquisitionAmount - Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.
 - asset.equityAmount - Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
 - asset.paidAmount - Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.
+- asset.transferedAmount - Hva du har overført til/fra denne asset
 - asset.mortageRateDecimal- Hvor mye av en asset som er lånt
 - asset.taxableDecimal - Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av
 - asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av
+- asset.taxableAmountOverride - Auto: Set to true for all coming years if it finds a asset.taxableAmount 
 - asset.taxDecimal - Prosent skatt på asset op en assets skattbare verdi
 - asset.taxAmount - Kroner skatt på asset op en assets skattbare verdi
 - asset.changerate - Hvor mye en asset endrer seg i verdi pr år
