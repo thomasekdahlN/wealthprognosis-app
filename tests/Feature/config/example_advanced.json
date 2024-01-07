@@ -58,6 +58,8 @@
                 "name": "inheritance",
                 "description": "",
                 "marketAmount": 1000000,
+                "acquisitionAmount" : 1,
+                "paidAmount": 1,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -122,16 +124,6 @@
             "active" : true,
             "tax": "house"
         },
-        "2010": {
-            "expence": {
-                "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                "amount": 7300,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
         "2015": {
             "asset": {
                 "marketAmount": 3000000,
@@ -151,6 +143,14 @@
                 "name": "Rental",
                 "description": "Rental 10000 pr month",
                 "amount": 10000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+                "amount": 7300,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
@@ -175,7 +175,7 @@
             "name": "My Crypto",
             "description": "Coinbase private",
             "active": true,
-            "tax": "fond"
+            "tax": "crypto"
         },
         "2022": {
             "asset": {
@@ -344,7 +344,7 @@
             }
         }
     },
-    "Company AS": {
+    "CompanyAS": {
         "meta" : {
             "type": "stock",
             "group": "company",

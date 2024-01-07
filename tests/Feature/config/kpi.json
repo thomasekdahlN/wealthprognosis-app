@@ -11,7 +11,7 @@
         "meta" : {
             "type": "kpi",
             "group": "private",
-            "name": "Cash",
+            "name": "KPI",
             "description": "",
             "active": true,
             "tax": "cash"

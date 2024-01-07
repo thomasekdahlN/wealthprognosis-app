@@ -633,7 +633,9 @@ class Prognosis
             $year = $matchesH[2][0];
             $assetname = $matchesH[1][0];
             $taxtype = $this->ArrGet("$assetname.meta.tax");
+            #print_r($this->ArrGet("$assetname.meta"));
 
+            #print "$assetname.taxtype: $taxtype\n";
             //Free money to spend
             [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxtype, $year, $this->ArrGet("$path.income.amount"), $this->ArrGet("$path.expence.amount"));
 
@@ -655,6 +657,8 @@ class Prognosis
             Arr::set($this->dataH, "$path.cashflow.afterTaxAggregatedAmount",$cashflowAfterTaxAmount);  #FIX: Cashflow is not accumulated now
             Arr::set($this->dataH, "$path.cashflow.taxAmount", $cashflowTaxAmount);
             Arr::set($this->dataH, "$path.cashflow.taxDecimal", $cashflowTaxPercent);
+        } else {
+            print "ERROR with path\n";
         }
     }
 

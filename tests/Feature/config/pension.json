@@ -20,8 +20,8 @@
             "income": {
                 "name": "Folketrygden",
                 "description": "Folketrygden fra $pensionOfficialYear",
-                "factor": 12,
                 "amount": 15000,
+                "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }

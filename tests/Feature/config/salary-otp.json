@@ -65,11 +65,11 @@
         },
         "$pensionWishYear": {
             "asset": {
-                "rule": "1|$pensionWishYear",
+                "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
                 "source" : "",
                 "changerate": "changerates.otp",
-                "description": "OTP fra $pensionWishYear, 1|$pensionWishYear av formuen",
+                "description": "OTP fra $pensionWishYear, 1|$pensionWishYears av formuen",
                 "repeat": true
             }
         }

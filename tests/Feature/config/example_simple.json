@@ -20,7 +20,7 @@
             "income": {
                 "name": "Income",
                 "description": "Income",
-                "asset": 40000,
+                "amount": 40000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
@@ -57,7 +57,9 @@
             "asset": {
                 "name": "inheritance",
                 "description": "",
-                "amount": 1000000,
+                "marketAmount": 1000000,
+                "acquisitionAmount" : 1,
+                "paidAmount": 1,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -159,16 +161,9 @@
         "2022": {
             "asset": {
                 "amount": 2000000,
+                "rule": "+6000",
                 "changerate": "changerates.fond",
                 "description": "Første innskudd på 2 millioner",
-                "repeat": true
-            }
-        },
-        "2023": {
-            "asset": {
-                "name": "Monthly savings",
-                "description": "Setter inn 6000,- pr år",
-                "rule": "+6000",
                 "repeat": true
             }
         },

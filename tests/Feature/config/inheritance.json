@@ -21,7 +21,8 @@
                 "name": "inheritance",
                 "description": "",
                 "marketAmount": 1000000,
-                "paidAmount": 0,
+                "acquisitionAmount" : 1,
+                "paidAmount": 1,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
