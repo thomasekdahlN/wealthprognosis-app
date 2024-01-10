@@ -8,6 +8,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class Prognosis
 {
@@ -71,7 +72,7 @@ class Prognosis
         'crypto' => true,
         'fond' => true,
         'stock' => true,
-        'otp' => false,
+        'otp' => true,
         'ask' => true,
         'pension' => true,
     ];

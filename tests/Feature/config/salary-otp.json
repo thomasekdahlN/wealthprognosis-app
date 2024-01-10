@@ -14,7 +14,7 @@
             "name": "Income",
             "description": "Income",
             "active": true,
-            "tax": "income"
+            "tax": "salary"
         },
         "2022": {
             "income": {
