@@ -193,7 +193,7 @@ class PrognosisExport2
         $sheet->getStyle('AG6:AG80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
         $sheet->getStyle('AL6:AL80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
 
-        for ($column = 1; $column <= 28 + 6; $column++) {
+        for ($column = 1; $column <= 30 + 6; $column++) {
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
         }
 

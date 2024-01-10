@@ -228,6 +228,14 @@ class Tax extends Model
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
 
+        } elseif ($taxtype == 'car') {
+            $realizationTaxableAmount = 0;
+            $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+
+        } elseif ($taxtype == 'boat') {
+            $realizationTaxableAmount = 0;
+            $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+
         } elseif ($taxtype == 'rental') {
             if ($assetMarketAmount > 0) {
                 $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
