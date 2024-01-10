@@ -102,24 +102,19 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * salary
 
 ### On the wishlist:
-- skatt på inntekt
-- potential - riktig algoritme
-- FIRE beløp - riktige algoritmer.
-- Vise akkumulert cashflow igjen (og beregne den riktig), 
-- Vise eiendomsskatt i kroner og % av verdi
-- Support for eiendomsskatt
+- FIRE beløp -Rule/transfer må telle som innskudd.
+- Eiendomsskatt algoritme og oppsett. (Visning er ok nå)
 - Beregne skatt på realisasjon av asset (ved transfer og pr år)
 - transferAmount må kunne registreres+/-.(for å gjennomføre neste punkt)
 - overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
 - ekstra nedbetaling på lån (men ikke forkorte lån)
 - Support for skjermingsfradrag
-- F.I.R.E - Use up percentage of partly sellable assets from wishPensionYear to DeathYear
-- F.I.R.E Sparerate
-- Klassifisere F.I.R.E oppnåelse pr år
+- F.I.R.E - Use up 4% of partly sellable assets from wishPensionYear to DeathYear to see how it handles.
 
-Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)
 
 #### Not a priority, but have been thinking of it.
+- Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)- 
+- Klassifisere F.I.R.E oppnåelse pr år
 - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
 - Tax configuration pr year and countries (support for more than norwegian tax regime)
 - Refactoring and cleanup of code
@@ -249,16 +244,17 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.rule
 - asset.transfer
 - asset.repeat
-- asset.realizationTaxableAmount - Skattbart beløp ved realisering av asset = asset.amount - asset.originalAmount
-- asset.realizationTaxAmount - Skattbart beløp ved realisering av asset
-- asset.realizationTaxDecimal - Skattbar prosent ved realisering av asset
-- asset.realizationTaxDeductableAmount - Fradrag ved realisering av asset
-- asset.realizationTaxDeductableDecimal - Fradrag prosent ved realisering av asset
+- asset.propertyTaxAmount - Eiendomsskatt i kroner. Beregnes av asset.marketAmount.
+- asset.propertyTaxDecimal - Eiendomsskatt i prosent
+- asset.realizationAmount - Beløpet man sitter igjen med etter et salg = asset.marketAmount - asset.realizationTaxAmount
+- asset.realizationTaxableAmount - Skattbart beløp ved realisering av asset = asset.marketAmount - asset.acquisitionAmount
+- asset.realizationTaxAmount - Skattbart beløp ved realisering av asset = asset.realizationTaxableAmount * asset.realizationTaxDecimal
+- asset.realizationTaxDecimal - Skattbar prosent ved realisering av asset. Lest fra tax.json
 - asset.description - Beskrivelse av asset/liability
 
 #### Potential
 How much potential the bank sees in your income - expences
-- potential.incomeAmount
+- potential.incomeAmount - On rental it accounts for 10 out of 12 months rented out, then subtracts the mortgage.termAmount (since an existing mortgage reduces your mortgage potential)
 - potential.mortgageAmount - Hvor mye du potensielt kan låne. debtCapacity?
 
 
@@ -269,8 +265,8 @@ Før eller etter skatt her?
 - fire.expenceAmount - F.I.R.E utgift
 - fire.diffDecimal - F.I.R.E inntekt / F.I.R.E utgift . prosent
 - fire.cashFlowAmount - F.I.R.E inntekt - F.I.R.E utgift
-- fire.savingAmount - sparebeløp. Hvor mye du kan spare pr år. Ikke medregnet nedbdetalign av lån. Bare frie assets ala fond, krypto, aksjer, kontanter
-- fire.savingRate - savingAmount / income    
+- fire.savingAmount - sparebeløp. Hvor mye du kan spare pr år. Medberegnet avdrag men ikke renter.Regnes på assets av typen $fireSavingTypes[house, rental, cabin, crypto, fond, stock, otp, ask, pension]
+- fire.savingRateDecimal - savingAmount / income    
 
 
 ### Example simple config

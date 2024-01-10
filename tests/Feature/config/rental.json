@@ -14,7 +14,7 @@
             "name": "My house",
             "description": "Here I live",
             "active" : true,
-            "tax": "house"
+            "tax": "rental"
         },
         "2023": {
             "asset": {

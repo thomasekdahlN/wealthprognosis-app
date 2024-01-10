@@ -11,7 +11,7 @@
         "meta" : {
             "type": "rental",
             "group": "private",
-            "name": "My house",
+            "name": "Rental",
             "description": "Rental",
             "active" : true,
             "tax": "rental"
@@ -60,6 +60,7 @@
             "asset": {
                 "marketAmount": 2100000,
                 "changerate": "changerates.fond",
+                "rule": "+5000",
                 "description": "",
                 "repeat": true
             }

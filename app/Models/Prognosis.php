@@ -41,6 +41,7 @@ class Prognosis
     public $statisticsH = [];
 
     //FIX: Kanskje feil å regne inn otp her? Der kan man jo ikke velge.
+    //Assets som man kan selge deler av hvert år for å finansiere FIRE. Huset ditt kan du f.eks ikke selge deler av. Dette brukes for å beregne potensiell inntekt fra salg av disse assets.
     public $firePartSalePossibleTypes = [
         'crypto' => true,
         'fond' => true,
@@ -49,7 +50,7 @@ class Prognosis
         'ask' => true,
         'pension' => true,
     ];
-
+//Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
     public $fireSavingTypes = [
         'house' => true,
         'rental' => true,
@@ -57,7 +58,7 @@ class Prognosis
         'crypto' => true,
         'fond' => true,
         'stock' => true,
-        'otp' => false,
+        'otp' => true,
         'ask' => true,
         'pension' => true,
     ];
@@ -222,8 +223,8 @@ class Prognosis
                     $firsttime = false;
                 }
 
-                [$assetChangeratePercent, $assetChangerateDecimal, $assetChangerateAmount, $assetExplanation1] = $this->changerate->getChangerate(true, $assetChangerate, $year, $assetChangerateAmount);
-                print "$year: $assetChangeratePercent%\n";
+                [$assetChangeratePercent, $assetChangerateDecimal, $assetChangerateAmount, $assetExplanation1] = $this->changerate->getChangerate(false, $assetChangerate, $year, $assetChangerateAmount);
+                //print "$year: $assetChangeratePercent%\n";
 
                 //print "\nAsset før: $assetname.$year assetPrevAmount:$assetMarketPrevAmount assetMarketAmount:$assetMarketAmount, assetRule:$assetRule\n";
                 [$assetMarketAmount, $assetDiffAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(false, $year, $assetMarketAmount, 0, $assetRule, $assetTransfer, $assetSource, 1);
@@ -300,6 +301,7 @@ class Prognosis
                 [$assetTaxableAmount, $assetTaxAmount, $assetTaxableDecimal, $assetTaxDecimal] = $this->tax->taxCalculationFortune($taxtype, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
 
                 [$realizationTaxableAmount, $realizationTaxAmount, $realizationTaxPercent] = $this->tax->taxCalculationRealization(false, $taxtype, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetFirstYear);
+                $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
 
                 //Vi må trekke fra formuesskatten fra cashflow
                 //$cashflow -= $assetTaxAmount;
@@ -348,6 +350,7 @@ class Prognosis
                     'transfer' => $assetTransfer,
                     'source' => $assetSource,
                     'repeat' => $assetRepeat,
+                    'realizationAmount' => $realizationAmount,
                     'realizationTaxableAmount' => $realizationTaxableAmount,
                     'realizationTaxAmount' => $realizationTaxAmount,
                     'realizationTaxDecimal' => $realizationTaxPercent,
@@ -624,43 +627,52 @@ class Prognosis
     {
     }
 
+    public function getAssetMetaFromPath($path, $type) {
+        $value = null;
+        $year = null;
+        $assetname = null;
+
+        if(preg_match('/(\w+).(\d+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
+            //print_r($matchesH);
+            $year = $matchesH[2][0];
+            $assetname = $matchesH[1][0];
+            $value = $this->ArrGet("$assetname.meta.$type");
+        } else {
+            echo "ERROR with path: $path\n";
+        }
+        return [$assetname, $year, $value];
+    }
+
     public function postProcessCashFlowYearly(string $path)
     {
         //post processing cashflow will ensure cashflow and tax is calculated correctly even after transfer/source/calculations out of sequence
         //echo "postProcessCashFlowYearly: $path\n";
 
-        if (preg_match('/(\w+).(\d+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
-            //print_r($matchesH);
-            $year = $matchesH[2][0];
-            $assetname = $matchesH[1][0];
-            $taxtype = $this->ArrGet("$assetname.meta.tax");
-            //print_r($this->ArrGet("$assetname.meta"));
+        [$assetname, $year, $taxtype] = $this->getAssetMetaFromPath($path, 'tax');
+        $prevYear = $year - 1;
 
-            //print "$assetname.taxtype: $taxtype\n";
-            //Free money to spend
-            [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxtype, $year, $this->ArrGet("$path.income.amount"), $this->ArrGet("$path.expence.amount"));
+        //Free money to spend
+        [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxtype, $year, $this->ArrGet("$path.income.amount"), $this->ArrGet("$path.expence.amount"));
 
-            $cashflowBeforeTaxAmount =
+        $cashflowBeforeTaxAmount =
+            $this->ArrGet("$path.income.amount")
+            - $this->ArrGet("$path.expence.amount");
+
+        $cashflowAfterTaxAmount =
                 $this->ArrGet("$path.income.amount")
-                - $this->ArrGet("$path.expence.amount");
+                - $this->ArrGet("$path.expence.amount") //cashflow basis = inntekt - utgift.
+                - $cashflowTaxAmount //Minus skatt på cashflow (Kan være både positiv og negativ)
+                - $this->ArrGet("$path.asset.taxAmount") //Minus formuesskatt
+                - $this->ArrGet("$path.asset.propertyTaxAmount") //Minus eiendomsskatt
+                - $this->ArrGet("$path.mortgage.termAmount"); //Minus terminbetaling på lånet
+        +$this->ArrGet("$path.mortgage.taxDeductableAmount"); //Plus skattefradrag på renter
 
-            $cashflowAfterTaxAmount =
-                    $this->ArrGet("$path.income.amount")
-                    - $this->ArrGet("$path.expence.amount") //cashflow basis = inntekt - utgift.
-                    - $cashflowTaxAmount //Minus skatt på cashflow (Kan være både positiv og negativ)
-                    - $this->ArrGet("$path.asset.taxAmount") //Minus formuesskatt
-                    - $this->ArrGet("$path.mortgage.termAmount"); //Minus terminbetaling på lånet
-            +$this->ArrGet("$path.mortgage.taxDeductableAmount"); //Plus skattefradrag på renter
-
-            Arr::set($this->dataH, "$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
-            Arr::set($this->dataH, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
-            Arr::set($this->dataH, "$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount);  //FIX: Cashflow is not accumulated now
-            Arr::set($this->dataH, "$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount);  //FIX: Cashflow is not accumulated now
-            Arr::set($this->dataH, "$path.cashflow.taxAmount", $cashflowTaxAmount);
-            Arr::set($this->dataH, "$path.cashflow.taxDecimal", $cashflowTaxPercent);
-        } else {
-            echo "ERROR with path\n";
-        }
+        Arr::set($this->dataH, "$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
+        Arr::set($this->dataH, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
+        Arr::set($this->dataH, "$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.beforeTaxAggregatedAmount"));  //FIX: Cashflow is not accumulated now
+        Arr::set($this->dataH, "$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.afterTaxAggregatedAmount"));  //FIX: Cashflow is not accumulated now
+        Arr::set($this->dataH, "$path.cashflow.taxAmount", $cashflowTaxAmount);
+        Arr::set($this->dataH, "$path.cashflow.taxDecimal", $cashflowTaxPercent);
     }
 
     /**
@@ -679,16 +691,34 @@ class Prognosis
             Arr::set($this->dataH, "$path.asset.mortageRateDecimal", 0);
         }
     }
-
+    /**
+     * Performs post-processing for the income potential as seen from a Bank
+     * This function calculates the potential maximum loan a user can handle based on their income
+     *
+     * @param string $path The path to the asset in the data structure. The path is in the format 'assetname.year'.
+     *
+     * @return void
+     */
     public function postProcessPotentialYearly(string $path)
     {
-        //Calculate the potential max loan you can handle base on income, tax adjusted - as seen from the bank.
-        //print "$assetname - p:$potentialIncome = i:$incomeAmount - t:$CashflowTaxableAmount\n";
-        //FIX: Should it be adjusted for different types of assets. Ie rental is income /12 * 10 (only get calculated for 10 months income on rental)
+        // Retrieve the year and tax type from the asset metadata.
+        [$assetname, $year, $taxtype] = $this->getAssetMetaFromPath($path, 'tax');
 
+        // Retrieve the income amount for the asset.
         $potentialIncomeAmount = $this->ArrGet("$path.income.amount");
+
+        // If the tax type is 'rental', the potential income is calculated for 10 months only.
+        if ($taxtype == 'rental') {
+            $potentialIncomeAmount = $potentialIncomeAmount / 12 * 10; //Only get calculated for 10 months income on rental
+        }
+        $potentialIncomeAmount -= $this->ArrGet("$path.mortgage.termAmount"); //Minus låne utgifter
+        // All other income counts as income, no tax or expense deducted.
+
+        // Set the potential income amount in the data structure.
         Arr::set($this->dataH, "$path.potential.incomeAmount", $potentialIncomeAmount);
-        Arr::set($this->dataH, "$path.potential.mortgageAmount", $potentialIncomeAmount * 5); //The bank will loand you 5 times the income.
+
+        // Calculate the potential mortgage amount (the bank will loan you 5 times the income) and set it in the data structure.
+        Arr::set($this->dataH, "$path.potential.mortgageAmount", $potentialIncomeAmount * 5); //The bank will loan you 5 times the income.
     }
 
     /**
@@ -741,16 +771,18 @@ class Prognosis
         //Calculate FIRE Savings amount
         $fireSavingAmount = 0;
         if (Arr::get($this->fireSavingTypes, $meta['type'])) {
-            $fireSavingAmount = $incomeAmount; //If this asset is a valid saving asset, we add it to the saving amount.
+            print "FIRE SAVING: $assetname: " . $meta['type'] . " : $incomeAmount \n";
+            $fireSavingAmount = $incomeAmount - $this->ArrGet("$path.mortgage.interestAmount"); //Renter is not saving, but prinicpal is
         }
 
         //##############################################################
         //Calculate FIRE Savings rate
         //Sparerate = Det du nedbetaler i gjeld + det du sparer eller investerer på andre måter / total inntekt (etter skatt).
-        $fireSavingRate = 0;
+        $fireSavingRateDecimal = 0;
         //ToDo: Should this be income adjusted for deductions and tax?
         if ($incomeAmount > 0) {
-            $fireSavingRate = $fireSavingAmount / $incomeAmount;
+            $fireSavingRateDecimal = ($fireSavingAmount / $incomeAmount) * 100;
+            print "FIRE SAVING RATE: $fireSavingRateDecimal = $fireSavingAmount / $incomeAmount\n";
         }
 
         $this->dataH[$assetname][$year]['fire'] = [
@@ -760,7 +792,7 @@ class Prognosis
             'diffPercent' => $fireDiffPercent,
             'cashFlowAmount' => $fireCashFlowAmount,
             'savingAmount' => $fireSavingAmount,
-            'savingRate' => $fireSavingRate,
+            'savingRateDecimal' => $fireSavingRateDecimal,
         ];
     }
 
