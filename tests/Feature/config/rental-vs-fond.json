@@ -1,0 +1,68 @@
+{
+    "meta": {
+        "name": "John Doe",
+        "birthYear": "1985",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "82"
+    },
+    "house": {
+        "meta" : {
+            "type": "rental",
+            "group": "private",
+            "name": "My house",
+            "description": "Rental",
+            "active" : true,
+            "tax": "rental"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": 3200000,
+                "changerate": "changerates.rental",
+                "description": "",
+                "repeat": true
+            },
+            "income": {
+                "name": "Rental",
+                "description": "Rental 13250 pr month",
+                "amount": 13250,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Husleie + eiendomsgebyr",
+                "amount": 3100,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 1100000,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "years": 20
+            }
+        }
+    },
+    "fond": {
+        "meta" : {
+            "type": "fond",
+            "group": "private",
+            "name": "fond",
+            "description": "",
+            "active": true,
+            "tax": "fond"
+        },
+        "2024": {
+            "asset": {
+                "marketAmount": 2100000,
+                "changerate": "changerates.fond",
+                "description": "",
+                "repeat": true
+            }
+        }
+    }
+}

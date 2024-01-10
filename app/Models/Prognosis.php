@@ -8,7 +8,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 class Prognosis
 {
@@ -157,7 +156,7 @@ class Prognosis
 
                 //#######################################################################################################
                 //Expence
-                $expenceAmount = $this->configOrPrevValue(true, $assetname, $year, 'expence', 'amount');
+                $expenceAmount = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'amount');
                 $expenceFactor = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'factor'); //We do not store this in dataH, we only use it to upscale amounts once to yearly amounts
                 $expenceRule = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'rule');
                 $expenceTransfer = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'transfer');
@@ -165,9 +164,9 @@ class Prognosis
                 $expenceRepeat = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'repeat');
                 $expenceChangerate = $this->configOrPrevValue(false, $assetname, $year, 'expence', 'changerate');
 
-                echo "Expence adjust before: $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
-                [$expenceAmount, $expenceDepositedAmount, $expenceRule, $explanation] = $this->applyRule(true, $year, $expenceAmount, 0, $expenceRule, $expenceTransfer, $expenceSource, $expenceFactor);
-                echo "Expence adjust after : $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
+                #echo "Expence adjust before: $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
+                [$expenceAmount, $expenceDepositedAmount, $expenceRule, $explanation] = $this->applyRule(false, $year, $expenceAmount, 0, $expenceRule, $expenceTransfer, $expenceSource, $expenceFactor);
+                #echo "Expence adjust after : $assetname.$year, expenceAmount:$expenceAmount, expenceRule: $expenceRule\n";
                 //print "$year: expenceChangeratePercent = $expenceChangerateDecimal - expence * $expence\n";
 
                 [$expenceChangeratePercent, $expenceChangerateDecimal, $expenceChangerateAmount, $expenceExplanation] = $this->changerate->getChangerate(false, $expenceChangerate, $year, $expenceChangerateAmount);
@@ -222,11 +221,11 @@ class Prognosis
                     $firsttime = false;
                 }
 
-                [$assetChangeratePercent, $assetChangerateDecimal, $assetChangerateAmount, $assetExplanation1] = $this->changerate->getChangerate(false, $assetChangerate, $year, $assetChangerateAmount);
-                //print "$year: " . $this->changerate->decimalToDecimal($assetChangerateDecimal) . "\n";
+                [$assetChangeratePercent, $assetChangerateDecimal, $assetChangerateAmount, $assetExplanation1] = $this->changerate->getChangerate(true, $assetChangerate, $year, $assetChangerateAmount);
+                print "$year: $assetChangeratePercent%\n";
 
                 //print "\nAsset før: $assetname.$year assetPrevAmount:$assetMarketPrevAmount assetMarketAmount:$assetMarketAmount, assetRule:$assetRule\n";
-                [$assetMarketAmount, $assetDiffAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(true, $year, $assetMarketAmount, 0, $assetRule, $assetTransfer, $assetSource, 1);
+                [$assetMarketAmount, $assetDiffAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(false, $year, $assetMarketAmount, 0, $assetRule, $assetTransfer, $assetSource, 1);
                 //print "Asset etter: $assetname.$year assetMarketAmount: $assetMarketAmount, paidExtraAmount: $paidExtraAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
 
                 if ($firsttime) {
@@ -307,7 +306,8 @@ class Prognosis
                 //#######################################################################################################
                 //Store all data in the dataH structure
                 $this->dataH[$assetname][$year]['income'] = [
-                    'changerate' => $incomeChangeratePercent,
+                    'changerate' => $incomeChangerate,
+                    'changeratePercent' => $incomeChangeratePercent,
                     'rule' => $incomeRule,
                     'transfer' => $incomeTransfer,
                     'source' => $incomeSource,
@@ -317,7 +317,8 @@ class Prognosis
                 ];
 
                 $this->dataH[$assetname][$year]['expence'] = [
-                    'changerate' => $expenceChangeratePercent,
+                    'changerate' => $expenceChangerate,
+                    'changeratePercent' => $expenceChangeratePercent,
                     'rule' => $expenceRule,
                     'transfer' => $expenceTransfer,
                     'source' => $expenceSource,
@@ -340,7 +341,8 @@ class Prognosis
                     'taxableAmountOverride' => $assetTaxableAmountOverride,
                     'taxDecimal' => $assetTaxDecimal,
                     'taxAmount' => $assetTaxAmount,
-                    'changerate' => $assetChangeratePercent,
+                    'changerate' => $assetChangerate,
+                    'changeratePercent' => $assetChangeratePercent,
                     'rule' => $assetNewRule,
                     'transfer' => $assetTransfer,
                     'source' => $assetSource,
@@ -526,6 +528,7 @@ class Prognosis
 
         //Trouble with bool handling here, and with amounts that are 0.0 (since amounts is set default to 0 so calculations shall work.
         //Isset is false if value is null, but it is true if value is 0 - thats why we need to check it it is numeric, and then check if it is 0.- then we try to get data from the dataH
+        //FIX: Problem with amount reset to zero, if repeat=true. Because we do not know the difference if it is not set or if it is really set o 0, since we default to zero, but need it always returning integer/float for calculations
         if ((! isset($value) && $repeat) || (is_numeric($value) && $value == 0 && $repeat)) {
             $value = $this->ArrGet("$assetname.$prevYear.$type.$variable"); //Retrive value from dataH previous year only if repeat is true
             if ($debug) {

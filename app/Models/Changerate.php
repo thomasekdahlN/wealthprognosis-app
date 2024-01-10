@@ -25,22 +25,33 @@ class Changerate extends Model
 
         $file = "prognosis/$prognosis.json";
         $configH = json_decode(Storage::disk('local')->get($file), true);
-        echo "Leser: '$file'\n";
+        echo "Leser prognose fra : '$file'\n";
+        //dd($configH['rental']);
+
 
         foreach ($configH as $type => $typeH) {
+
             $prevChangerate = 0;
             for ($year = $startYear; $year <= $stopYear; $year++) {
-                //print "$type.$year = " . Arr::get($configH, "$type.$year", null) . "\n";
-
                 $changerate = Arr::get($configH, "$type.$year", null);
+
+                if($type == 'rrental') {
+                    print "$type.$year = " . Arr::get($configH, "$type.$year", null) . "\n";
+                }
+
                 if (isset($changerate)) {
                     $prevChangerate = $changerate;
                 } else {
                     $changerate = $prevChangerate;
                 }
+                if($type == 'rrental') {
+                    print "$type.$year = $changerate\n";
+                }
+
                 $this->changerateH[$type][$year] = $changerate;
             }
         }
+        //dd($this->changerateH['rental']);
     }
 
     /**

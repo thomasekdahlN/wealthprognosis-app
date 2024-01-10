@@ -102,30 +102,29 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * salary
 
 ### On the wishlist:
+- skatt på inntekt
+- potential - riktig algoritme
+- FIRE beløp - riktige algoritmer.
+- Vise akkumulert cashflow igjen (og beregne den riktig), 
+- Vise eiendomsskatt i kroner og % av verdi
+- Support for eiendomsskatt
+- Beregne skatt på realisasjon av asset (ved transfer og pr år)
+- transferAmount må kunne registreres+/-.(for å gjennomføre neste punkt)
+- overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
+- ekstra nedbetaling på lån (men ikke forkorte lån)
 - Support for skjermingsfradrag
-- Support for correct taxt calculation on sale and part sale or transfer of assets
-- Support for extra downpayments for loans, also reducing the length of the loan
-- Fortune tax - check that it is correct
 - F.I.R.E - Use up percentage of partly sellable assets from wishPensionYear to DeathYear
-- Showing all values compared to KPI index (relative value) and how we perform compared to kpi
-
-- FIRE uttak beregnes fra wishPenison year inn i inntekt på person. Skatteberegnes også?
-- Er OTP uttak skattbart? Sjekk og juster.
-- Graf som viser formuen (fratrukket gjeld) i % fordelt på ulike grupper assets. Eiendom, fond, krypto, råvarer, aksjer, kontanter, pensjon
 - F.I.R.E Sparerate
-- FIRE asset usage is not deducted from the asset value, it probably should.
 - Klassifisere F.I.R.E oppnåelse pr år
-- Tax configuration pr year and for different countries
+
+Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)
+
+#### Not a priority, but have been thinking of it.
+- Showing all values compared to KPI index (relative value) and how we perform compared to kpi
+- Tax configuration pr year and countries (support for more than norwegian tax regime)
 - Refactoring and cleanup of code
 - Retrieving asset values from API, like Crypto/Fond/stocks
-
-Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med)
-
-Hvis en transfer blir gjort, må alt regnes på nytt på både fra og til asset siden verdi er påvirket, En transfer må også gjøre skatteberegninger som en realisasjon.
-
-Summere riktige verdier for hva man har gitt minus det man tar ut - for riktig skatteberegning (separat felt)
-Summere riktig skattefradrag basert på rente og alder.
-Riktig skatt på realisasjon
+- Summere riktig skattefradrag basert på rente og alder på hus og hytter 
 
 ## Config
 
@@ -212,7 +211,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - expence.transferedAmount - Hva du har overført til/fra expence
 
 #### Cashflow
-- cashflow.beforeTaxAmount = income.amount - expence.amount
+- cashflow.beforeTaxAmount = income.amount - expence.amount - cashflowTaxAmount - asset.taxAmount - mortgage.termAmount + mortgage.taxDeductableAmount
 - cashflow.afterTaxAmount = cashflow.beforeTaxAmount - cashflow.taxYearlyAmount
 - cashflow.beforeTaxAggregatedAmount += cashflow.beforeTaxAccumulatedAmount
 - cashflow.afterTaxAggregatedAmount += cashflow.afterTaxAccumulatedAmount
@@ -231,7 +230,6 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - mortgage.gebyrAmount - gebyr pr år
 - mortgage.taxDeductableAmount - fradrag
 - mortgage.taxDeductableDecimal - fradrag i prosent
-
 - mortgage.description - beskrivelse av lånet
 
 #### asset
@@ -241,7 +239,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.equityAmount - Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
 - asset.paidAmount - Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.
 - asset.transferedAmount - Hva du har overført til/fra denne asset
-- asset.mortageRateDecimal- Hvor mye av en asset som er lånt
+- asset.mortageRateDecimal- Hvor mye i % av en asset som er lånt. Belåningsgrad. 
 - asset.taxableDecimal - Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av
 - asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av
 - asset.taxableAmountOverride - Auto: Set to true for all coming years if it finds a asset.taxableAmount 
@@ -275,7 +273,7 @@ Før eller etter skatt her?
 - fire.savingRate - savingAmount / income    
 
 
-### Example config
+### Example simple config
 
 {
 "meta": {

@@ -101,12 +101,12 @@ class PrognosisAssetSheet2
             $this->worksheet->setCellValue("A$this->rows", $year);
             $this->worksheet->setCellValue("B$this->rows", (int) $year - Arr::get($this->config, 'meta.birthYear'));
             $this->worksheet->setCellValue("C$this->rows", Arr::get($data, 'income.amount'));
-            if (Arr::get($data, 'income.changerate') != 0 && Arr::get($data, 'income.amount') > 0) {
-                $this->worksheet->setCellValue("D$this->rows", $this->percentToExcel(Arr::get($data, 'income.changerate')));
+            if (Arr::get($data, 'income.changeratePercent') != 0 && Arr::get($data, 'income.amount') > 0) {
+                $this->worksheet->setCellValue("D$this->rows", $this->percentToExcel(Arr::get($data, 'income.changeratePercent')));
             }
             $this->worksheet->setCellValue("E$this->rows", Arr::get($data, 'expence.amount'));
-            if (Arr::get($data, 'expence.changerate') != 0 && Arr::get($data, 'expence.amount') > 0) {
-                $this->worksheet->setCellValue("F$this->rows", $this->percentToExcel(Arr::get($data, 'expence.changerate')));
+            if (Arr::get($data, 'expence.changeratePercent') != 0 && Arr::get($data, 'expence.amount') > 0) {
+                $this->worksheet->setCellValue("F$this->rows", $this->percentToExcel(Arr::get($data, 'expence.changeratePercent')));
             }
 
             $this->worksheet->setCellValue("G$this->rows", Arr::get($data, 'cashflow.taxAmount'));
@@ -129,8 +129,8 @@ class PrognosisAssetSheet2
             }
 
             $this->worksheet->setCellValue("P$this->rows", Arr::get($data, 'asset.marketAmount'));
-            if (Arr::get($data, 'asset.changerate') != 0 && Arr::get($data, 'asset.marketAmount') > 0) {
-                $this->worksheet->setCellValue("Q$this->rows", $this->percentToExcel(Arr::get($data, 'asset.changerate')));
+            if (Arr::get($data, 'asset.changeratePercent') != 0 && Arr::get($data, 'asset.marketAmount') > 0) {
+                $this->worksheet->setCellValue("Q$this->rows", $this->percentToExcel(Arr::get($data, 'asset.changeratePercent')));
             }
             $this->worksheet->setCellValue("R$this->rows", Arr::get($data, 'asset.marketMortgageDeductedAmount'));
 
