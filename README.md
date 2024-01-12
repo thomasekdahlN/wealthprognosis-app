@@ -103,14 +103,11 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 
 ### On the wishlist:
 - FIRE beløp -Rule/transfer må telle som innskudd.
-- Eiendomsskatt algoritme og oppsett. (Visning er ok nå)
 - Beregne skatt på realisasjon av asset (ved transfer og pr år)
 - transferAmount må kunne registreres+/-.(for å gjennomføre neste punkt)
 - overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
 - ekstra nedbetaling på lån (men ikke forkorte lån)
 - Support for skjermingsfradrag
-- F.I.R.E - Use up 4% of partly sellable assets from wishPensionYear to DeathYear to see how it handles.
-
 
 #### Not a priority, but have been thinking of it.
 - Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)- 
@@ -120,6 +117,8 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 - Refactoring and cleanup of code
 - Retrieving asset values from API, like Crypto/Fond/stocks
 - Summere riktig skattefradrag basert på rente og alder på hus og hytter 
+- Support for property tax with different setting spr asset (du to different places having different taxes. Both tax percent and standardDeduction). Deduction for property tax for rentals is not handled.
+- F.I.R.E - Use up 4% of partly sellable assets from wishPensionYear to DeathYear to see how it handles. Not needed anymore since using up a divisor of your assets (1/10) until you die is a better way to use up sellable assets.
 
 ## Config
 
