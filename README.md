@@ -237,15 +237,17 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.mortageRateDecimal- Hvor mye i % av en asset som er lånt. Belåningsgrad. 
 - asset.taxableDecimal - Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av
 - asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av
-- asset.taxableAmountOverride - Auto: Set to true for all coming years if it finds a asset.taxableAmount 
+- asset.taxableAmountOverride - Auto: Set to true for all coming years if it finds a asset.taxableAmount the first year.
 - asset.taxDecimal - Prosent skatt på asset op en assets skattbare verdi
 - asset.taxAmount - Kroner skatt på asset op en assets skattbare verdi
 - asset.changerate - Hvor mye en asset endrer seg i verdi pr år
 - asset.rule
 - asset.transfer
 - asset.repeat
-- asset.propertyTaxAmount - Eiendomsskatt i kroner. Beregnes av asset.marketAmount.
-- asset.propertyTaxDecimal - Eiendomsskatt i prosent
+- asset.taxablePropertyDecimal -  Skattbar prosent - Antall prosent av markedsverdien til en asset det skal beregnes eiendomsskatt av
+- asset.taxablePropertyAmount- Skattbart beløp - Antall kroner av markedsverdien til en asset det skal betales eiendomsskatt av (både % og bunnfradrad hensyntatt)
+- asset.taxPropertyAmount - Eiendomsskatt i kroner. Beregnes av asset.marketAmount.
+- asset.taxPropertyDecimal - Eiendomsskatt i prosent
 - asset.realizationAmount - Beløpet man sitter igjen med etter et salg = asset.marketAmount - asset.realizationTaxAmount
 - asset.realizationTaxableAmount - Skattbart beløp ved realisering av asset = asset.marketAmount - asset.acquisitionAmount
 - asset.realizationTaxAmount - Skattbart beløp ved realisering av asset = asset.realizationTaxableAmount * asset.realizationTaxDecimal

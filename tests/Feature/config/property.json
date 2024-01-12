@@ -14,7 +14,8 @@
             "name": "My property",
             "description": "Here I rent out the house",
             "active" : true,
-            "tax": "rental"
+            "tax": "rental",
+            "taxProperty": "property"
         },
         "2023": {
             "asset": {

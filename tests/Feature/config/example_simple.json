@@ -72,7 +72,7 @@
             "name": "Folketrygden",
             "description": "Folketrygden",
             "active": true,
-            "tax": "income"
+            "tax": "pension"
         },
         "$pensionOfficialYear": {
             "income": {

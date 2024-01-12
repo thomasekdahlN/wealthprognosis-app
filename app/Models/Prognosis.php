@@ -50,6 +50,7 @@ class Prognosis
         'ask' => true,
         'pension' => true,
     ];
+
 //Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
     public $fireSavingTypes = [
         'house' => true,
@@ -63,6 +64,7 @@ class Prognosis
         'pension' => true,
     ];
 
+    //Assetene vi viser frem i statistikken (i % av investeringene)
     public $assetSpreadTypes = [
         'boat' => true,
         'car' => true,
@@ -298,7 +300,7 @@ class Prognosis
                 //Tax calculations
                 //print "$taxtype.$year incomeCurrentAmount: $incomeAmount, expenceCurrentAmount: $expenceAmount\n";
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                [$assetTaxableAmount, $assetTaxAmount, $assetTaxableDecimal, $assetTaxDecimal] = $this->tax->taxCalculationFortune($taxtype, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
+                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->tax->taxCalculationFortune($taxtype, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
 
                 [$realizationTaxableAmount, $realizationTaxAmount, $realizationTaxPercent] = $this->tax->taxCalculationRealization(false, $taxtype, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetFirstYear);
                 $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
@@ -344,6 +346,10 @@ class Prognosis
                     'taxableAmountOverride' => $assetTaxableAmountOverride,
                     'taxDecimal' => $assetTaxDecimal,
                     'taxAmount' => $assetTaxAmount,
+                    'taxablePropertyDecimal' => $assetTaxablePropertyPercent,
+                    'taxablePropertyAmount' => $assetTaxablePropertyAmount,
+                    'taxPropertyDecimal' => $assetTaxPropertyDecimal,
+                    'taxPropertyAmount' => $assetTaxPropertyAmount,
                     'changerate' => $assetChangerate,
                     'changeratePercent' => $assetChangeratePercent,
                     'rule' => $assetNewRule,
@@ -663,7 +669,7 @@ class Prognosis
                 - $this->ArrGet("$path.expence.amount") //cashflow basis = inntekt - utgift.
                 - $cashflowTaxAmount //Minus skatt på cashflow (Kan være både positiv og negativ)
                 - $this->ArrGet("$path.asset.taxAmount") //Minus formuesskatt
-                - $this->ArrGet("$path.asset.propertyTaxAmount") //Minus eiendomsskatt
+                - $this->ArrGet("$path.asset.taxPropertyAmount") //Minus eiendomsskatt
                 - $this->ArrGet("$path.mortgage.termAmount"); //Minus terminbetaling på lånet
         +$this->ArrGet("$path.mortgage.taxDeductableAmount"); //Plus skattefradrag på renter
 
@@ -771,7 +777,7 @@ class Prognosis
         //Calculate FIRE Savings amount
         $fireSavingAmount = 0;
         if (Arr::get($this->fireSavingTypes, $meta['type'])) {
-            print "FIRE SAVING: $assetname: " . $meta['type'] . " : $incomeAmount \n";
+            //print "FIRE SAVING: $assetname: " . $meta['type'] . " : $incomeAmount \n";
             $fireSavingAmount = $incomeAmount - $this->ArrGet("$path.mortgage.interestAmount"); //Renter is not saving, but prinicpal is
         }
 
@@ -782,7 +788,7 @@ class Prognosis
         //ToDo: Should this be income adjusted for deductions and tax?
         if ($incomeAmount > 0) {
             $fireSavingRateDecimal = ($fireSavingAmount / $incomeAmount) * 100;
-            print "FIRE SAVING RATE: $fireSavingRateDecimal = $fireSavingAmount / $incomeAmount\n";
+            //print "FIRE SAVING RATE: $fireSavingRateDecimal = $fireSavingAmount / $incomeAmount\n";
         }
 
         $this->dataH[$assetname][$year]['fire'] = [

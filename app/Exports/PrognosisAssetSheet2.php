@@ -119,7 +119,7 @@ class PrognosisAssetSheet2
             }
 
             $this->worksheet->setCellValue("G$this->rows", Arr::get($data, 'cashflow.taxAmount'));
-            if (Arr::get($data, 'cashflow.taxDecimal') != 0) {
+            if (Arr::get($data, 'cashflow.taxAmount') != 0) {
                 $this->worksheet->setCellValue("H$this->rows", Arr::get($data, 'cashflow.taxDecimal'));
             }
             $this->worksheet->setCellValue("I$this->rows", Arr::get($data, 'mortgage.termAmount'));
@@ -156,10 +156,10 @@ class PrognosisAssetSheet2
                 $this->worksheet->setCellValue("X$this->rows", Arr::get($data, 'asset.taxDecimal'));
             }
 
-            $this->worksheet->setCellValue("Y$this->rows", Arr::get($data, 'asset.propertyTaxAmount'));
+            $this->worksheet->setCellValue("Y$this->rows", Arr::get($data, 'asset.taxPropertyAmount'));
 
-            if (Arr::get($data, 'asset.propertyTaxAmount') != 0) {
-                $this->worksheet->setCellValue("Z$this->rows", Arr::get($data, 'asset.propertyTaxDecimal'));
+            if (Arr::get($data, 'asset.taxPropertyAmount') > 0) {
+                $this->worksheet->setCellValue("Z$this->rows", Arr::get($data, 'asset.taxPropertyDecimal'));
             }
 
             $this->worksheet->setCellValue("AA$this->rows", Arr::get($data, 'asset.realizationAmount'));
@@ -170,7 +170,6 @@ class PrognosisAssetSheet2
             if (Arr::get($data, 'asset.realizationTaxableAmount') != 0) {
                 $this->worksheet->setCellValue("AD$this->rows", Arr::get($data, 'asset.realizationTaxDecimal'));
             }
-
 
             $this->worksheet->setCellValue("AE$this->rows", Arr::get($data, 'cashflow.afterTaxAmount'));
             $this->worksheet->setCellValue("AF$this->rows", Arr::get($data, 'cashflow.afterTaxAggregatedAmount'));
