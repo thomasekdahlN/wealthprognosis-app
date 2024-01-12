@@ -924,13 +924,13 @@ class Prognosis
     //FIX: Much better if we could use calculus here to reduce number of methods, but to advanced for the moment.
     public function groupFireSaveRate(int $year)
     {
-        if (Arr::get($this->totalH, "$year.fire.incomeAmount", 0) > 0) {
+        if (Arr::get($this->totalH, "$year.fire.savingAmount", 0) > 0) {
             Arr::set($this->totalH, "$year.fire.savingRate", Arr::get($this->totalH, "$year.fire.incomeAmount", 0) / Arr::get($this->totalH, "$year.fire.savingAmount", 0));
         }
-        if (Arr::get($this->companyH, "$year.fire.incomeAmount", 0) > 0) {
+        if (Arr::get($this->companyH, "$year.fire.savingAmount", 0) > 0) {
             Arr::set($this->companyH, "$year.fire.savingRate", Arr::get($this->companyH, "$year.fire.incomeAmount", 0) / Arr::get($this->companyH, "$year.fire.savingAmount", 0));
         }
-        if (Arr::get($this->privateH, "$year.fire.incomeAmount", 0) > 0) {
+        if (Arr::get($this->privateH, "$year.fire.savingAmount", 0) > 0) {
             Arr::set($this->privateH, "$year.fire.savingRate", Arr::get($this->privateH, "$year.fire.incomeAmount", 0) / Arr::get($this->privateH, "$year.fire.savingAmount", 0));
         }
         //FIX: Loop this out for groups.
