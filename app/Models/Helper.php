@@ -144,20 +144,22 @@ class Helper extends Model
         return [$diffAmount, $explanation];
     }
 
-    public function pathToElements($path) {
+    public function pathToElements($path)
+    {
         $assetname = null;
         $year = null;
         $type = null;
         $field = null;
 
-        if(preg_match('/(\w+).(\w+).(\w+).(\w+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
+        if (preg_match('/(\w+).(\w+).(\w+).(\w+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
             $assetname = $matchesH[1][0];
             $year = $matchesH[2][0];
             $type = $matchesH[3][0];
             $field = $matchesH[4][0];
         } else {
-            print "ERRROR: pathToElements($path)\n";
+            echo "ERRROR: pathToElements($path)\n";
         }
+
         return [$assetname, $year, $type, $field];
     }
 }

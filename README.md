@@ -103,10 +103,10 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * salary
 
 ### On the wishlist:
-- Ny konfig: Simulere på å bare betaler renter på lån og putte avdrag i fond, vs å betale ned lån.
-- Beregne skatt på realisasjon av asset (ved transfer og pr år)
-- overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
 - ekstra nedbetaling på lån (men ikke forkorte lån)
+- avdragsfritt lån.
+- Ny konfig: Simulere på å bare betaler renter på lån og putte avdrag i fond, vs å betale ned lån.
+- overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
 - Support for skjermingsfradrag
 
 #### Not a priority, but have been thinking of it.
@@ -168,7 +168,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - mortgage.interest - Required. rente i prosent. Recommended to use "changerates.interest" to get the interst prediction pr year and not hardcode it.
 - mortgage.years - Required. Hvor mange år skal lånet være
 - mortgage.gebyr - gebyr pr år
-- mortgage.paymentExtra - fradrag
+- mortgage.extraDownpaymentAmount - årlig ekstra nedbetaling på lån hele lånets løpetid.
 - mortgage.description - beskrivelse av lånet
 
 #### asset

@@ -65,12 +65,13 @@ class Amortization extends Model
         $this->period = $this->terms * $this->term_years;
         $this->balanceAmount = 0;
         $this->year_end = $year + $this->term_years;
+        $this->extraDownpaymentAmount = Arr::get($mortgage, 'extraDownpaymentAmount', 0); //Yearly extra downpayment
 
         if (isset($mortgages[$year + 1]) && $year + 1 < $this->year_end) {
             $this->year_end = $year;
         }
 
-        $this->getSchedule();
+        $this->calculateAmortizationSchedule();
     }
 
     /**
@@ -81,23 +82,21 @@ class Amortization extends Model
      * After the `calculate()` method is called, the loan amount is updated to be the current balance of the loan, and the period of the loan is decremented by one.
      * Once the amortization schedule has been calculated, the `assetChangerateValue` property is reset to `null`.
      */
-    public function getSchedule()
+    public function calculateAmortizationSchedule()
     {
         while ($this->balanceAmount >= 0 && $this->year_start <= $this->year_end) {
-            $this->calculate($this->year_start++);
+            echo "$this->year_start, period: $this->period, extraDownpaymentAmount: $this->extraDownpaymentAmount\n";
+            $this->calculate(true, $this->year_start++, $this->extraDownpaymentAmount);
             $this->remainingMortgageAmount = $this->balanceAmount;
             $this->period--;
         }
         $this->assetChangerateValue = null;
     }
 
-    private function calculate(int $year)
+    private function calculate(bool $debug, int $year, float $extraDownpaymentAmount = 0)
     {
-        //handle extra payment
-        $extraDownpaymentAmount = 0;
-        //$extraDownpaymentAmount = Arr::get($this->mortgageH,"$this->assettname.$year.cashflow.amount", 0); #Håndterer ikke ekstra innbetalinger pr nå
-
-        //New: Retrieving interest pr year.
+        $description = null;
+        //Retrieving interest pr year.
         [$interestPercent, $interestDecimal, $this->assetChangerateValue, $explanation] = $this->changerate->getChangerate(false, Arr::get($this->config, "$this->assettname.$year.mortgage.interest"), $year, $this->assetChangerateValue);
         $interestDecimal = $interestPercent / 100;
 
@@ -108,28 +107,39 @@ class Amortization extends Model
             $this->termAmount = ($this->remainingMortgageAmount * $interestDecimal) / $deno;
             $interestAmount = $this->remainingMortgageAmount * $interestDecimal;
 
-            //$this->principalAmount = $this->termAmount + $paymentExtra - $interestAmount ; //Experimental
-            $this->principalAmount = $this->termAmount - $interestAmount; //Normal
+            $this->principalAmount = $this->termAmount - $interestAmount + $extraDownpaymentAmount; //Beregn avdrag denne terminen, extra nedbetalign teller som avdrag.
+            $this->balanceAmount = $this->remainingMortgageAmount - $this->principalAmount; //Beregn gjenværende lånebeløp denne terminen
+            if ($this->balanceAmount > 0) {
 
-            //$this->balanceAmount = $this->remainingMortgageAmount - $this->principalAmount - $paymentExtra;
-            $this->balanceAmount = $this->remainingMortgageAmount - $this->principalAmount;
+                if ($debug) {
+                    echo "$year: $this->period : deno: $deno : $interestDecimal% = $interestDecimal : remainingMortgageAmount: " . round($this->remainingMortgageAmount) . ' termAmount: ' . round($this->termAmount) . ' : interestAmount ' . round($interestAmount) . ' : principalAmount: ' . round($this->principalAmount) . ' : balanceAmount: ' . round($this->balanceAmount) . "\n";
+                }
+                if ($extraDownpaymentAmount > 0) {
+                    $description .= " extraDownpaymentAmount: $extraDownpaymentAmount\n";
+                }
 
-            //print "$year: $this->period : deno: $deno : $interestDecimal% = $interestDecimal : remainingMortgageAmount: " . round($this->remainingMortgageAmount)  . " termAmount: " . round($this->termAmount)  . " : interestAmount " . round($interestAmount) . " : principalAmount: " . round($this->principalAmount) . " : balanceAmount: " . round($this->balanceAmount) . "\n";
-            $this->dataH[$this->assettname][$year]['mortgage'] = [
-                'amount' => round($this->amount),
-                'termAmount' => round($this->termAmount),
-                'interestDecimal' => $interestPercent / 100,
-                'interestAmount' => round($interestAmount),
-                'principalAmount' => round($this->principalAmount),
-                'balanceAmount' => round($this->balanceAmount),
-                'extraDownpaymentAmount' => $extraDownpaymentAmount,
-                'gebyrAmount' => 0,
-                'description' => '',
-            ];
+                $this->dataH[$this->assettname][$year]['mortgage'] = [
+                    'amount' => round($this->amount), //Opprinnelig lånebeløp
+                    'termAmount' => round($this->termAmount), //Terminbeløp (pr år)
+                    'interest' => $interestPercent,
+                    'interestDecimal' => $interestPercent / 100,
+                    'interestAmount' => round($interestAmount), //Renter
+                    'principalAmount' => round($this->principalAmount), //Avdrag
+                    'balanceAmount' => round($this->balanceAmount), //Gjenværende lånebeløpm mappes til amount på reberegning av lån.
+                    'extraDownpaymentAmount' => $extraDownpaymentAmount, //Extra innebtaling som er gjort dette året.
+                    'years' => $this->period, //Remaining years, if we need to recalculate
+                    'gebyrAmount' => 0,
+                    'description' => $description,
+                ];
+            }    else {
+                $this->balanceAmount = 0;
+                echo "Lucky you. Mortgage downpayment faster that configured\n";
+
+        }
 
         //print_r($this->dataH[$this->assettname][$year]['mortgage']);
-        //print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
-        //}
+            //print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
+            //}
         } else {
             echo "Problems with Amortization deno: $deno, interest is probably 0 in config or changerates\n";
         }
@@ -137,7 +147,7 @@ class Amortization extends Model
 
     public function getSummary()
     {
-        $this->calculate(0);
+        $this->calculate(0); //FIX??????
         $total_pay = $this->termAmount * $this->period;
         $total_interest = $total_pay - $this->remainingMortgageAmount;
 

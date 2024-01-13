@@ -28,15 +28,14 @@ class Changerate extends Model
         echo "Leser prognose fra : '$file'\n";
         //dd($configH['rental']);
 
-
         foreach ($configH as $type => $typeH) {
 
             $prevChangerate = 0;
             for ($year = $startYear; $year <= $stopYear; $year++) {
                 $changerate = Arr::get($configH, "$type.$year", null);
 
-                if($type == 'rrental') {
-                    print "$type.$year = " . Arr::get($configH, "$type.$year", null) . "\n";
+                if ($type == 'rrental') {
+                    echo "$type.$year = ".Arr::get($configH, "$type.$year", null)."\n";
                 }
 
                 if (isset($changerate)) {
@@ -44,8 +43,8 @@ class Changerate extends Model
                 } else {
                     $changerate = $prevChangerate;
                 }
-                if($type == 'rrental') {
-                    print "$type.$year = $changerate\n";
+                if ($type == 'rrental') {
+                    echo "$type.$year = $changerate\n";
                 }
 
                 $this->changerateH[$type][$year] = $changerate;

@@ -13,13 +13,12 @@ class Tax extends Model
 
     public $taxH = [];
 
-
     //Tax types where we check for propertyTax
     public $propertyTaxTypes = [
         'house' => true,
         'rental' => true,
         'cabin' => true,
-        'property' => true
+        'property' => true,
     ];
 
     //Will be rewritten to support yearly tax differences, just faking for now.
@@ -145,7 +144,7 @@ class Tax extends Model
 
         if (Arr::get($this->propertyTaxTypes, $taxtype)) {
             $taxablePropertyAmount = ($marketAmount - $taxPropertyStandardDeductionAmount) * $taxablePropertyPercent;
-            if($taxablePropertyAmount > 0 && $taxPropertyPercent > 0) {
+            if ($taxablePropertyAmount > 0 && $taxPropertyPercent > 0) {
                 $taxPropertyAmount = $taxablePropertyAmount * $taxPropertyPercent;
             } else {
                 $taxablePropertyPercent = 0;
