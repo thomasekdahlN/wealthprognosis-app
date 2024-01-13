@@ -104,7 +104,7 @@ class Amortization extends Model
         //print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
 
         if ($deno > 0) {
-            $this->termAmount = ($this->remainingMortgageAmount * $interestDecimal) / $deno;
+            $this->termAmount = ($this->remainingMortgageAmount * $interestDecimal) / $deno; //This makes the downpaymet go faster in years (instead of streatching it on the configured years), since we do not take into accoutn extra downpayments. Thats great.
             $interestAmount = $this->remainingMortgageAmount * $interestDecimal;
 
             $this->principalAmount = $this->termAmount - $interestAmount + $extraDownpaymentAmount; //Beregn avdrag denne terminen, extra nedbetalign teller som avdrag.
@@ -147,7 +147,7 @@ class Amortization extends Model
         }
     }
 
-    public function getSummary()
+    public function getSummaryXXXX()
     {
         $this->calculate(0); //FIX??????
         $total_pay = $this->termAmount * $this->period;
