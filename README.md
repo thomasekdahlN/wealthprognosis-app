@@ -103,11 +103,7 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * salary
 
 ### Functionality on the priority wishlist:
-- Ny konfig: Simulere på å bare betaler renter på lån og putte avdrag i fond, vs å betale ned lån.
 - ekstra nedbetaling på lån basert på en årlig variable ekstra innbetaling på lån fra en rule eller en transfer fra en annen asset
-- overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
-- 
-- 
 - Support for skjermingsfradrag
 
 #### Not a priority, but have been thinking of it.
