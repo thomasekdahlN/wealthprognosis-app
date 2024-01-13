@@ -1,49 +1,48 @@
 {
     "meta": {
         "name": "John Doe",
-        "birthYear": "1985",
+        "birthYear": "1995",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "70"
     },
     "house": {
         "meta" : {
             "type": "rental",
             "group": "private",
-            "name": "Rental",
-            "description": "Rental",
+            "name": "House",
+            "description": "House with normal mortgage, the rest is put into fund",
             "active" : true,
-            "tax": "rental"
+            "tax": "house"
         },
-        "2023": {
+        "2024": {
+            "income": {
+                "name": "Income",
+                "description": "Income",
+                "amount": 20000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
             "asset": {
-                "marketAmount": 3200000,
-                "changerate": "changerates.rental",
+                "marketAmount": 3000000,
+                "changerate": "changerates.house",
                 "description": "",
                 "repeat": true
             },
-            "income": {
-                "name": "Rental",
-                "description": "Rental 13250 pr month",
-                "amount": 13250,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Husleie + eiendomsgebyr",
-                "amount": 3100,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
             "mortgage": {
-                "amount": 1100000,
+                "amount": 1500000,
                 "interest": "changerates.interest",
                 "gebyr": 600,
                 "years": 20
+            },
+            "cashflow": {
+                "description": "We transfer the positive cashflow into a fund",
+                "rule": "100%",
+                "transfer": "fond.$year.asset.marketAmount",
+                "source": "",
+                "repeat": true
             }
         }
     },
@@ -58,9 +57,8 @@
         },
         "2024": {
             "asset": {
-                "marketAmount": 2100000,
+                "marketAmount": 1000,
                 "changerate": "changerates.fond",
-                "rule": "+5000",
                 "description": "",
                 "repeat": true
             }

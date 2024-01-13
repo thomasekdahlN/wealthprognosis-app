@@ -102,11 +102,12 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * rental
 * salary
 
-### On the wishlist:
-- avdragsfritt lån.
-- ekstra nedbetaling på lån basert på en årlig variable ekstra innebtaling på lån fra en rule eller en transfer fra en annen asset
+### Functionality on the priority wishlist:
 - Ny konfig: Simulere på å bare betaler renter på lån og putte avdrag i fond, vs å betale ned lån.
+- ekstra nedbetaling på lån basert på en årlig variable ekstra innbetaling på lån fra en rule eller en transfer fra en annen asset
 - overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
+- 
+- 
 - Support for skjermingsfradrag
 
 #### Not a priority, but have been thinking of it.
@@ -206,13 +207,16 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - expence.transferedAmount - Hva du har overført til/fra expence (fra transfer, source eller rule). Ikke changerate endringer.
 
 #### Cashflow
-- cashflow.beforeTaxAmount = income.amount - expence.amount - cashflowTaxAmount - asset.taxAmount - mortgage.termAmount + mortgage.taxDeductableAmount
-- cashflow.afterTaxAmount = cashflow.beforeTaxAmount - cashflow.taxYearlyAmount
+- cashflow.afterTaxAmount = income.amount - expence.amount - cashflowTaxAmount - asset.taxAmount - mortgage.termAmount + mortgage.taxDeductableAmount- tax taken into account
+- cashflow.beforeTaxAmount = cashflow.beforeTaxAmount - cashflow.taxYearlyAmount - Tax not calculated
 - cashflow.beforeTaxAggregatedAmount += cashflow.beforeTaxAccumulatedAmount
 - cashflow.afterTaxAggregatedAmount += cashflow.afterTaxAccumulatedAmount
 - cashflow.taxAmount - skatt beløp (could be positive or negative, deponds on income positive opr negative)
 - cashflow.taxDecimal - skatt prosent
 - cashflow.transferedAmount - Beløp du har overført til/fra. (fra transfer, source eller rule). Ikke changerate.
+- cashflow.rule - regler for hvordan beløpet skal beregnes
+- cashflow.transfer - overføring av positiv cashflow til en annen asset
+- cashflow.repeat - gjenta konfigurasjonen [cashflow.rule, cashflow.transfer, cashflow.repeat]for kommende år
 - cashflow.description - beskrivelse av cashflow
 
 #### mortgage - Lån

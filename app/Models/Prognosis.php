@@ -96,14 +96,16 @@ class Prognosis
         foreach ($this->config as $assetname => $assetconfig) {
 
             if ($assetname == 'meta') {
+                #print "--- Jump over meta $assetname\n";
                 continue;
             } //Hopp over metadata, reserved keyword meta.
-            echo "Asset: $assetname\n";
+            #echo "*** Asset: $assetname\n";
 
             //Store all metadata about the asset, the rest is yearly calculations
             $this->dataH[$assetname]['meta'] = $this->ArrGetConfig("$assetname.meta"); //Copy metadata into dataH
 
             if (! $this->ArrGetConfig("$assetname.meta.active")) {
+                #print "--- Asset $assetname is not active\n";
                 continue;
             } //Jump past inactive assets
 
@@ -150,6 +152,8 @@ class Prognosis
 
                 $prevYear = $year - 1;
                 $path = "$assetname.$year";
+
+                #echo "$path\n";
 
                 //#######################################################################################################
                 //TAX
@@ -221,7 +225,7 @@ class Prognosis
                 if ($this->ArrGet("$assetname.$prevYear.asset.marketAmount") <= 0 && $assetMarketAmount > 0) {
                     $assetFirstYear = $year;
                     $firsttime = true;
-                    echo "\n\nFirst time: $assetname.$year\n";
+                    #echo "\n\nFirst time: $assetname.$year\n";
                 } else {
                     $firsttime = false;
                 }
@@ -301,76 +305,131 @@ class Prognosis
                 //print "PAID: $assetname.$year.asset.paidAmount: " . $assetPaidAmount . " + curPaid: " . $this->ArrGet("$assetname.$year.asset.paidAmount") . " + prevPaid: " . $this->ArrGet("$assetname.$prevYear.asset.paidAmount") . " - assetEquityAmount: $assetEquityAmount\n";
 
                 //#######################################################################################################
-                //Tax calculations
+                //Asset tax calculations
                 //print "$taxtype.$year incomeCurrentAmount: $incomeAmount, expenceCurrentAmount: $expenceAmount\n";
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
                 [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->tax->taxCalculationFortune($taxtype, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
 
-                //If we sell the asset, how much money is left for us after tax?
-                [$realizationTaxableAmount, $realizationTaxAmount, $realizationTaxPercent] = $this->tax->taxCalculationRealization(false, $taxtype, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetFirstYear);
-                $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
 
-                //Vi må trekke fra formuesskatten fra cashflow
-                //$cashflow -= $assetTaxAmount;
+                //#######################################################################################################
+                //Check if we have any transfers from the cashflow - have to do it as the last thing.
+                //We have to calculate it before we can transfer from it. Could have been before asset in the sequence?
+                $cashflowRule = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'rule');
+                $cashflowTransfer = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'transfer');
+                $cashflowSource = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'source');
+                $cashflowRepeat = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'repeat');
+
+                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxtype, $year, $incomeAmount, $expenceAmount);
+
+                $cashflowBeforeTaxAmount =
+                    $incomeAmount
+                    - $expenceAmount;
+
+                $cashflowAfterTaxAmount =
+                    $incomeAmount
+                    - $expenceAmount //cashflow basis = inntekt - utgift.
+                    - $cashflowTaxAmount //Minus skatt på cashflow (Kan være både positiv og negativ)
+                    - $assetTaxAmount //Minus formuesskatt
+                    - $assetTaxPropertyAmount //Minus eiendomsskatt
+                    - $this->ArrGet("$path.mortgage.termAmount"); //Minus terminbetaling på lånet
+                +$this->ArrGet("$path.mortgage.taxDeductableAmount"); //Plus skattefradrag på renter
+
+                $cashflowNewRule = null;
+                if($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
+                    #print "  Cashflow-start: $assetname.$year, transferOrigin: $path.cashflow.afterTaxAmount, cashflowTransfer:$cashflowTransfer, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
+                    [$cashflowAfterTaxAmount, $cashflowDiffAmount, $cashflowNewRule, $cashflowExplanation] = $this->applyRule(false, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount, 0, $cashflowRule, $cashflowTransfer, $cashflowSource, 1);
+                    #print "  Cashflow-end  : $assetname.$year, transferOrigin: $path.cashflow.afterTaxAmount, cashflowTransfer:$cashflowTransfer, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
+                    //Amounts will probably be transfered to Assets here. So need to do a new calculation.
+                }
+
+                //#######################################################################################################
+                //If we sell the asset, how much money is left for us after tax? In sequence has to be after cashflow.
+                $assetMarketAmount += $this->ArrGet("$path.asset.transferedAmount");
+                $assetAcquisitionAmount += $this->ArrGet("$path.asset.transferedAmount");
+                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent] = $this->tax->taxCalculationRealization(false, $taxtype, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetFirstYear);
+                $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
 
                 //#######################################################################################################
                 //Store all data in the dataH structure
-                $this->dataH[$assetname][$year]['income'] = [
-                    'changerate' => $incomeChangerate,
-                    'changeratePercent' => $incomeChangeratePercent,
-                    'rule' => $incomeRule,
-                    'transfer' => $incomeTransfer,
-                    'source' => $incomeSource,
-                    'repeat' => $incomeRepeat,
-                    'amount' => $incomeAmount,
-                    'description' => $this->ArrGetConfig("$assetname.$year.income.description").$incomeExplanation,
-                ];
+                if($incomeAmount > 0) {
+                    $this->dataH[$assetname][$year]['income'] = [
+                        'changerate' => $incomeChangerate,
+                        'changeratePercent' => $incomeChangeratePercent,
+                        'rule' => $incomeRule,
+                        'transfer' => $incomeTransfer,
+                        'source' => $incomeSource,
+                        'repeat' => $incomeRepeat,
+                        'amount' => $incomeAmount,
+                        'description' => $this->ArrGetConfig("$assetname.$year.income.description") . $incomeExplanation,
+                    ];
+                }
 
-                $this->dataH[$assetname][$year]['expence'] = [
-                    'changerate' => $expenceChangerate,
-                    'changeratePercent' => $expenceChangeratePercent,
-                    'rule' => $expenceRule,
-                    'transfer' => $expenceTransfer,
-                    'source' => $expenceSource,
-                    'repeat' => $expenceRepeat,
-                    'amount' => $expenceAmount,
-                    'description' => $this->ArrGetConfig("$assetname.$year.expence.description").$expenceExplanation,
-                ];
+                if($expenceAmount > 0) {
+                    $this->dataH[$assetname][$year]['expence'] = [
+                        'changerate' => $expenceChangerate,
+                        'changeratePercent' => $expenceChangeratePercent,
+                        'rule' => $expenceRule,
+                        'transfer' => $expenceTransfer,
+                        'source' => $expenceSource,
+                        'repeat' => $expenceRepeat,
+                        'amount' => $expenceAmount,
+                        'description' => $this->ArrGetConfig("$assetname.$year.expence.description") . $expenceExplanation,
+                    ];
+                }
 
                 //print_r($this->dataH[$assetname][$year]['income']);
                 //Fix before and after tax cashflow calculations.
 
-                $this->dataH[$assetname][$year]['asset'] = [
-                    'marketAmount' => $assetMarketAmount,
-                    'acquisitionAmount' => $assetAcquisitionAmount,
-                    'marketMortgageDeductedAmount' => $assetMarketMortgageDeductedAmount,
-                    'equityAmount' => $assetEquityAmount,
-                    'paidAmount' => $assetPaidAmount,
-                    'taxableDecimal' => $assetTaxableDecimal,
-                    'taxableAmount' => $assetTaxableAmount,
-                    'taxableAmountOverride' => $assetTaxableAmountOverride,
-                    'taxDecimal' => $assetTaxDecimal,
-                    'taxAmount' => $assetTaxAmount,
-                    'taxablePropertyDecimal' => $assetTaxablePropertyPercent,
-                    'taxablePropertyAmount' => $assetTaxablePropertyAmount,
-                    'taxPropertyDecimal' => $assetTaxPropertyDecimal,
-                    'taxPropertyAmount' => $assetTaxPropertyAmount,
-                    'changerate' => $assetChangerate,
-                    'changeratePercent' => $assetChangeratePercent,
-                    'rule' => $assetNewRule,
-                    'transfer' => $assetTransfer,
-                    'source' => $assetSource,
-                    'repeat' => $assetRepeat,
-                    'realizationAmount' => $realizationAmount,
-                    'realizationTaxableAmount' => $realizationTaxableAmount,
-                    'realizationTaxAmount' => $realizationTaxAmount,
-                    'realizationTaxDecimal' => $realizationTaxPercent,
-                    'description' => $this->ArrGetConfig("$assetname.$year.asset.description").' Asset rule:'.$assetRule.' '.$assetExplanation1.$assetExplanation2,
-                ];
+                if($assetMarketAmount > 0 ) {
+                    $this->ArrSet("$path.asset.marketAmount", $assetMarketAmount);
+                    $this->ArrSet( "$path.asset.acquisitionAmount", $assetAcquisitionAmount);
+                    $this->ArrSet( "$path.asset.marketMortgageDeductedAmount", $assetMarketMortgageDeductedAmount + $this->ArrGet("$path.asset.transferedAmount"));
+                    $this->ArrSet( "$path.asset.equityAmount", $assetEquityAmount + $this->ArrGet("$path.asset.transferedAmount"));
+                    $this->ArrSet( "$path.asset.paidAmount", $assetPaidAmount + $this->ArrGet("$path.asset.transferedAmount"));
+                    $this->ArrSet( "$path.asset.taxableDecimal", $assetTaxableDecimal);
+                    $this->ArrSet( "$path.asset.taxableAmount", $assetTaxableAmount);
+                    $this->ArrSet( "$path.asset.taxableAmountOverride", $assetTaxableAmountOverride);
+                    $this->ArrSet( "$path.asset.taxDecimal", $assetTaxDecimal);
+                    $this->ArrSet( "$path.asset.taxAmount", $assetTaxAmount);
+                    if($assetTaxablePropertyAmount > 0) {
+                        $this->ArrSet( "$path.asset.taxablePropertyDecimal", $assetTaxablePropertyPercent);
+                        $this->ArrSet( "$path.asset.taxablePropertyAmount", $assetTaxablePropertyAmount);
+                    }
+                    if($assetTaxPropertyAmount > 0) {
+                        $this->ArrSet( "$path.asset.taxPropertyDecimal", $assetTaxPropertyDecimal);
+                        $this->ArrSet( "$path.asset.taxPropertyAmount", $assetTaxPropertyAmount);
+                    }
+                    $this->ArrSet( "$path.asset.changerate", $assetChangerate);
+                    $this->ArrSet( "$path.asset.changeratePercent", $assetChangeratePercent);
+                    if($assetNewRule) {
+                        $this->ArrSet( "$path.asset.rule", $assetNewRule);
+                    }
+                    if($assetTransfer) {
+                        $this->ArrSet( "$path.asset.transfer", $assetTransfer);
+                    }
+                    if($assetSource) {
+                        $this->ArrSet( "$path.asset.source", $assetSource);
+                    }
+                    $this->ArrSet( "$path.asset.repeat", $assetRepeat);
+                    $this->ArrSet( "$path.asset.realizationAmount", $realizationAmount);
+                    $this->ArrSet( "$path.asset.realizationTaxableAmount", $realizationTaxableAmount);
+                    $this->ArrSet( "$path.asset.realizationTaxAmount", $realizationTaxAmount);
+                    $this->ArrSet( "$path.asset.realizationTaxDecimal", $realizationTaxPercent);
+                    $this->ArrSet( "$path.asset.description", $this->ArrGetConfig("$assetname.$year.asset.description") . $this->ArrGet("$assetname.$year.asset.description") . ' Asset rule:' . $assetRule . ' ' . $assetExplanation1 . $assetExplanation2);
+                }
+
+                //Try to no process the same here as in the post processing step
+                $this->ArrSet( "$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
+                $this->ArrSet( "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
+                $this->ArrSet( "$path.cashflow.taxAmount", $cashflowTaxAmount);
+                $this->ArrSet( "$path.cashflow.taxDecimal", $cashflowTaxPercent);
+                $this->ArrSet( "$path.cashflow.rule", $cashflowNewRule);
+                $this->ArrSet( "$path.cashflow.transfer", $cashflowTransfer);
+                $this->ArrSet( "$path.cashflow.source", $cashflowSource);
+                $this->ArrSet( "$path.cashflow.repeat", $cashflowRepeat);
+                $this->ArrSet( "$path.cashflow.description", $this->ArrGetConfig("$assetname.$year.cashflow.description"));
 
             } //Year loop finished here.
-
-            $this->postProcess();
 
         } //End loop over assets
 
@@ -428,7 +487,7 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "    applyRule INPUT($year, amount: $amount, rule: $rule, transfer: $transferTo, source: $source factor: $factor)\n";
+            echo "    applyRule INPUT($originYear, amount: $amount, rule: $rule, transfer: $transferTo, source: $source factor: $factor)\n";
         }
 
         //##############################################################################################################
@@ -457,7 +516,7 @@ class Prognosis
             [$diffAmount, $explanation] = $this->source($debug, $source, $rule);
             $newAmount = $amount + $diffAmount;
 
-            Arr::set($this->dataH, $transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
+            $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
 
         } else {
             //No transfers or sourcing involved, just apply the rule to the amount if it exists
@@ -466,7 +525,7 @@ class Prognosis
                     echo "  Normal rule\n";
                 }
                 [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $acquisitionAmount, $rule, $factor);
-                Arr::set($this->dataH, $transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
+                $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
 
             } else {
                 //No changes here
@@ -488,6 +547,11 @@ class Prognosis
     public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount = 0)
     {
 
+        $realizationTaxableAmount = 0;
+        $realizationTaxAmount = 0;
+        $acquisitionAmount = 0;
+        $realizationTaxPercent = 0;
+
         [$originAssetname, $originYear, $originType, $originField] = $this->helper->pathToElements($transferOrigin);
 
         $paidAmount = 0;
@@ -506,19 +570,26 @@ class Prognosis
         [$taxAssetname, $taxYear, $taxType] = $this->getAssetMetaFromPath($transferOrigin, 'tax');
         //print "    Tax asset: $taxAssetname, year: $taxYear, type: $taxType\n";
 
-        [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent] = $this->tax->taxCalculationRealization(false, $taxType, $originYear, $amount, $acquisitionAmount, $originYear);
+        if($originType == 'asset') {
+            //It is only calculated tax when realizing assets, not when transfering to an asset (buying)
+            [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent] = $this->tax->taxCalculationRealization(false, $taxType, $originYear, $amount, $acquisitionAmount, $originYear);
+        } else {
+            //It is probably income, expence or cashflow transfered to an asset. No tax calculations needed.
+        }
+
         //print "    Realization amount: $amount, acquisitionAmount: $acquisitionAmount, realizationTaxableAmount: $realizationTaxableAmount, realizationTaxAmount: $realizationTaxAmount, realizationTaxPercent: $realizationTaxPercent\n";
 
         $transferedAmount = $amount - $realizationTaxAmount; //The amnount we transfer minus the realizationTax
 
         //The transfer happens here.
-        Arr::set($this->dataH, $transferTo, $this->ArrGet($transferTo) + $transferedAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
-        Arr::set($this->dataH, $transferedToAmount, $this->ArrGet($transferedToAmount) + $transferedAmount); //The amount we transfered to - for later reference and calculation
-        Arr::set($this->dataH, $transferedToDescription, $this->ArrGet($transferedToDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedAmount from $transferOrigin "); //The amount we transfered including the tax - for later reference and calculation
-        Arr::set($this->dataH, $transferedOriginAmount, $this->ArrGet($transferedOriginAmount) - $amount); //The amount we transfered including the tax - for later reference and calculation
+        $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
+        $this->ArrSet($transferedToAmount, $this->ArrGet($transferedToAmount) + $transferedAmount); //The amount we transfered to - for later reference and calculation
+        $this->ArrSet($transferedToDescription, $this->ArrGet($transferedToDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedAmount from $transferOrigin "); //The amount we transfered including the tax - for later reference and calculation
+        $this->ArrSet($transferedOriginAmount, $this->ArrGet($transferedOriginAmount) - $amount); //The amount we transfered including the tax - for later reference and calculation
 
-        //print "      transferedOriginAmount inc tax: " . $this->ArrGet($transferedOriginAmount) . " \n";
-        //print "      transferedToAmount ex tax: " . $this->ArrGet($transferedToAmount) . "\n";
+        //print "      transferTo ex tax: $transferTo=" . $this->ArrGet($transferTo) . " \n";
+        //print "      transferedToAmount ex tax: $transferedToAmount=" . $this->ArrGet($transferedToAmount) . " \n";
+        //print "      transferedOriginAmount inc tax: $transferedOriginAmount=" . $this->ArrGet($transferedOriginAmount) . " \n";
         //dd($this->dataH[$toAssetname][$toYear][$toType]);
         //dd($this->dataH[$originAssetname][$originYear][$originType]);
 
@@ -590,6 +661,7 @@ class Prognosis
     {
         foreach ($this->dataH as $assetname => $assetH) {
 
+            #print "PostProcess: $assetname\n";
             //print_r($assetH);
             $meta = $assetH['meta'];
             if (! $meta['active']) {
@@ -621,6 +693,19 @@ class Prognosis
         //print "ArrGet: $path - default: $default\n";
 
         return Arr::get($this->dataH, $path, $default);
+    }
+
+    public function ArrSet(string $path, $value)
+    {
+        $debug = false;
+        if (Str::contains($path, ['marketAmountX', 'afterTaxAmountX'])) {
+            $debug = true;
+        }
+
+        if($debug) {
+            print "ArrSet: $path:$value\n";
+        }
+        return Arr::set($this->dataH, $path, $value);
     }
 
     //Special Arr get that onlye gets data from configH to make cleaner code.
@@ -696,34 +781,11 @@ class Prognosis
 
     public function postProcessCashFlowYearly(string $path)
     {
-        //post processing cashflow will ensure cashflow and tax is calculated correctly even after transfer/source/calculations out of sequence
-        //echo "postProcessCashFlowYearly: $path\n";
-
-        [$assetname, $year, $taxtype] = $this->getAssetMetaFromPath($path, 'tax');
+        [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
         $prevYear = $year - 1;
-
-        //Free money to spend
-        [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxtype, $year, $this->ArrGet("$path.income.amount"), $this->ArrGet("$path.expence.amount"));
-
-        $cashflowBeforeTaxAmount =
-            $this->ArrGet("$path.income.amount")
-            - $this->ArrGet("$path.expence.amount");
-
-        $cashflowAfterTaxAmount =
-                $this->ArrGet("$path.income.amount")
-                - $this->ArrGet("$path.expence.amount") //cashflow basis = inntekt - utgift.
-                - $cashflowTaxAmount //Minus skatt på cashflow (Kan være både positiv og negativ)
-                - $this->ArrGet("$path.asset.taxAmount") //Minus formuesskatt
-                - $this->ArrGet("$path.asset.taxPropertyAmount") //Minus eiendomsskatt
-                - $this->ArrGet("$path.mortgage.termAmount"); //Minus terminbetaling på lånet
-        +$this->ArrGet("$path.mortgage.taxDeductableAmount"); //Plus skattefradrag på renter
-
-        Arr::set($this->dataH, "$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
-        Arr::set($this->dataH, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
-        Arr::set($this->dataH, "$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.beforeTaxAggregatedAmount"));  //FIX: Cashflow is not accumulated now
-        Arr::set($this->dataH, "$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.afterTaxAggregatedAmount"));  //FIX: Cashflow is not accumulated now
-        Arr::set($this->dataH, "$path.cashflow.taxAmount", $cashflowTaxAmount);
-        Arr::set($this->dataH, "$path.cashflow.taxDecimal", $cashflowTaxPercent);
+        //echo "postProcessCashFlowYearly: $path\n";
+        $this->ArrSet("$path.cashflow.beforeTaxAggregatedAmount", $this->ArrGet("$path.cashflow.beforeTaxAmount") + $this->ArrGet("$assetname.$prevYear.cashflow.beforeTaxAggregatedAmount"));  //FIX: Cashflow is not accumulated now
+        $this->ArrSet( "$path.cashflow.afterTaxAggregatedAmount", $this->ArrGet("$path.cashflow.afterTaxAmount") + $this->ArrGet("$assetname.$prevYear.cashflow.afterTaxAggregatedAmount"));  //FIX: Cashflow is not accumulated now
     }
 
     /**
@@ -737,9 +799,9 @@ class Prognosis
     {
 
         if ($this->ArrGet("$path.mortgage.balanceAmount") > 0 && $this->ArrGet("$path.asset.marketAmount") > 0) {
-            Arr::set($this->dataH, "$path.asset.mortageRateDecimal", $this->ArrGet("$path.mortgage.balanceAmount") / $this->ArrGet("$path.asset.marketAmount"));
+            $this->ArrSet("$path.asset.mortageRateDecimal", $this->ArrGet("$path.mortgage.balanceAmount") / $this->ArrGet("$path.asset.marketAmount"));
         } else {
-            Arr::set($this->dataH, "$path.asset.mortageRateDecimal", 0);
+            $this->ArrSet("$path.asset.mortageRateDecimal", 0);
         }
     }
 
@@ -766,10 +828,10 @@ class Prognosis
         // All other income counts as income, no tax or expense deducted.
 
         // Set the potential income amount in the data structure.
-        Arr::set($this->dataH, "$path.potential.incomeAmount", $potentialIncomeAmount);
+        $this->ArrSet( "$path.potential.incomeAmount", $potentialIncomeAmount);
 
         // Calculate the potential mortgage amount (the bank will loan you 5 times the income) and set it in the data structure.
-        Arr::set($this->dataH, "$path.potential.mortgageAmount", $potentialIncomeAmount * 5); //The bank will loan you 5 times the income.
+        $this->ArrSet( "$path.potential.mortgageAmount", $potentialIncomeAmount * 5); //The bank will loan you 5 times the income.
     }
 
     /**

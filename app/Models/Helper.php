@@ -93,7 +93,7 @@ class Helper extends Model
             $newAmount = $amount + $divisorAmount;
             $explanation = 'Adding divisor: '.$divisorAmount;
         } else {
-            //When no sign is given, we reduce the amount. Its lake taking this divisor out of the amount.
+            //When no sign is given, we reduce the amount. Its like taking this divisor out of the amount.
             $newAmount = $amount - $divisorAmount;
             $explanation = 'Subtracting divisor: '.$divisorAmount;
         }
@@ -115,8 +115,9 @@ class Helper extends Model
             $newAmount = round($amount * (($percent / 100) + 1));
             $explanation = "$amount+$percent%=$newAmount";
         } else {
-            $newAmount = round($amount * (($percent / 100) + 1));
-            $explanation = "$amount+$percent%=$newAmount";
+            //When no sign is given, we reduce the amount. Its like taking this percentage out of the amount.
+            $newAmount = round($amount * ((-$percent / 100) + 1));
+            $explanation = "$amount-$percent%=$newAmount";
         }
 
         $diffAmount = $newAmount - $amount;

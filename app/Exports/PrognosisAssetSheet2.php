@@ -47,7 +47,8 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue('J2', $meta['description']);
 
         //Gruppering av kolonner med navn
-        $this->worksheet->setCellValue('C4', 'Cashflow');
+        $this->worksheet->setCellValue('C4', 'Inntekt');
+        $this->worksheet->setCellValue('E4', 'Utgift');
         $this->worksheet->setCellValue('I4', 'Lån');
         $this->worksheet->setCellValue('P4', 'Formue');
         $this->worksheet->setCellValue('U4', 'Formuesskatt');
@@ -100,6 +101,7 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("AM$this->rowHeader", 'Description');
 
         //return;
+        ksort($this->asset); //Sorter på
 
         foreach ($this->asset as $year => $data) {
 

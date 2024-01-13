@@ -1,0 +1,68 @@
+{
+    "meta": {
+        "name": "John Doe",
+        "birthYear": "1995",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "70"
+    },
+    "house": {
+        "meta" : {
+            "type": "rental",
+            "group": "private",
+            "name": "House",
+            "description": "House with 10 interestOnlyYears, the rest of the money put into fond",
+            "active" : true,
+            "tax": "house"
+        },
+        "2024": {
+            "income": {
+                "name": "Income",
+                "description": "Income",
+                "amount": 20000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "asset": {
+                "marketAmount": 3000000,
+                "changerate": "changerates.house",
+                "description": "",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 1500000,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "years": 20,
+                "interestOnlyYears": 10
+            },
+            "cashflow": {
+                "description": "We transfer the positive cashflow from interestOnly into a fund",
+                "rule": "100%",
+                "transfer": "fond.$year.asset.marketAmount",
+                "source": "",
+                "repeat": true
+            }
+        }
+    },
+    "fond": {
+        "meta" : {
+            "type": "fond",
+            "group": "private",
+            "name": "fond",
+            "description": "",
+            "active": true,
+            "tax": "fond"
+        },
+        "2024": {
+            "asset": {
+                "marketAmount": 1000,
+                "changerate": "changerates.fond",
+                "description": "",
+                "repeat": true
+            }
+        }
+    }
+}
