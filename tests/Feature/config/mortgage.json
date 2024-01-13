@@ -1,0 +1,41 @@
+{
+    "meta": {
+        "name": "John Doe",
+        "birthYear": "1995",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "62"
+    },
+    "house": {
+        "meta": {
+            "type": "house",
+            "group": "private",
+            "name": "My house",
+            "description": "Here I live",
+            "active": true,
+            "tax": "house"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": "3000000",
+                "changerate": "changerates.house",
+                "description": "",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+                "amount": 7300,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 1500000,
+                "interest": "changerates.interest",
+                "years": 20
+            }
+        }
+    }
+}
