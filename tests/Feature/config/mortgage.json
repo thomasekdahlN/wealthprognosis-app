@@ -7,12 +7,12 @@
         "pensionWishYear": "63",
         "deathYear": "62"
     },
-    "house": {
+    "house1": {
         "meta": {
             "type": "house",
             "group": "private",
-            "name": "My house",
-            "description": "Here I live",
+            "name": "InterestOnly5years",
+            "description": "Paying only interest for the first 5 years, then paying interest and principal for the remaining years",
             "active": true,
             "tax": "house"
         },
@@ -27,7 +27,54 @@
                 "amount": 1500000,
                 "interest": "changerates.interest",
                 "years": 10,
-                "extraDownpaymentAmount": 150000
+                "interestOnlyYears": 5
+            }
+        }
+    },
+    "house2": {
+        "meta": {
+            "type": "house",
+            "group": "private",
+            "name": "ExtraDownpayment",
+            "description": "Paying interest and principal + 60 000 ekstra downpayment for all the years",
+            "active": true,
+            "tax": "house"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": "3000000",
+                "changerate": "changerates.house",
+                "description": "",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 1500000,
+                "interest": "changerates.interest",
+                "years": 10,
+                "extraDownpaymentAmount": 60000
+            }
+        }
+    },
+    "house3": {
+        "meta": {
+            "type": "house",
+            "group": "private",
+            "name": "Normal",
+            "description": "Paying interest and principal for all the years",
+            "active": true,
+            "tax": "house"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": "3000000",
+                "changerate": "changerates.house",
+                "description": "",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 1500000,
+                "interest": "changerates.interest",
+                "years": 10
             }
         }
     }

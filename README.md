@@ -103,8 +103,8 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * salary
 
 ### On the wishlist:
-- ekstra nedbetaling på lån (men ikke forkorte lån)
 - avdragsfritt lån.
+- ekstra nedbetaling på lån basert på en årlig variable ekstra innebtaling på lån fra en rule eller en transfer fra en annen asset
 - Ny konfig: Simulere på å bare betaler renter på lån og putte avdrag i fond, vs å betale ned lån.
 - overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
 - Support for skjermingsfradrag
@@ -167,6 +167,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - mortgage.amount - Required. The original mortgage amount
 - mortgage.interest - Required. rente i prosent. Recommended to use "changerates.interest" to get the interst prediction pr year and not hardcode it.
 - mortgage.years - Required. Hvor mange år skal lånet være
+- mortgage.interestOnlyYears - Optional. Hvor mange år lånet skal være avdragsfritt og man bare betaler renter. Må være mindre enn mortgage.years. Hvis ikke angitt, betales renter og avdrag for mortgage.years
 - mortgage.gebyr - gebyr pr år
 - mortgage.extraDownpaymentAmount - årlig ekstra nedbetaling på lån hele lånets løpetid. Forkorter lånets løpetid om beløpet er stort nok.
 - mortgage.description - beskrivelse av lånet
