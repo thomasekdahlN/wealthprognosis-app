@@ -9,7 +9,7 @@ class Helper extends Model
 {
     use HasFactory;
 
-    public function calculateRule(bool $debug, int $amount, int $depositedAmount, string $rule, int $factor = 1)
+    public function calculateRule(bool $debug, int $amount, int $acquisitionAmount, string $rule, int $factor = 1)
     {
         $totalAmount = 0;
         $explanation = null;
@@ -142,5 +142,22 @@ class Helper extends Model
         $diffAmount = $newAmount - $amount;
 
         return [$diffAmount, $explanation];
+    }
+
+    public function pathToElements($path) {
+        $assetname = null;
+        $year = null;
+        $type = null;
+        $field = null;
+
+        if(preg_match('/(\w+).(\w+).(\w+).(\w+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
+            $assetname = $matchesH[1][0];
+            $year = $matchesH[2][0];
+            $type = $matchesH[3][0];
+            $field = $matchesH[4][0];
+        } else {
+            print "ERRROR: pathToElements($path)\n";
+        }
+        return [$assetname, $year, $type, $field];
     }
 }

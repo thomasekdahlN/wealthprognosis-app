@@ -237,7 +237,7 @@ class Tax extends Model
         return [$cashflowTaxAmount, $cashflowTaxPercent];
     }
 
-    public function taxCalculationRealization(bool $debug, string $taxtype, int $year, int $assetMarketAmount, int $acquisitionAmount = 0, ?int $acquisitionYear = 0)
+    public function taxCalculationRealization(bool $debug, string $taxtype, int $year, float $amount, float $acquisitionAmount = 0, ?int $acquisitionYear = 0)
     {
 
         //FIX - should probably not be pairs, but the same thing.
@@ -250,7 +250,7 @@ class Tax extends Model
         $numberOfYears = $year - $acquisitionYear;
 
         if ($debug) {
-            echo "\n$taxtype.$year: assetMarketAmount: $assetMarketAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent\n";
+            echo "\n  taxCalculationRealizationStart $taxtype.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent\n";
         }
 
         if ($taxtype == 'salary') {
@@ -278,46 +278,66 @@ class Tax extends Model
             $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
 
         } elseif ($taxtype == 'rental') {
-            if ($assetMarketAmount > 0) {
-                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+            if ($amount - $acquisitionAmount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien skal skattes ved salg
             }
 
         } elseif ($taxtype == 'stock') {
-            if ($assetMarketAmount > 0) {
-                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+            if ($amount - $acquisitionAmount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien skal skattes ved salg?
             }
 
         } elseif ($taxtype == 'fond') {
-            if ($assetMarketAmount > 0) {
-                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+            if ($amount - $acquisitionAmount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
         } elseif ($taxtype == 'ask') {
-            if ($assetMarketAmount > 0) {
-                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+            if ($amount - $acquisitionAmount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
+
+        } elseif ($taxtype == 'otp') {
+            if ($amount - $acquisitionAmount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
+
+        } elseif ($taxtype == 'crypto') {
+            if ($amount - $acquisitionAmount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            }
+
+        } elseif ($taxtype == 'gold') {
+            if ($amount - $acquisitionAmount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
         } elseif ($taxtype == 'cash') {
-            $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+            $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
             $realizationTaxAmount = 0;  //Ingen skatt ved salg.
 
         } else {
 
-            if ($assetMarketAmount > 0) {
-                $realizationTaxableAmount = $assetMarketAmount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+            if ($amount > 0) {
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
         }
 
+        $acquisitionAmount -= $amount; //We remove the amount from the acquisitionAmount
+
         if ($debug) {
-            echo "$taxtype.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationTaxAmount: $realizationTaxAmount, realizationTaxPercent: $realizationTaxPercent\n";
+            echo "  taxCalculationRealizationEnd $taxtype.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxPercent: $realizationTaxPercent\n";
         }
 
         //V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
-        return [$realizationTaxableAmount, $realizationTaxAmount, $realizationTaxPercent];
+        return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent];
     }
 }

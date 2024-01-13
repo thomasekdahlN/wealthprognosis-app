@@ -89,8 +89,9 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * car
 * cash
 * child
-* company => stock
+* stock - Må hensynta fritaksregelen. Ingen skatt på salg av aksjer.
 * crypto
+* gold
 * fond
 * inheritance
 * income
@@ -102,9 +103,8 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * salary
 
 ### On the wishlist:
-- FIRE beløp -Rule/transfer må telle som innskudd.
+- Ny konfig: Simulere på å bare betaler renter på lån og putte avdrag i fond, vs å betale ned lån.
 - Beregne skatt på realisasjon av asset (ved transfer og pr år)
-- transferAmount må kunne registreres+/-.(for å gjennomføre neste punkt)
 - overføre % beløp fra cashflow til asset og reberegne asset (refactoring til income/expence/asset metoder for beregning med år som input)
 - ekstra nedbetaling på lån (men ikke forkorte lån)
 - Support for skjermingsfradrag
@@ -193,7 +193,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - income.transfer - overføring av inntekt til en annen asset
 - income.repeat - gjenta konfigurasjonen for kommende år
 - income.description - beskrivelse av inntekten
-- income.transferedAmount - Hva du har overført til/fra income
+- income.transferedAmount - Hva du har overført til/fra income (fra transfer, source eller rule). Ikke changerate endringer.
 
 #### Expence
 - expence.amount - beløp før skatt
@@ -202,7 +202,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - expence.transfer - overføring av inntekt til en annen asset
 - expence.repeat - gjenta konfigurasjonen for kommende år
 - expence.description - beskrivelse av utgiften
-- expence.transferedAmount - Hva du har overført til/fra expence
+- expence.transferedAmount - Hva du har overført til/fra expence (fra transfer, source eller rule). Ikke changerate endringer.
 
 #### Cashflow
 - cashflow.beforeTaxAmount = income.amount - expence.amount - cashflowTaxAmount - asset.taxAmount - mortgage.termAmount + mortgage.taxDeductableAmount
@@ -211,6 +211,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - cashflow.afterTaxAggregatedAmount += cashflow.afterTaxAccumulatedAmount
 - cashflow.taxAmount - skatt beløp (could be positive or negative, deponds on income positive opr negative)
 - cashflow.taxDecimal - skatt prosent
+- cashflow.transferedAmount - Beløp du har overført til/fra. (fra transfer, source eller rule). Ikke changerate.
 - cashflow.description - beskrivelse av cashflow
 
 #### mortgage - Lån
@@ -219,7 +220,8 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - mortgage.interestAmount - renter - i kroner pr år
 - mortgage.principalAmount - Avdrag - i kroner pr år (det er dette som nedbetaler lånet)
 - mortgage.balanceAmount - gjenstående lån i kroner
-- mortgage.extraDownpaymentAmount - ekstra nedbetaling av lån pr år
+- mortgage.extraDownpaymentAmount - ekstra nedbetaling av lån pr år (Utgår nå som vi har: transferedAmount?)
+- mortgage.transferedAmount - Hva du har overført til/fra mortgage
 - mortgage.interestDecimal - rente i prosent
 - mortgage.gebyrAmount - gebyr pr år
 - mortgage.taxDeductableAmount - fradrag
@@ -232,7 +234,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.acquisitionAmount - Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.
 - asset.equityAmount - Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
 - asset.paidAmount - Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.
-- asset.transferedAmount - Hva du har overført til/fra denne asset
+- asset.transferedAmount - Hva du har overført til/fra denne asset. Kan være både positivt og negativt beløp.  (fra transfer, source eller rule). Ikke changerate.
 - asset.mortageRateDecimal- Hvor mye i % av en asset som er lånt. Belåningsgrad. 
 - asset.taxableDecimal - Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av
 - asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av
@@ -261,14 +263,13 @@ How much potential the bank sees in your income - expences
 
 #### fire (F.I.R.E) - beregnes på income, expence, asset, mortgage, cashflow
 Før eller etter skatt her?
-- fire.decimal - F.I.R.E inntekt / F.I.R.E utgift - prosent
-- fire.incomeAmount - F.I.R.E inntekt
-- fire.expenceAmount - F.I.R.E utgift
-- fire.diffDecimal - F.I.R.E inntekt / F.I.R.E utgift . prosent
-- fire.cashFlowAmount - F.I.R.E inntekt - F.I.R.E utgift
-- fire.savingAmount - sparebeløp. Hvor mye du kan spare pr år. Medberegnet avdrag men ikke renter.Regnes på assets av typen $fireSavingTypes[house, rental, cabin, crypto, fond, stock, otp, ask, pension]
-- fire.savingRateDecimal - savingAmount / income    
-
+- fire.percent - % uttaket du vil ta fra assetsa når FIRE er oppnådd.
+- fire.incomeAmount - F.I.R.E inntekt - Basert på 4% uttak av assets som er definert i $firePartSalePossibleTypes. Dvs det du kan leve av av sparemidler. Har en del spørsmål her mtp fratrekk av lån/renter/skatt 
+- fire.expenceAmount - F.I.R.E utgift - Dine faktiske utgifter ihht config
+- fire.rateDecimal - fire.incomeAmount / fire.expenceAmount . Hvor nærme du er å nå FIRE 
+- fire.cashFlowAmount - fire.incomeAmount - fire.expenceAmount
+- fire.savingAmount - sparebeløp. Hvor mye du sparer pr år. Medberegnet avdrag men ikke renter.Regnes på assets av typen $fireSavingTypes[house, rental, cabin, crypto, fond, stock, otp, ask, pension]
+- fire.savingRateDecimal - fire.savingAmount (hvor mye som regnes som sparing) / income.amount (mot dine totale inntekter)
 
 ### Example simple config
 
