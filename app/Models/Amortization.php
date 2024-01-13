@@ -134,7 +134,9 @@ class Amortization extends Model
             }    else {
                 $this->balanceAmount = 0;
                 echo "Lucky you. Mortgage downpayment faster that configured\n";
-
+                $this->dataH[$this->assettname][$year]['mortgage'] = [
+                    'description' => "Mortgage payed faster due to extraDownpayments",
+                ];
         }
 
         //print_r($this->dataH[$this->assettname][$year]['mortgage']);

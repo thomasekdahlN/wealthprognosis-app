@@ -168,7 +168,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - mortgage.interest - Required. rente i prosent. Recommended to use "changerates.interest" to get the interst prediction pr year and not hardcode it.
 - mortgage.years - Required. Hvor mange år skal lånet være
 - mortgage.gebyr - gebyr pr år
-- mortgage.extraDownpaymentAmount - årlig ekstra nedbetaling på lån hele lånets løpetid.
+- mortgage.extraDownpaymentAmount - årlig ekstra nedbetaling på lån hele lånets løpetid. Forkorter lånets løpetid om beløpet er stort nok.
 - mortgage.description - beskrivelse av lånet
 
 #### asset
@@ -222,11 +222,13 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - mortgage.balanceAmount - gjenstående lån i kroner
 - mortgage.extraDownpaymentAmount - ekstra nedbetaling av lån pr år (Utgår nå som vi har: transferedAmount?)
 - mortgage.transferedAmount - Hva du har overført til/fra mortgage
-- mortgage.interestDecimal - rente i prosent
+- mortgage.interest - rente i prosent (Brukes i reberegning ved ekstra nedbetaling av lån)
+- mortgage.interestDecimal - rente i desimal
+- mortgage.years - Gjenværende atnall år løpetid på lånet, basert på første konfigurasjon av lånet. Med ekstra nedbetalign vil lånet kunne bli betalt ned på færre antall år om ekstra innbetalingsbeløpene er store nok
 - mortgage.gebyrAmount - gebyr pr år
 - mortgage.taxDeductableAmount - fradrag
 - mortgage.taxDeductableDecimal - fradrag i prosent
-- mortgage.description - beskrivelse av lånet
+- mortgage.description - beskrivelse av ektsra hendelser i låneberegningen.
 
 #### asset
 - asset.marketAmount - Markedsverdien på en asset
