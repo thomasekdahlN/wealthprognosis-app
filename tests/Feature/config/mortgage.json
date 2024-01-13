@@ -27,7 +27,7 @@
                 "amount": 1500000,
                 "interest": "changerates.interest",
                 "years": 10,
-                "extraDownpaymentAmount": 60000
+                "extraDownpaymentAmount": 150000
             }
         }
     }

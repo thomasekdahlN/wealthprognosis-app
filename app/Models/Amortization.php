@@ -63,7 +63,7 @@ class Amortization extends Model
         $this->amount = $this->remainingMortgageAmount = (float) Arr::get($mortgage, 'amount');
         $this->terms = 1;
         $this->period = $this->terms * $this->term_years;
-        $this->balanceAmount = 0;
+        $this->balanceAmount = $this->amount;
         $this->year_end = $year + $this->term_years;
         $this->extraDownpaymentAmount = Arr::get($mortgage, 'extraDownpaymentAmount', 0); //Yearly extra downpayment
 
@@ -84,7 +84,7 @@ class Amortization extends Model
      */
     public function calculateAmortizationSchedule()
     {
-        while ($this->balanceAmount >= 0 && $this->year_start <= $this->year_end) {
+        while ($this->balanceAmount > 0 && $this->year_start <= $this->year_end) {
             echo "$this->year_start, period: $this->period, extraDownpaymentAmount: $this->extraDownpaymentAmount\n";
             $this->calculate(true, $this->year_start++, $this->extraDownpaymentAmount);
             $this->remainingMortgageAmount = $this->balanceAmount;
@@ -133,9 +133,9 @@ class Amortization extends Model
                 ];
             }    else {
                 $this->balanceAmount = 0;
-                echo "Lucky you. Mortgage downpayment faster that configured\n";
+                echo "Lucky you. Mortgage downpayment $this->period years faster that configured\n";
                 $this->dataH[$this->assettname][$year]['mortgage'] = [
-                    'description' => "Mortgage payed faster due to extraDownpayments",
+                    'description' => "Mortgage payed $this->period years faster due to extraDownpayments",
                 ];
         }
 
