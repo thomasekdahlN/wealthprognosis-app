@@ -38,7 +38,7 @@
     },
     "otp": {
         "meta" : {
-            "type": "fond",
+            "type": "otp",
             "group": "private",
             "name": "OTP",
             "description": "OTP",

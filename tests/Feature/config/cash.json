@@ -26,7 +26,7 @@
             "$pensionWishYear": {
                 "rule": "1|$pensionWishYear",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.cash",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen",
                 "repeat": true
             }

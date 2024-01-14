@@ -87,12 +87,12 @@
     },
     "otp": {
         "meta" : {
-            "type": "fond",
+            "type": "equityfund",
             "group": "private",
             "name": "OTP",
             "description": "OTP",
             "active": true,
-            "tax": "fond"
+            "tax": "equityfund"
         },
         "2023": {
             "asset": {
@@ -152,18 +152,18 @@
     },
     "fond": {
         "meta" : {
-            "type": "fond",
+            "type": "equityfund",
             "group": "private",
             "name": "fond privat",
             "description": "",
             "active": true,
-            "tax": "fond"
+            "tax": "equityfund"
         },
         "2022": {
             "asset": {
                 "amount": 2000000,
                 "rule": "+6000",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "Første innskudd på 2 millioner",
                 "repeat": true
             }
@@ -180,7 +180,7 @@
             "asset": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
                 "repeat": true
             }
@@ -207,7 +207,7 @@
             "asset": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }

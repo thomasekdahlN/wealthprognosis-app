@@ -87,12 +87,12 @@
     },
     "otp": {
         "meta" : {
-            "type": "fond",
+            "type": "equityfund",
             "group": "private",
             "name": "OTP",
             "description": "OTP",
             "active": true,
-            "tax": "fond"
+            "tax": "equityfund"
         },
         "2022": {
             "asset": {
@@ -190,7 +190,7 @@
             "asset": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }
@@ -198,17 +198,17 @@
     },
     "fond": {
         "meta" : {
-            "type": "fond",
+            "type": "equityfund",
             "group": "private",
             "name": "fond privat",
             "description": "",
             "active": true,
-            "tax": "fond"
+            "tax": "equityfund"
         },
         "2022": {
             "asset": {
                 "marketAmount": 2000000,
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "",
                 "repeat": true
             }
@@ -233,7 +233,7 @@
             "asset": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }
@@ -260,7 +260,7 @@
             "asset": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }
@@ -320,18 +320,18 @@
     },
     "klp": {
         "meta" : {
-            "type": "fond",
+            "type": "equityfund",
             "group": "company",
             "name": "KLP fond",
             "description": "",
             "active": true,
-            "tax": "fond"
+            "tax": "equityfund"
         },
         "2022": {
             "asset": {
                 "description": "",
                 "marketAmount": 1000000,
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "repeat": true
             }
         },
@@ -339,7 +339,7 @@
             "asset": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }

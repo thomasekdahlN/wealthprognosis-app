@@ -6,7 +6,7 @@ Note: This is just a hack and is not production ready, but its already useful.
 
 Configure all your assets value, mortgage, income and expences. Run different standard prognosis like negative, normal or positive and see how well your assets behave.
 
-It outputs a very detailed excel spreadsheet of your future economy. 
+It outputs a very detailed excel spreadsheet of your future economy prognosis. 
 
 ### Examples:
 
@@ -83,38 +83,46 @@ Default den asset man står på, medmindre annet er spesifisert. Brukes for å b
 Overføring av beløp fra den asset regelen er på til den asset som er spesifisert i regelen,
 Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal sende beløpet, hvis ikke blir beløpet lagt til den asset man står på.
 
-### Supported assets for prognosis and tax calculation
-* boat
-* cabin
-* car
-* cash
-* child
-* stock - Må hensynta fritaksregelen. Ingen skatt på salg av aksjer.
-* crypto
-* gold
-* fond
-* inheritance
-* income
-* kpi
-* otp
-* pension - public pension
-* property
-* rental
-* salary
+### Supported assets types for prognosis and tax calculation
+* ask - Aksjesparing med skattefradrag
+* boat - Båt
+* cabin - Hytte
+* car - Bil
+* bank - Bankkonto
+* cash - Kontanter
+* child - Barn. Skattefritt men kjekt å klassifisere.
+* crypto - Krypto
+* bondfund - Aksjefond eller fond som det kalles på, populært
+* equityfund - Aksjefond eller fond som det kalles på, populært
+* gold - Gull
+* inheritance - Arv.
+* ips - Pensjonssparing med spesielle skatteregler.
+* loantocompany - Når du har gitt et lån til et firma (Skjermingsfadrag
+* income - her samler vi inntekt fra alle assets. Det blir aldri regnet skatt her. income regnes som ferdig skattet fra en transfer/rule/source fra annen asset
+* kpi - Konsumpris indeksen. For å se om investeringene dine gjør det bedre eller dårligere enn denne.
+* otp - Offentlig tjenestepensjon
+* pension - public pension / folketrygd
+* property - Eiendom du ikke leier ut. Sekundærboliger.
+* rental - Utleieeiendom
+* salary - Lønn
+* soleproprietorship - Enkeltpersonforetak
+* stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
+- Support for skjermingsfradrag. Konseptuelt problem, skal skjerminsfradraget regnes av alle penger du til sammen har satt inn, eller skal det trekkes fra til du går i null og så summere oppover. Tror det er riktig beregnet frem til uttak/transfer.
 - ekstra nedbetaling på lån basert på en årlig variable ekstra innbetaling på lån fra en rule eller en transfer fra en annen asset
-- Support for skjermingsfradrag
 
 #### Not a priority, but have been thinking of it.
+- Support for selling parts of partsellable assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
+- Tax configuration pr year and countries (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
+- Take into account the number of years you have owned an asset regardign tax calculation on i.e house and cabin.
 - Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)- 
 - Klassifisere F.I.R.E oppnåelse pr år
 - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
-- Tax configuration pr year and countries (support for more than norwegian tax regime)
 - Refactoring and cleanup of code
 - Retrieving asset values from API, like Crypto/Fond/stocks
 - Summere riktig skattefradrag basert på rente og alder på hus og hytter 
-- Support for property tax with different setting spr asset (du to different places having different taxes. Both tax percent and standardDeduction). Deduction for property tax for rentals is not handled.
+- Support for property tax with different tax pr asset (due to different places having different taxes. Both tax percent and standardDeduction). Deduction for property tax for rentals is not handled.
 - F.I.R.E - Use up 4% of partly sellable assets from wishPensionYear to DeathYear to see how it handles. Not needed anymore since using up a divisor of your assets (1/10) until you die is a better way to use up sellable assets.
 
 ## Config
@@ -252,11 +260,15 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.taxablePropertyAmount- Skattbart beløp - Antall kroner av markedsverdien til en asset det skal betales eiendomsskatt av (både % og bunnfradrad hensyntatt)
 - asset.taxPropertyAmount - Eiendomsskatt i kroner. Beregnes av asset.marketAmount.
 - asset.taxPropertyDecimal - Eiendomsskatt i prosent
-- asset.realizationAmount - Beløpet man sitter igjen med etter et salg = asset.marketAmount - asset.realizationTaxAmount
-- asset.realizationTaxableAmount - Skattbart beløp ved realisering av asset = asset.marketAmount - asset.acquisitionAmount
-- asset.realizationTaxAmount - Skattbart beløp ved realisering av asset = asset.realizationTaxableAmount * asset.realizationTaxDecimal
-- asset.realizationTaxDecimal - Skattbar prosent ved realisering av asset. Lest fra tax.json
 - asset.description - Beskrivelse av asset/liability
+
+#### realization (Really a part of asset, but we keep the structure simpler by having it separate). This is what happens if we sell the asset. It does not meen we have sold it, sale is done with a transfer to another asset.
+- realization.amount - Beløpet man sitter igjen med etter et salg = asset.marketAmount - asset.realizationTaxAmount
+- realization.taxableAmount - Skattbart beløp ved realisering av asset = asset.marketAmount - asset.acquisitionAmount
+- realization.taxAmount - Skattbart beløp ved realisering av asset = asset.realizationTaxableAmount * asset.realizationTaxDecimal - realization.taxShieldAmount
+- realization.taxDecimal - Skattbar prosent ved realisering av asset. Lest fra tax.json
+- realization.taxShieldAmount - Skjermingsfradrag beløp (Akkumuleres hvis ubenyttet, reduseres automatisak hvis benyttet)
+- realization.taxShieldDecimal - Skjermingsfradrag prosent
 
 #### Potential
 How much potential the bank sees in your income - expences
@@ -275,7 +287,6 @@ Før eller etter skatt her?
 - fire.savingRateDecimal - fire.savingAmount (hvor mye som regnes som sparing) / income.amount (mot dine totale inntekter)
 
 ### Example simple config
-
 {
 "meta": {
 "name": "John Doe",
@@ -285,7 +296,6 @@ Før eller etter skatt her?
 "pensionWishYear": "63",
 "deathYear": "82"
 },
-"assets": {
 "income": {
 "meta": {
 "type": "income",
@@ -293,33 +303,33 @@ Før eller etter skatt her?
 "name": "Income",
 "description": "Income",
 "active": true,
-"tax": "income"
+"tax": "salary"
 },
-"income": {
 "2023": {
+"income": {
 "name": "Income",
 "description": "Income",
-"asset": 40000,
-"transferRule": "add&5%",
-"transferResource": "otp.$year.asset.amount",
+"amount": 40000,
+"factor": 12,
 "changerate": "changerates.kpi",
 "repeat": true
-},
-"$pensionWishYear": {
-"name": "Income",
-"description": "Pensioned, no more income from here",
-"asset": "=0",
-"changerate": "changerates.zero",
-"repeat": false
-}
 },
 "expence": {
-"2023": {
 "name": "Expences",
 "description": "",
-"asset": 15000,
+"amount": 15000,
+"factor": 12,
 "changerate": "changerates.kpi",
 "repeat": true
+}
+},
+"$pensionWishYear": {
+"income": {
+"name": "Income",
+"description": "Pensioned, no more income from here",
+"amount": 0,
+"changerate": "changerates.zero",
+"repeat": false
 }
 }
 },
@@ -332,11 +342,13 @@ Før eller etter skatt her?
 "active": true,
 "tax": "inheritance"
 },
-"asset": {
 "2037": {
+"asset": {
 "name": "inheritance",
 "description": "",
-"asset": 1000000,
+"marketAmount": 1000000,
+"acquisitionAmount" : 1,
+"paidAmount": 1,
 "changerate": "changerates.kpi",
 "repeat": true
 }
@@ -349,13 +361,14 @@ Før eller etter skatt her?
 "name": "Folketrygden",
 "description": "Folketrygden",
 "active": true,
-"tax": "income"
+"tax": "pension"
 },
-"income": {
 "$pensionOfficialYear": {
+"income": {
 "name": "Folketrygden",
 "description": "Folketrygden fra $pensionOfficialYear",
 "amount": 15000,
+"factor": 12,
 "changerate": "changerates.kpi",
 "repeat": true
 }
@@ -363,25 +376,30 @@ Før eller etter skatt her?
 },
 "otp": {
 "meta" : {
-"type": "fond",
+"type": "equityfund",
 "group": "private",
 "name": "OTP",
 "description": "OTP",
 "active": true,
-"tax": "fond"
+"tax": "equityfund"
 },
-"asset": {
 "2023": {
-"amount": "=500000",
+"asset": {
+"amount": 500000,
+"rule": "5%",
+"source": "income.$year.income.amount",
 "changerate": "changerates.otp",
 "description": "OTP Sparing frem til pensjonsår",
 "repeat": true
+}
 },
 "$otpStartYear": {
-"transferRule": "transfer&1/$otpYears",
-"transferResource": "income.$year.income.amount",
+"asset": {
+"rule": "1|$otpYears",
+"transfer": "income.$year.income.amount",
+"source": "",
 "changerate": "changerates.otp",
-"description": "OTP fra $otpStartYear, -1/$otpYears av formuen fra pensjonsåret",
+"description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
 "repeat": true
 }
 }
@@ -393,27 +411,25 @@ Før eller etter skatt her?
 "name": "My house",
 "description": "Here I live",
 "active" : true,
-"tax": "house"
+"tax": "house",
+"taxProperty": "property"
 },
-"asset": {
 "2023": {
-"amount": "3000000",
+"asset": {
+"marketAmount": "3000000",
 "changerate": "changerates.house",
 "description": "",
 "repeat": true
-}
 },
 "expence": {
-"2023": {
 "name": "Utgifter",
 "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
 "amount": 7300,
+"factor": 12,
 "changerate": "changerates.kpi",
 "repeat": true
-}
 },
 "mortgage": {
-"2023": {
 "amount": 1500000,
 "interest": "changerates.interest",
 "gebyr": 600,
@@ -425,36 +441,35 @@ Før eller etter skatt her?
 },
 "fond": {
 "meta" : {
-"type": "fond",
+"type": "equityfund",
 "group": "private",
 "name": "fond privat",
 "description": "",
 "active": true,
-"tax": "fond"
+"tax": "equityfund"
 },
-"asset": {
 "2022": {
+"asset": {
 "amount": 2000000,
-"changerate": "changerates.fond",
+"rule": "+6000",
+"changerate": "changerates.equityfund",
 "description": "Første innskudd på 2 millioner",
 "repeat": true
-},
-"2023": {
-"name": "Monthly savings",
-"description": "Setter inn 6000,- pr år",
-"amount": "+6000",
-"repeat": true
+}
 },
 "2033": {
+"asset": {
 "name": "Monthly savings",
 "description": "Slutter å sette inn 6000,- pr år",
-"amount": "+0",
+"rule": "",
 "repeat": true
+}
 },
 "$pensionWishYear": {
-"transferRule": "transfer&1/$pensionWishYears",
-"transferResource": "income.$year.income.amount",
-"changerate": "changerates.fond",
+"asset": {
+"rule": "1|$pensionWishYears",
+"transfer": "income.$year.income.amount",
+"changerate": "changerates.equityfund",
 "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
 "repeat": true
 }
@@ -469,18 +484,20 @@ Før eller etter skatt her?
 "active": true,
 "tax": "cash"
 },
-"asset": {
 "2022": {
-"amount": 50000,
+"asset": {
+"marketAmount": 50000,
 "changerate": "changerates.cash",
 "description": "Kontanter p.t.",
 "repeat": true
+}
 },
 "$pensionWishYear": {
-"transferRule": "transfer&1/$pensionWishYears",
-"transferResource": "income.$year.income.amount",
-"changerate": "changerates.fond",
-"description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+"asset": {
+"rule": "1|$pensionWishYears",
+"transfer": "income.$year.income.amount",
+"changerate": "changerates.equityfund",
+"description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
 "repeat": true
 }
 }
@@ -494,26 +511,25 @@ Før eller etter skatt her?
 "active": true,
 "tax": "car"
 },
-"asset": {
 "2020": {
-"amount": 50000,
+"asset": {
+"marketAmount": 50000,
 "changerate": "changerates.car",
 "description": "verditap",
 "repeat": true
-}
 },
 "expence": {
-"2019": {
 "name": "Utgifter",
 "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
 "amount": 3000,
+"factor": 12,
 "changerate": "changerates.kpi",
 "repeat": true
 }
 }
 }
 }
-}
+
 
 
 Algoritme for å beregne ny årlig betaling med ekstra avdrag:

@@ -48,17 +48,17 @@
     },
     "fond": {
         "meta" : {
-            "type": "fond",
+            "type": "equityfund",
             "group": "private",
             "name": "fond",
             "description": "",
             "active": true,
-            "tax": "fond"
+            "tax": "equityfund"
         },
         "2024": {
             "asset": {
                 "marketAmount": 1000,
-                "changerate": "changerates.fond",
+                "changerate": "changerates.equityfund",
                 "description": "",
                 "repeat": true
             }

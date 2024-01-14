@@ -88,7 +88,7 @@ class Changerate extends Model
     }
 
     //Should be moved to helper?
-    //Percent is either a percentage integer 7 or a text refering to the chanegrate structure dynamically like "fond" - It will look up fond changerates for that year.
+    //Percent is either a percentage integer 7 or a text refering to the chanegrate structure dynamically like "equityfund" - It will look up equityfund changerates for that year.
     /**
      * Converts the change rate to its decimal equivalent and retrieves associated information.
      *

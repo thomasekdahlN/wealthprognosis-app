@@ -174,7 +174,7 @@ class PrognosisExport2
         $this->spreadsheet->setActiveSheetIndexByName($meta['name']);
         $sheet = $this->spreadsheet->getActiveSheet();
 
-        $sheet->getStyle('B6:AL80')->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
+        $sheet->getStyle('B6:AN80')->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
 
         //Kolonner med prosenter i innhold
         $sheet->getStyle('D6:D80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
@@ -190,16 +190,18 @@ class PrognosisExport2
         $sheet->getStyle('Z6:Z80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
 
         $sheet->getStyle('AD6:AD80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('AG6:AG80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('AL6:AL80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+        $sheet->getStyle('AF6:AF80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+        $sheet->getStyle('AI6:AI80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
 
-        for ($column = 1; $column <= 30 + 6; $column++) {
+        $sheet->getStyle('AN6:AN80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+
+        for ($column = 1; $column <= 32 + 6; $column++) {
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
         }
 
         $verticaloffsett = 6;
         //Grå Kolonne header
-        $sheet->getStyle('A5:AM5')->getFill()
+        $sheet->getStyle('A5:AO5')->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('CCCCCC');
 
@@ -225,31 +227,31 @@ class PrognosisExport2
 
         //I år - horozontal
         $row = $this->thisYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:AM$row")->getFill()
+        $sheet->getStyle("A$row:AO$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->thisYearRowColor);
 
         //Prognosis year - horizontal
         $row = $this->prognoseYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:AM$row")->getFill()
+        $sheet->getStyle("A$row:AO$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
         //Pension official - horizontal
         $row = $this->pensionOfficialYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:AM$row")->getFill()
+        $sheet->getStyle("A$row:AO$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
 
         //Pension wish - horizontal
         $row = $this->pensionWishYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle("A$row:AM$row")->getFill()
+        $sheet->getStyle("A$row:AO$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
 
         //Deathyear - horizontal
         $row = $this->deathYear - $this->economyStartYear + $verticaloffsett;
-        $sheet->getStyle('A'.$row.':AM'.$row)->getFill()
+        $sheet->getStyle('A'.$row.':AO'.$row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->deathYearRowColor);
     }

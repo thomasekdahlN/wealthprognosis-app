@@ -14,7 +14,7 @@
             "name": "My Crypto",
             "description": "Coinbase private",
             "active": true,
-            "tax": "fond"
+            "tax": "crypto"
         },
         "2022": {
             "asset": {
@@ -26,7 +26,7 @@
             "$pensionWishYear": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.fond",
+                "changerate": "changerates.crypto",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }
