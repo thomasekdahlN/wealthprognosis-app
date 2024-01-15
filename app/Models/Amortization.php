@@ -18,7 +18,7 @@ class Amortization extends Model
 
     private int $term_years;
 
-    private float $interest;
+    private $interest;
 
     private int $terms;
 
@@ -61,6 +61,7 @@ class Amortization extends Model
         $this->year_start = (int) $year;
         $this->term_years = (int) Arr::get($mortgage, 'years');
         $this->amount = $this->remainingMortgageAmount = (float) Arr::get($mortgage, 'amount');
+        $this->interest = Arr::get($mortgage, 'interest');
         $this->terms = 1;
         $this->period = $this->terms * $this->term_years;
         $this->balanceAmount = $this->amount;
@@ -103,11 +104,11 @@ class Amortization extends Model
     {
         $description = null;
         //Retrieving interest pr year.
-        [$interestPercent, $interestDecimal, $this->assetChangerateValue, $explanation] = $this->changerate->getChangerate(false, Arr::get($this->config, "$this->assettname.$year.mortgage.interest"), $year, $this->assetChangerateValue);
+        [$interestPercent, $interestDecimal, $this->assetChangerateValue, $explanation] = $this->changerate->getChangerate(false, $this->interest, $year, $this->assetChangerateValue);
         $interestDecimal = $interestPercent / 100;
 
         $deno = 1 - (1 / pow((1 + $interestDecimal), $this->period));
-        //print "##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
+        //print "      ##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
 
         if ($deno > 0) {
 
@@ -129,7 +130,7 @@ class Amortization extends Model
             if ($this->balanceAmount > 0) {
 
                 if ($debug) {
-                    echo "$year: years: $this->period, interestOnlyYears: $this->interestOnlyYears, deno: $deno : $interestPercent% = $interestDecimal : remainingMortgageAmount: ".round($this->remainingMortgageAmount).' termAmount: '.round($this->termAmount).' : interestAmount '.round($interestAmount).' : principalAmount: '.round($this->principalAmount).' : balanceAmount: '.round($this->balanceAmount)."\n";
+                    echo "      $year: years: $this->period, interestOnlyYears: $this->interestOnlyYears, deno: $deno : $interestPercent% = $interestDecimal : remainingMortgageAmount: ".round($this->remainingMortgageAmount).' termAmount: '.round($this->termAmount).' : interestAmount '.round($interestAmount).' : principalAmount: '.round($this->principalAmount).' : balanceAmount: '.round($this->balanceAmount)."\n";
                 }
                 if ($extraDownpaymentAmount > 0) {
                     $description .= " extraDownpaymentAmount: $extraDownpaymentAmount\n";
@@ -138,7 +139,7 @@ class Amortization extends Model
                 $this->dataH[$this->assettname][$year]['mortgage'] = [
                     'amount' => round($this->amount), //Opprinnelig lånebeløp
                     'termAmount' => round($this->termAmount), //Terminbeløp (pr år)
-                    'interest' => $interestPercent,
+                    'interest' => $this->assetChangerateValue, //We want the reference to changerates, to be dynamic, not a number.
                     'interestDecimal' => $interestPercent / 100,
                     'interestAmount' => round($interestAmount), //Renter
                     'principalAmount' => round($this->principalAmount), //Avdrag
@@ -148,6 +149,8 @@ class Amortization extends Model
                     'interestOnlyYears' => $this->interestOnlyYears, //Remaining years to only pay interest.
                     'gebyrAmount' => 0,
                     'description' => $description,
+                    'taxDeductableAmount' => round($interestAmount) * 0.22, //FIX - Should be read from tax config yearly
+                    'taxDeductableDecimal' => 0.22, //FIX - Should be read from tax config yearly
                 ];
             } else {
                 $this->balanceAmount = 0;

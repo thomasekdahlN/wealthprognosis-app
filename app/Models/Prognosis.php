@@ -51,7 +51,7 @@ class Prognosis
         'ask' => true,
         'ips' => true,
         'cash' => true,
-        'bank' => true
+        'bank' => true,
     ];
 
     //Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
@@ -316,8 +316,8 @@ class Prognosis
                 $cashflowNewRule = null;
                 if ($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
                     //print "  Cashflow-start: $assetname.$year, transferOrigin: $path.cashflow.afterTaxAmount, cashflowTransfer:$cashflowTransfer, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
-                    [$cashflowAfterTaxAmount, $cashflowDiffAmount, $cashflowNewRule, $cashflowExplanation] = $this->applyRule(true, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount, 0, $cashflowRule, $cashflowTransfer, $cashflowSource, 1);
-                    print "  Cashflow-end  : $assetname.$year, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, cashflowDiffAmount: $cashflowDiffAmount, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
+                    [$cashflowAfterTaxAmount, $cashflowDiffAmount, $cashflowNewRule, $cashflowExplanation] = $this->applyRule(false, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount, 0, $cashflowRule, $cashflowTransfer, $cashflowSource, 1);
+                    //print "  Cashflow-end  : $assetname.$year, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, cashflowDiffAmount: $cashflowDiffAmount, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
                     //Amounts will probably be transfered to Assets here. So need to do a new calculation.
                 }
 
@@ -326,7 +326,7 @@ class Prognosis
                 $assetMarketAmount += ($this->ArrGet("$path.asset.transferedAmount") * $assetChangerateDecimal);
                 $assetAcquisitionAmount += $this->ArrGet("$path.asset.transferedAmount");
                 $realizationPrevTaxShieldAmount = $this->ArrGet("$assetname.$prevYear.realization.taxShieldAmount");
-                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldDecimal] = $this->tax->taxCalculationRealization(true, $taxtype, $year, $assetMarketAmount, $assetAcquisitionAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
+                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldDecimal] = $this->tax->taxCalculationRealization(false, $taxtype, $year, $assetMarketAmount, $assetAcquisitionAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
                 $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
 
                 //If a mortgage is involved, the termAmount is a part of the Paid amount, since you also paid the term amount. The amount pais is usually the same ass the $assetEquityAmount
@@ -487,7 +487,7 @@ class Prognosis
 
         //This is really just a fixed number, but it can appear at the same time as a rule.
         if (is_numeric($amount) && $amount != 0) {
-            $explanation = 'Using current amount: '.round($amount)." * $factor";
+            $explanation = 'Using current amount: '.round($amount)." * $factor ";
             $amount = $calculatedNumericAmount = round($amount * $factor);
             //This is not a deposit
         }
@@ -510,9 +510,9 @@ class Prognosis
             $transferAmount = -$diffAmount;
 
             if ($transferAmount > 0) {
-                $this->transfer($debug, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount);
-                //$calculatedAmount = $amount - $newAmount; //Removes the transferred amount from this asset.
-                //$acquisitionAmount = round($newAmount - $amount);
+                [$XpaidAmount, $notTransferedAmount, $Xexplanation] = $this->transfer($debug, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount);
+                $newAmount = $notTransferedAmount;
+                $diffAmount = $transferAmount - $notTransferedAmount;
             }
         } elseif ($source && $rule) {
             //If we are not transfering the values to another resoruce, then we are adding it to the current resource
@@ -561,7 +561,7 @@ class Prognosis
         [$originAssetname, $originYear, $originType, $originField] = $this->helper->pathToElements($transferOrigin);
 
         $paidAmount = 0;
-        $explanation = " transfer $amount to $transferTo";
+        $explanation = " transfer $amount to $transferTo ";
         if ($debug) {
             echo "Transferto before: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
         }
@@ -587,18 +587,26 @@ class Prognosis
 
         $transferedAmount = $amount - $realizationTaxAmount; //The amnount we transfer minus the realizationTax
 
-        //The transfer happens here.
-        $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
-        $this->ArrSet($transferedToAmount, $this->ArrGet($transferedToAmount) + $transferedAmount); //The amount we transfered to - for later reference and calculation
-        $this->ArrSet($transferedToDescription, $this->ArrGet($transferedToDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedAmount from $transferOrigin "); //The amount we transfered including the tax - for later reference and calculation
-        $this->ArrSet($transferedOriginAmount, $this->ArrGet($transferedOriginAmount) - $amount); //The amount we transfered including the tax - for later reference and calculation
+        if (Str::contains($transferTo, ['mortgage.extraDownpaymentAmount']) && $transferedAmount > 0) {
+            //We see it is an extra $extraDownpaymentAmount for the mortgage, then we recalculate it.
+            //Will also handle if we try to transfer to a non existing mortgage, not transfering anything.
+            [$notTransferedAmount, $mortgageExplanation] = $this->mortgageExtraDownPayment($toAssetname, $toYear, $transferedAmount);
+            $transferedAmount = $transferedAmount - $notTransferedAmount;
+            if ($transferedAmount > 0) {
+                $this->ArrSet($transferedToDescription, $this->ArrGet($transferedToDescription)."extraDownpaymentAmount $transferedAmount from $transferOrigin "); //The amount we transfered including the tax - for later reference and calculation
+            }
+        } else {
 
-        //print "      transferTo ex tax: $transferTo=" . $this->ArrGet($transferTo) . " \n";
-        //print "      transferedToAmount ex tax: $transferedToAmount=" . $this->ArrGet($transferedToAmount) . " \n";
-        //print "      transferedOriginAmount inc tax: $transferedOriginAmount=" . $this->ArrGet($transferedOriginAmount) . " \n";
-        //dd($this->dataH[$toAssetname][$toYear][$toType]);
-        //dd($this->dataH[$originAssetname][$originYear][$originType]);
+            //The transfer happens here.
+            $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
+            $this->ArrSet($transferedToDescription, $this->ArrGet($transferedToDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedAmount from $transferOrigin "); //The amount we transfered including the tax - for later reference and calculation
 
+        }
+        if ($transferedAmount > 0) {
+            //Could happen if downpayment of mortgage is finished.
+            $this->ArrSet($transferedToAmount, $this->ArrGet($transferedToAmount) + $transferedAmount); //The amount we transfered to - for later reference and calculation
+            $this->ArrSet($transferedOriginAmount, $this->ArrGet($transferedOriginAmount) - $amount); //The amount we transfered including the tax - for later reference and calculation
+        }
         //FIX: Should add explanation also on the asset transfered to for easier debug.
         $paidAmount -= $amount;
         if ($paidAmount < 0) {
@@ -613,7 +621,62 @@ class Prognosis
         //reduce value from this assetAmount
         $explanation .= " reduce by $amount\n";
 
-        return [$paidAmount, $explanation];
+        return [$paidAmount, $notTransferedAmount, $explanation];
+    }
+
+    public function mortgageExtraDownPayment($assetname, $year, $extraDownPaymentAmount)
+    {
+
+        $description = null;
+        $notUsedExtraAmount = 0;
+        $mortgage = [];
+        //We have to recalculate it from the next year, we can not change the run of this year without big problems....
+        $year++;
+        //We see it is an extra $extraDownpaymentAmount for the mortgage, then we recalculate it.
+        //Mortage - has to be calculated before asset, since we use data from mortgage to calculate asset values correctly.
+        //How can we ensure we are transfering to a valid mortgage, it could have been finished already.
+        $mortgageBalanceAmount = $this->ArrGet("$assetname.$year.mortgage.balanceAmount");
+        $mortgage['amount'] = $mortgageBalanceAmount - $extraDownPaymentAmount; //Vi reberegner lånet minus ekstra innbetaliungen - basert på gjenværende lånebeløp dette året.
+        if ($mortgage['amount'] > 0) {
+
+            echo "*** Reberegner opprinnelig lån $mortgageBalanceAmount med ekstra innbetaling $year: $extraDownPaymentAmount = ny lånesum: ".$mortgage['amount']."\n";
+
+            //The mortgage has a remaining balance after extra payment, we recalculate on this amount.
+            $mortgage['years'] = $this->ArrGet("$assetname.$year.mortgage.years"); //Vi reberegner slik at lånet er ferdig på samme år som det opprinnelige lånet
+            $mortgage['interest'] = $this->ArrGet("$assetname.$year.mortgage.interest"); //Vi reberegner med den opprinnelige rentebanen
+            $mortgage['extraDownpaymentAmount'] = $this->ArrGet("$assetname.$year.mortgage.extraDownpaymentAmount");
+            $mortgage['interestOnlyYears'] = $this->ArrGet("$assetname.$year.mortgage.interestOnlyYears"); //Vi reberegner med gjenværende avdragsfritt lån
+            $mortgage['gebyrAmount'] = $this->ArrGet("$assetname.$year.mortgage.gebyrAmount"); //Vi reberegner med samme gebyr som opprinnelig (FIX: ikke støttet uansett)
+
+            $this->removeMortgageFrom($assetname, $year); //Clean up all mortage from dataH even from this year before recalculating it back into the array.
+            //Recalculate the mortgage from this year an onwards.
+            if ($mortgage) {
+                //print_r($mortgage);
+                $this->dataH = (new Amortization($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
+            }
+
+        } else {
+            //FIX: Do we have to reset some variables here since we were not able to use the money..... Should be checked before we started the transfer......
+            //The mortgage have been payd in full, it may be some $extraDownPaymentAmount left to return and not transfer. We only transfer what we need to pay the mortgage
+            //This will happen for all transfers for the length of the asset from the first extra down payment has happened when transfering extra money.
+            $notUsedExtraAmount = abs($mortgage['amount']); //The remaining amount after the mortgage has been payed.
+            $mortgageBalanceAmount = 0; //Loan is emptied
+            $this->removeMortgageFrom($assetname, $year--);
+
+            //print "    notUsedExtraAmount: $notUsedExtraAmount - going back into cashflow\n";
+        }
+
+        return [$notUsedExtraAmount, $description];
+    }
+
+    public function removeMortgageFrom($assetname, $year)
+    {
+        while (isset($this->dataH[$assetname][$year]['mortgage'])) {
+            //As long as mortgage is set for this year, we remove it until we do not find it anymore.
+            //print "    Removing mortgage from dataH[$year]\n";
+            unset($this->dataH[$assetname][$year]['mortgage']);
+            $year++;
+        }
     }
 
     /**
@@ -816,7 +879,6 @@ class Prognosis
     public function postProcessRealizationYearly(string $path)
     {
     }
-
 
     /**
      * Performs post-processing for the income potential as seen from a Bank

@@ -16,7 +16,15 @@
             "active": true,
             "tax": "house"
         },
-        "2023": {
+        "2024": {
+            "income": {
+                "name": "Income",
+                "description": "Income",
+                "amount": 14500,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
             "asset": {
                 "marketAmount": "3000000",
                 "changerate": "changerates.house",
@@ -27,7 +35,14 @@
                 "amount": 1500000,
                 "interest": "changerates.interest",
                 "years": 10,
-                "interestOnlyYears": 5
+                "XinterestOnlyYears": 5
+            },
+            "cashflow": {
+                "description": "We do extra downpayment of mortgage with positive cashflow.",
+                "rule": "100%",
+                "transfer": "house1.$year.mortgage.extraDownpaymentAmount",
+                "source": "",
+                "repeat": true
             }
         }
     },
@@ -37,10 +52,10 @@
             "group": "private",
             "name": "ExtraDownpayment",
             "description": "Paying interest and principal + 60 000 ekstra downpayment for all the years",
-            "active": true,
+            "active": false,
             "tax": "house"
         },
-        "2023": {
+        "2024": {
             "asset": {
                 "marketAmount": "3000000",
                 "changerate": "changerates.house",

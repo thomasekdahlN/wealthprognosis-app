@@ -76,13 +76,14 @@ class Tax extends Model
         if (Arr::get($this->taxShieldTypes, $taxtype)) {
             //Note: All Tax shield percentage are changed by the government yearly.
             $percent = Arr::get($this->taxH, "shareholdershield.$year", null);
-            if(!isset($percent)) {
+            if (! isset($percent)) {
                 //Fallback to our prognosis for the comming years if no percentage curve is given
-                $percent = Arr::get($this->taxH, "shareholdershield.all", 23);
+                $percent = Arr::get($this->taxH, 'shareholdershield.all', 23);
             }
             //print "   shareholdershield.$year: $percent%\n";
             $percent = $percent / 100;
         }
+
         return $percent;
     }
 
@@ -303,10 +304,10 @@ class Tax extends Model
         }
 
         //Skjermingsfradrag
-        if($realizationTaxShieldPercent > 0) {
+        if ($realizationTaxShieldPercent > 0) {
             $realizationTaxShieldAmount = ($acquisitionAmount * $realizationTaxShieldPercent) + $taxShieldPrevAmount; //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
             //print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
-            if($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
+            if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
                 $realizationTaxShieldAmount = 0;
             }
         }
@@ -416,11 +417,11 @@ class Tax extends Model
 
         //Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationTaxAmount -= $realizationTaxShieldAmount;
-        if($realizationTaxAmount < 0) {
+        if ($realizationTaxAmount < 0) {
             $realizationTaxAmount = 0; //Skjermingsfradraget kan ikke være større enn skatten
         }
         $acquisitionAmount -= $amount; //We remove the transfered amount from the acquisitionAmount
-        if($acquisitionAmount < 0) {
+        if ($acquisitionAmount < 0) {
             $acquisitionAmount = 0; //Kjøpsbeløpet kan ikke være negativt.
         }
 

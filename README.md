@@ -133,7 +133,7 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 - meta.prognoseYear - Just visualizes this year extra with a colored line in excel
 - meta.pensionOfficialYear - Official pension year in your country (67 in noprway)
 - meta.pensionWishYear - When you wish to retire. Maybe you want to retire earlier because of F.I.R.E
-- meta.deathYear - Required. How long do you think you live.
+- meta.deathYear - Required. When do you think you die?
 
 Your pensionOfficialYear/pensionWishYear will be used to calculate equal payments (like 1/14 of your assets) from your assets until deathYear. So if you live longer, you get less pr year.
 
