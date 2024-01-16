@@ -557,6 +557,7 @@ class Prognosis
         $realizationTaxAmount = 0;
         $taxShieldPrevAmount = 0;
         $realizationTaxPercent = 0;
+        $notTransferedAmount = 0;
 
         [$originAssetname, $originYear, $originType, $originField] = $this->helper->pathToElements($transferOrigin);
 

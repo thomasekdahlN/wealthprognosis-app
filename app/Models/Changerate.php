@@ -26,7 +26,6 @@ class Changerate extends Model
         $file = "prognosis/$prognosis.json";
         $configH = json_decode(Storage::disk('local')->get($file), true);
         echo "Leser prognose fra : '$file'\n";
-        //dd($configH['rental']);
 
         foreach ($configH as $type => $typeH) {
 
