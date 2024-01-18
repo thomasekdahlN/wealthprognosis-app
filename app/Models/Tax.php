@@ -26,6 +26,7 @@ class Tax extends Model
         'stock' => true,
         'equityfund' => true,
         'bondfund' => true,
+        'ask' => true,
         'loantocompany' => true, //lån til andre, fradrag om det er låm
         'soleproprietorship' => true, //Enkeltpersonforetak
     ];
@@ -305,7 +306,8 @@ class Tax extends Model
 
         //Skjermingsfradrag
         if ($realizationTaxShieldPercent > 0) {
-            $realizationTaxShieldAmount = ($acquisitionAmount * $realizationTaxShieldPercent) + $taxShieldPrevAmount; //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
+            //TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
+            $realizationTaxShieldAmount = ($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount; //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
             //print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
             if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
                 $realizationTaxShieldAmount = 0;

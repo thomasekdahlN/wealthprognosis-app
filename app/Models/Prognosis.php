@@ -234,10 +234,10 @@ class Prognosis
                 [$assetChangeratePercent, $assetChangerateDecimal, $assetChangerateAmount, $assetExplanation1] = $this->changerate->getChangerate(false, $assetChangerate, $year, $assetChangerateAmount);
                 //print "$year: $assetChangeratePercent%\n";
 
-                //print "\nAsset før: $assetname.$year assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetRule:$assetRule\n";
+                print "\nAsset før: $assetname.$year assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetRule:$assetRule\n";
                 //FIX: Trouble sending in $assetAcquisitionAmount here, since it is recalculated in the step after.... chicken and egg problem.
-                [$assetMarketAmount, $assetDiffAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(false, "$path.asset.marketAmount", $assetMarketAmount, $assetAcquisitionAmount, $assetRule, $assetTransfer, $assetSource, 1);
-                //print "Asset etter: $assetname.$year assetMarketAmount: $assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
+                [$assetMarketAmount, $assetDiffAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(true, "$path.asset.marketAmount", $assetMarketAmount, $assetAcquisitionAmount, $assetRule, $assetTransfer, $assetSource, 1);
+                print "Asset etter: $assetname.$year assetMarketAmount: $assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
 
                 if ($firsttime) {
                     //default values we only set on the first run
@@ -274,11 +274,11 @@ class Prognosis
                     //Calculation of the changerate asset has to be done after paidAmount, equityAmount but before we calculate the Taxes.
                     $assetMarketAmount = round($assetMarketAmount * $assetChangerateDecimal);
                     $assetTaxableAmount = round(($assetTaxableAmount + $assetDiffAmount) * $assetChangerateDecimal); //FIX: Trouble with override special case destrous all marketAmounts after it is set the first time. Does not neccessarily be more taxable if you put more money into it. Special case with house/cabin/rental.
-                    $assetPaidAmount += $this->ArrGet("$assetname.$year.mortgage.termAmount") + $assetDiffAmount; //Recalculated every year.
-                    $assetAcquisitionAmount += $assetDiffAmount; //Add/subtract amounts that are added by rule, transfer or source. Not changerate. Recalculated every year.
+                    $assetPaidAmount += $this->ArrGet("$assetname.$year.mortgage.termAmount"); // + $assetDiffAmount; //Recalculated every year.
+                    //$assetAcquisitionAmount += $assetDiffAmount; //Add/subtract amounts that are added by rule, transfer or source. Not changerate. Recalculated every year.
                 }
 
-                //print "Asset LENGE etter: $assetname.$year assetMarketAmount: $assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetNewRule:$assetNewRule explanation: $explanation\n\n";
+                print "Asset LENGE etter: $assetname.$year assetMarketAmount: $assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetNewRule:$assetNewRule explanation: $explanation\n\n";
 
                 //print "$year.assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
@@ -503,16 +503,13 @@ class Prognosis
             //$debug = true;
 
             if ($rule) {
-                [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $acquisitionAmount, $rule, $factor);
-            }
+                [$newAmount, $transferAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $acquisitionAmount, $rule, $factor);
 
-            //Have to switch signs on $diffAmount
-            $transferAmount = -$diffAmount;
-
-            if ($transferAmount > 0) {
-                [$XpaidAmount, $notTransferedAmount, $Xexplanation] = $this->transfer($debug, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount);
-                $newAmount = $notTransferedAmount;
-                $diffAmount = $transferAmount - $notTransferedAmount;
+                if ($transferAmount > 0) {
+                    [$XpaidAmount, $notTransferedAmount, $Xexplanation] = $this->transfer(true, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount);
+                    $diffAmount = $transferAmount - $notTransferedAmount;
+                    //$newAmount -= $diffAmount; //THe transfer will also be added later in the prosess, but since a transfer can come from multiple assets we do not know the difference between addition here and later.
+                }
             }
         } elseif ($source && $rule) {
             //If we are not transfering the values to another resoruce, then we are adding it to the current resource
@@ -564,7 +561,7 @@ class Prognosis
         $paidAmount = 0;
         $explanation = " transfer $amount to $transferTo ";
         if ($debug) {
-            echo "Transferto before: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
+            echo "        Transferto before: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
         }
 
         [$toAssetname, $toYear, $toType, $toField] = $this->helper->pathToElements($transferTo);
@@ -615,7 +612,7 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "Transferto after: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
+            echo "        Transferto after: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
         }
 
         //###########################################################################################################

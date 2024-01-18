@@ -20,129 +20,113 @@ class Helper extends Model
 
         if ($rule) {
             if (preg_match('/(\+|\-)?(\d*)(\%)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
-                [$diffAmount, $explanation] = $this->calculationPercentage($debug, $amount, $ruleH);
+                [$newAmount, $calcAmount, $explanation] = $this->calculationPercentage($debug, $amount, $ruleH);
 
             } elseif (preg_match('/(\+|\-)?(\d*)\/(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
                 //When divisor sign is pipe / -Normal divisor
 
-                [$diffAmount, $explanation] = $this->calculationDivisor($debug, $amount, $ruleH);
+                [$newAmount, $calcAmount, $explanation] = $this->calculationDivisor($debug, $amount, $ruleH);
 
             } elseif (preg_match('/(\+|\-)?(\d*)\|(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
                 //When divisor sign is pipe | - we dynamically count down divisor according to rules
-                [$diffAmount, $rule, $explanation] = $this->calculationDynamicDivisor($debug, $amount, $ruleH);
+                [$newAmount, $calcAmount, $rule, $explanation] = $this->calculationDynamicDivisor($debug, $amount, $ruleH);
 
             } elseif (preg_match('/(\+|\-)?(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
-                [$diffAmount, $explanation] = $this->calculationPlusMinus($debug, $amount, $ruleH, $factor);
+                [$newAmount, $calcAmount, $explanation] = $this->calculationPlusMinus($debug, $amount, $ruleH, $factor);
 
             } else {
                 echo "ERROR: calculateRule #$rule# not supported";
             }
         }
 
-        $totalAmount = $diffAmount + $amount;
-
-        return [$totalAmount, $diffAmount, $rule, $explanation];
+        return [$newAmount, $calcAmount, $rule, $explanation];
     }
 
     public function calculationDynamicDivisor(bool $debug, string $amount, array $ruleH)
     {
+
         $rule = null;
 
-        $diffAmount = round($amount / $ruleH[3][0]);
+        [$newAmount, $calcAmount, $explanation] = $this->calculationDivisor($debug, $amount, $ruleH);
 
-        if ($ruleH[1][0] == '-') {
-            $newAmount = $amount - $diffAmount;
-            $explanation = 'Subtracting divisor: '.$diffAmount;
-            $ruleH[3][0]--; //Dynamic divisor
-
-        } elseif ($ruleH[1][0] == '+') {
-            $newAmount = $amount + $diffAmount;
-            $explanation = 'Adding divisor: '.$diffAmount;
-            $ruleH[3][0]--; //Dynamic divisor
-        } else {
-            //When no sign is given, we reduce the amount. Its lake taking this divisor out of the amount.
-            $newAmount = $amount - $diffAmount;
-            $explanation = 'Adding divisor: '.$diffAmount;
-            $ruleH[3][0]--; //Dynamic divisor
-        }
+        $ruleH[3][0]--; //Dynamic divisor, we count down.
 
         if ($ruleH[3][0] > 0) {
-            $rule = $ruleH[1][0].$ruleH[2][0].'|'.$ruleH[3][0]; //ToDo: Note rule is rewritten for each iteration
+            $rule = $ruleH[1][0].$ruleH[2][0].'|'.$ruleH[3][0];
         }
 
         $explanation .= " rewritten rule: $rule";
 
         if ($debug) {
-            echo "  calculationDynamicDivisor OUTPUT(amount: $amount, diffAmount: $diffAmount, rule: $rule, explanation: $explanation)\n";
+            echo "  calculationDynamicDivisor OUTPUT(amount: $amount, newAmount: $newAmount, calcAmount: $calcAmount, newrule: $rule, explanation: $explanation)\n";
         }
 
-        $diffAmount = $newAmount - $amount;
-
-        return [$diffAmount, $rule, $explanation]; //Returns rewritten rule, has to be remembered
+        return [$newAmount, $calcAmount, $rule, $explanation]; //Returns rewritten rule, has to be remembered
     }
 
     public function calculationDivisor(bool $debug, int $amount, array $ruleH)
     {
-        $divisorAmount = round($amount / $ruleH[3][0]);
+        $divisor = $ruleH[3][0];
+        $calcAmount = round($amount / $divisor);
 
         if ($ruleH[1][0] == '-') {
-            $newAmount = $amount - $divisorAmount;
-            $explanation = 'Subtracting divisor: '.$divisorAmount;
+            $newAmount = $amount - $calcAmount;
+            $explanation = "Subtracting division: $amount/$divisor=".$calcAmount;
 
         } elseif ($ruleH[1][0] == '+') {
             $newAmount = $amount + $divisorAmount;
-            $explanation = 'Adding divisor: '.$divisorAmount;
+            $explanation = "Adding division: $amount/$divisor=".$calcAmount;
         } else {
-            //When no sign is given, we reduce the amount. Its like taking this divisor out of the amount.
-            $newAmount = $amount - $divisorAmount;
-            $explanation = 'Subtracting divisor: '.$divisorAmount;
+            //When no sign is given,  we only want the part of the amount. Its like taking this divisor out of the amount.
+            $newAmount = $amount; //We do not change the original amount
+            $explanation = "Division: $amount/$divisor=".$calcAmount;
         }
 
-        $diffAmount = $newAmount - $amount;
-
-        return [$diffAmount, $explanation];
+        return [$newAmount, $calcAmount, $explanation];
     }
 
     public function calculationPercentage(bool $debug, string $amount, array $ruleH)
     {
 
         $percent = $ruleH[2][0];
+        $calcAmount = 0;
+
         if ($ruleH[1][0] == '-') {
             $newAmount = round($amount * ((-$percent / 100) + 1));
             $explanation = "$amount-$percent%=$newAmount";
+            $calcAmount = $newAmount - $amount;
 
         } elseif ($ruleH[1][0] == '+') {
             $newAmount = round($amount * (($percent / 100) + 1));
             $explanation = "$amount+$percent%=$newAmount";
+            $calcAmount = $newAmount - $amount;
+
         } else {
-            //When no sign is given, we reduce the amount. Its like taking this percentage out of the amount.
-            $newAmount = round($amount * ((-$percent / 100) + 1));
-            $explanation = "$amount-$percent%=$newAmount";
+            //When no sign is given, we only want the part of the amount. Its like taking this percentage out of the amount.
+            $newAmount = $amount; //We do not change the original amount
+            $calcAmount = round($amount * ($percent / 100));
+            $explanation = "$percent% of $amount=$calcAmount";
+            //$diffAmount = $newAmount - $amount;
         }
 
-        $diffAmount = $newAmount - $amount;
-
-        return [$diffAmount, $explanation];
+        return [$newAmount, $calcAmount, $explanation];
     }
 
     public function calculationPlusMinus(bool $debug, int $amount, array $ruleH, int $factor = 1)
     {
         $extraAmount = $ruleH[2][0];
-        $calckAmount = round($extraAmount * $factor);
+        $calcAmount = round($extraAmount * $factor);
 
         if ($ruleH[1][0] == '-') {
-            $newAmount = $amount - $calckAmount;
-            $explanation = "Subtracting: $newAmount = $amount + ($extraAmount * $factor)";
+            $newAmount = $amount - $calcAmount;
+            $explanation = "Subtracting: $amount-($extraAmount*$factor)=$newAmount ";
 
         } elseif ($ruleH[1][0] == '+') {
-            $newAmount = $amount + $calckAmount;
-            $explanation = "Adding: $newAmount = $amount + ($extraAmount * $factor)";
-
+            $newAmount = $amount + $calcAmount;
+            $explanation = "Adding: $amount+($extraAmount*$factor)=$newAmount ";
         }
 
-        $diffAmount = $newAmount - $amount;
-
-        return [$diffAmount, $explanation];
+        return [$newAmount, $calcAmount, $explanation];
     }
 
     public function pathToElements($path)
