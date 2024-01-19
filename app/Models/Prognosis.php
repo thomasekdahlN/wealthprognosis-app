@@ -464,6 +464,7 @@ class Prognosis
 
         [$originAssetname, $originYear, $originType, $originField] = $this->helper->pathToElements($transferOrigin);
         $transferedOriginAmount = "$originAssetname.$originYear.$originType.transferedAmount";
+        $transferedOriginDescription = "$originAssetname.$originYear.$originType.description";
 
         //print "  transferOrigin: $originAssetname.$originYear.$originType.acquisitionAmount: $acquisitionAmount\n";
 
@@ -521,21 +522,22 @@ class Prognosis
 
             $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
 
-        } else {
-            //No transfers or sourcing involved, just apply the rule to the amount if it exists
-            if ($rule) {
-                if ($debug) {
-                    echo "  Normal rule\n";
-                }
-                [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $acquisitionAmount, $rule, $factor);
-                $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
+        } elseif ($rule) {
 
-            } else {
-                //No changes here
-                $newAmount = $amount;
-                $diffAmount = 0;
-                $rule = '';
+            //A rule without a transfer adds money to an asset without removing it from another asset. It is treated as a deposit.
+            if ($debug) {
+                echo "  Normal rule\n";
             }
+            [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, $acquisitionAmount, $rule, $factor);
+            $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
+            $this->ArrSet($transferedOriginDescription, Arr::get($this->dataH, $transferedOriginDescription, 0) . " added $diffAmount from rule $rule"); //The amount we transfered to - for later reference and calculation
+            $newAmount = $amount; //Since we started putting the transfer in the data structure, we can not add it here, because it is then added twice.
+
+        } else {
+            //No changes here
+            $newAmount = $amount;
+            $diffAmount = 0;
+            $rule = '';
         }
 
         if ($debug) {

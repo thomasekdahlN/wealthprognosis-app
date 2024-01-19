@@ -5,7 +5,7 @@
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "70"
     },
     "income": {
         "meta": {
@@ -16,7 +16,7 @@
             "active": true,
             "tax": "salary"
         },
-        "2022": {
+        "2024": {
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -53,9 +53,9 @@
             "active": true,
             "tax": "equityfund"
         },
-        "2023": {
+        "2024": {
             "asset": {
-                "marketAmount": 1500000,
+                "marketAmount": 1000000,
                 "rule": "+5000",
                 "changerate": "changerates.equityfund",
                 "description": "",
