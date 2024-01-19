@@ -288,7 +288,7 @@ class Tax extends Model
         return [$cashflowTaxAmount, $cashflowTaxPercent];
     }
 
-    public function taxCalculationRealization(bool $debug, string $taxtype, int $year, float $amount, float $acquisitionAmount = 0, float $taxShieldPrevAmount = 0, ?int $acquisitionYear = 0)
+    public function taxCalculationRealization(bool $debug, bool $transfer, string $taxtype, int $year, float $amount, float $acquisitionAmount = 0, float $assetDiffAmount, float $taxShieldPrevAmount = 0, ?int $acquisitionYear = 0)
     {
         $numberOfYears = $year - $acquisitionYear;
 
@@ -300,18 +300,20 @@ class Tax extends Model
         $realizationTaxAmount = 0;
         $realizationTaxShieldAmount = 0;
 
-        if ($debug && $amount != 0) {
-            echo "\n  taxCalculationRealizationStart $taxtype.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
-        }
-
         //Skjermingsfradrag
         if ($realizationTaxShieldPercent > 0) {
             //TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
-            $realizationTaxShieldAmount = ($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount; //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
+            $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
             //print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
-            if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
-                $realizationTaxShieldAmount = 0;
-            }
+        } else {
+            $realizationTaxShieldAmount = $taxShieldPrevAmount;
+        }
+        if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
+            $realizationTaxShieldAmount = 0;
+        }
+
+        if ($debug && $amount != 0) {
+            echo "\n  taxCalculationRealizationStart $taxtype.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
         }
 
         if ($taxtype == 'salary') {
@@ -336,11 +338,11 @@ class Tax extends Model
 
         } elseif ($taxtype == 'car') {
             $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+            $realizationTaxAmount = 0;
 
         } elseif ($taxtype == 'boat') {
             $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+            $realizationTaxAmount = 0;
 
         } elseif ($taxtype == 'property') {
             if ($amount - $acquisitionAmount > 0) {
@@ -418,7 +420,21 @@ class Tax extends Model
         }
 
         //Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
-        $realizationTaxAmount -= $realizationTaxShieldAmount;
+        $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
+
+        if($transfer) {
+            //We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
+            if ($realizationTaxAmount >= $realizationTaxShieldAmount) {
+                //print "REDUCING TAX SHIELD1\n";
+                $realizationTaxAmount -= $realizationTaxShieldAmount; //Reduce the tax amount by the taxShieldAmount
+                $realizationTaxShieldAmount = 0; //Then taxShieldAmount is used and has to go to zero.
+            } else {
+                //print "REDUCING TAX SHIELD2\n";
+                $realizationTaxShieldAmount -= $realizationTaxAmount; //We reduce it by the amount we used
+                $realizationTaxAmount = 0; //Then taxAmount is zero, since the entire emount was taxShielded.
+            }
+        }
+
         if ($realizationTaxAmount < 0) {
             $realizationTaxAmount = 0; //Skjermingsfradraget kan ikke være større enn skatten
         }
@@ -427,8 +443,8 @@ class Tax extends Model
             $acquisitionAmount = 0; //Kjøpsbeløpet kan ikke være negativt.
         }
 
-        if ($debug && $amount != 0) {
-            echo "  taxCalculationRealizationEnd   $taxtype.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
+        if ($debug) {
+            echo "  taxCalculationRealizationEnd   $taxtype.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationBeforeShieldTaxAmount: $realizationBeforeShieldTaxAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
         }
 
         //V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
