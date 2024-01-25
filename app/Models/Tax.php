@@ -57,24 +57,24 @@ class Tax extends Model
         //dd( $this->taxH);
     }
 
-    public function getTaxYearly($taxtype, $year)
+    public function getTaxYearly($taxType, $year)
     {
 
-        return Arr::get($this->taxH, "$taxtype.yearly", 0) / 100;
+        return Arr::get($this->taxH, "$taxType.yearly", 0) / 100;
     }
 
-    public function getTaxRealization($taxtype, $year)
+    public function getTaxRealization($taxType, $year)
     {
 
-        return Arr::get($this->taxH, "$taxtype.realization", 0) / 100;
+        return Arr::get($this->taxH, "$taxType.realization", 0) / 100;
     }
 
-    public function getTaxShieldRealization($taxtype, $year)
+    public function getTaxShieldRealization($taxType, $year)
     {
         $percent = 0;
 
         //Note: Not all assets types has tax shield
-        if (Arr::get($this->taxShieldTypes, $taxtype)) {
+        if (Arr::get($this->taxShieldTypes, $taxType)) {
             //Note: All Tax shield percentage are changed by the government yearly.
             $percent = Arr::get($this->taxH, "shareholdershield.$year", null);
             if (! isset($percent)) {
@@ -89,10 +89,10 @@ class Tax extends Model
     }
 
     //Returnerer hvor stor del av formuen som blir skattlagt
-    public function getTaxableFortune($taxtype, $year)
+    public function getTaxableFortune($taxType, $year)
     {
 
-        return Arr::get($this->taxH, "$taxtype.fortune", 0) / 100;
+        return Arr::get($this->taxH, "$taxType.fortune", 0) / 100;
     }
 
     //Returnerer formuesskatten i %
@@ -145,12 +145,12 @@ class Tax extends Model
         return [$fortuneTaxAmount, $fortuneTaxPercent];
     }
 
-    public function taxCalculationFortune(string $taxtype, int $year, ?int $marketAmount = 0, ?int $taxableAmount = 0, ?bool $taxableAmountOverride = false)
+    public function taxCalculationFortune(string $taxGroup, string $taxType, int $year, ?int $marketAmount = 0, ?int $taxableAmount = 0, ?bool $taxableAmountOverride = false)
     {
         $taxAmount = 0;
         $taxStandardDeductionAmount = $this->getFortuneTaxStandardDeduction($year);
         $taxPercent = $this->getFortuneTax($year);
-        $taxablePercent = $this->getTaxableFortune($taxtype, $year);
+        $taxablePercent = $this->getTaxableFortune($taxType, $year);
         $taxablePropertyAmount = 0;
         $taxPropertyAmount = 0;
         $taxablePropertyPercent = $this->getPropertyTaxable($year);
@@ -165,13 +165,20 @@ class Tax extends Model
             //echo "   taxableAmount normal: $taxableAmount\n";
         }
 
-        //Only fortune tax on more than 1.7million pr 2023
-        if ($taxableAmount > $taxStandardDeductionAmount) { //FIX: Should be read from config
+        //Only fortune tax on more than 1.7-20million pr 2023
+        if ($taxableAmount > $taxStandardDeductionAmount && $taxableAmount < 20000000) { //FIX: Should be read from config
             $taxAmount = ($taxableAmount - $taxStandardDeductionAmount) * $taxPercent; //Calculate the tax you shall pay from the taxable fortune
         }
         //print "$AmountTaxableFortune, $taxAmount, $taxPercent\n";
 
-        if (Arr::get($this->taxPropertyTypes, $taxtype)) {
+        #FIX: 1.1% fortuen tax if value is more than 20millions.
+        if ($taxableAmount > 20000000) { //FIX: Should be read from config
+            $taxAmount = (20000000 - $taxStandardDeductionAmount) * $taxPercent; //Different tax on first interval 1.7-20mill
+            $taxPercent = 0.011; //FIX: Should be read from config
+            $taxAmount += ($taxableAmount - 20000000) * $taxPercent; //Different tax above 20mill
+        }
+
+        if (Arr::get($this->taxPropertyTypes, $taxType)) {
             $taxablePropertyAmount = ($marketAmount - $taxPropertyStandardDeductionAmount) * $taxablePropertyPercent;
             if ($taxablePropertyAmount > 0 && $taxPropertyPercent > 0) {
                 $taxPropertyAmount = $taxablePropertyAmount * $taxPropertyPercent;
@@ -184,11 +191,11 @@ class Tax extends Model
         return [$taxableAmount, $taxablePercent, $taxAmount, $taxPercent, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent];
     }
 
-    public function taxCalculationCashflow(bool $debug, string $taxtype, int $year, ?float $income, ?float $expence)
+    public function taxCalculationCashflow(bool $debug, string $taxGroup, string $taxType, int $year, ?float $income, ?float $expence)
     {
 
         //FIX - should probably not be pairs, but the same thing.
-        $cashflowTaxPercent = $this->getTaxYearly($taxtype, $year); //FIX
+        $cashflowTaxPercent = $this->getTaxYearly($taxType, $year); //FIX
 
         //Forskjell på hva man betaler skatt av
         $cashflowBeforeTaxAmount = 0;
@@ -197,42 +204,42 @@ class Tax extends Model
         $cashflowTaxAmount = 0;
 
         if ($debug) {
-            echo "\ntaxtype: $taxtype.$year: income: $income, expence: $expence, cashflowTaxPercent: $cashflowTaxPercent\n";
+            echo "\ntaxtype: $taxGroup.$taxType.$year: income: $income, expence: $expence, cashflowTaxPercent: $cashflowTaxPercent\n";
         }
 
-        if ($taxtype == 'salary') {
+        if ($taxType == 'salary') {
             $cashflowTaxAmount = $income * $cashflowTaxPercent;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'pension') {
+        } elseif ($taxType == 'pension') {
             $cashflowTaxAmount = $income * $cashflowTaxPercent;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'income') {
+        } elseif ($taxType == 'income') {
             $cashflowTaxAmount = $income * $cashflowTaxPercent;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'house') {
+        } elseif ($taxType == 'house') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'cabin') {
+        } elseif ($taxType == 'cabin') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - 10000) * $cashflowTaxPercent; //Airbnb skatten
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'rental') {
+        } elseif ($taxType == 'rental') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'property') {
+        } elseif ($taxType == 'property') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'stock') {
+        } elseif ($taxType == 'stock') {
             //Hm. Aksjer som selges skattes bare som formuesskatt og ved realisasjon
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             //FIX: Skjermingsfradrag
@@ -240,35 +247,35 @@ class Tax extends Model
             $cashflowTaxAmount = 0;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'bondfund') {
+        } elseif ($taxType == 'bondfund') {
             //Hm. bondfund i praksis bare eid i firmaer, alt privat i ASK og skattes bare ved realisasjon + formuesskatt
             $cashflowTaxAmount = 0;
 
-        } elseif ($taxtype == 'equityfund') {
+        } elseif ($taxType == 'equityfund') {
             //Hm. equityfund i praksis bare eid i firmaer, alt privat i ASK og skattes bare ved realisasjon + formuesskatt
             $cashflowTaxAmount = 0;
 
-        } elseif ($taxtype == 'ask') {
+        } elseif ($taxType == 'ask') {
             //Aksjesparekonto. TODO Fix. Kun skatt ved salg??? Ikke årlig
             $cashflowTaxAmount = 0; //Ikke årlig skatt på ASK
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'otp') {
+        } elseif ($taxType == 'otp') {
             //Pensjonssparing fra arbeidsgiver
             $cashflowTaxAmount = 0; //Ikke årlig skatt på ASK
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'ips') {
+        } elseif ($taxType == 'ips') {
             //Pensjonssparing fra arbeidsgiver
             $cashflowTaxAmount = 0; //Ikke årlig skatt på ASK
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'bank') {
+        } elseif ($taxType == 'bank') {
             //ToDo: Man skal bare betale skatt av rentene
             $cashflowTaxAmount = $income * $cashflowTaxPercent; //ToDO FIX
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
-        } elseif ($taxtype == 'cash') {
+        } elseif ($taxType == 'cash') {
             //ToDo: Man skal bare betale skatt av rentene
             $cashflowTaxAmount = $income * $cashflowTaxPercent; //ToDO FIX
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
@@ -280,7 +287,7 @@ class Tax extends Model
         }
 
         if ($debug) {
-            echo "$taxtype.$year: cashflow: $cashflow, cashflowTaxAmount: $cashflowTaxAmount, cashflowTaxPercent: $cashflowTaxPercent, potentialIncomeAmount: $potentialIncomeAmount\n";
+            echo "$taxType.$year: cashflow: $cashflow, cashflowTaxAmount: $cashflowTaxAmount, cashflowTaxPercent: $cashflowTaxPercent, potentialIncomeAmount: $potentialIncomeAmount\n";
         }
         $cashflowBeforeTaxAmount = $income - $expence;
 
@@ -288,12 +295,12 @@ class Tax extends Model
         return [$cashflowTaxAmount, $cashflowTaxPercent];
     }
 
-    public function taxCalculationRealization(bool $debug, bool $transfer, string $taxtype, int $year, float $amount, float $acquisitionAmount = 0, float $assetDiffAmount, float $taxShieldPrevAmount = 0, ?int $acquisitionYear = 0)
+    public function taxCalculationRealization(bool $debug, bool $transfer, string $taxGroup, string $taxType, int $year, float $amount, float $acquisitionAmount = 0, float $assetDiffAmount, float $taxShieldPrevAmount = 0, ?int $acquisitionYear = 0)
     {
         $numberOfYears = $year - $acquisitionYear;
 
-        $realizationTaxPercent = $this->getTaxRealization($taxtype, $year);
-        $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxtype, $year);
+        $realizationTaxPercent = $this->getTaxRealization($taxType, $year);
+        $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxType, $year);
 
         //Forskjell på hva man betaler skatt av
         $realizationTaxableAmount = 0; //The amount to pay tax from. Often calculated as taxof(MarketAmount - acquisitionAmount). We assume we always sell to market value
@@ -313,101 +320,111 @@ class Tax extends Model
         }
 
         if ($debug && $amount != 0) {
-            echo "\n  taxCalculationRealizationStart $taxtype.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
+            echo "\n  taxCalculationRealizationStart $taxType.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
         }
 
-        if ($taxtype == 'salary') {
+        if ($taxType == 'salary') {
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;
 
-        } elseif ($taxtype == 'pension') {
+        } elseif ($taxType == 'pension') {
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;
 
-        } elseif ($taxtype == 'income') {
+        } elseif ($taxType == 'income') {
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;
 
-        } elseif ($taxtype == 'house') {
+        } elseif ($taxType == 'house') {
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;  //Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
 
-        } elseif ($taxtype == 'cabin') {
+        } elseif ($taxType == 'cabin') {
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
 
-        } elseif ($taxtype == 'car') {
+        } elseif ($taxType == 'car') {
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;
 
-        } elseif ($taxtype == 'boat') {
+        } elseif ($taxType == 'boat') {
             $realizationTaxableAmount = 0;
             $realizationTaxAmount = 0;
 
-        } elseif ($taxtype == 'property') {
+        } elseif ($taxType == 'property') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien skal skattes ved salg
             }
 
-        } elseif ($taxtype == 'rental') {
+        } elseif ($taxType == 'rental') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg
             }
 
-        } elseif ($taxtype == 'stock') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg?
+        } elseif ($taxType == 'stock') {
+
+            if ($taxGroup == 'company') {
+                //Fritaksmodellen
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = 0;
+                    $realizationTaxAmount = 0;
+                }
+            } else {
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg?
+                }
             }
 
-        } elseif ($taxtype == 'bondfund') {
+
+        } elseif ($taxType == 'bondfund') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
-        } elseif ($taxtype == 'equityfund') {
+        } elseif ($taxType == 'equityfund') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
-        } elseif ($taxtype == 'ask') {
+        } elseif ($taxType == 'ask') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
-        } elseif ($taxtype == 'otp') {
+        } elseif ($taxType == 'otp') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
-        } elseif ($taxtype == 'ips') {
+        } elseif ($taxType == 'ips') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
-        } elseif ($taxtype == 'crypto') {
+        } elseif ($taxType == 'crypto') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
 
-        } elseif ($taxtype == 'gold') {
+        } elseif ($taxType == 'gold') {
             if ($amount - $acquisitionAmount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
-        } elseif ($taxtype == 'bank') {
+        } elseif ($taxType == 'bank') {
             $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
             $realizationTaxAmount = 0;  //Ingen skatt ved salg.
 
-        } elseif ($taxtype == 'cash') {
+        } elseif ($taxType == 'cash') {
             $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
             $realizationTaxAmount = 0;  //Ingen skatt ved salg.
 
@@ -418,6 +435,7 @@ class Tax extends Model
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
             }
         }
+
 
         //Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
@@ -444,7 +462,7 @@ class Tax extends Model
         }
 
         if ($debug) {
-            echo "  taxCalculationRealizationEnd   $taxtype.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationBeforeShieldTaxAmount: $realizationBeforeShieldTaxAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
+            echo "  taxCalculationRealizationEnd   $taxType.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationBeforeShieldTaxAmount: $realizationBeforeShieldTaxAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
         }
 
         //V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.

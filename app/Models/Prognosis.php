@@ -119,7 +119,8 @@ class Prognosis
                 continue;
             } //Jump past inactive assets
 
-            $taxtype = $this->ArrGetConfig("$assetname.meta.tax"); //How tax is to be calculated for this asset
+            $taxType = $this->ArrGetConfig("$assetname.meta.tax"); //How tax is to be calculated for this asset
+            $taxGroup = $this->ArrGetConfig("$assetname.meta.group"); //How tax is to be calculated for this asset
 
             $firsttime = false; //Only set to true on the first time we see a configuration on this asset.
             $assetMarketAmount = 0;
@@ -292,9 +293,9 @@ class Prognosis
 
                 //#######################################################################################################
                 //Asset tax calculations
-                //print "$taxtype.$year incomeCurrentAmount: $incomeAmount, expenceCurrentAmount: $expenceAmount\n";
+                //print "$taxType.$year incomeCurrentAmount: $incomeAmount, expenceCurrentAmount: $expenceAmount\n";
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->tax->taxCalculationFortune($taxtype, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
+                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->tax->taxCalculationFortune($taxGroup, $taxType, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
 
                 //#######################################################################################################
                 //Check if we have any transfers from the cashflow - have to do it as the last thing.
@@ -304,7 +305,7 @@ class Prognosis
                 $cashflowSource = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'source');
                 $cashflowRepeat = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'repeat');
 
-                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxtype, $year, $incomeAmount, $expenceAmount);
+                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount);
 
                 $cashflowBeforeTaxAmount =
                     $incomeAmount
@@ -331,7 +332,7 @@ class Prognosis
                 //If we sell the asset, how much money is left for us after tax? In sequence has to be after cashflow.
                 $assetMarketAmount += ($this->ArrGet("$path.asset.transferedAmount") * $assetChangerateDecimal);
                 $assetAcquisitionAmount += $this->ArrGet("$path.asset.transferedAmount");
-                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmountSimulation, $realizationTaxShieldDecimal] = $this->tax->taxCalculationRealization(false, false, $taxtype, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetDiffAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
+                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmountSimulation, $realizationTaxShieldDecimal] = $this->tax->taxCalculationRealization(false, false, $taxGroup, $taxType, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetDiffAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
                 $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
 
                 if($realizationTaxShieldAmount == $realizationPrevTaxShieldAmount) {
@@ -588,11 +589,13 @@ class Prognosis
 
         //Realisation tax calculations here, because we have to realize a transfered asset.
         [$taxAssetname, $taxYear, $taxType] = $this->getAssetMetaFromPath($transferOrigin, 'tax');
+        [$taxAssetname, $taxYear, $taxGroup] = $this->getAssetMetaFromPath($transferOrigin, 'group');
+
         //print "    Tax asset: $taxAssetname, year: $taxYear, type: $taxType\n";
 
         if ($originType == 'asset') {
             //It is only calculated tax when realizing assets, not when transfering to an asset (buying)
-            [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $taxShieldAmount, $realizationTaxShieldPercent] = $this->tax->taxCalculationRealization(false, true, $taxType, $originYear, $amount, $acquisitionAmount, $amount, $taxShieldAmount, $originYear);
+            [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $taxShieldAmount, $realizationTaxShieldPercent] = $this->tax->taxCalculationRealization(false, true, $taxGroup, $taxType, $originYear, $amount, $acquisitionAmount, $amount, $taxShieldAmount, $originYear);
         } else {
             //It is probably income, expence or cashflow transfered to an asset. No tax calculations needed.
         }
@@ -904,13 +907,13 @@ class Prognosis
     public function postProcessPotentialYearly(string $path)
     {
         // Retrieve the year and tax type from the asset metadata.
-        [$assetname, $year, $taxtype] = $this->getAssetMetaFromPath($path, 'tax');
+        [$assetname, $year, $taxType] = $this->getAssetMetaFromPath($path, 'tax');
 
         // Retrieve the income amount for the asset.
         $potentialIncomeAmount = $this->ArrGet("$path.income.amount");
 
         // If the tax type is 'rental', the potential income is calculated for 10 months only.
-        if ($taxtype == 'rental') {
+        if ($taxType == 'rental') {
             $potentialIncomeAmount = $potentialIncomeAmount / 12 * 10; //Only get calculated for 10 months income on rental
         }
         $potentialIncomeAmount -= $this->ArrGet("$path.mortgage.termAmount"); //Minus låne utgifter
