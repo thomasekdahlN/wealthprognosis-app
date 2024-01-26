@@ -1,12 +1,13 @@
-## Wealth prognosis predicts your yearly future economi from now until you die
+## Wealth prognosis predicts your yearly future economy from now until you die
 
-Makes a qualified prognosis of your economic future year for year until your death. It takes into account your income, expences, assets, loans, taxes, inflation and more.
+Makes a qualified prognosis of your economic future year for year until your death. It takes into account your income, expences, assets/liabilities, loans, taxes, inflation and more.
 
 Configure all your assets, mortgage, income and expences.
 
 The program takes into account all known taxes in Norway, like fortune tax, property tax, income tax, capital tax, pension tax, rental tax, company tax, dividend tax, interest tax, wealth tax, inheritance tax, gift tax, sales tax and tax shield and calculates it for every asset every year
 The program looks at how much your max possibel mortgage can be
 The program looks at different F.I.R.E metrics so you can see when you can become financially independent and retire early. But recommends a different approach than the 4% rule - it will take the number of years from you wish to retire until the year you die - and sell the sellable assets until zero (fully configurable). You will still have your house, car, boat and cabin left after these sales.
+Supports correct taxation when transfering an asset from a company to private (first correct taxation on realization in company, then correct taxation when transfering to private)
 
 Supports normal annuitets mortgage and extra downpayments.
 
@@ -144,8 +145,8 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
-- Support for skjermingsfradrag. Konseptuelt problem, skal skjerminsfradraget regnes av alle penger du til sammen har satt inn, eller skal det trekkes fra til du går i null og så summere oppover. Tror det er riktig beregnet frem til uttak/transfer.
-- ekstra nedbetaling på lån basert på en årlig variable ekstra innbetaling på lån fra en rule eller en transfer fra en annen asset
+- Correct taxation when transfering an asset from a company to private (first correct taxation on realization in company, then correct taxation when transfering to private)
+- Check that the taxation on all asset types in company and private looks correct.
 
 #### Not a priority, but have been thinking of it.
 - Support for selling parts of partsellable assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
@@ -230,6 +231,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 #### Income
 - income.amount - beløp før skatt
 - income.changerate - endring i prosent
+- changeratePercent
 - income.rule - regler for hvordan inntekten skal behandles
 - income.transfer - overføring av inntekt til en annen asset
 - income.repeat - gjenta konfigurasjonen for kommende år
@@ -239,6 +241,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 #### Expence
 - expence.amount - beløp før skatt
 - expence.changerate - endring i prosent
+- changeratePercent
 - expence.rule - regler for hvordan utgiften skal behandles
 - expence.transfer - overføring av inntekt til en annen asset
 - expence.repeat - gjenta konfigurasjonen for kommende år
@@ -288,6 +291,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.taxDecimal - Prosent skatt på asset op en assets skattbare verdi
 - asset.taxAmount - Kroner skatt på asset op en assets skattbare verdi
 - asset.changerate - Hvor mye en asset endrer seg i verdi pr år
+- changeratePercent
 - asset.rule
 - asset.transfer
 - asset.repeat

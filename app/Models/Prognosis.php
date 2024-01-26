@@ -1084,6 +1084,8 @@ class Prognosis
             $this->groupFireSaveRate($year);
             $this->groupFirediffPercent($year);
             $this->groupFortuneTax($year);
+            $this->groupChangerates($year);
+
             //FIX, later correct tax handling on the totals ums including deductions
         }
 
@@ -1119,6 +1121,69 @@ class Prognosis
             }
         }
         //print_r($this->statisticsH);
+    }
+
+    //Calculate the actual changerate of income, expence and assets - not the prognosed one.
+    private function groupChangerates(int $year)
+    {
+        $prevYear = $year - 1;
+
+        if(Arr::get($this->totalH, "$prevYear.income.amount") > 0) {
+            Arr::set($this->totalH, "$year.income.changeratePercent", ((Arr::get($this->totalH, "$year.income.amount") / Arr::get($this->totalH, "$prevYear.income.amount")) - 1) * 100);
+        } else {
+            Arr::set($this->totalH, "$year.income.changeratePercent", 0);
+        }
+
+        if(Arr::get($this->totalH, "$prevYear.expence.amount") > 0) {
+            Arr::set($this->totalH, "$year.expence.changeratePercent", ((Arr::get($this->totalH, "$year.expence.amount") / Arr::get($this->totalH, "$prevYear.expence.amount")) - 1) * 100);
+        } else {
+            Arr::set($this->totalH, "$year.expence.changeratePercent", 0);
+        }
+
+        if(Arr::get($this->totalH, "$prevYear.asset.marketAmount") > 0) {
+            Arr::set($this->totalH, "$year.asset.changeratePercent", ((Arr::get($this->totalH, "$year.asset.marketAmount") / Arr::get($this->totalH, "$prevYear.asset.marketAmount")) - 1) * 100);
+        } else {
+            Arr::set($this->totalH, "$year.asset.changeratePercent", 0);
+        }
+
+
+        if(Arr::get($this->companyH, "$prevYear.income.amount") > 0) {
+            Arr::set($this->companyH, "$year.income.changeratePercent", ((Arr::get($this->companyH, "$year.income.amount") / Arr::get($this->companyH, "$prevYear.income.amount")) - 1) * 100);
+        } else {
+            Arr::set($this->companyH, "$year.income.changeratePercent", 0);
+        }
+
+        if(Arr::get($this->companyH, "$prevYear.expence.amount") > 0) {
+            Arr::set($this->companyH, "$year.expence.changeratePercent", ((Arr::get($this->companyH, "$year.expence.amount") / Arr::get($this->companyH, "$prevYear.expence.amount")) - 1) * 100);
+        } else {
+            Arr::set($this->companyH, "$year.expence.changeratePercent", 0);
+        }
+
+        if(Arr::get($this->companyH, "$prevYear.asset.marketAmount") > 0) {
+            Arr::set($this->companyH, "$year.asset.changeratePercent", ((Arr::get($this->companyH, "$year.asset.marketAmount") / Arr::get($this->companyH, "$prevYear.asset.marketAmount")) - 1) * 100);
+        } else {
+            Arr::set($this->companyH, "$year.asset.changeratePercent", 0);
+        }
+
+        if(Arr::get($this->privateH, "$prevYear.income.amount") > 0) {
+            print "privateH: $year: " . Arr::get($this->privateH, "$year.income.amount") . " / " . Arr::get($this->privateH, "$prevYear.income.amount") . "\n";
+            Arr::set($this->privateH, "$year.income.changeratePercent", ((Arr::get($this->privateH, "$year.income.amount") / Arr::get($this->privateH, "$prevYear.income.amount")) - 1) * 100);
+        } else {
+            Arr::set($this->privateH, "$year.income.changeratePercent", 0);
+        }
+
+        if(Arr::get($this->privateH, "$prevYear.expence.amount") > 0) {
+            Arr::set($this->privateH, "$year.expence.changeratePercent", ((Arr::get($this->privateH, "$year.expence.amount") / Arr::get($this->privateH, "$prevYear.expence.amount")) - 1) * 100);
+        } else {
+            Arr::set($this->privateH, "$year.expence.changeratePercent", 0);
+        }
+
+        if(Arr::get($this->privateH, "$prevYear.asset.marketAmount") > 0) {
+            Arr::set($this->privateH, "$year.asset.changeratePercent", ((Arr::get($this->privateH, "$year.asset.marketAmount") / Arr::get($this->privateH, "$prevYear.asset.marketAmount")) - 1) * 100);
+        } else {
+            Arr::set($this->privateH, "$year.asset.changeratePercent", 0);
+        }
+
     }
 
     private function groupFortuneTax(int $year)

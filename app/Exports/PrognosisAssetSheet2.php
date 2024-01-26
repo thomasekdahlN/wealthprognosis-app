@@ -157,13 +157,13 @@ class PrognosisAssetSheet2
             }
             $this->worksheet->setCellValue("W$this->rows", Arr::get($data, 'asset.taxAmount'));
 
-            if (Arr::get($data, 'asset.marketAmount') != 0) {
+            if (Arr::get($data, 'asset.marketAmount') != 0 && Arr::get($data, 'asset.taxAmount') > 0) {
                 $this->worksheet->setCellValue("X$this->rows", Arr::get($data, 'asset.taxDecimal'));
             }
 
             $this->worksheet->setCellValue("Y$this->rows", Arr::get($data, 'asset.taxPropertyAmount'));
 
-            if (Arr::get($data, 'asset.taxPropertyAmount') > 0) {
+            if (Arr::get($data, 'asset.taxPropertyDecimal') != 0 && Arr::get($data, 'asset.taxPropertyAmount') > 0) {
                 $this->worksheet->setCellValue("Z$this->rows", Arr::get($data, 'asset.taxPropertyDecimal'));
             }
 
@@ -171,13 +171,13 @@ class PrognosisAssetSheet2
             $this->worksheet->setCellValue("AB$this->rows", Arr::get($data, 'realization.taxableAmount'));
             $this->worksheet->setCellValue("AC$this->rows", Arr::get($data, 'realization.taxAmount'));
 
-            if (Arr::get($data, 'realization.taxableAmount') != 0) {
+            if (Arr::get($data, 'realization.taxDecimal') != 0 && Arr::get($data, 'realization.taxableAmount') != 0) {
                 $this->worksheet->setCellValue("AD$this->rows", Arr::get($data, 'realization.taxDecimal'));
             }
 
             $this->worksheet->setCellValue("AE$this->rows", Arr::get($data, 'realization.taxShieldAmount'));
 
-            if (Arr::get($data, 'realization.taxShieldAmount') != 0) {
+            if (Arr::get($data, 'realization.taxShieldDecimal') != 0 && Arr::get($data, 'realization.taxShieldAmount') != 0) {
                 $this->worksheet->setCellValue("AF$this->rows", Arr::get($data, 'realization.taxShieldDecimal'));
             }
 

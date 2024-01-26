@@ -118,7 +118,7 @@ class PrognosisExport2
         //dd($prognosis->privateH);
         $meta = [
             'active' => true,
-            'name' => 'total',
+            'name' => 'Sum total',
             'type' => '',
             'group' => '',
             'description' => 'Total oversikt over din økonomi',
@@ -130,12 +130,12 @@ class PrognosisExport2
         }
 
         if ($generate == 'all' or $generate == 'private') {
-            $meta['name'] = 'private';
+            $meta['name'] = 'Sum private';
             $this->page($prognosis->privateH, $meta);
         }
 
         if ($generate == 'all' or $generate == 'company') {
-            $meta['name'] = 'company';
+            $meta['name'] = 'Sum holding';
             $this->page($prognosis->companyH, $meta);
         }
         //$this->page($prognosis->groupH, $meta);
@@ -220,8 +220,23 @@ class PrognosisExport2
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->cashflowColor);
 
-        //cashflow blå - vertikal
-        $sheet->getStyle('U6:U'.$this->totalYears + $verticaloffsett - 1)->getFill()
+        //Formuesskatt blå - vertikal
+        $sheet->getStyle('W6:W'.$this->totalYears + $verticaloffsett - 1)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->expenceColor);
+
+        //Eiendomsskatt blå - vertikal
+        $sheet->getStyle('Y6:Y'.$this->totalYears + $verticaloffsett - 1)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->expenceColor);
+
+        //Realiseringsskatt blå - vertikal
+        $sheet->getStyle('AC6:AC'.$this->totalYears + $verticaloffsett - 1)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB($this->expenceColor);
+
+        //Cashflow blå - vertikal
+        $sheet->getStyle('AG6:AG'.$this->totalYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->cashflowColor);
 

@@ -63,16 +63,24 @@ class Tax extends Model
         return Arr::get($this->taxH, "$taxType.yearly", 0) / 100;
     }
 
-    public function getTaxRealization($taxType, $year)
+    public function getTaxRealization($taxGroup, $taxType, $year)
     {
+        if($taxGroup == 'company') {
+            //A company does not pay realization tax
+            return 22/100; #FIX: Hardcoded tax of all company assets, 22%
+        }
 
         return Arr::get($this->taxH, "$taxType.realization", 0) / 100;
     }
 
-    public function getTaxShieldRealization($taxType, $year)
+    public function getTaxShieldRealization($taxGroup, $taxType, $year)
     {
         $percent = 0;
 
+        if($taxGroup == 'company') {
+            //A company does not pay realization tax
+            return 0;
+        }
         //Note: Not all assets types has tax shield
         if (Arr::get($this->taxShieldTypes, $taxType)) {
             //Note: All Tax shield percentage are changed by the government yearly.
@@ -157,37 +165,45 @@ class Tax extends Model
         $taxPropertyPercent = $this->getPropertyTax($year);
         $taxPropertyStandardDeductionAmount = $this->getPropertyTaxStandardDeduction($year);
 
-        if ($taxableAmountOverride && $taxableAmount > 0) {
-            $taxablePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
-        //echo "   taxableAmount ovveride: $taxableAmount\n";
-        } else {
-            $taxableAmount = $marketAmount * $taxablePercent; //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
-            //echo "   taxableAmount normal: $taxableAmount\n";
-        }
+        if($taxGroup == 'company') {
+            //A company does not pay fortune tax
+            $taxablePercent = 0;
+            $taxPercent = 0;
+            $taxPropertyPercent = 0;
+            $taxableAmount = 0;
 
-        //Only fortune tax on more than 1.7-20million pr 2023
-        if ($taxableAmount > $taxStandardDeductionAmount && $taxableAmount < 20000000) { //FIX: Should be read from config
-            $taxAmount = ($taxableAmount - $taxStandardDeductionAmount) * $taxPercent; //Calculate the tax you shall pay from the taxable fortune
-        }
-        //print "$AmountTaxableFortune, $taxAmount, $taxPercent\n";
-
-        #FIX: 1.1% fortuen tax if value is more than 20millions.
-        if ($taxableAmount > 20000000) { //FIX: Should be read from config
-            $taxAmount = (20000000 - $taxStandardDeductionAmount) * $taxPercent; //Different tax on first interval 1.7-20mill
-            $taxPercent = 0.011; //FIX: Should be read from config
-            $taxAmount += ($taxableAmount - 20000000) * $taxPercent; //Different tax above 20mill
-        }
-
-        if (Arr::get($this->taxPropertyTypes, $taxType)) {
-            $taxablePropertyAmount = ($marketAmount - $taxPropertyStandardDeductionAmount) * $taxablePropertyPercent;
-            if ($taxablePropertyAmount > 0 && $taxPropertyPercent > 0) {
-                $taxPropertyAmount = $taxablePropertyAmount * $taxPropertyPercent;
+        } elseif($taxGroup == 'private') {
+            if ($taxableAmountOverride && $taxableAmount > 0) {
+                $taxablePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
+                //echo "   taxableAmount ovveride: $taxableAmount\n";
             } else {
-                $taxablePropertyPercent = 0;
+                $taxableAmount = $marketAmount * $taxablePercent; //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
+                //echo "   taxableAmount normal: $taxableAmount\n";
             }
-            //print "   taxablePropertyAmount: $taxablePropertyAmount, taxPropertyAmount: $taxPropertyAmount\n";
-        }
 
+            //Only fortune tax on more than 1.7-20million pr 2023
+            if ($taxableAmount > $taxStandardDeductionAmount && $taxableAmount < 20000000) { //FIX: Should be read from config
+                $taxAmount = ($taxableAmount - $taxStandardDeductionAmount) * $taxPercent; //Calculate the tax you shall pay from the taxable fortune
+            }
+            //print "$AmountTaxableFortune, $taxAmount, $taxPercent\n";
+
+            #FIX: 1.1% fortuen tax if value is more than 20millions.
+            if ($taxableAmount > 20000000) { //FIX: Should be read from config
+                $taxAmount = (20000000 - $taxStandardDeductionAmount) * $taxPercent; //Different tax on first interval 1.7-20mill
+                $taxPercent = 0.011; //FIX: Should be read from config
+                $taxAmount += ($taxableAmount - 20000000) * $taxPercent; //Different tax above 20mill
+            }
+
+            if (Arr::get($this->taxPropertyTypes, $taxType)) {
+                $taxablePropertyAmount = ($marketAmount - $taxPropertyStandardDeductionAmount) * $taxablePropertyPercent;
+                if ($taxablePropertyAmount > 0 && $taxPropertyPercent > 0) {
+                    $taxPropertyAmount = $taxablePropertyAmount * $taxPropertyPercent;
+                } else {
+                    $taxablePropertyPercent = 0;
+                }
+                //print "   taxablePropertyAmount: $taxablePropertyAmount, taxPropertyAmount: $taxPropertyAmount\n";
+            }
+        }
         return [$taxableAmount, $taxablePercent, $taxAmount, $taxPercent, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent];
     }
 
@@ -299,8 +315,8 @@ class Tax extends Model
     {
         $numberOfYears = $year - $acquisitionYear;
 
-        $realizationTaxPercent = $this->getTaxRealization($taxType, $year);
-        $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxType, $year);
+        $realizationTaxPercent = $this->getTaxRealization($taxGroup, $taxType, $year);
+        $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxGroup, $taxType, $year);
 
         //Forskjell på hva man betaler skatt av
         $realizationTaxableAmount = 0; //The amount to pay tax from. Often calculated as taxof(MarketAmount - acquisitionAmount). We assume we always sell to market value
