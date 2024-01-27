@@ -742,7 +742,7 @@ class Prognosis
         $prevYear = $year - 1;
         $value = $this->ArrGetConfig("$assetname.$year.$type.$variable");
 
-        $repeat = $this->ArrGetConfig("$assetname.$year.$type.repeat");
+        $repeat = $this->ArrGetConfig("$assetname.$prevYear.$type.repeat"); //We repeat the current year if repeat was the previous years value, but not the next
         if (! isset($repeat)) { //Check if repeat is set in the config
             $repeat = $this->ArrGet("$assetname.$prevYear.$type.repeat"); //Check if we stopped repeating the previous year.
         }

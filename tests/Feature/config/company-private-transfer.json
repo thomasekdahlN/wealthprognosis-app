@@ -28,7 +28,7 @@
             "asset": {
                 "rule": "100%",
                 "transfer": "fondprivate.$year.asset.marketAmount",
-                "repeat": true
+                "repeat": false
             }
         }
      },
