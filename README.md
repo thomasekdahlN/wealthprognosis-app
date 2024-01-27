@@ -145,10 +145,13 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
-- Correct taxation when transfering an asset from a company to private (first correct taxation on realization in company, then correct taxation when transfering to private)
-- Check that the taxation on all asset types in company and private looks correct.
+- changerate amount is applied after transfer....... (so when tranfsering 100% it is still a changerate amount left that is growing.)
+- repeat false stops the run of the current year, should run the year repat stops, but not the next year.
+
 
 #### Not a priority, but have been thinking of it.
+- rename group => owner [private|company]
+- zero out a rule and transfer for the coming years, do not repeat it?
 - Support for selling parts of partsellable assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
 - Tax configuration pr year and countries (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
 - Take into account the number of years you have owned an asset regardign tax calculation on i.e house and cabin.
@@ -308,6 +311,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - realization.taxDecimal - Skattbar prosent ved realisering av asset. Lest fra tax.json
 - realization.taxShieldAmount - Skjermingsfradrag beløp (Akkumuleres hvis ubenyttet, reduseres automatisak hvis benyttet)
 - realization.taxShieldDecimal - Skjermingsfradrag prosent
+- realization.description - Beskrivelse av salg/realisasjon av asset
 
 #### Potential
 How much potential the bank sees in your income - expences

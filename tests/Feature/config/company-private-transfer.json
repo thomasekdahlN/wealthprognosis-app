@@ -1,0 +1,53 @@
+{
+    "meta": {
+        "name": "John Doe",
+        "birthYear": "1995",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "62"
+    },
+    "fondcompany": {
+        "meta" : {
+            "type": "equityfund",
+            "group": "company",
+            "name": "Fond - Firma",
+            "description": "Fond - Firma",
+            "active": true,
+            "tax": "equityfund"
+        },
+        "2020": {
+            "asset": {
+                "marketAmount": 1000000,
+                "changerate": "changerates.equityfund",
+                "description": "",
+                "repeat": true
+            }
+        },
+        "2025": {
+            "asset": {
+                "rule": "100%",
+                "transfer": "fondprivate.$year.asset.marketAmount",
+                "repeat": true
+            }
+        }
+     },
+    "fondprivate": {
+        "meta" : {
+            "type": "equityfund",
+            "group": "private",
+            "name": "Fond - Privat",
+            "description": "Fond - Privat",
+            "active": true,
+            "tax": "equityfund"
+        },
+        "2020": {
+            "asset": {
+                "marketAmount": 100000,
+                "changerate": "changerates.otp",
+                "description": "OTP Sparing frem til pensjonsår",
+                "repeat": true
+            }
+        }
+    }
+}

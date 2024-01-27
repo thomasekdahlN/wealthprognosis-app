@@ -90,11 +90,13 @@ class Prognosis
         'pension' => true,
     ];
 
-    public function __construct(array $config, object $tax, object $changerate)
+    public function __construct(array $config, object $taxcashflow, object $taxfortune, object $taxrealization, object $changerate)
     {
         //$this->test();
         $this->config = $config;
-        $this->tax = $tax;
+        $this->taxcashflow = $taxcashflow;
+        $this->taxfortune = $taxfortune;
+        $this->taxrealization = $taxrealization;
         $this->changerate = $changerate;
         $this->helper = new \App\Models\Helper();
 
@@ -224,6 +226,9 @@ class Prognosis
                 $assetRepeat = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'repeat');
                 $assetChangerate = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'changerate');
 
+                print "\nAsset enda før: $assetname.$year assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetRule:$assetRule\n";
+
+
                 if ($this->ArrGet("$assetname.$prevYear.asset.marketAmount") <= 0 && $assetMarketAmount > 0) {
                     $assetFirstYear = $year;
                     $firsttime = true;
@@ -235,7 +240,7 @@ class Prognosis
                 [$assetChangeratePercent, $assetChangerateDecimal, $assetChangerateAmount, $assetExplanation1] = $this->changerate->getChangerate(false, $assetChangerate, $year, $assetChangerateAmount);
                 //print "$year: $assetChangeratePercent%\n";
 
-                //print "\nAsset før: $assetname.$year assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetRule:$assetRule\n";
+                print "\nAsset før: $assetname.$year assetMarketAmount:$assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetRule:$assetRule\n";
                 //FIX: Trouble sending in $assetAcquisitionAmount here, since it is recalculated in the step after.... chicken and egg problem.
                 $realizationPrevTaxShieldAmount = $this->ArrGet("$assetname.$prevYear.realization.taxShieldAmount");
 
@@ -243,8 +248,8 @@ class Prognosis
                     //print_r($this->dataH[$assetname][$prevYear]['realization']);
                 }
 
-                [$assetMarketAmount, $assetDiffAmount, $realizationTaxShieldAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(false, "$path.asset.marketAmount", $assetMarketAmount, $assetAcquisitionAmount, $realizationPrevTaxShieldAmount, $assetRule, $assetTransfer, $assetSource, 1);
-                //print "Asset etter: $assetname.$year assetMarketAmount: $assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
+                [$assetMarketAmount, $assetDiffAmount, $realizationTaxShieldAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(true, "$path.asset.marketAmount", $assetMarketAmount, $assetAcquisitionAmount, $realizationPrevTaxShieldAmount, $assetRule, $assetTransfer, $assetSource, 1);
+                print "Asset etter: $assetname.$year assetMarketAmount: $assetMarketAmount, assetAcquisitionAmount: $assetAcquisitionAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
 
                 if ($firsttime) {
                     //default values we only set on the first run
@@ -295,7 +300,7 @@ class Prognosis
                 //Asset tax calculations
                 //print "$taxType.$year incomeCurrentAmount: $incomeAmount, expenceCurrentAmount: $expenceAmount\n";
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->tax->taxCalculationFortune($taxGroup, $taxType, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
+                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
 
                 //#######################################################################################################
                 //Check if we have any transfers from the cashflow - have to do it as the last thing.
@@ -305,7 +310,7 @@ class Prognosis
                 $cashflowSource = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'source');
                 $cashflowRepeat = $this->configOrPrevValue(false, $assetname, $year, 'cashflow', 'repeat');
 
-                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->tax->taxCalculationCashflow(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount);
+                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->taxcashflow->taxCalculationCashflow(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount);
 
                 $cashflowBeforeTaxAmount =
                     $incomeAmount
@@ -332,7 +337,7 @@ class Prognosis
                 //If we sell the asset, how much money is left for us after tax? In sequence has to be after cashflow.
                 $assetMarketAmount += ($this->ArrGet("$path.asset.transferedAmount") * $assetChangerateDecimal);
                 $assetAcquisitionAmount += $this->ArrGet("$path.asset.transferedAmount");
-                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmountSimulation, $realizationTaxShieldDecimal] = $this->tax->taxCalculationRealization(false, false, $taxGroup, $taxType, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetDiffAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
+                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmountSimulation, $realizationTaxShieldDecimal] = $this->taxrealization->taxCalculationRealization(false, false, $taxGroup, $taxType, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetDiffAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
                 $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
 
                 if($realizationTaxShieldAmount == $realizationPrevTaxShieldAmount) {
@@ -510,7 +515,7 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "    applyRule INPUT($originYear, amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldAmount: $taxShieldAmount, rule: $rule, transfer: $transferTo, source: $source factor: $factor)\n";
+            echo "    applyRule INPUT($originYear, amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldAmount: $taxShieldAmount, transfer $rule of $transferTo, source: $source factor: $factor)\n";
         }
 
         //##############################################################################################################
@@ -518,12 +523,14 @@ class Prognosis
         if ($transferTo) {
 
             //$debug = true;
-
+            echo "    @@@@ transferTo set\n";
             if ($rule) {
                 [$newAmount, $transferAmount, $rule, $explanation] = $this->helper->calculateRule(false, $amount, $acquisitionAmount, $rule, $factor);
+                echo "    **** rule: $rule, transferAmount: $transferAmount\n";
 
                 if ($transferAmount > 0) {
-                    [$XpaidAmount, $notTransferedAmount, $taxShieldAmount, $Xexplanation] = $this->transfer(false, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount, $taxShieldAmount);
+                    echo "    #### transferAmount > 0\n";
+                    [$XpaidAmount, $notTransferedAmount, $taxShieldAmount, $Xexplanation] = $this->transfer(true, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount, $taxShieldAmount);
                     $diffAmount = $transferAmount - $notTransferedAmount;
                     //$newAmount -= $diffAmount; //THe transfer will also be added later in the prosess, but since a transfer can come from multiple assets we do not know the difference between addition here and later.
                 }
@@ -557,7 +564,7 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "    applyRule OUTPUT(newAmount: $newAmount, diffAmount: $diffAmount, taxShieldAmount: $taxShieldAmount, rule: $rule, explanation: $explanation)\n";
+            echo "    applyRule OUTPUT($originYear, newAmount: $newAmount, diffAmount: $diffAmount, taxShieldAmount: $taxShieldAmount, rule: $rule, explanation: $explanation)\n";
         }
 
         //print "return amountAdjustment($newAmount, $rule, $explanation)\n";
@@ -588,14 +595,37 @@ class Prognosis
         $transferedOriginAmount = "$originAssetname.$originYear.$originType.transferedAmount";
 
         //Realisation tax calculations here, because we have to realize a transfered asset.
-        [$taxAssetname, $taxYear, $taxType] = $this->getAssetMetaFromPath($transferOrigin, 'tax');
-        [$taxAssetname, $taxYear, $taxGroup] = $this->getAssetMetaFromPath($transferOrigin, 'group');
+        [$taxAssetname, $taxYear, $taxOriginType] = $this->getAssetMetaFromPath($transferOrigin, 'tax');
+        [$taxAssetname, $taxYear, $taxOriginGroup] = $this->getAssetMetaFromPath($transferOrigin, 'group');
+
+        [$taxToAssetname, $taxToYear, $taxToType] = $this->getAssetMetaFromPath($transferTo, 'tax');
+        [$taxToAssetname, $taxToYear, $taxToGroup] = $this->getAssetMetaFromPath($transferTo, 'group');
 
         //print "    Tax asset: $taxAssetname, year: $taxYear, type: $taxType\n";
 
         if ($originType == 'asset') {
             //It is only calculated tax when realizing assets, not when transfering to an asset (buying)
-            [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $taxShieldAmount, $realizationTaxShieldPercent] = $this->tax->taxCalculationRealization(false, true, $taxGroup, $taxType, $originYear, $amount, $acquisitionAmount, $amount, $taxShieldAmount, $originYear);
+            [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $taxShieldAmount, $realizationTaxShieldPercent] = $this->taxrealization->taxCalculationRealization(false, true, $taxOriginGroup, $taxOriginType, $originYear, $amount, $acquisitionAmount, $amount, $taxShieldAmount, $originYear);
+
+            print "@@@@ Asset transfer - taxOriginGroup:$taxOriginGroup, taxToGroup:$taxToGroup\n";
+
+
+            if($taxOriginGroup == 'company' && $taxToGroup == 'private') {
+                //If a transfer is from a company to a private group, then the normal realization tax has to be paid and the tax of the dividend has to be added
+                //How much is left after realization tax, no tax shield on company,FIX: But tax shield on private......
+                $amount = $amount - $realizationTaxAmount;
+
+                //Calculate the tax of the divident/utbytte to private
+                $dividendTaxPercent = 0.378; //FIX: Should be a variable, not a fixed number
+                $dividendTaxAmount = $amount * $dividendTaxPercent;
+
+                print "TRANSFER FROM COMPANY TO PRIVATE: amount: $amount, realizationTaxAmount: $realizationTaxAmount ($realizationTaxPercent), dividendTaxAmount: $dividendTaxAmount ($dividendTaxPercent)\n\n\n";
+                $explanation .= " from company to private with dividend tax by $dividendTaxAmount ($dividendTaxPercent) \n";
+
+                $realizationTaxAmount += $dividendTaxAmount; //We add the taxes together
+
+            }
+
         } else {
             //It is probably income, expence or cashflow transfered to an asset. No tax calculations needed.
         }
@@ -636,7 +666,7 @@ class Prognosis
 
         //###########################################################################################################
         //reduce value from this assetAmount
-        $explanation .= " reduce by $amount\n";
+        $explanation .= " reduce by $amount \n";
 
         return [$paidAmount, $notTransferedAmount, $taxShieldAmount, $explanation];
     }
@@ -833,17 +863,19 @@ class Prognosis
     {
     }
 
-    public function getAssetMetaFromPath($path, $type)
+    public function getAssetMetaFromPath($path, $field)
     {
         $value = null;
         $year = null;
         $assetname = null;
 
         if (preg_match('/(\w+).(\d+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
+            //print "$path\n";
             //print_r($matchesH);
             $year = $matchesH[2][0];
             $assetname = $matchesH[1][0];
-            $value = $this->ArrGet("$assetname.meta.$type");
+            $value = $this->ArrGetConfig("$assetname.meta.$field");
+            //print_r($this->ArrGetConfig("$assetname.meta"));
         } else {
             echo "ERROR with path: $path\n";
         }
@@ -1085,6 +1117,7 @@ class Prognosis
             $this->groupFirediffPercent($year);
             $this->groupFortuneTax($year);
             $this->groupChangerates($year);
+            $this->groupCompanyDividendTax($year);
 
             //FIX, later correct tax handling on the totals ums including deductions
         }
@@ -1122,6 +1155,46 @@ class Prognosis
         }
         //print_r($this->statisticsH);
     }
+
+
+/**
+ * This method calculates the amount that would be realized if company assets were transferred to a private person.
+ * It takes into account the tax implications of such a transfer.
+ * FIX: Should shielding be applied here?
+ * @param int $year The year for which the calculation is being performed.
+ */
+private function groupCompanyDividendTax(int $year)
+{
+    // The tax rate for transferring company assets to a private person.
+    $realizationTaxDecimal = 37.8/100;
+
+    // Retrieve the amount after normal taxation from realization in the companyH array.
+    $originalAmount = Arr::get($this->companyH, "$year.realization.amount");
+    $originalTaxAmount = Arr::get($this->companyH, "$year.realization.taxAmount");
+
+    if($originalAmount > 0) {
+
+        $dividendTaxAmount = round($originalAmount * $realizationTaxDecimal);
+
+        // Calculate the final amount by subtracting the dividend tax from the original amount.
+        $amount = round($originalAmount - $dividendTaxAmount);
+
+        // Calculate the tax amount by adding the company tax to the private person tax.
+        $taxAmount = $originalTaxAmount + $dividendTaxAmount;
+
+        // Print the calculated values for debugging purposes.
+        $description = " Company dividend tax on originalAmount: $originalAmount, originalTaxAmount: $originalTaxAmount, dividendTaxAmount:$dividendTaxAmount, newTaxAmount: $taxAmount, realizationamount: $amount";
+        print "$year: $description\n";
+
+        // Update the companyH array with the calculated values.
+        Arr::set($this->companyH, "$year.realization.amount", $amount);
+        Arr::set($this->companyH, "$year.realization.taxAmount", $taxAmount);
+        Arr::set($this->companyH, "$year.realization.taxDecimal", $realizationTaxDecimal);
+        Arr::set($this->companyH, "$year.realization.description", $description);
+    }
+    Arr::set($this->companyH, "$year.realization.taxShieldAmount", 0);
+    Arr::set($this->companyH, "$year.realization.taxShieldDecimal", 0);
+}
 
     //Calculate the actual changerate of income, expence and assets - not the prognosed one.
     private function groupChangerates(int $year)
@@ -1166,7 +1239,6 @@ class Prognosis
         }
 
         if(Arr::get($this->privateH, "$prevYear.income.amount") > 0) {
-            print "privateH: $year: " . Arr::get($this->privateH, "$year.income.amount") . " / " . Arr::get($this->privateH, "$prevYear.income.amount") . "\n";
             Arr::set($this->privateH, "$year.income.changeratePercent", ((Arr::get($this->privateH, "$year.income.amount") / Arr::get($this->privateH, "$prevYear.income.amount")) - 1) * 100);
         } else {
             Arr::set($this->privateH, "$year.income.changeratePercent", 0);
@@ -1190,13 +1262,13 @@ class Prognosis
     {
         //ToDo - fortune tax sybtraction level support.
 
-        [$assetTaxAmount, $fortuneTaxDecimal] = $this->tax->fortuneTaxGroupCalculation('total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0), $year);
+        [$assetTaxAmount, $fortuneTaxDecimal] = $this->taxfortune->fortuneTaxGroupCalculation('total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0), $year);
         Arr::set($this->totalH, "$year.asset.taxAmount", $assetTaxAmount);
 
-        [$assetTaxAmount, $fortuneTaxDecimal] = $this->tax->fortuneTaxGroupCalculation('company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0), $year);
+        [$assetTaxAmount, $fortuneTaxDecimal] = $this->taxfortune->fortuneTaxGroupCalculation('company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0), $year);
         Arr::set($this->companyH, "$year.asset.taxAmount", $assetTaxAmount);
 
-        [$assetTaxAmount, $fortuneTaxDecimal] = $this->tax->fortuneTaxGroupCalculation('private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0), $year);
+        [$assetTaxAmount, $fortuneTaxDecimal] = $this->taxfortune->fortuneTaxGroupCalculation('private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0), $year);
         Arr::set($this->privateH, "$year.asset.taxAmount", $assetTaxAmount);
     }
 
