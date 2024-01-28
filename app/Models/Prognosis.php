@@ -532,7 +532,7 @@ class Prognosis
 
                 if ($transferAmount > 0) {
                     //echo "    #### transferAmount > 0\n";
-                    [$XpaidAmount, $notTransferedAmount, $taxShieldAmount, $Xexplanation] = $this->transfer(true, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount, $taxShieldAmount);
+                    [$XpaidAmount, $notTransferedAmount, $taxShieldAmount, $Xexplanation] = $this->transfer(false, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount, $taxShieldAmount);
                     $diffAmount = $transferAmount - $notTransferedAmount;
                     //$newAmount -= $diffAmount; //THe transfer will also be added later in the prosess, but since a transfer can come from multiple assets we do not know the difference between addition here and later.
                 }
@@ -684,6 +684,9 @@ class Prognosis
         //We see it is an extra $extraDownpaymentAmount for the mortgage, then we recalculate it.
         //Mortage - has to be calculated before asset, since we use data from mortgage to calculate asset values correctly.
         //How can we ensure we are transfering to a valid mortgage, it could have been finished already.
+
+        print "@@@@ mortgageExtraDownPayment\n";
+
         $mortgageBalanceAmount = $this->ArrGet("$assetname.$year.mortgage.balanceAmount");
         $mortgage['amount'] = $mortgageBalanceAmount - $extraDownPaymentAmount; //Vi reberegner lånet minus ekstra innbetaliungen - basert på gjenværende lånebeløp dette året.
         if ($mortgage['amount'] > 0) {
@@ -710,22 +713,11 @@ class Prognosis
             //This will happen for all transfers for the length of the asset from the first extra down payment has happened when transfering extra money.
             $notUsedExtraAmount = abs($mortgage['amount']); //The remaining amount after the mortgage has been payed.
             $mortgageBalanceAmount = 0; //Loan is emptied
-            $this->removeMortgageFrom($assetname, $year--);
 
-            //print "    notUsedExtraAmount: $notUsedExtraAmount - going back into cashflow\n";
+            print "    notUsedExtraAmount: $notUsedExtraAmount - going back into cashflow\n";
         }
 
         return [$notUsedExtraAmount, $description];
-    }
-
-    public function removeMortgageFrom($assetname, $year)
-    {
-        while (isset($this->dataH[$assetname][$year]['mortgage'])) {
-            //As long as mortgage is set for this year, we remove it until we do not find it anymore.
-            //print "    Removing mortgage from dataH[$year]\n";
-            unset($this->dataH[$assetname][$year]['mortgage']);
-            $year++;
-        }
     }
 
     /**

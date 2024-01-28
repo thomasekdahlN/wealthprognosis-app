@@ -75,6 +75,7 @@ class Amortization extends Model
             $this->year_end = $year;
         }
 
+        $this->removeMortgageFrom($this->year_start); //JUst clean up the structure because of extra downpayment faster mortage payment later on will leave traces in not removed properly.
         $this->calculateAmortizationSchedule();
     }
 
@@ -168,17 +169,17 @@ class Amortization extends Model
         }
     }
 
-    public function getSummaryXXXX()
+    public function removeMortgageFrom($fromYear)
     {
-        $this->calculate(0); //FIX??????
-        $total_pay = $this->termAmount * $this->period;
-        $total_interest = $total_pay - $this->remainingMortgageAmount;
+        $toYear = $fromYear + 80;
+        print "    removeMortgageFrom($this->assettname, $fromYear)\n";
 
-        return [
-            'total_pay' => $total_pay,
-            'total_interest' => $total_interest,
-        ];
+        for ($year = $fromYear; $year <= $toYear; $year++) {
+            print "    Removing mortgage from dataH[$year]\n";
+            unset($this->dataH[$this->assettname][$year]['mortgage']);
+        }
     }
+
 
     public function add($year, $type, $row)
     {
