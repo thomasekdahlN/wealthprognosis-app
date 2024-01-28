@@ -192,7 +192,7 @@ class PrognosisExport2
 
         $sheet->getStyle('V6:V80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
         $sheet->getStyle('X6:X80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('Z6:Z80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+        $sheet->getStyle('Z6:Z80')->getNumberFormat()->setFormatCode('0.00%;[Red]-0.00%'); //% styling
 
         $sheet->getStyle('AD6:AD80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
         $sheet->getStyle('AF6:AF80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling

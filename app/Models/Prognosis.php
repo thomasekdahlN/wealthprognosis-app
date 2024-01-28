@@ -123,6 +123,7 @@ class Prognosis
 
             $taxType = $this->ArrGetConfig("$assetname.meta.tax"); //How tax is to be calculated for this asset
             $taxGroup = $this->ArrGetConfig("$assetname.meta.group"); //How tax is to be calculated for this asset
+            $taxProperty = $this->ArrGetConfig("$assetname.meta.taxProperty"); //How tax is to be calculated for this asset
 
             $firsttime = false; //Only set to true on the first time we see a configuration on this asset.
             $assetMarketAmount = 0;
@@ -295,7 +296,7 @@ class Prognosis
                 //Asset tax calculations
                 //print "$taxType.$year incomeCurrentAmount: $incomeAmount, expenceCurrentAmount: $expenceAmount\n";
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
+                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableAmount, $assetTaxableAmountOverride);
 
                 //#######################################################################################################
                 //Check if we have any transfers from the cashflow - have to do it as the last thing.
@@ -1263,13 +1264,13 @@ private function groupCompanyDividendTax(int $year)
     {
         //ToDo - fortune tax sybtraction level support.
 
-        [$assetTaxAmount, $fortuneTaxDecimal] = $this->taxfortune->fortuneTaxGroupCalculation('total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0), $year);
+        [$assetTaxAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0));
         Arr::set($this->totalH, "$year.asset.taxAmount", $assetTaxAmount);
 
-        [$assetTaxAmount, $fortuneTaxDecimal] = $this->taxfortune->fortuneTaxGroupCalculation('company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0), $year);
+        [$assetTaxAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0));
         Arr::set($this->companyH, "$year.asset.taxAmount", $assetTaxAmount);
 
-        [$assetTaxAmount, $fortuneTaxDecimal] = $this->taxfortune->fortuneTaxGroupCalculation('private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0), $year);
+        [$assetTaxAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0));
         Arr::set($this->privateH, "$year.asset.taxAmount", $assetTaxAmount);
     }
 

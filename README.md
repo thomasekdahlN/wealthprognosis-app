@@ -147,6 +147,7 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 ### Functionality on the priority wishlist:
 
 #### Not a priority, but have been thinking of it.
+- Property tax should use the tax value of year-2 (Holmestrand at least))
 - rename group => owner [private|company]
 - Support for selling parts of partsellable assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
 - Tax configuration pr year and countries (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now

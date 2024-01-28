@@ -14,37 +14,37 @@
             "name": "My house",
             "description": "Here I live",
             "active" : true,
-            "tax": "rental"
+            "tax": "rental",
+            "taxProperty": "ringerike"
         },
         "2023": {
             "asset": {
-                "marketAmount": 3000000,
-                "changerate": "changerates.house",
-                "description": "Selling part of the house",
+                "marketAmount": 2500000,
+                "changerate": "changerates.rental",
+                "description": "Rental",
                 "repeat": true
             },
             "income": {
                 "name": "Rental",
-                "description": "Rental 10000 pr month",
-                "amount": 10000,
+                "description": "Rental 10500 pr month",
+                "amount": 10500,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
             "expence": {
                 "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                "amount": 7300,
+                "description": "Kommunale/Forsikring/Strøm 2600 mnd",
+                "amount": 2600,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
-            "mortgage": {
-                "amount": 1500000,
+            "mortgageX": {
+                "amount": 1250000,
                 "interest": "changerates.interest",
                 "gebyr": 600,
                 "tax": 22,
-                "paymentExtra": "home.$year.cashflow.amount",
                 "years": 20
             }
         }
