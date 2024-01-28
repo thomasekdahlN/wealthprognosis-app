@@ -242,7 +242,7 @@ class Prognosis
                 //FIX: Trouble sending in $assetAcquisitionAmount here, since it is recalculated in the step after.... chicken and egg problem.
                 $realizationPrevTaxShieldAmount = $this->ArrGet("$assetname.$prevYear.realization.taxShieldAmount");
 
-                if(isset($this->dataH[$assetname][$prevYear]['realization'])) {
+                if (isset($this->dataH[$assetname][$prevYear]['realization'])) {
                     //print_r($this->dataH[$assetname][$prevYear]['realization']);
                 }
 
@@ -342,7 +342,7 @@ class Prognosis
 
                 //print "Asset5: $assetname.$year .assetMarketAmount:$assetMarketAmount, transferedAmount:$transferedAmount, transferedChangerateAmount:$transferedChangerateAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
-                if($realizationTaxShieldAmount == $realizationPrevTaxShieldAmount) {
+                if ($realizationTaxShieldAmount == $realizationPrevTaxShieldAmount) {
                     //If $realizationTaxShieldAmount is not changed (lowered), then we are in an accumulating situation.
                     //print "ACCUMULATING SHIELD: $realizationTaxShieldAmount == $realizationPrevTaxShieldAmount\n";
                     $realizationTaxShieldAmount = $realizationTaxShieldAmountSimulation;
@@ -555,7 +555,7 @@ class Prognosis
             }
             [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule(false, $amount, $acquisitionAmount, $rule, $factor);
             $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); //The amount we transfered to - for later reference and calculation
-            $this->ArrSet($transferedOriginDescription, Arr::get($this->dataH, $transferedOriginDescription, 0) . " added $diffAmount from rule $rule"); //The amount we transfered to - for later reference and calculation
+            $this->ArrSet($transferedOriginDescription, Arr::get($this->dataH, $transferedOriginDescription, 0)." added $diffAmount from rule $rule"); //The amount we transfered to - for later reference and calculation
             $newAmount = $amount; //Since we started putting the transfer in the data structure, we can not add it here, because it is then added twice.
 
         } else {
@@ -612,7 +612,7 @@ class Prognosis
 
             //print "@@@@ Asset transfer - taxOriginGroup:$taxOriginGroup, taxToGroup:$taxToGroup\n";
 
-            if($taxOriginGroup == 'company' && $taxToGroup == 'private') {
+            if ($taxOriginGroup == 'company' && $taxToGroup == 'private') {
                 //If a transfer is from a company to a private group, then the normal realization tax has to be paid and the tax of the dividend has to be added
                 //How much is left after realization tax, no tax shield on company,FIX: But tax shield on private......
                 $amount = $amount - $realizationTaxAmount;
@@ -877,7 +877,7 @@ class Prognosis
             $year = $matchesH[2][0];
             $assetname = $matchesH[1][0];
             $value = $this->ArrGetConfig("$assetname.meta.$field");
-            //print_r($this->ArrGetConfig("$assetname.meta"));
+        //print_r($this->ArrGetConfig("$assetname.meta"));
         } else {
             echo "ERROR with path: $path\n";
         }
@@ -1158,101 +1158,100 @@ class Prognosis
         //print_r($this->statisticsH);
     }
 
+    /**
+     * This method calculates the amount that would be realized if company assets were transferred to a private person.
+     * It takes into account the tax implications of such a transfer.
+     * FIX: Should shielding be applied here?
+     *
+     * @param  int  $year The year for which the calculation is being performed.
+     */
+    private function groupCompanyDividendTax(int $year)
+    {
+        // The tax rate for transferring company assets to a private person.
+        $realizationTaxDecimal = 37.8 / 100;
 
-/**
- * This method calculates the amount that would be realized if company assets were transferred to a private person.
- * It takes into account the tax implications of such a transfer.
- * FIX: Should shielding be applied here?
- * @param int $year The year for which the calculation is being performed.
- */
-private function groupCompanyDividendTax(int $year)
-{
-    // The tax rate for transferring company assets to a private person.
-    $realizationTaxDecimal = 37.8/100;
+        // Retrieve the amount after normal taxation from realization in the companyH array.
+        $originalAmount = Arr::get($this->companyH, "$year.realization.amount");
+        $originalTaxAmount = Arr::get($this->companyH, "$year.realization.taxAmount");
 
-    // Retrieve the amount after normal taxation from realization in the companyH array.
-    $originalAmount = Arr::get($this->companyH, "$year.realization.amount");
-    $originalTaxAmount = Arr::get($this->companyH, "$year.realization.taxAmount");
+        if ($originalAmount > 0) {
 
-    if($originalAmount > 0) {
+            $dividendTaxAmount = round($originalAmount * $realizationTaxDecimal);
 
-        $dividendTaxAmount = round($originalAmount * $realizationTaxDecimal);
+            // Calculate the final amount by subtracting the dividend tax from the original amount.
+            $amount = round($originalAmount - $dividendTaxAmount);
 
-        // Calculate the final amount by subtracting the dividend tax from the original amount.
-        $amount = round($originalAmount - $dividendTaxAmount);
+            // Calculate the tax amount by adding the company tax to the private person tax.
+            $taxAmount = $originalTaxAmount + $dividendTaxAmount;
 
-        // Calculate the tax amount by adding the company tax to the private person tax.
-        $taxAmount = $originalTaxAmount + $dividendTaxAmount;
+            // Print the calculated values for debugging purposes.
+            $description = " Company dividend tax on originalAmount: $originalAmount, originalTaxAmount: $originalTaxAmount, dividendTaxAmount:$dividendTaxAmount, newTaxAmount: $taxAmount, realizationamount: $amount";
+            //print "$year: $description\n";
 
-        // Print the calculated values for debugging purposes.
-        $description = " Company dividend tax on originalAmount: $originalAmount, originalTaxAmount: $originalTaxAmount, dividendTaxAmount:$dividendTaxAmount, newTaxAmount: $taxAmount, realizationamount: $amount";
-        //print "$year: $description\n";
-
-        // Update the companyH array with the calculated values.
-        Arr::set($this->companyH, "$year.realization.amount", $amount);
-        Arr::set($this->companyH, "$year.realization.taxAmount", $taxAmount);
-        Arr::set($this->companyH, "$year.realization.taxDecimal", $realizationTaxDecimal);
-        Arr::set($this->companyH, "$year.realization.description", $description);
+            // Update the companyH array with the calculated values.
+            Arr::set($this->companyH, "$year.realization.amount", $amount);
+            Arr::set($this->companyH, "$year.realization.taxAmount", $taxAmount);
+            Arr::set($this->companyH, "$year.realization.taxDecimal", $realizationTaxDecimal);
+            Arr::set($this->companyH, "$year.realization.description", $description);
+        }
+        Arr::set($this->companyH, "$year.realization.taxShieldAmount", 0);
+        Arr::set($this->companyH, "$year.realization.taxShieldDecimal", 0);
     }
-    Arr::set($this->companyH, "$year.realization.taxShieldAmount", 0);
-    Arr::set($this->companyH, "$year.realization.taxShieldDecimal", 0);
-}
 
     //Calculate the actual changerate of income, expence and assets - not the prognosed one.
     private function groupChangerates(int $year)
     {
         $prevYear = $year - 1;
 
-        if(Arr::get($this->totalH, "$prevYear.income.amount") > 0) {
+        if (Arr::get($this->totalH, "$prevYear.income.amount") > 0) {
             Arr::set($this->totalH, "$year.income.changeratePercent", ((Arr::get($this->totalH, "$year.income.amount") / Arr::get($this->totalH, "$prevYear.income.amount")) - 1) * 100);
         } else {
             Arr::set($this->totalH, "$year.income.changeratePercent", 0);
         }
 
-        if(Arr::get($this->totalH, "$prevYear.expence.amount") > 0) {
+        if (Arr::get($this->totalH, "$prevYear.expence.amount") > 0) {
             Arr::set($this->totalH, "$year.expence.changeratePercent", ((Arr::get($this->totalH, "$year.expence.amount") / Arr::get($this->totalH, "$prevYear.expence.amount")) - 1) * 100);
         } else {
             Arr::set($this->totalH, "$year.expence.changeratePercent", 0);
         }
 
-        if(Arr::get($this->totalH, "$prevYear.asset.marketAmount") > 0) {
+        if (Arr::get($this->totalH, "$prevYear.asset.marketAmount") > 0) {
             Arr::set($this->totalH, "$year.asset.changeratePercent", ((Arr::get($this->totalH, "$year.asset.marketAmount") / Arr::get($this->totalH, "$prevYear.asset.marketAmount")) - 1) * 100);
         } else {
             Arr::set($this->totalH, "$year.asset.changeratePercent", 0);
         }
 
-
-        if(Arr::get($this->companyH, "$prevYear.income.amount") > 0) {
+        if (Arr::get($this->companyH, "$prevYear.income.amount") > 0) {
             Arr::set($this->companyH, "$year.income.changeratePercent", ((Arr::get($this->companyH, "$year.income.amount") / Arr::get($this->companyH, "$prevYear.income.amount")) - 1) * 100);
         } else {
             Arr::set($this->companyH, "$year.income.changeratePercent", 0);
         }
 
-        if(Arr::get($this->companyH, "$prevYear.expence.amount") > 0) {
+        if (Arr::get($this->companyH, "$prevYear.expence.amount") > 0) {
             Arr::set($this->companyH, "$year.expence.changeratePercent", ((Arr::get($this->companyH, "$year.expence.amount") / Arr::get($this->companyH, "$prevYear.expence.amount")) - 1) * 100);
         } else {
             Arr::set($this->companyH, "$year.expence.changeratePercent", 0);
         }
 
-        if(Arr::get($this->companyH, "$prevYear.asset.marketAmount") > 0) {
+        if (Arr::get($this->companyH, "$prevYear.asset.marketAmount") > 0) {
             Arr::set($this->companyH, "$year.asset.changeratePercent", ((Arr::get($this->companyH, "$year.asset.marketAmount") / Arr::get($this->companyH, "$prevYear.asset.marketAmount")) - 1) * 100);
         } else {
             Arr::set($this->companyH, "$year.asset.changeratePercent", 0);
         }
 
-        if(Arr::get($this->privateH, "$prevYear.income.amount") > 0) {
+        if (Arr::get($this->privateH, "$prevYear.income.amount") > 0) {
             Arr::set($this->privateH, "$year.income.changeratePercent", ((Arr::get($this->privateH, "$year.income.amount") / Arr::get($this->privateH, "$prevYear.income.amount")) - 1) * 100);
         } else {
             Arr::set($this->privateH, "$year.income.changeratePercent", 0);
         }
 
-        if(Arr::get($this->privateH, "$prevYear.expence.amount") > 0) {
+        if (Arr::get($this->privateH, "$prevYear.expence.amount") > 0) {
             Arr::set($this->privateH, "$year.expence.changeratePercent", ((Arr::get($this->privateH, "$year.expence.amount") / Arr::get($this->privateH, "$prevYear.expence.amount")) - 1) * 100);
         } else {
             Arr::set($this->privateH, "$year.expence.changeratePercent", 0);
         }
 
-        if(Arr::get($this->privateH, "$prevYear.asset.marketAmount") > 0) {
+        if (Arr::get($this->privateH, "$prevYear.asset.marketAmount") > 0) {
             Arr::set($this->privateH, "$year.asset.changeratePercent", ((Arr::get($this->privateH, "$year.asset.marketAmount") / Arr::get($this->privateH, "$prevYear.asset.marketAmount")) - 1) * 100);
         } else {
             Arr::set($this->privateH, "$year.asset.changeratePercent", 0);
