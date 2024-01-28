@@ -7,17 +7,43 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Class TaxRealization
+ *
+ * This class extends the Model class and is responsible for handling tax calculations.
+ * It uses the HasFactory trait provided by Laravel.
+ */
 class TaxRealization extends Model
 {
     use HasFactory;
 
+    /**
+     * @var array Holds the tax configuration.
+     */
     public $taxH = [];
 
-    //Will be rewritten to support yearly tax differences, just faking for now.
-    //Should probably be a deep nested json structure.
+    //Asset types that will automatically be calculated with tax shield
+    public $taxShieldTypes = [
+        'stock' => true,
+        'equityfund' => true,
+        'bondfund' => true,
+        'ask' => true,
+        'loantocompany' => true, //lån til andre, fradrag om det er låm
+        'soleproprietorship' => true, //Enkeltpersonforetak
+    ];
+
+    /**
+     * Constructor for the TaxRealization class.
+     *
+     * Reads the tax configuration from a JSON file and stores it in the taxH property.
+     * Note: This will be rewritten to support yearly tax differences.
+     *
+     * @param  string  $config The name of the tax configuration file (without the .json extension).
+     * @param  int  $startYear The start year for the tax calculation (currently not used).
+     * @param  int  $stopYear The stop year for the tax calculation (currently not used).
+     */
     public function __construct($config, $startYear, $stopYear)
     {
-
         $file = "tax/$config.json";
         $configH = json_decode(Storage::disk('local')->get($file), true);
 
@@ -26,6 +52,14 @@ class TaxRealization extends Model
         }
     }
 
+    /**
+     * Returns the tax realization percentage.
+     *
+     * @param  string  $taxGroup The tax group (e.g., 'company').
+     * @param  string  $taxType The type of tax.
+     * @param  int  $year The year for which the tax is being calculated.
+     * @return float The tax realization percentage. For companies, a hardcoded tax of 22% is returned.
+     */
     public function getTaxRealization($taxGroup, $taxType, $year)
     {
         if ($taxGroup == 'company') {
@@ -36,6 +70,14 @@ class TaxRealization extends Model
         return Arr::get($this->taxH, "$taxType.realization", 0) / 100;
     }
 
+    /**
+     * Returns the tax shield realization percentage.
+     *
+     * @param  string  $taxGroup The tax group (e.g., 'company').
+     * @param  string  $taxType The type of tax.
+     * @param  int  $year The year for which the tax is being calculated.
+     * @return float The tax shield realization percentage. If no tax shield is available for the asset type, 0 is returned.
+     */
     public function getTaxShieldRealization($taxGroup, $taxType, $year)
     {
         $percent = 0;
@@ -55,32 +97,38 @@ class TaxRealization extends Model
         return $percent;
     }
 
+    /**
+     * Calculates the tax realization.
+     *
+     * This method calculates the tax realization based on various parameters such as tax group, tax type, year, amount, acquisition amount, asset difference amount, previous tax shield amount, and acquisition year.
+     * It handles different tax types and calculates the tax realization accordingly.
+     * It also handles the tax shield, which is only used when transferring between private assets or from company to private asset.
+     *
+     * @param  bool  $debug If true, debug information will be printed.
+     * @param  bool  $transfer If true, the tax shield is used.
+     * @param  string  $taxGroup The tax group for the calculation.
+     * @param  string  $taxType The type of tax for the calculation.
+     * @param  int  $year The year for which the tax is being calculated.
+     * @param  float  $amount The amount for the calculation.
+     * @param  float  $acquisitionAmount The acquisition amount for the calculation.
+     * @param  float  $assetDiffAmount The asset difference amount for the calculation.
+     * @param  float  $taxShieldPrevAmount The previous tax shield amount for the calculation.
+     * @param  int|null  $acquisitionYear The acquisition year for the calculation. If null, it is considered as 0.
+     * @return array Returns an array containing the taxable amount, tax amount, acquisition amount, tax percent, tax shield amount, and tax shield percent.
+     */
     public function taxCalculationRealization(bool $debug, bool $transfer, string $taxGroup, string $taxType, int $year, float $amount, float $acquisitionAmount, float $assetDiffAmount, float $taxShieldPrevAmount = 0, ?int $acquisitionYear = 0)
     {
+        $explanation = '';
         $numberOfYears = $year - $acquisitionYear;
 
         $realizationTaxPercent = $this->getTaxRealization($taxGroup, $taxType, $year);
-        $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxGroup, $taxType, $year);
 
         //Forskjell på hva man betaler skatt av
         $realizationTaxableAmount = 0; //The amount to pay tax from. Often calculated as taxof(MarketAmount - acquisitionAmount). We assume we always sell to market value
         $realizationTaxAmount = 0;
-        $realizationTaxShieldAmount = 0;
-
-        //Skjermingsfradrag
-        if ($realizationTaxShieldPercent > 0) {
-            //TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
-            $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
-        //print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
-        } else {
-            $realizationTaxShieldAmount = $taxShieldPrevAmount;
-        }
-        if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
-            $realizationTaxShieldAmount = 0;
-        }
 
         if ($debug && $amount != 0) {
-            echo "\n  taxCalculationRealizationStart $taxGroup.$taxType.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
+            echo "\n  taxCalculationRealizationStart $taxGroup.$taxType.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent\n";
         }
 
         if ($taxType == 'salary') {
@@ -188,33 +236,18 @@ class TaxRealization extends Model
             $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
             $realizationTaxAmount = 0;  //Ingen skatt ved salg.
 
-        } else {
-
-            if ($amount > 0) {
+        } elseif ($amount > 0) {
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
                 $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
         }
 
         //###############################################################################################################
         //TaxShield handling
         //Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
+        [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $this->taxShield($year, $taxGroup, $taxType, $transfer, $amount, $realizationTaxAmount, $taxShieldPrevAmount);
 
-        if ($transfer && $taxGroup == 'private') {
-            //tax shield is only used when tansfering between private assets or from company to private asset - never between company assets.
-            //We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
-            if ($realizationTaxAmount >= $realizationTaxShieldAmount) {
-                //print "REDUCING TAX SHIELD1\n";
-                $realizationTaxAmount -= $realizationTaxShieldAmount; //Reduce the tax amount by the taxShieldAmount
-                $realizationTaxShieldAmount = 0; //Then taxShieldAmount is used and has to go to zero.
-            } else {
-                //print "REDUCING TAX SHIELD2\n";
-                $realizationTaxShieldAmount -= $realizationTaxAmount; //We reduce it by the amount we used
-                $realizationTaxAmount = 0; //Then taxAmount is zero, since the entire emount was taxShielded.
-            }
-        }
-
+        //###############################################################################################################
         if ($realizationTaxAmount < 0) {
             $realizationTaxAmount = 0; //Skjermingsfradraget kan ikke være større enn skatten
         }
@@ -228,6 +261,54 @@ class TaxRealization extends Model
         }
 
         //V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
-        return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent];
+        return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
+    }
+
+    public function taxShield(int $year, string $taxGroup, string $taxType, bool $transfer, float $amount, float $realizationTaxAmount, float $taxShieldPrevAmount){
+        $explanation = '';
+        $realizationTaxShieldAmount = 0;
+
+        $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxGroup, $taxType, $year);
+
+        //Skjermingsfradrag
+        if ($realizationTaxShieldPercent > 0) {
+            //TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
+            $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
+            //print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
+            $explanation = "TaxShieldPercent:" . $realizationTaxShieldPercent*100 . ". ";
+        } else {
+            $realizationTaxShieldAmount = $taxShieldPrevAmount;
+            $explanation = "TaxShieldPercent:" . $realizationTaxShieldPercent*100 . ". ";
+        }
+        if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
+            $realizationTaxShieldAmount = 0;
+        }
+
+        if ($transfer) {
+            if($taxGroup == 'private') {
+                //tax shield is only used when tansfering between private assets or from company to private asset - never between company assets.
+                //We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
+                if ($realizationTaxAmount >= $realizationTaxShieldAmount) {
+                    //print "REDUCING TAX SHIELD1\n";
+                    $explanation .= "Taxshield ($realizationTaxShieldAmount) lower than tax ($realizationTaxAmount), using entire shield. ";
+
+                    $realizationTaxAmount -= $realizationTaxShieldAmount; //Reduce the tax amount by the taxShieldAmount
+                    $realizationTaxShieldAmount = 0; //Then taxShieldAmount is used and has to go to zero.
+                } else {
+                    $explanation .= "Taxshield ($realizationTaxShieldAmount) bigger than tax ($realizationTaxAmount), using part of the shield. ";
+
+                    //print "REDUCING TAX SHIELD2\n";
+                    $realizationTaxShieldAmount -= $realizationTaxAmount; //We reduce it by the amount we used
+                    $realizationTaxAmount = 0; //Then taxAmount is zero, since the entire emount was taxShielded.
+                }
+            } else {
+                $explanation .= "Only taxshield on private group assets, found #$taxGroup#. ";
+            }
+        } else {
+            $explanation .= "Taxshield simulation, not an actual transfer. ";
+        }
+
+        //print "    taxShield: $year, amount:$amount, realizationTaxAmount:$realizationTaxAmount, realizationTaxShieldAmount:$realizationTaxShieldAmount, $explanation\n";
+        return [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
     }
 }

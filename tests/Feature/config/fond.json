@@ -63,7 +63,7 @@
             }
         },
         "$pensionWishYear": {
-            "asset": {
+            "assetX": {
                 "transfer": "income.$year.income.amount",
                 "rule": "1|$pensionWishYears",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
