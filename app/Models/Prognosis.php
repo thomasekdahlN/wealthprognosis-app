@@ -273,7 +273,7 @@ class Prognosis
 
                     if ($assetTaxableAmount <= 0) {
                         //Only to be set on first run here, not to be recalculated. But if rules or transfers add money, they are added to $assetAcquisitionAmount (not changerates), only real money.
-                        $assetTaxableAmount = $assetMarketAmount;
+                        $assetTaxableAmount = $assetMarketAmount + $assetDiffAmount;
                     } else {
                         //Since it is set from before, we have an override situation.
                         $assetTaxableAmountOverride = true;
@@ -325,22 +325,28 @@ class Prognosis
                 if ($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
                     //print "  Cashflow-start: $assetname.$year, transferOrigin: $path.cashflow.afterTaxAmount, cashflowTransfer:$cashflowTransfer, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
                     [$cashflowAfterTaxAmount, $cashflowDiffAmount, $taxShieldAmountX, $cashflowNewRule, $cashflowExplanation] = $this->applyRule(false, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount, 0, 0, $cashflowRule, $cashflowTransfer, $cashflowSource, 1);
-                    //print "  Cashflow-end  : $assetname.$year, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, cashflowDiffAmount: $cashflowDiffAmount, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
+                    $cashflowAfterTaxAmount = $cashflowAfterTaxAmount - $cashflowDiffAmount;
+                    print "  Cashflow-end  : $assetname.$year, cashflowDiffAmount: $cashflowDiffAmount, cashflowRule:$cashflowRule, cashflowAfterTaxAmount: $cashflowAfterTaxAmount \n";
                     //Amounts will probably be transfered to Assets here. So need to do a new calculation.
                 }
 
                 //#######################################################################################################
                 //If we sell the asset, how much money is left for us after tax? In sequence has to be after cashflow.
-                //print "Asset4: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
+                print "Asset4: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
                 $transferedAmount = $this->ArrGet("$path.asset.transferedAmount");
                 $transferedChangerateAmount = round($transferedAmount * $assetChangerateDecimal);
                 $assetMarketAmount = $assetMarketAmount + $transferedChangerateAmount;
-                $assetAcquisitionAmount += $this->ArrGet("$path.asset.transferedAmount");
+                $assetAcquisitionAmount += $transferedAmount; //Correct
+                $assetTaxableAmount += $transferedAmount; //FIX: SHould only add the fortune taxable part of the transfered amount.
+                $assetEquityAmount += $transferedAmount; //Correct
+                $assetPaidAmount += $transferedAmount; //Correct
+                print "   TaxRealization1: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
+
                 [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmountSimulation, $realizationTaxShieldDecimal] = $this->taxrealization->taxCalculationRealization(false, false, $taxGroup, $taxType, $year, $assetMarketAmount, $assetAcquisitionAmount, $assetDiffAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
                 $realizationAmount = $assetMarketAmount - $realizationTaxAmount; //Markedspris minus skatt ved salg.
 
-                //print "Asset5: $assetname.$year .assetMarketAmount:$assetMarketAmount, transferedAmount:$transferedAmount, transferedChangerateAmount:$transferedChangerateAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
+                print "   TaxRealization2: $assetname.$year .assetMarketAmount:$assetMarketAmount, transferedAmount:$transferedAmount, transferedChangerateAmount:$transferedChangerateAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetAcquisitionAmount, assetEquityAmount:$assetEquityAmount, assetPaidAmount: $assetPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
                 if ($realizationTaxShieldAmount == $realizationPrevTaxShieldAmount) {
                     //If $realizationTaxShieldAmount is not changed (lowered), then we are in an accumulating situation.
@@ -511,7 +517,7 @@ class Prognosis
 
         //This is really just a fixed number, but it can appear at the same time as a rule.
         if (is_numeric($amount) && $amount != 0) {
-            $explanation = 'Using current amount: '.round($amount)." * $factor ";
+            //$explanation = 'Using current amount: '.round($amount)." * $factor ";
             $amount = $calculatedNumericAmount = round($amount * $factor);
             //This is not a deposit
         }
@@ -596,6 +602,7 @@ class Prognosis
         $transferedToPathAmount = "$toAssetname.$toYear.$toType.transferedAmount";
         $transferedToPathDescription = "$toAssetname.$toYear.$toType.description";
         $transferedOriginPathAmount = "$originAssetname.$originYear.$originType.transferedAmount";
+        $transferedOriginPathDescription = "$originAssetname.$originYear.$originType.description";
 
         //Realisation tax calculations here, because we have to realize a transfered asset.
         [$taxAssetname, $taxYear, $taxOriginType] = $this->getAssetMetaFromPath($transferOrigin, 'tax');
@@ -649,7 +656,7 @@ class Prognosis
             //The transfer happens here.
             $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedToAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
             $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount from $transferOrigin "); //The amount we transfered including the tax - for later reference and calculation
-
+            $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount to $transferTo "); //The amount we transfered including the tax - for later reference and calculation
         }
         if ($transferedToAmount > 0) {
             //Could happen if downpayment of mortgage is finished.
