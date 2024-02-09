@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class TaxCashflow extends Model
 {
@@ -18,8 +18,8 @@ class TaxCashflow extends Model
     public function __construct($config, $startYear, $stopYear)
     {
 
-        $file = "tax/$config.json";
-        $configH = json_decode(Storage::disk('local')->get($file), true);
+        $file = config_path("tax/$config.json");
+        $configH = File::json($file);
         echo "Leser: '$file'\n";
 
         foreach ($configH as $type => $typeH) {

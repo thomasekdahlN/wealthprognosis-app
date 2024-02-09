@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class Changerate
@@ -23,8 +23,8 @@ class Changerate extends Model
 
         $startYear = 1970; //Since its so much trouble if we miss a sequenze
 
-        $file = "prognosis/$prognosis.json";
-        $configH = json_decode(Storage::disk('local')->get($file), true);
+        $file = config_path("prognosis/$prognosis.json");
+        $configH = File::json($file);
         echo "Leser prognose fra : '$file'\n";
 
         foreach ($configH as $type => $typeH) {

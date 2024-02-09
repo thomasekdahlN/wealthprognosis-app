@@ -146,8 +146,6 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 
 ### Functionality on the priority wishlist:
 Some trouble transfering extraDownPayment to mortgage not working. Gir veldig negativ cashflow.
-Yield calculation
-Removing mortgage of property from mortgage calculations.
 
 #### Not a priority, but have been thinking of it.
 - Supporting tax prognosis, not just use this years taxes

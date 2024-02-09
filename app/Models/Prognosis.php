@@ -914,10 +914,10 @@ class Prognosis
 
         }
 
-        echo "#### $path:" . $this->ArrGet("$path.asset.acquisitionAmount") . " bruttoPercent: $bruttoPercent, nettoPercent: $nettoPercent\n";
+        //echo "#### $path:" . $this->ArrGet("$path.asset.acquisitionAmount") . " bruttoPercent: $bruttoPercent, nettoPercent: $nettoPercent\n";
 
         // Set the calculated brutto yield percentage in the dataH array.
-        $this->ArrSet("$path.yield.bruttoPercent",$bruttoPercent );
+        $this->ArrSet("$path.yield.bruttoPercent", $bruttoPercent);
 
         // Set the calculated netto yield percentage in the dataH array.
         $this->ArrSet("$path.yield.nettoPercent", $nettoPercent);
@@ -1197,7 +1197,6 @@ class Prognosis
         Arr::set($this->totalH, "$year.yield.bruttoPercent", $bruttoPercent);
         Arr::set($this->totalH, "$year.yield.nettoPercent", $nettoPercent);
 
-
         $bruttoPercent = 0;
         $nettoPercent = 0;
         if (Arr::get($this->companyH, "$year.asset.acquisitionAmount") > 1) {
@@ -1210,7 +1209,6 @@ class Prognosis
         }
         Arr::set($this->companyH, "$year.yield.bruttoPercent", $bruttoPercent);
         Arr::set($this->companyH, "$year.yield.nettoPercent", $nettoPercent);
-
 
         $bruttoPercent = 0;
         $nettoPercent = 0;
