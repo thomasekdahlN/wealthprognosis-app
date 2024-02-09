@@ -118,6 +118,7 @@ Default den asset man står på, medmindre annet er spesifisert. Brukes for å b
 
 Overføring av beløp fra den asset regelen er på til den asset som er spesifisert i regelen,
 Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal sende beløpet, hvis ikke blir beløpet lagt til den asset man står på.
+Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det er extraDownPayment på lån, ellers så må transfer alltid skje til en kommende asset.
 
 ### Supported assets types for prognosis and tax calculation
 * ask - Aksjesparing med skattefradrag
@@ -128,7 +129,7 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * cash - Kontanter
 * child - Barn. Skattefritt men kjekt å klassifisere.
 * crypto - Krypto
-* bondfund - Aksjefond eller fond som det kalles på, populært
+* bondfund - Rentefond
 * equityfund - Aksjefond eller fond som det kalles på, populært
 * gold - Gull
 * inheritance - Arv.

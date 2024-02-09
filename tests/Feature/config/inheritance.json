@@ -7,6 +7,37 @@
         "pensionWishYear": "63",
         "deathYear": "82"
     },
+    "house": {
+        "meta": {
+            "type": "house",
+            "group": "private",
+            "name": "My house",
+            "description": "Here I live",
+            "active": true,
+            "tax": "house"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": "3000000",
+                "changerate": "changerates.house",
+                "description": "",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+                "amount": 7300,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 1500000,
+                "interest": "changerates.interest",
+                "years": 20
+            }
+        }
+    },
     "inheritance": {
         "meta": {
             "type": "inheritance",
@@ -24,6 +55,28 @@
                 "acquisitionAmount" : 1,
                 "paidAmount": 1,
                 "changerate": "changerates.kpi",
+                "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
+                "rule": "100%",
+                "transferX": "fond.$year.asset.marketAmount",
+                "transfer": "house.$year.mortgage.extraDownpaymentAmount",
+                "repeat": false
+            }
+        }
+    },
+    "fond": {
+        "meta" : {
+            "type": "equityfund",
+            "group": "private",
+            "name": "fond",
+            "description": "",
+            "active": false,
+            "tax": "equityfund"
+        },
+        "2024": {
+            "asset": {
+                "marketAmount": 1000,
+                "changerate": "changerates.equityfund",
+                "description": "",
                 "repeat": true
             }
         }
