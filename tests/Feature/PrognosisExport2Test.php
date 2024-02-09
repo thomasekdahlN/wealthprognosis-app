@@ -13,7 +13,7 @@ class PrognosisExport2Test extends TestCase
      *
      * @return void
      */
-    public function testConstruct()
+    public function Construct()
     {
         // You should replace the parameters with variable or input that you want to test
         $prognosis = 'tenpercent'; //

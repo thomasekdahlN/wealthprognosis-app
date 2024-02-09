@@ -55,10 +55,11 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue('Y4', 'Eiendomsskatt');
         $this->worksheet->setCellValue('AA4', 'Salg');
         $this->worksheet->setCellValue('AE4', 'Skjermingsfradrag');
-        $this->worksheet->setCellValue('AG4', 'Cashflow');
-        $this->worksheet->setCellValue('AI4', 'Belåningsgrad');
-        $this->worksheet->setCellValue('AJ4', 'Bank');
-        $this->worksheet->setCellValue('AL4', 'F.I.R.E');
+        $this->worksheet->setCellValue('AG4', 'Yield');
+        $this->worksheet->setCellValue('AI4', 'Cashflow');
+        $this->worksheet->setCellValue('AK4', 'Belåningsgrad');
+        $this->worksheet->setCellValue('AL4', 'Bank');
+        $this->worksheet->setCellValue('AN4', 'F.I.R.E');
 
         //Kolonne headinger
         $this->worksheet->setCellValue("A$this->rowHeader", 'År');
@@ -93,15 +94,17 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("AD$this->rowHeader", '% Skatt');
         $this->worksheet->setCellValue("AE$this->rowHeader", 'Fradrag');
         $this->worksheet->setCellValue("AF$this->rowHeader", '% Fradrag');
-        $this->worksheet->setCellValue("AG$this->rowHeader", 'Cashflow');
-        $this->worksheet->setCellValue("AH$this->rowHeader", 'Akkumulert');
-        $this->worksheet->setCellValue("AI$this->rowHeader", 'Belåningsgrad');
-        $this->worksheet->setCellValue("AJ$this->rowHeader", 'Betjeningsevne');
-        $this->worksheet->setCellValue("AK$this->rowHeader", 'Max lån');
-        $this->worksheet->setCellValue("AL$this->rowHeader", 'Sparing');
-        $this->worksheet->setCellValue("AM$this->rowHeader", 'Cashflow');
-        $this->worksheet->setCellValue("AN$this->rowHeader", 'Sparerate');
-        $this->worksheet->setCellValue("AO$this->rowHeader", 'Description');
+        $this->worksheet->setCellValue("AG$this->rowHeader", 'Brutto'); //Yield
+        $this->worksheet->setCellValue("AH$this->rowHeader", 'Netto'); //Yield
+        $this->worksheet->setCellValue("AI$this->rowHeader", 'Cashflow');
+        $this->worksheet->setCellValue("AJ$this->rowHeader", 'Akkumulert');
+        $this->worksheet->setCellValue("AK$this->rowHeader", 'Belåningsgrad');
+        $this->worksheet->setCellValue("AL$this->rowHeader", 'Betjeningsevne');
+        $this->worksheet->setCellValue("AM$this->rowHeader", 'Max lån');
+        $this->worksheet->setCellValue("AN$this->rowHeader", 'Sparing');
+        $this->worksheet->setCellValue("AO$this->rowHeader", 'Cashflow');
+        $this->worksheet->setCellValue("AP$this->rowHeader", 'Sparerate');
+        $this->worksheet->setCellValue("AQ$this->rowHeader", 'Description');
 
         //return;
         ksort($this->asset); //Sorter på
@@ -181,21 +184,28 @@ class PrognosisAssetSheet2
                 $this->worksheet->setCellValue("AF$this->rows", Arr::get($data, 'realization.taxShieldDecimal'));
             }
 
-            $this->worksheet->setCellValue("AG$this->rows", Arr::get($data, 'cashflow.afterTaxAmount'));
-            $this->worksheet->setCellValue("AH$this->rows", Arr::get($data, 'cashflow.afterTaxAggregatedAmount'));
+            if (Arr::get($data, 'yield.bruttoPercent') != 0) {
+                $this->worksheet->setCellValue("AG$this->rows", $this->percentToExcel(Arr::get($data, 'yield.bruttoPercent')));
+            }
+            if (Arr::get($data, 'yield.nettoPercent') != 0) {
+                $this->worksheet->setCellValue("AH$this->rows", $this->percentToExcel(Arr::get($data, 'yield.nettoPercent')));
+            }
+
+            $this->worksheet->setCellValue("AI$this->rows", Arr::get($data, 'cashflow.afterTaxAmount'));
+            $this->worksheet->setCellValue("AJ$this->rows", Arr::get($data, 'cashflow.afterTaxAggregatedAmount'));
             if (Arr::get($data, 'asset.mortageRateDecimal') != 0) {
-                $this->worksheet->setCellValue("AI$this->rows", Arr::get($data, 'asset.mortageRateDecimal'));
+                $this->worksheet->setCellValue("AK$this->rows", Arr::get($data, 'asset.mortageRateDecimal'));
             }
-            $this->worksheet->setCellValue("AJ$this->rows", Arr::get($data, 'potential.incomeAmount'));
-            $this->worksheet->setCellValue("AK$this->rows", Arr::get($data, 'potential.mortgageAmount'));
+            $this->worksheet->setCellValue("AL$this->rows", Arr::get($data, 'potential.incomeAmount'));
+            $this->worksheet->setCellValue("AM$this->rows", Arr::get($data, 'potential.mortgageAmount'));
 
-            $this->worksheet->setCellValue("AL$this->rows", Arr::get($data, 'fire.savingAmount'));
+            $this->worksheet->setCellValue("AN$this->rows", Arr::get($data, 'fire.savingAmount'));
 
-            $this->worksheet->setCellValue("AM$this->rows", Arr::get($data, 'fire.cashFlow'));
+            $this->worksheet->setCellValue("AO$this->rows", Arr::get($data, 'fire.cashFlow'));
             if (Arr::get($data, 'fire.savingRateDecimal') != 0) {
-                $this->worksheet->setCellValue("AN$this->rows", $this->percentToExcel(Arr::get($data, 'fire.savingRateDecimal')));
+                $this->worksheet->setCellValue("AP$this->rows", $this->percentToExcel(Arr::get($data, 'fire.savingRateDecimal')));
             }
-            $this->worksheet->setCellValue("AO$this->rows", Arr::get($data, 'income.description').Arr::get($data, 'expence.description').Arr::get($data, 'asset.description').Arr::get($data, 'realization.description').Arr::get($data, 'mortgage.description'));
+            $this->worksheet->setCellValue("AQ$this->rows", Arr::get($data, 'income.description').Arr::get($data, 'expence.description').Arr::get($data, 'asset.description').Arr::get($data, 'realization.description').Arr::get($data, 'mortgage.description'));
 
             $this->rows++;
         }

@@ -145,6 +145,9 @@ Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
+Some trouble transfering extraDownPayment to mortgage not working. Gir veldig negativ cashflow.
+Yield calculation
+Removing mortgage of property from mortgage calculations.
 
 #### Not a priority, but have been thinking of it.
 - Supporting tax prognosis, not just use this years taxes
@@ -311,6 +314,10 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - realization.taxShieldAmount - Skjermingsfradrag beløp (Akkumuleres hvis ubenyttet, reduseres automatisak hvis benyttet)
 - realization.taxShieldDecimal - Skjermingsfradrag prosent
 - realization.description - Beskrivelse av salg/realisasjon av asset
+
+#### Yield
+- yield.bruttoPercent = (income.amount / asset.acquisitionAmount) * 100
+- yield.nettoPercent = ((income.amount - expence.amount) / asset.acquisitionAmount) * 100
 
 #### Potential
 How much potential the bank sees in your income - expences

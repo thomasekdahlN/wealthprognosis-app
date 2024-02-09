@@ -685,7 +685,7 @@ class Prognosis
         //Mortage - has to be calculated before asset, since we use data from mortgage to calculate asset values correctly.
         //How can we ensure we are transfering to a valid mortgage, it could have been finished already.
 
-        print "@@@@ mortgageExtraDownPayment\n";
+        echo "@@@@ mortgageExtraDownPayment\n";
 
         $mortgageBalanceAmount = $this->ArrGet("$assetname.$year.mortgage.balanceAmount");
         $mortgage['amount'] = $mortgageBalanceAmount - $extraDownPaymentAmount; //Vi reberegner lånet minus ekstra innbetaliungen - basert på gjenværende lånebeløp dette året.
@@ -714,7 +714,7 @@ class Prognosis
             $notUsedExtraAmount = abs($mortgage['amount']); //The remaining amount after the mortgage has been payed.
             $mortgageBalanceAmount = 0; //Loan is emptied
 
-            print "    notUsedExtraAmount: $notUsedExtraAmount - going back into cashflow\n";
+            echo "    notUsedExtraAmount: $notUsedExtraAmount - going back into cashflow\n";
         }
 
         return [$notUsedExtraAmount, $description];
@@ -788,6 +788,7 @@ class Prognosis
                 $this->postProcessAssetYearly($datapath);
                 $this->postProcessRealizationYearly($datapath);
                 $this->postProcessPotentialYearly($datapath);
+                $this->postProcessYieldYearly($datapath);
                 $this->postProcessFireYearly($assetname, $year, $meta);
             }
         }
@@ -891,6 +892,35 @@ class Prognosis
         }
 
         return [$diffAmount, $explanation];
+    }
+
+    /**
+     * This method calculates and sets the brutto and netto yield percentages for a given asset in a specific year.
+     * The yield is calculated based on the income and expenses of the asset.
+     *
+     * @param  string  $path The path to the asset data in the dataH array. The path should be in the format "assetname.year".
+     * @return void
+     */
+    public function postProcessYieldYearly(string $path)
+    {
+        $bruttoPercent = 0;
+        $nettoPercent = 0;
+        if ($this->ArrGet("$path.asset.acquisitionAmount") > 1) {
+            // Calculate the brutto yield percentage. This is done by dividing the income amount by the brutto percent of the asset and multiplying by 100.
+            $bruttoPercent = round(($this->ArrGet("$path.income.amount") / $this->ArrGet("$path.asset.acquisitionAmount")) * 100, 1);
+
+            // Calculate the netto yield percentage. This is done by subtracting the expense amount from the income amount, dividing the result by the brutto percent of the asset and multiplying by 100.
+            $nettoPercent = round((($this->ArrGet("$path.income.amount") - $this->ArrGet("$path.expence.amount")) / $this->ArrGet("$path.asset.acquisitionAmount")) * 100, 1);
+
+        }
+
+        echo "#### $path:" . $this->ArrGet("$path.asset.acquisitionAmount") . " bruttoPercent: $bruttoPercent, nettoPercent: $nettoPercent\n";
+
+        // Set the calculated brutto yield percentage in the dataH array.
+        $this->ArrSet("$path.yield.bruttoPercent",$bruttoPercent );
+
+        // Set the calculated netto yield percentage in the dataH array.
+        $this->ArrSet("$path.yield.nettoPercent", $nettoPercent);
     }
 
     public function postProcessCashFlowYearly(string $path)
@@ -1112,6 +1142,7 @@ class Prognosis
             $this->groupFortuneTax($year);
             $this->groupChangerates($year);
             $this->groupCompanyDividendTax($year);
+            $this->groupYield($year);
 
             //FIX, later correct tax handling on the totals ums including deductions
         }
@@ -1148,6 +1179,52 @@ class Prognosis
             }
         }
         //print_r($this->statisticsH);
+    }
+
+    private function groupYield(int $year)
+    {
+        $bruttoPercent = 0;
+        $nettoPercent = 0;
+        if (Arr::get($this->totalH, "$year.asset.acquisitionAmount") > 1) {
+            // Calculate the brutto yield percentage. This is done by dividing the income amount by the brutto percent of the asset and multiplying by 100.
+            $bruttoPercent = round((Arr::get($this->totalH, "$year.income.amount") / Arr::get($this->totalH, "$year.asset.acquisitionAmount")) * 100, 1);
+
+            // Calculate the netto yield percentage. This is done by subtracting the expense amount from the income amount, dividing the result by the brutto percent of the asset and multiplying by 100.
+            $nettoPercent = round(((Arr::get($this->totalH, "$year.income.amount") - Arr::get($this->totalH, "$year.expence.amount")) / Arr::get($this->totalH, "$year.asset.acquisitionAmount")) * 100, 1);
+
+        }
+
+        Arr::set($this->totalH, "$year.yield.bruttoPercent", $bruttoPercent);
+        Arr::set($this->totalH, "$year.yield.nettoPercent", $nettoPercent);
+
+
+        $bruttoPercent = 0;
+        $nettoPercent = 0;
+        if (Arr::get($this->companyH, "$year.asset.acquisitionAmount") > 1) {
+            // Calculate the brutto yield percentage. This is done by dividing the income amount by the brutto percent of the asset and multiplying by 100.
+            $bruttoPercent = round((Arr::get($this->companyH, "$year.income.amount") / Arr::get($this->companyH, "$year.asset.acquisitionAmount")) * 100, 1);
+
+            // Calculate the netto yield percentage. This is done by subtracting the expense amount from the income amount, dividing the result by the brutto percent of the asset and multiplying by 100.
+            $nettoPercent = round(((Arr::get($this->companyH, "$year.income.amount") - Arr::get($this->companyH, "$year.expence.amount")) / Arr::get($this->companyH, "$year.asset.acquisitionAmount")) * 100, 1);
+
+        }
+        Arr::set($this->companyH, "$year.yield.bruttoPercent", $bruttoPercent);
+        Arr::set($this->companyH, "$year.yield.nettoPercent", $nettoPercent);
+
+
+        $bruttoPercent = 0;
+        $nettoPercent = 0;
+        if (Arr::get($this->privateH, "$year.asset.acquisitionAmount") > 1) {
+            // Calculate the brutto yield percentage. This is done by dividing the income amount by the brutto percent of the asset and multiplying by 100.
+            $bruttoPercent = round((Arr::get($this->privateH, "$year.income.amount") / Arr::get($this->privateH, "$year.asset.acquisitionAmount")) * 100, 1);
+
+            // Calculate the netto yield percentage. This is done by subtracting the expense amount from the income amount, dividing the result by the brutto percent of the asset and multiplying by 100.
+            $nettoPercent = round(((Arr::get($this->privateH, "$year.income.amount") - Arr::get($this->privateH, "$year.expence.amount")) / Arr::get($this->privateH, "$year.asset.acquisitionAmount")) * 100, 1);
+
+        }
+
+        Arr::set($this->privateH, "$year.yield.bruttoPercent", $bruttoPercent);
+        Arr::set($this->privateH, "$year.yield.nettoPercent", $nettoPercent);
     }
 
     /**

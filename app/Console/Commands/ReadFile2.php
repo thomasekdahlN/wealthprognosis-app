@@ -28,6 +28,8 @@ class ReadFile2 extends Command
      */
     public function handle()
     {
+        ini_set('memory_limit', '512M');
+
         $exportfile = dirname($this->argument('configfile')).'/'.basename($this->argument('configfile'), '.json').'_'.$this->argument('prognosis').'.xlsx';
 
         new PrognosisExport2($this->argument('configfile'), $exportfile, $this->argument('prognosis'), $this->argument('generate'));

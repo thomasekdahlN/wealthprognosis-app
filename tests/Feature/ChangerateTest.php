@@ -40,4 +40,50 @@ class ChangerateTest extends TestCase
         $this->assertNull($variablename); // Check if the variable name should be null, since the original is set
         $this->assertStringContainsString('original er satt til en variabel', $explanation); // Check if the explanation contains the expected substring
     }
+
+    public function test_it_calculates_changerate_values_for_positive_percent()
+    {
+        $changerate = new Changerate('prognosis', 2022, 2023);
+        $changerate->changerateH = ['type' => [2022 => 5]];
+        [$percent, $decimal] = $changerate->getChangerateValues('type', 2022);
+        $this->assertEquals(5, $percent);
+        $this->assertEquals(1.05, $decimal);
+    }
+
+    public function test_it_calculates_changerate_values_for_zero_percent()
+    {
+        $changerate = new Changerate('prognosis', 2022, 2023);
+        $changerate->changerateH = ['type' => [2022 => 0]];
+        [$percent, $decimal] = $changerate->getChangerateValues('type', 2022);
+        $this->assertEquals(0, $percent);
+        $this->assertEquals(1, $decimal);
+    }
+
+    public function test_it_calculates_changerate_values_for_negative_percent()
+    {
+        $changerate = new Changerate('prognosis', 2022, 2023);
+        $changerate->changerateH = ['type' => [2022 => -5]];
+        [$percent, $decimal] = $changerate->getChangerateValues('type', 2022);
+        $this->assertEquals(-5, $percent);
+        $this->assertEquals(0.95, $decimal);
+    }
+
+    public function test_it_calculates_changerate_for_numeric_original()
+    {
+        $changerate = new Changerate('prognosis', 2022, 2023);
+        [$percent, $decimal, $variablename, $explanation] = $changerate->getChangerate(false, '5', 2022, null);
+        $this->assertEquals(5, $percent);
+        $this->assertEquals(1.05, $decimal);
+        $this->assertNull($variablename);
+    }
+
+    public function test_it_calculates_changerate_for_variable_original()
+    {
+        $changerate = new Changerate('prognosis', 2022, 2023);
+        $changerate->changerateH = ['type' => [2022 => 5]];
+        [$percent, $decimal, $variablename, $explanation] = $changerate->getChangerate(false, 'changerates.type', 2022, null);
+        $this->assertEquals(5, $percent);
+        $this->assertEquals(1.05, $decimal);
+        $this->assertEquals('changerates.type', $variablename);
+    }
 }

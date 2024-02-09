@@ -18,7 +18,7 @@ class ValueChangeTest extends TestCase
         $depositedAmount = 0;
         $rule = '-50%';
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals(-500, $depositedAmount);
@@ -32,7 +32,7 @@ class ValueChangeTest extends TestCase
         $depositedAmount = 0;
         $rule = '+50%';
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1500, $newValue);
         $this->assertEquals(+500, $depositedAmount);
@@ -46,7 +46,7 @@ class ValueChangeTest extends TestCase
         $depositedAmount = 0;
         $rule = '-1/4'; //Note that this should count down until 1/1 to use up the rest
 
-        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(750, $newValue1);
         $this->assertEquals(-250, $depositedAmount);
@@ -60,7 +60,7 @@ class ValueChangeTest extends TestCase
         $depositedAmount = 0;
         $rule = '+1/4';
 
-        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1250, $newValue1);
         $this->assertEquals(+250, $depositedAmount);
@@ -74,7 +74,7 @@ class ValueChangeTest extends TestCase
         $amount = 1000;
         $rule = '-1|4'; //Note that this should count down until 1/1 to use up the rest
 
-        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(750, $newValue1);
         $this->assertEquals(-250, $depositedAmount);
@@ -89,7 +89,7 @@ class ValueChangeTest extends TestCase
         $amount = 1000;
         $rule = '+1|4';
 
-        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1250, $newValue1);
         $this->assertEquals(+250, $depositedAmount);
@@ -104,7 +104,7 @@ class ValueChangeTest extends TestCase
         $amount = 1000;
         $rule = '+500';
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(1500, $newValue);
         $this->assertEquals(+500, $depositedAmount);
@@ -118,7 +118,7 @@ class ValueChangeTest extends TestCase
         $rule = '-500';
         $depositedAmount = 0;
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(500, $newValue);
         $this->assertEquals(-500, $depositedAmount);
@@ -132,7 +132,7 @@ class ValueChangeTest extends TestCase
         $rule = '+5000';
         $depositedAmount = 0;
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(110000, $newValue);
         $this->assertEquals(5000, $depositedAmount);
@@ -146,7 +146,7 @@ class ValueChangeTest extends TestCase
         $rule = null;
         $depositedAmount = 0;
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 12);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 12);
 
         $this->assertEquals(480000, $newValue, 'verdi'); //return salary pr year
         $this->assertEquals(480000, $depositedAmount, 'deposit');
@@ -160,7 +160,7 @@ class ValueChangeTest extends TestCase
         $rule = '+5000';
         $depositedAmount = 0;
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 12);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 12);
 
         $this->assertEquals(160000, $newValue);
         $this->assertEquals(60000, $depositedAmount);
@@ -174,7 +174,7 @@ class ValueChangeTest extends TestCase
         $rule = '-5000';
         $depositedAmount = 0;
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 12);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 12);
 
         $this->assertEquals(40000, $newValue);
         $this->assertEquals(-60000, $depositedAmount);
@@ -188,7 +188,7 @@ class ValueChangeTest extends TestCase
         $rule = null;
         $depositedAmount = 0;
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 1);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
         $this->assertEquals(100000, $newValue);
         $this->assertEquals(100000, $depositedAmount);
@@ -202,7 +202,7 @@ class ValueChangeTest extends TestCase
         $rule = null;
         $depositedAmount = 0;
 
-        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->adjustAmount($debug, $amount, $depositedAmount, $rule, 12);
+        [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 12);
 
         $this->assertEquals(480000, $newValue);
         $this->assertEquals(480000, $depositedAmount);

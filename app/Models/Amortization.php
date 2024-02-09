@@ -172,14 +172,13 @@ class Amortization extends Model
     public function removeMortgageFrom($fromYear)
     {
         $toYear = $fromYear + 80;
-        print "    removeMortgageFrom($this->assettname, $fromYear)\n";
+        //print "    removeMortgageFrom($this->assettname, $fromYear)\n";
 
         for ($year = $fromYear; $year <= $toYear; $year++) {
-            print "    Removing mortgage from dataH[$year]\n";
+            //print "    Removing mortgage from dataH[$year]\n";
             unset($this->dataH[$this->assettname][$year]['mortgage']);
         }
     }
-
 
     public function add($year, $type, $row)
     {

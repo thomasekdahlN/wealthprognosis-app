@@ -237,8 +237,8 @@ class TaxRealization extends Model
             $realizationTaxAmount = 0;  //Ingen skatt ved salg.
 
         } elseif ($amount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+            $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
         }
 
         //###############################################################################################################
@@ -264,7 +264,8 @@ class TaxRealization extends Model
         return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
     }
 
-    public function taxShield(int $year, string $taxGroup, string $taxType, bool $transfer, float $amount, float $realizationTaxAmount, float $taxShieldPrevAmount){
+    public function taxShield(int $year, string $taxGroup, string $taxType, bool $transfer, float $amount, float $realizationTaxAmount, float $taxShieldPrevAmount)
+    {
         $explanation = '';
         $realizationTaxShieldAmount = 0;
 
@@ -275,17 +276,17 @@ class TaxRealization extends Model
             //TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
             $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
             //print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
-            $explanation = "TaxShieldPercent:" . $realizationTaxShieldPercent*100 . ". ";
+            $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. ';
         } else {
             $realizationTaxShieldAmount = $taxShieldPrevAmount;
-            $explanation = "TaxShieldPercent:" . $realizationTaxShieldPercent*100 . ". ";
+            $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. ';
         }
         if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
             $realizationTaxShieldAmount = 0;
         }
 
         if ($transfer) {
-            if($taxGroup == 'private') {
+            if ($taxGroup == 'private') {
                 //tax shield is only used when tansfering between private assets or from company to private asset - never between company assets.
                 //We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
                 if ($realizationTaxAmount >= $realizationTaxShieldAmount) {
@@ -305,7 +306,7 @@ class TaxRealization extends Model
                 $explanation .= "Only taxshield on private group assets, found #$taxGroup#. ";
             }
         } else {
-            $explanation .= "Taxshield simulation, not an actual transfer. ";
+            $explanation .= 'Taxshield simulation, not an actual transfer. ';
         }
 
         //print "    taxShield: $year, amount:$amount, realizationTaxAmount:$realizationTaxAmount, realizationTaxShieldAmount:$realizationTaxShieldAmount, $explanation\n";

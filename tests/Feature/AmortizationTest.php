@@ -48,4 +48,59 @@ class AmortizationTest extends TestCase
         // Assert that the summary is an array
         $this->assertIsArray($dataH);
     }
+
+    public function test_it_calculates_amortization_schedule_with_positive_balance()
+    {
+        $changerate = new \stdClass();
+        $changerate->getChangerate = function () {
+            return [5, 0.05, null, ''];
+        };
+        $amortization = new Amortization([], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%'], 'asset', 2022);
+        $data = $amortization->get();
+        $this->assertEquals(100000, $data['asset'][2022]['mortgage']['amount']);
+        $this->assertEquals(10500, $data['asset'][2022]['mortgage']['termAmount']);
+    }
+
+    public function test_it_calculates_amortization_schedule_with_zero_balance()
+    {
+        $changerate = new \stdClass();
+        $changerate->getChangerate = function () {
+            return [5, 0.05, null, ''];
+        };
+        $amortization = new Amortization([], $changerate, [], ['amount' => 0, 'years' => 10, 'interest' => '5%'], 'asset', 2022);
+        $data = $amortization->get();
+        $this->assertArrayNotHasKey('mortgage', $data['asset'][2022]);
+    }
+
+    public function test_it_calculates_amortization_schedule_with_interest_only_years()
+    {
+        $changerate = new \stdClass();
+        $changerate->getChangerate = function () {
+            return [5, 0.05, null, ''];
+        };
+        $amortization = new Amortization([], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%', 'interestOnlyYears' => 5], 'asset', 2022);
+        $data = $amortization->get();
+        $this->assertEquals(5000, $data['asset'][2022]['mortgage']['termAmount']);
+    }
+
+    public function test_it_calculates_amortization_schedule_with_extra_downpayment()
+    {
+        $changerate = new \stdClass();
+        $changerate->getChangerate = function () {
+            return [5, 0.05, null, ''];
+        };
+        $amortization = new Amortization([], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%', 'extraDownpaymentAmount' => 5000], 'asset', 2022);
+        $data = $amortization->get();
+        $this->assertEquals(95000, $data['asset'][2022]['mortgage']['balanceAmount']);
+    }
+
+    public function test_it_throws_error_for_invalid_interest()
+    {
+        $this->expectException(\Exception::class);
+        $changerate = new \stdClass();
+        $changerate->getChangerate = function () {
+            return [0, 0, null, ''];
+        };
+        new Amortization([], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '0%'], 'asset', 2022);
+    }
 }
