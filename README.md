@@ -6,6 +6,7 @@ Configure all your assets, mortgage, income and expences.
 
 The program takes into account all known taxes in Norway, like fortune tax, property tax, income tax, capital tax, pension tax, rental tax, company tax, dividend tax, interest tax, wealth tax, inheritance tax, gift tax, sales tax and tax shield and calculates it for every asset every year
 The program looks at how much your max possibel mortgage can be
+
 The program looks at different F.I.R.E metrics so you can see when you can become financially independent and retire early. But recommends a different approach than the 4% rule - it will take the number of years from you wish to retire until the year you die - and sell the sellable assets until zero (fully configurable). You will still have your house, car, boat and cabin left after these sales.
 Supports correct taxation when transfering an asset from a company to private (first correct taxation on realization in company, then correct taxation when transfering to private)
 
@@ -14,19 +15,21 @@ Supports normal annuitets mortgage and extra downpayments.
 On each asset you can do a rule based addition or subtraction, like adding 5000 to a equity fund every month.
 On each asset you can do an calculation based on other assets value and add it to this asset. Like taking 5% of the salary and add it to OTP (this does not change your salary but it increases your OTP)
 On each asset you can do an transfer to another asset. This will correctly calculate the taxes for the sale involved before transfer. 
-Examples
--- Like taking 1/15 part of a equity fund each year and add it to your income for spending
--- taking 50% of the positive cachflow of one asset to make a extra mortgage downpayment for finish mortgage earlier.
--- Take 100% of the sales value of a stock/company and transfer it to a equity fund on your exit from the stock.
--. Transfer the value from one asset to another (to simulate if it gives you more wealth)
--- Children asset has both income and expences until the children move out, then they are removed from your economy
--- Public pension is added to your income the year you pension
--- Public pension is added to your income the year you pension until you ar 77 years.
+
+#### Examples
+- Like taking 1/15 part of a equity fund each year and add it to your income for spending
+- taking 50% of the positive cachflow of one asset to make a extra mortgage downpayment for finish mortgage earlier.
+- Take 100% of the sales value of a stock/company and transfer it to a equity fund on your exit from the stock.
+- Transfer the value from one asset to another (to simulate if it gives you more wealth)
+- Children asset has both income and expences until the children move out, then they are removed from your economy
+- Public pension is added to your income the year you pension
+- Public pension is added to your income the year you pension until you ar 77 years.
 
 Your asset configuration can then be run with different prognossis, like realistic, positive, negative, tenpercent, zero, variable, all, private, company.
 Each asset can have a changerate, that can be different for each year on how the asset behaves. The different prognosis configurations has different yearly change paths for each type of asset or you can make your own.
 Assets can both increase and decrease in value based on the changerates.
-Example: 
+
+#### Example: 
 - Change path for interest can på 4% in 2023, 6% in 2024 and then 5% in 2025, etc
 - Change path for your car or boat would be -10% in 2023, -10% in 2024 and then -10% in 2025, etc
 It then sums everything up and shows you all the details on how your economy behaves.
@@ -37,7 +40,7 @@ It also outputs a page with the spread of your different asset types - so you ca
 Note II: A transfer should always be done to an asset later in the config file, since the assets are calculated in order of appearance in the config file. A source should alsways be retrieved from an asset earlier in the config file.
 Note: This is just a hack and is not production ready, but its already useful.
 
-Special asset names:
+#### Special asset names:
 total, company (total company summary), private (total private summary), income (private collecting all income from assets that are taxed - not same as salary which will be taxed)
 
 ### Examples:
