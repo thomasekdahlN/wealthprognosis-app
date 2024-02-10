@@ -360,7 +360,7 @@ class Prognosis
                 //print "Asset4: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
                 $transferedCashfLowAmount = $this->ArrGet("$path.cashflow.transferedAmount");
-                $cashflowAfterTaxAmount  += $transferedCashfLowAmount;
+                $cashflowAfterTaxAmount += $transferedCashfLowAmount;
                 $cashflowBeforeTaxAmount += $transferedCashfLowAmount;
 
                 //print "   TaxRealization1: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
@@ -458,7 +458,7 @@ class Prognosis
                 $this->ArrSet("$path.cashflow.transfer", $cashflowTransfer);
                 $this->ArrSet("$path.cashflow.source", $cashflowSource);
                 $this->ArrSet("$path.cashflow.repeat", $cashflowRepeat);
-                $this->ArrSet("$path.cashflow.description", $this->ArrGetConfig("$assetname.$year.cashflow.description") . $this->ArrGet("$assetname.$year.cashflow.description"));
+                $this->ArrSet("$path.cashflow.description", $this->ArrGetConfig("$assetname.$year.cashflow.description").$this->ArrGet("$assetname.$year.cashflow.description"));
 
             } //Year loop finished here.
 
@@ -575,7 +575,7 @@ class Prognosis
     }
 
     //Transferes the amount to another asset. This actualle has to change variables like assetEquityAmount, assetPaidAmount, realizationShieldAmount etc. Others are only simulations, not happening.
-    public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount = 0, float $taxShieldAmount = 0, string $explanation)
+    public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount, float $taxShieldAmount, string $explanation)
     {
 
         $realizationTaxableAmount = 0;
@@ -1026,8 +1026,10 @@ class Prognosis
         $this->ArrSet("$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
 
         //echo "postProcessCashFlowYearly: $path\n";
-        $this->ArrSet("$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.beforeTaxAggregatedAmount"));
-        $this->ArrSet("$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.afterTaxAggregatedAmount"));
+        if($year >= $this->thisYear) {
+            $this->ArrSet("$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.beforeTaxAggregatedAmount"));
+            $this->ArrSet("$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.afterTaxAggregatedAmount"));
+        }
     }
 
     /**
