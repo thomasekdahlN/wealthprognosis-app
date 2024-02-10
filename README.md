@@ -147,8 +147,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 
 ### Functionality on the priority wishlist:
 TransferCashflow amount konseptet må støttes.
-
-
+When an extra downpayment is more than the rest of the mortgage, the amount is not handled correctly. It should be repeated on the original asset until used up, not dissapear.
 
 #### Not a priority, but have been thinking of it.
 - Extra nedbetaling av lån skaper masse utfordringer (fordi det påvirker mange verdier som allerede er beregnet og må reberegnes)

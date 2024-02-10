@@ -175,7 +175,7 @@ class TaxFortune extends Model
                 $taxableFortuneAmount = 0;
                 $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
                 $explanation = 'Tax override to zero ';
-                echo "   taxableAmount override negative to 0\n";
+                //echo "   taxableAmount override negative to 0\n";
             }
         } else {
             $taxablePropertyAmount = round($marketAmount);

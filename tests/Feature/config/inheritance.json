@@ -32,7 +32,7 @@
                 "repeat": true
             },
             "mortgage": {
-                "amount": 1500000,
+                "amount": 1000000,
                 "interest": "changerates.interest",
                 "years": 20
             }
@@ -51,7 +51,7 @@
             "asset": {
                 "name": "inheritance",
                 "description": "",
-                "marketAmount": 1000000,
+                "marketAmount": 2000000,
                 "acquisitionAmount" : 1,
                 "paidAmount": 1,
                 "changerate": "changerates.kpi",
