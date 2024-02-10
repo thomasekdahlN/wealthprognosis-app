@@ -44,22 +44,21 @@
             }
         }
     },
-    "otp": {
+    "equityfund": {
         "meta" : {
-            "type": "otp",
+            "type": "equityfund",
             "group": "private",
-            "name": "OTP",
-            "description": "OTP",
+            "name": "equityfund",
+            "description": "equityfund",
             "active": true,
-            "tax": "otp"
+            "tax": "equityfund"
         },
         "2022": {
             "asset": {
-                "rule": "5%",
-                "source": "salary.$year.income.amount",
+                "rule": "+12000",
                 "marketAmount": 1080000,
                 "changerate": "changerates.otp",
-                "description": "OTP Sparing frem til pensjonsår",
+                "description": "Sparing i fond frem til pensjonsår",
                 "repeat": true
             }
         },

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "John Doe",
-        "birthYear": "1975",
+        "birthYear": "1985",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
@@ -9,38 +9,57 @@
     },
     "salary": {
         "meta": {
-            "type": "income",
+            "type": "salary",
             "group": "private",
             "name": "Salary",
-            "description": "Salary",
+            "description": "Lønn",
             "active": true,
             "tax": "salary"
         },
-        "2022": {
+        "2024": {
             "income": {
-                "name": "Income",
-                "description": "Income",
-                "amount": 40000,
+                "name": "Lønn",
+                "description": "Lønn 600000",
+                "amount": 50000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
             "expence": {
-                "name": "Expences",
+                "name": "Utgifter",
                 "description": "",
-                "amount": 15000,
+                "amount": 10000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
         },
-        "$pensionWishYear": {
+        "$pensionOfficialYear": {
             "income": {
-                "name": "Salary",
-                "description": "Pensioned, no more salary from here",
-                "amount": "0",
-                "changerate": "changerates.zero",
+                "name": "Slutt på lønn",
+                "description": "",
+                "amount": 0,
                 "repeat": false
+            }
+        }
+    },
+    "pension": {
+        "meta": {
+            "type": "pension",
+            "group": "private",
+            "name": "Folketrygden",
+            "description": "Folketrygden",
+            "active": true,
+            "tax": "salary"
+        },
+        "$pensionOfficialYear": {
+            "income": {
+                "name": "Folketrygden",
+                "description": "Folketrygden fra $pensionOfficialYear",
+                "amount": 15000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
             }
         }
     },
@@ -53,23 +72,22 @@
             "active": true,
             "tax": "otp"
         },
-        "2022": {
+        "2024": {
             "asset": {
+                "marketAmount": 2000000,
                 "rule": "5%",
                 "source": "salary.$year.income.amount",
-                "marketAmount": 1080000,
                 "changerate": "changerates.otp",
                 "description": "OTP Sparing frem til pensjonsår",
                 "repeat": true
             }
         },
-        "$pensionWishYear": {
+        "$otpStartYear": {
             "asset": {
-                "rule": "1|$pensionWishYears",
+                "rule": "1|$otpYears",
                 "transfer": "income.$year.income.amount",
-                "source" : "",
                 "changerate": "changerates.otp",
-                "description": "OTP fra $pensionWishYear, 1|$pensionWishYears av formuen",
+                "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
                 "repeat": true
             }
         }

@@ -137,48 +137,63 @@ class TaxFortune extends Model
      * @param  bool|null  $taxableAmountOverride If true, the taxable amount is overridden. If null, it is considered as false.
      * @return array Returns an array containing the taxable amount, taxable percent, tax amount, tax percent, taxable property amount, taxable property percent, tax property amount, tax property percent and an explanation.
      */
-    public function taxCalculationFortune(string $taxGroup, string $taxType, ?string $taxProperty, int $year, ?int $marketAmount = 0, ?int $taxableAmount = 0, ?bool $taxableAmountOverride = false)
+    public function taxCalculationFortune(string $taxGroup, string $taxType, ?string $taxProperty, int $year, ?int $marketAmount = 0, ?int $taxableInitialAmount = 0, ?int $mortgageBalanceAmount, ?bool $taxableAmountOverride = false)
     {
         $explanation = '';
         $explanation1 = '';
         $explanation2 = '';
-        $taxAmount = 0;
-        $taxPercent = 0;
         $explanation = '';
         $taxableFortuneAmount = 0;
-        $taxablePropertyAmount = 0;
 
         //Property tax
         $taxPropertyPercent = 0;
         $taxablePropertyPercent = 0;
-        $taxablePropertyAmount = $taxableAmount;
         $taxPropertyAmount = 0;
         $taxablePropertyAmount = 0;
 
-        $taxablePercent = $this->getFortuneTaxable($taxGroup, $taxType, $year);
+        $taxableFortunePercent = $this->getFortuneTaxable($taxGroup, $taxType, $year);
 
-        if ($taxableAmountOverride && $taxableAmount > 0) {
-            $taxablePropertyAmount = $taxableAmount;
-            $taxableFortuneAmount = $taxableAmount;
+        if ($taxableAmountOverride) {
 
-            $taxablePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
-            $explanation = 'Fixed taxable amount. ';
-        //echo "   taxableAmount ovveride: $taxableAmount\n";
+            if($taxableInitialAmount > 0) {
+                $taxablePropertyAmount = $taxableInitialAmount;
+            } else {
+                $taxablePropertyAmount = 0;
+            }
+
+            if($taxableInitialAmount - $mortgageBalanceAmount > 0) {
+                //Is it still taxable after mortgaeg is deducted.
+                //FIX: Not all assets is allowed to have mortgage deducted. Only rivate house/rental/cabins. Check tax laws.
+
+                $taxableFortuneAmount = $taxableInitialAmount - $mortgageBalanceAmount;
+                $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
+                $explanation = 'Tax override. ';
+                //echo "   taxableAmount ovveride: taxableInitialAmount:$taxableInitialAmount - mortgageBalanceAmount:$mortgageBalanceAmount\n";
+            } else {
+                //Assuming fortuine tax can not be negative and now it is
+
+                $taxableFortuneAmount = 0;
+                $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
+                $explanation = 'Tax override to zero ';
+                echo "   taxableAmount override negative to 0\n";
+            }
         } else {
             $taxablePropertyAmount = round($marketAmount);
-            $taxableFortuneAmount = round($marketAmount * $taxablePercent); //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
-            //echo "   taxableAmount normal: $taxableAmount\n";
+            $taxableFortuneAmount = round($marketAmount * $taxableFortunePercent); //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
+            //echo "   taxableAmount normal: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent\n";
             $explanation = 'Market taxable amount. ';
         }
 
         [$taxAmount, $taxPercent, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount);
+        //echo "   taxableAmount normal: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent, taxAmount:$taxAmount taxPercent:$taxPercent\n";
+
 
         if ($taxProperty) {
             [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation2] = $this->calculatePorpertyTax($year, $taxGroup, $taxProperty, $taxablePropertyAmount);
         }
         $explanation = $explanation1.$explanation2;
 
-        return [$taxableAmount, $taxablePercent, $taxAmount, $taxPercent, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation];
+        return [$taxableFortuneAmount, $taxableFortunePercent, $taxAmount, $taxPercent, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation];
     }
 
     /**

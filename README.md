@@ -146,11 +146,21 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
-Some trouble transfering extraDownPayment to mortgage not working. Gir veldig negativ cashflow.
+TransferCashflow amount konseptet må støttes.
+Hva med rules med faste innbetalinger, kommer det i transferAmount?
+
+Extra nedbetaling av lån skaper masse utfordringer:
+- påvirker alle verdier som har brukt lån i beregninen, som rentefradrag, cashflow, etc.
+- Formuesskatt må reberegnes hvis lånet blir betalt ned raskere siden det er et fradrag der........ 
+= Vil fungere bedre med beregning med år først, så asset??
 
 #### Not a priority, but have been thinking of it.
+- Airbnb skatt på inntekt på utleie av hytte blir ikke riktig.
+- Catch 22. If calculating otp from salary we can not transfer to salary from otp because of sequenze problems. Have to add a "income" type at the end of the config to add all such transfers, to split between salary and income (from investements)
+- Når man betaler ned et lån og det blir penger igjen etter extraDownpayment så repeteres ikke det gjenværende beløpet på asset'en den kom fra. Både riktig og galt når repeat er false.... Men reglene skal ikke repeteres (eller må vi ha separat repeat på ulike deler)
 - Supporting tax prognosis, not just use this years taxes
 - Property tax should use the tax value of year-2 (Holmestrand at least))
+- Company fortune tax for private person should use the tax value of year-2 
 - rename group => owner [private|company]
 - Support for selling parts of partsellable assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
 - Tax configuration pr year and countries (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
@@ -159,11 +169,9 @@ Some trouble transfering extraDownPayment to mortgage not working. Gir veldig ne
 - Klassifisere F.I.R.E oppnåelse pr år
 - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
 - Refactoring and cleanup of code
-- Support for property tax with different tax pr asset (due to different places having different taxes. Both tax percent and standardDeduction). Deduction for property tax for rentals is not handled.
 - More TDD / tests
 - F.I.R.E - Use up 4% of partly sellable assets from wishPensionYear to DeathYear to see how it handles. Not needed anymore since using up a divisor of your assets (1/10) until you die is a better way to use up sellable assets.
 - Retrieving asset values from API, like Crypto/Fond/stocks
-
 
 ## Config
 
@@ -221,8 +229,8 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.marketAmount - Required. Markedsverdien på en asset. This is the main value we use when talking about an asset.
 - asset.acquisitionAmount - Optional. Anskaffelsesverdi. Blir default satt. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.
 - asset.equityAmount - Optional. Egenkapital : Blir default satt til asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
-- asset.paidAmount - Optional. Blir default satt til asset.marketAmount hvis ikke angitt. Brukes hvsi du har betalt noe annet enn makredsverdi, f.eks ved arv.
-- asset.taxableAmount - Optional. Skattbart beløp. Blir default satt til asset.marketAmount. Antall kroner av markedsverdien til en asset det skal skattes av. F.eks en hytte kan ha mye lavere skattbar verdi enn markedsverdien minus verdsettelsesrabatt.
+- asset.paidAmount - Optional. Finanskostnader. Blir default satt til asset.marketAmount hvis ikke angitt. Brukes hvsi du har betalt noe annet enn markedsverdi, f.eks ved arv.
+- asset.taxableInitialAmount - Optional. Skattbart beløp ikke hensyntatt lån. Blir default satt til asset.marketAmount. Antall kroner av markedsverdien til en asset det skal skattes av. F.eks en hytte kan ha mye lavere skattbar verdi enn markedsverdien minus verdsettelsesrabatt. Blir justert med changerate til asset.
 - asset.changerate - endring i prosent eller variabel hentet fra config fil for prosent f.eks changerates.kpi, changerates.fond, changerates.otp, changerates.house, changerates.car, changerates.cash
 - asset.rule - regler for hvordan inntekten skal behandles. Se eget kapittel for syntax
 - asset.transfer - overføring av inntekt til en annen asset, dvs den flytter pengene fra denne asset til den asset som er oppgitt i transfer. Merk at en transfer bør beregnes før asset den overføres til. Hvis du overfører til en som allerede er beregnet, så blir den ikke reberegnet
@@ -285,15 +293,19 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.marketAmount - Markedsverdien på en asset
 - asset.marketMortgageDeductedAmount - Markedsverdien ved salg hensyntatt restlån men ikke skatt : asset.amount - mortgage.balanceAmount 
 - asset.acquisitionAmount - Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.
+- asset.acquisitionInitialAmount - Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere
 - asset.equityAmount - Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
-- asset.paidAmount - Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.
+- asset.equityInitialAmount - Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere
+- asset.paidAmount - Finanskostnader. Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.
+- asset.paidInitialAmount - Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere
 - asset.transferedAmount - Hva du har overført til/fra denne asset. Kan være både positivt og negativt beløp.  (fra transfer, source eller rule). Ikke changerate.
 - asset.mortageRateDecimal- Hvor mye i % av en asset som er lånt. Belåningsgrad. 
 - asset.taxableDecimal - Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av
-- asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av
+- asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av minus lån. Denne er dynamisk og regnes ut fra asset.taxableInitialAmount - mortgage.balanceAmount. Kan ikke overstyres direkte.
+- asset.taxableInitialAmount - Skattbart beløp før lånet er trukket fra. Dvs det er det samme som asset.taxableAmount hvis det ikke er lån, men vi må holde det tilgjengelig og justere det for å kunne finne det igjen når et lån er nedbetaøt. Trenger aldri vises. Kun for beregninger. Blir justert årlig.
 - asset.taxableAmountOverride - Auto: Set to true for all coming years if it finds a asset.taxableAmount the first year.
-- asset.taxDecimal - Prosent skatt på asset op en assets skattbare verdi
-- asset.taxAmount - Kroner skatt på asset op en assets skattbare verdi
+- asset.taxDecimal - Formuesskatt. Prosent skatt på asset op en assets skattbare verdi
+- asset.taxAmount - Formuesskatt. Kroner skatt på asset op en assets skattbare verdi
 - asset.changerate - Hvor mye en asset endrer seg i verdi pr år
 - changeratePercent
 - asset.rule
