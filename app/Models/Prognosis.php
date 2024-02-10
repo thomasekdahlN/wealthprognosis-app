@@ -810,6 +810,7 @@ class Prognosis
                 $datapath = "$assetname.$year";
                 $this->postProcessIncomeYearly($datapath);
                 $this->postProcessExpenceYearly($datapath);
+                $this->postProcessFortuneTaxYearly($datapath); //Chicken and egg problem that this changes the Cashflow
                 $this->postProcessCashFlowYearly($datapath);
                 $this->postProcessAssetYearly($datapath);
 
@@ -857,6 +858,36 @@ class Prognosis
         }
 
         return Arr::get($this->config, $path, $default);
+    }
+
+
+    //Has to be done because a mortgae could potentially have extra downplayments making the fortune colculation wrong
+    public function postProcessFortuneTaxYearly(string $path)
+    {
+
+        [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
+        [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($path, 'group');
+        [$assetname, $year, $taxType] = $this->getAssetMetaFromPath($path, 'tax');
+        [$assetname, $year, $taxProperty] = $this->getAssetMetaFromPath($path, 'taxProperty');
+
+        $assetMarketAmount = $this->ArrGet("$path.asset.marketAmount");
+        $assetTaxableInitialAmount = $this->ArrGet("$path.asset.taxableInitialAmount");
+        $mortgageBalanceAmount = $this->ArrGet("$assetname.$year.mortgage.balanceAmount");
+        $assetTaxableAmountOverride = $this->ArrGet("$path.asset.taxableAmountOverride");
+
+        [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $mortgageBalanceAmount, $assetTaxableAmountOverride);
+
+        $this->ArrSet("$path.asset.taxableAmount", $assetTaxableAmount);
+        $this->ArrSet("$path.asset.taxDecimal", $assetTaxDecimal);
+        $this->ArrSet("$path.asset.taxAmount", $assetTaxAmount);
+        if ($assetTaxablePropertyAmount > 0) {
+            $this->ArrSet("$path.asset.taxablePropertyDecimal", $assetTaxablePropertyPercent);
+            $this->ArrSet("$path.asset.taxablePropertyAmount", $assetTaxablePropertyAmount);
+        }
+        if ($assetTaxPropertyAmount > 0) {
+            $this->ArrSet("$path.asset.taxPropertyDecimal", $assetTaxPropertyDecimal);
+            $this->ArrSet("$path.asset.taxPropertyAmount", $assetTaxPropertyAmount);
+        }
     }
 
     /**
