@@ -44,11 +44,11 @@ class Amortization extends Model
      * This constructor initializes the Amortization object with the provided configuration, change rate, data history, mortgages, and asset name.
      * It then calculates the amortization schedule for each mortgage in the provided mortgages array.
      *
-     * @param  array  $config Configuration array for the amortization calculation.
-     * @param  object  $changerate Object containing the change rate for the loan.
-     * @param  array  $dataH Array containing the data history for the loan.
-     * @param  array  $mortgages Array containing the mortgage details for the loan.
-     * @param  string  $assettname Name of the asset associated with the loan.
+     * @param  array  $config  Configuration array for the amortization calculation.
+     * @param  object  $changerate  Object containing the change rate for the loan.
+     * @param  array  $dataH  Array containing the data history for the loan.
+     * @param  array  $mortgages  Array containing the mortgage details for the loan.
+     * @param  string  $assettname  Name of the asset associated with the loan.
      */
     public function __construct(array $config, object $changerate, array $dataH, array $mortgage, string $assettname, int $year)
     {
@@ -120,7 +120,7 @@ class Amortization extends Model
                 $this->termAmount = $interestAmount; //Terminkostnadene er bare renter
                 $this->principalAmount += $extraDownpaymentAmount; //Ingen normale avdrag denne terminen, men ekstra nedbetalign teller som avdrag.
                 $this->balanceAmount = $this->remainingMortgageAmount; //Gjenværende lånebeløp er det samme som før terminen siden vi bare har betalt renter
-            //echo "    Interest only year: $year: termAmount: $this->termAmount, balanceAmount: $this->balanceAmount \n";
+                //echo "    Interest only year: $year: termAmount: $this->termAmount, balanceAmount: $this->balanceAmount \n";
             } else {
                 //Avdrag
                 $this->termAmount = ($this->remainingMortgageAmount * $interestDecimal) / $deno; //This makes the downpaymet go faster in years (instead of streatching it on the configured years), since we do not take into accoutn extra downpayments. Thats great.
@@ -161,9 +161,9 @@ class Amortization extends Model
                 ];
             }
 
-        //print_r($this->dataH[$this->assettname][$year]['mortgage']);
-        //print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
-        //}
+            //print_r($this->dataH[$this->assettname][$year]['mortgage']);
+            //print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
+            //}
         } else {
             echo "Problems with Amortization deno: $deno, interest is probably 0 in config or changerates\n";
         }

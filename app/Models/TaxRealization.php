@@ -38,9 +38,9 @@ class TaxRealization extends Model
      * Reads the tax configuration from a JSON file and stores it in the taxH property.
      * Note: This will be rewritten to support yearly tax differences.
      *
-     * @param  string  $config The name of the tax configuration file (without the .json extension).
-     * @param  int  $startYear The start year for the tax calculation (currently not used).
-     * @param  int  $stopYear The stop year for the tax calculation (currently not used).
+     * @param  string  $config  The name of the tax configuration file (without the .json extension).
+     * @param  int  $startYear  The start year for the tax calculation (currently not used).
+     * @param  int  $stopYear  The stop year for the tax calculation (currently not used).
      */
     public function __construct($config, $startYear, $stopYear)
     {
@@ -55,9 +55,9 @@ class TaxRealization extends Model
     /**
      * Returns the tax realization percentage.
      *
-     * @param  string  $taxGroup The tax group (e.g., 'company').
-     * @param  string  $taxType The type of tax.
-     * @param  int  $year The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group (e.g., 'company').
+     * @param  string  $taxType  The type of tax.
+     * @param  int  $year  The year for which the tax is being calculated.
      * @return float The tax realization percentage. For companies, a hardcoded tax of 22% is returned.
      */
     public function getTaxRealization($taxGroup, $taxType, $year)
@@ -73,9 +73,9 @@ class TaxRealization extends Model
     /**
      * Returns the tax shield realization percentage.
      *
-     * @param  string  $taxGroup The tax group (e.g., 'company').
-     * @param  string  $taxType The type of tax.
-     * @param  int  $year The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group (e.g., 'company').
+     * @param  string  $taxType  The type of tax.
+     * @param  int  $year  The year for which the tax is being calculated.
      * @return float The tax shield realization percentage. If no tax shield is available for the asset type, 0 is returned.
      */
     public function getTaxShieldRealization($taxGroup, $taxType, $year)
@@ -104,16 +104,16 @@ class TaxRealization extends Model
      * It handles different tax types and calculates the tax realization accordingly.
      * It also handles the tax shield, which is only used when transferring between private assets or from company to private asset.
      *
-     * @param  bool  $debug If true, debug information will be printed.
-     * @param  bool  $transfer If true, the tax shield is used.
-     * @param  string  $taxGroup The tax group for the calculation.
-     * @param  string  $taxType The type of tax for the calculation.
-     * @param  int  $year The year for which the tax is being calculated.
-     * @param  float  $amount The amount for the calculation.
-     * @param  float  $acquisitionAmount The acquisition amount for the calculation.
-     * @param  float  $assetDiffAmount The asset difference amount for the calculation.
-     * @param  float  $taxShieldPrevAmount The previous tax shield amount for the calculation.
-     * @param  int|null  $acquisitionYear The acquisition year for the calculation. If null, it is considered as 0.
+     * @param  bool  $debug  If true, debug information will be printed.
+     * @param  bool  $transfer  If true, the tax shield is used.
+     * @param  string  $taxGroup  The tax group for the calculation.
+     * @param  string  $taxType  The type of tax for the calculation.
+     * @param  int  $year  The year for which the tax is being calculated.
+     * @param  float  $amount  The amount for the calculation.
+     * @param  float  $acquisitionAmount  The acquisition amount for the calculation.
+     * @param  float  $assetDiffAmount  The asset difference amount for the calculation.
+     * @param  float  $taxShieldPrevAmount  The previous tax shield amount for the calculation.
+     * @param  int|null  $acquisitionYear  The acquisition year for the calculation. If null, it is considered as 0.
      * @return array Returns an array containing the taxable amount, tax amount, acquisition amount, tax percent, tax shield amount, and tax shield percent.
      */
     public function taxCalculationRealization(bool $debug, bool $transfer, string $taxGroup, string $taxType, int $year, float $amount, float $acquisitionAmount, float $assetDiffAmount, float $taxShieldPrevAmount = 0, ?int $acquisitionYear = 0)

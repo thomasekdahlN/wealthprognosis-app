@@ -232,7 +232,7 @@ class Prognosis
                 if ($this->ArrGet("$assetname.$prevYear.asset.marketAmount") <= 0 && $assetMarketAmount > 0) {
                     $assetFirstYear = $year;
                     $firsttime = true;
-                //echo "\n\nFirst time: $assetname.$year\n";
+                    //echo "\n\nFirst time: $assetname.$year\n";
                 } else {
                     $firsttime = false;
                 }
@@ -250,7 +250,6 @@ class Prognosis
 
                 [$assetMarketAmount, $assetDiffAmount, $realizationTaxShieldAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(false, "$path.asset.marketAmount", $assetMarketAmount, $assetInitialAcquisitionAmount, $realizationPrevTaxShieldAmount, $assetRule, $assetTransfer, $assetSource, 1);
                 //print "Asset2: $assetname.$year assetMarketAmount: $assetMarketAmount, assetDiffAmount:$assetDiffAmount, assetAcquisitionAmount: $assetInitialAcquisitionAmount, assetNewRule:$assetNewRule explanation: $explanation\n";
-
 
                 if ($firsttime) {
                     //default values we only set on the first run
@@ -283,15 +282,15 @@ class Prognosis
                     }
                 }
 
-                if($assetInitialAcquisitionAmount > 0) {
+                if ($assetInitialAcquisitionAmount > 0) {
                     //If it actually is set it is either the first time or a override later in time
                     $this->ArrSet("$path.asset.acquisitionInitialAmount", $assetInitialAcquisitionAmount);
                 }
-                if($assetInitialEquityAmount > 0) {
+                if ($assetInitialEquityAmount > 0) {
                     //If it actually is set it is either the first time or a override later in time
                     $this->ArrSet("$path.asset.equityInitialAmount", $assetInitialEquityAmount);
                 }
-                if($assetInitialPaidAmount > 0) {
+                if ($assetInitialPaidAmount > 0) {
                     //If it actually is set it is either the first time or a override later in time
                     $this->ArrSet("$path.asset.paidInitialAmount", $assetInitialPaidAmount);
                 }
@@ -299,7 +298,7 @@ class Prognosis
                 //Calculation of the changerate asset has to be done after paidAmount, equityAmount but before we calculate the Taxes.
                 $transferedAmount = $this->ArrGet("$path.asset.transferedAmount");
 
-                $assetMarketAmount = ($assetMarketAmount + $transferedAmount ) * $assetChangerateDecimal;
+                $assetMarketAmount = ($assetMarketAmount + $transferedAmount) * $assetChangerateDecimal;
                 $assetTaxableInitialAmount = round(($assetTaxableInitialAmount + $transferedAmount) * $assetChangerateDecimal); //FIX: Trouble with override special case destrous all marketAmounts after it is set the first time. Does not neccessarily be more taxable if you put more money into it. Special case with house/cabin/rental.
 
                 //print "Asset3: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
@@ -308,12 +307,12 @@ class Prognosis
 
                 //#######################################################################################################
                 //Asset tax calculations
-                if($assetname == 'amundrodveien') {
-                    print "TaxFortuneBefore $assetname.$year, taxType:$taxType, taxProperty:$taxProperty, assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, balanceAmount:" . $this->ArrGet("$assetname.$year.mortgage.balanceAmount") . "\n";
+                if ($assetname == 'amundrodveien') {
+                    echo "TaxFortuneBefore $assetname.$year, taxType:$taxType, taxProperty:$taxProperty, assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, balanceAmount:".$this->ArrGet("$assetname.$year.mortgage.balanceAmount")."\n";
                 }
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
                 [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
-                if($assetname == 'amundrodveien') {
+                if ($assetname == 'amundrodveien') {
                     echo "   TaxFortuneAfter: $assetname.$year assetTaxableInitialAmount:$assetTaxableInitialAmount, assetTaxableAmount:$assetTaxableAmount, assetTaxAmount:$assetTaxAmount,assetTaxAmount:$assetTaxAmount\n";
                 }
 
@@ -752,11 +751,11 @@ class Prognosis
      * This function retrieves a value from the configuration or from the previous year's data.
      * It checks if the value is an amount and if so, it adds any transferred amount to this year to the previous year's amount.
      *
-     * @param  bool  $debug Indicates whether debugging is enabled.
-     * @param  string  $assetname The name of the asset.
-     * @param  int  $year The year for which the value is being retrieved.
-     * @param  string  $type The type of the value being retrieved (e.g., 'income', 'expense', etc.).
-     * @param  string  $variable The specific variable within the type being retrieved.
+     * @param  bool  $debug  Indicates whether debugging is enabled.
+     * @param  string  $assetname  The name of the asset.
+     * @param  int  $year  The year for which the value is being retrieved.
+     * @param  string  $type  The type of the value being retrieved (e.g., 'income', 'expense', etc.).
+     * @param  string  $variable  The specific variable within the type being retrieved.
      * @return mixed The retrieved value.
      */
     public function configOrPrevValue(bool $debug, string $assetname, int $year, string $type, string $variable)
@@ -863,8 +862,8 @@ class Prognosis
     /**
      * Modifies the yearly cash flow for a given asset and year.
      *
-     * @param  int  $year The year for which to modify the cash flow.
-     * @param  string  $assetName The name of the asset for which to modify the cash flow.
+     * @param  int  $year  The year for which to modify the cash flow.
+     * @param  string  $assetName  The name of the asset for which to modify the cash flow.
      * @return void
      */
     public function postProcessIncomeYearly(string $path)
@@ -887,7 +886,7 @@ class Prognosis
             $year = $matchesH[2][0];
             $assetname = $matchesH[1][0];
             $value = $this->ArrGetConfig("$assetname.meta.$field");
-        //print_r($this->ArrGetConfig("$assetname.meta"));
+            //print_r($this->ArrGetConfig("$assetname.meta"));
         } else {
             echo "ERROR with path: $path\n";
         }
@@ -915,7 +914,7 @@ class Prognosis
      * This method calculates and sets the brutto and netto yield percentages for a given asset in a specific year.
      * The yield is calculated based on the income and expenses of the asset.
      *
-     * @param  string  $path The path to the asset data in the dataH array. The path should be in the format "assetname.year".
+     * @param  string  $path  The path to the asset data in the dataH array. The path should be in the format "assetname.year".
      * @return void
      */
     public function postProcessYieldYearly(string $path)
@@ -973,8 +972,8 @@ class Prognosis
     /**
      * Post-processes asset yearly data.
      *
-     * @param  int  $year The year of the asset.
-     * @param  string  $assetname The name of the asset.
+     * @param  int  $year  The year of the asset.
+     * @param  string  $assetname  The name of the asset.
      * @return void
      */
     public function postProcessAssetYearly(string $path)
@@ -983,46 +982,45 @@ class Prognosis
         $prevYear = $year - 1;
 
         $marketAmount = $this->ArrGet("$assetname.$year.asset.marketAmount");
-        if($marketAmount <= 0) {
+        if ($marketAmount <= 0) {
             //If the market value is gone, we zero out everything.
             $this->ArrSet("$path.asset.acquisitionAmount", 0);
             $this->ArrSet("$path.asset.equityAmount", 0);
             $this->ArrSet("$path.asset.paidAmount", 0);
 
-
         } else {
 
             //ACQUISITION
             $acquisitionAmount = $this->ArrGet("$assetname.$year.asset.acquisitionInitialAmount");
-            if (!$acquisitionAmount) {
+            if (! $acquisitionAmount) {
                 $acquisitionAmount = $this->ArrGet("$assetname.$prevYear.asset.acquisitionAmount");
             }
             $acquisitionAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.asset.transferedCashflowAmount");
-            if($acquisitionAmount < 0) {
+            if ($acquisitionAmount < 0) {
                 $acquisitionAmount = 0;
             }
             $this->ArrSet("$path.asset.acquisitionAmount", $acquisitionAmount);
 
             //EQUITY
             $equityAmount = $this->ArrGet("$assetname.$year.asset.equityInitialAmount");
-            if (!$equityAmount) {
+            if (! $equityAmount) {
                 $equityAmount = $this->ArrGet("$assetname.$prevYear.asset.equityAmount");
             }
             $equityAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.asset.transferedCashflowAmount");
-            if($equityAmount < 0) {
+            if ($equityAmount < 0) {
                 $equityAmount = 0;
             }
             $this->ArrSet("$path.asset.equityAmount", $equityAmount);
 
             //PAID
             $paidAmount = $this->ArrGet("$assetname.$year.asset.paidInitialAmount");
-            if (!$paidAmount) {
+            if (! $paidAmount) {
                 $paidAmount = $this->ArrGet("$assetname.$prevYear.asset.paidAmount");
             } else {
                 //echo "    $assetname.$year.asset.paidInitialAmount: $paidAmount\n";
             }
             $paidAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.asset.transferedCashflowAmount") + $this->ArrGet("$path.mortgage.termAmount");
-            if($paidAmount < 0) {
+            if ($paidAmount < 0) {
                 $paidAmount = 0;
             }
             $this->ArrSet("$path.asset.paidAmount", $paidAmount);
@@ -1043,14 +1041,13 @@ class Prognosis
     public function postProcessRealizationYearly(string $path)
     {
 
-
     }
 
     /**
      * Performs post-processing for the income potential as seen from a Bank
      * This function calculates the potential maximum loan a user can handle based on their income
      *
-     * @param  string  $path The path to the asset in the data structure. The path is in the format 'assetname.year'.
+     * @param  string  $path  The path to the asset in the data structure. The path is in the format 'assetname.year'.
      * @return void
      */
     public function postProcessPotentialYearly(string $path)
@@ -1083,8 +1080,8 @@ class Prognosis
      * //FIX - Hva regnes egentlig som sparing. Er det visse typer assets, ikke all inntekt????
      * amount = assetverdi - lån i beregningene + inntekt? (Hvor mye er 4% av de reelle kostnadene + inntekt (sannsynligvis kunn inntekt fra utleie)
      *
-     * @param  int  $year The year for which the calculations are performed.
-     * @param  string  $assetname The name of the asset for which the calculations are performed.
+     * @param  int  $year  The year for which the calculations are performed.
+     * @param  string  $assetname  The name of the asset for which the calculations are performed.
      * @return void
      */
     public function postProcessFireYearly(string $assetname, int $year, array $meta)
@@ -1323,7 +1320,7 @@ class Prognosis
      * It takes into account the tax implications of such a transfer.
      * FIX: Should shielding be applied here?
      *
-     * @param  int  $year The year for which the calculation is being performed.
+     * @param  int  $year  The year for which the calculation is being performed.
      */
     private function groupCompanyDividendTax(int $year)
     {

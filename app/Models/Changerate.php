@@ -55,8 +55,8 @@ class Changerate extends Model
     /**
      * Retrieves the change rate and its decimal equivalent for a given type and year.
      *
-     * @param  string  $type The type of change for which to retrieve the rate.
-     * @param  int  $year The year for which to retrieve the rate.
+     * @param  string  $type  The type of change for which to retrieve the rate.
+     * @param  int  $year  The year for which to retrieve the rate.
      * @return array An array containing the percentage rate and its decimal equivalent.
      */
     public function getChangerateValues(string $type, int $year)
@@ -91,10 +91,10 @@ class Changerate extends Model
     /**
      * Converts the change rate to its decimal equivalent and retrieves associated information.
      *
-     * @param  bool  $debug Indicates whether to enable debug mode.
-     * @param  string|null  $original The original value to be converted.
-     * @param  int  $year The year for which to retrieve the rate.
-     * @param  string|null  $variablename The variable name to be used for substitution.
+     * @param  bool  $debug  Indicates whether to enable debug mode.
+     * @param  string|null  $original  The original value to be converted.
+     * @param  int  $year  The year for which to retrieve the rate.
+     * @param  string|null  $variablename  The variable name to be used for substitution.
      * @return array An array containing the percentage rate, its decimal equivalent, the variable name, and an explanation.
      */
     public function getChangerate(bool $debug, ?string $original, int $year, ?string $variablename)
@@ -118,7 +118,7 @@ class Changerate extends Model
                 if (is_numeric($original)) { //Just a percentage integer, use it directly
                     $percent = $original;
                     $decimal = $this->convertPercentToDecimal($percent);
-                //$explanation = "original er satt til percent: $original, decimal: $decimal";
+                    //$explanation = "original er satt til percent: $original, decimal: $decimal";
 
                 } else { //Allow to read the changerate from the changerate yearly config as a variable name subsituted for its amount
                     //print "Remove the changerates from the text: $original\n";

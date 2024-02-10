@@ -17,9 +17,9 @@ class TaxFortune extends Model
      * Constructor for the TaxFortune class.
      * Reads the tax configuration from a JSON file and stores it in the taxH property.
      *
-     * @param  string  $config The name of the tax configuration file (without the .json extension).
-     * @param  int  $startYear The start year for the tax calculation (currently not used).
-     * @param  int  $stopYear The stop year for the tax calculation (currently not used).
+     * @param  string  $config  The name of the tax configuration file (without the .json extension).
+     * @param  int  $startYear  The start year for the tax calculation (currently not used).
+     * @param  int  $stopYear  The stop year for the tax calculation (currently not used).
      */
     public function __construct($config, $startYear, $stopYear)
     {
@@ -35,9 +35,9 @@ class TaxFortune extends Model
     /**
      * Returns the portion of the fortune that is taxable.
      *
-     * @param  string  $taxGroup The tax group (e.g., 'company').
-     * @param  string  $taxType The type of tax.
-     * @param  int  $year The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group (e.g., 'company').
+     * @param  string  $taxType  The type of tax.
+     * @param  int  $year  The year for which the tax is being calculated.
      * @return float The portion of the fortune that is taxable.
      */
     public function getFortuneTaxable($taxGroup, $taxType, $year)
@@ -53,8 +53,8 @@ class TaxFortune extends Model
     /**
      * Returns the fortune tax percentage.
      *
-     * @param  int  $year The year for which the tax is being calculated.
-     * @param  string  $type The type of tax.
+     * @param  int  $year  The year for which the tax is being calculated.
+     * @param  string  $type  The type of tax.
      * @return float The fortune tax percentage.
      */
     public function getFortuneTax($year, $type)
@@ -65,8 +65,8 @@ class TaxFortune extends Model
     /**
      * Returns the fortune tax amount.
      *
-     * @param  int  $year The year for which the tax is being calculated.
-     * @param  string  $type The type of tax.
+     * @param  int  $year  The year for which the tax is being calculated.
+     * @param  string  $type  The type of tax.
      * @return int The fortune tax amount.
      */
     public function getFortuneTaxAmount($year, $type)
@@ -77,8 +77,8 @@ class TaxFortune extends Model
     /**
      * Returns the standard deduction for the fortune tax.
      *
-     * @param  string  $taxGroup The tax group.
-     * @param  int  $year The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group.
+     * @param  int  $year  The year for which the tax is being calculated.
      * @return int The standard deduction for the fortune tax.
      */
     public function getFortuneTaxStandardDeduction($taxGroup, $year)
@@ -89,9 +89,9 @@ class TaxFortune extends Model
     /**
      * Returns the taxable portion of the property.
      *
-     * @param  string  $taxGroup The tax group.
-     * @param  string  $taxProperty The type of property.
-     * @param  int  $year The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group.
+     * @param  string  $taxProperty  The type of property.
+     * @param  int  $year  The year for which the tax is being calculated.
      * @return float The taxable portion of the property.
      */
     public function getPropertyTaxable($taxGroup, $taxProperty, $year)
@@ -102,9 +102,9 @@ class TaxFortune extends Model
     /**
      * Returns the standard deduction for the property tax.
      *
-     * @param  string  $taxGroup The tax group.
-     * @param  string  $taxProperty The type of property.
-     * @param  int  $year The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group.
+     * @param  string  $taxProperty  The type of property.
+     * @param  int  $year  The year for which the tax is being calculated.
      * @return int The standard deduction for the property tax.
      */
     public function getPropertyTaxStandardDeduction($taxGroup, $taxProperty, $year)
@@ -115,9 +115,9 @@ class TaxFortune extends Model
     /**
      * Returns the property tax percentage.
      *
-     * @param  string  $taxGroup The tax group.
-     * @param  string  $taxProperty The type of property.
-     * @param  int  $year The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group.
+     * @param  string  $taxProperty  The type of property.
+     * @param  int  $year  The year for which the tax is being calculated.
      * @return float The property tax percentage.
      */
     public function getPropertyTax($taxGroup, $taxProperty, $year)
@@ -128,16 +128,16 @@ class TaxFortune extends Model
     /**
      * Calculates the fortune tax and property tax based on the given parameters.
      *
-     * @param  string  $taxGroup The tax group for the calculation.
-     * @param  string  $taxType The tax type for the calculation.
-     * @param  string|null  $taxProperty The property type for the calculation. If null, property tax is not calculated.
-     * @param  int  $year The year for which the tax is being calculated.
-     * @param  int|null  $marketAmount The market amount for the calculation. If null, it is considered as 0.
-     * @param  int|null  $taxableAmount The taxable amount for the calculation. If null, it is considered as 0.
-     * @param  bool|null  $taxableAmountOverride If true, the taxable amount is overridden. If null, it is considered as false.
+     * @param  string  $taxGroup  The tax group for the calculation.
+     * @param  string  $taxType  The tax type for the calculation.
+     * @param  string|null  $taxProperty  The property type for the calculation. If null, property tax is not calculated.
+     * @param  int  $year  The year for which the tax is being calculated.
+     * @param  int|null  $marketAmount  The market amount for the calculation. If null, it is considered as 0.
+     * @param  int|null  $taxableAmount  The taxable amount for the calculation. If null, it is considered as 0.
+     * @param  bool|null  $taxableAmountOverride  If true, the taxable amount is overridden. If null, it is considered as false.
      * @return array Returns an array containing the taxable amount, taxable percent, tax amount, tax percent, taxable property amount, taxable property percent, tax property amount, tax property percent and an explanation.
      */
-    public function taxCalculationFortune(string $taxGroup, string $taxType, ?string $taxProperty, int $year, ?int $marketAmount = 0, ?int $taxableInitialAmount = 0, ?int $mortgageBalanceAmount, ?bool $taxableAmountOverride = false)
+    public function taxCalculationFortune(string $taxGroup, string $taxType, ?string $taxProperty, int $year, ?int $marketAmount, ?int $taxableInitialAmount, ?int $mortgageBalanceAmount, ?bool $taxableAmountOverride = false)
     {
         $explanation = '';
         $explanation1 = '';
@@ -155,13 +155,13 @@ class TaxFortune extends Model
 
         if ($taxableAmountOverride) {
 
-            if($taxableInitialAmount > 0) {
+            if ($taxableInitialAmount > 0) {
                 $taxablePropertyAmount = $taxableInitialAmount;
             } else {
                 $taxablePropertyAmount = 0;
             }
 
-            if($taxableInitialAmount - $mortgageBalanceAmount > 0) {
+            if ($taxableInitialAmount - $mortgageBalanceAmount > 0) {
                 //Is it still taxable after mortgaeg is deducted.
                 //FIX: Not all assets is allowed to have mortgage deducted. Only rivate house/rental/cabins. Check tax laws.
 
@@ -187,7 +187,6 @@ class TaxFortune extends Model
         [$taxAmount, $taxPercent, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount);
         //echo "   taxableAmount normal: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent, taxAmount:$taxAmount taxPercent:$taxPercent\n";
 
-
         if ($taxProperty) {
             [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation2] = $this->calculatePorpertyTax($year, $taxGroup, $taxProperty, $taxablePropertyAmount);
         }
@@ -199,10 +198,10 @@ class TaxFortune extends Model
     /**
      * Calculates the property tax based on the given parameters.
      *
-     * @param  int  $year The year for which the tax is being calculated.
-     * @param  string  $taxGroup The tax group for the calculation.
-     * @param  string  $taxProperty The property type for the calculation.
-     * @param  float  $amount The amount of property for the calculation.
+     * @param  int  $year  The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group for the calculation.
+     * @param  string  $taxProperty  The property type for the calculation.
+     * @param  float  $amount  The amount of property for the calculation.
      * @return array Returns an array containing the taxable property amount, taxable property percent, tax property amount, tax property percent and an explanation.
      */
     public function calculatePorpertyTax(int $year, string $taxGroup, $taxProperty, float $amount)
@@ -239,10 +238,10 @@ class TaxFortune extends Model
     /**
      * Calculates the fortune tax based on the given parameters.
      *
-     * @param  bool  $debug If true, debug information will be printed.
-     * @param  int  $year The year for which the tax is being calculated.
-     * @param  string  $taxGroup The tax group for the calculation.
-     * @param  float  $amount The amount of fortune for the calculation.
+     * @param  bool  $debug  If true, debug information will be printed.
+     * @param  int  $year  The year for which the tax is being calculated.
+     * @param  string  $taxGroup  The tax group for the calculation.
+     * @param  float  $amount  The amount of fortune for the calculation.
      * @return array Returns an array containing the calculated tax amount, tax percent and an explanation.
      */
     public function calculatefortunetax(bool $debug, int $year, string $taxGroup, float $amount)
