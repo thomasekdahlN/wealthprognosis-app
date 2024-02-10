@@ -534,7 +534,7 @@ class Prognosis
 
                 if ($transferAmount > 0) {
                     //echo "    #### transferAmount > 0\n";
-                    [$XpaidAmount, $notTransferedAmount, $taxShieldAmount, $Xexplanation] = $this->transfer(false, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount, $taxShieldAmount);
+                    [$XpaidAmount, $notTransferedAmount, $taxShieldAmount, $Xexplanation] = $this->transfer(false, $transferOrigin, $transferTo, $transferAmount, $acquisitionAmount, $taxShieldAmount, $explanation);
                     $diffAmount = $transferAmount - $notTransferedAmount;
                     //$newAmount -= $diffAmount; //THe transfer will also be added later in the prosess, but since a transfer can come from multiple assets we do not know the difference between addition here and later.
                 }
@@ -575,7 +575,7 @@ class Prognosis
     }
 
     //Transferes the amount to another asset. This actualle has to change variables like assetEquityAmount, assetPaidAmount, realizationShieldAmount etc. Others are only simulations, not happening.
-    public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount = 0, float $taxShieldAmount = 0)
+    public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount = 0, float $taxShieldAmount = 0, string $explanation)
     {
 
         $realizationTaxableAmount = 0;
@@ -588,9 +588,9 @@ class Prognosis
         [$originAssetname, $originYear, $originType, $originField] = $this->helper->pathToElements($transferOrigin);
 
         $paidAmount = 0;
-        $explanation = " transfer $amount to $transferTo ";
+        $explanation = " transfer $amount ($explanation) to $transferTo ";
         if ($debug) {
-            echo "        Transferto before: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
+            echo "        Transferto before: $transferTo ($explanation): ".Arr::get($this->dataH, $transferTo, 0)."\n";
         }
 
         [$toAssetname, $toYear, $toType, $toField] = $this->helper->pathToElements($transferTo);
@@ -654,8 +654,8 @@ class Prognosis
 
             //The transfer happens here.
             $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedToAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
-            $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount from $transferOrigin ");
-            $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered -$amount + $realizationTaxAmount (tax) = $transferedToAmount to $transferTo ");
+            $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount from $transferOrigin $explanation");
+            $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered -$amount + $realizationTaxAmount (tax) = $transferedToAmount to $transferTo $explanation");
             echo "#### Transfer from: $transferedOriginPathDescription :" . $this->ArrGet($transferedOriginPathDescription) . "\n";
         }
         if ($transferedToAmount > 0) {
