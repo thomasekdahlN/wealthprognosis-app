@@ -158,7 +158,6 @@ Feature complete for now
 - All transfers to next year? (to avoid vertical processing problem)
 - Extra nedbetaling av lån skaper masse utfordringer (fordi det påvirker mange verdier som allerede er beregnet og må reberegnes)
 - Should support different tax types within the asset, like separate tax for income vs asset value
--- Airbnb skatt på inntekt på utleie av hytte blir ikke riktig.
 - Catch 22. If calculating otp from salary we can not transfer to salary from otp because of sequenze problems. Have to add a "income" type at the end of the config to add all such transfers, to split between salary and income (from investements)
 - Når man betaler ned et lån og det blir penger igjen etter extraDownpayment så repeteres ikke det gjenværende beløpet på asset'en den kom fra. Både riktig og galt når repeat er false.... Men reglene skal ikke repeteres (eller må vi ha separat repeat på ulike deler)
 - Supporting tax prognosis, not just use this years taxes

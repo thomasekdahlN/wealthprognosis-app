@@ -33,6 +33,11 @@ class TaxCashflow extends Model
         return Arr::get($this->taxH, "$taxType.yearly", 0) / 100;
     }
 
+    public function getTaxStandardDeduction($taxGroup, $taxType, $year)
+    {
+        return Arr::get($this->taxH, "$taxType.standardDeduction", 0);
+    }
+
     public function taxCalculationCashflow(bool $debug, string $taxGroup, string $taxType, int $year, ?float $income, ?float $expence)
     {
 
@@ -68,9 +73,13 @@ class TaxCashflow extends Model
 
         } elseif ($taxType == 'cabin') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-            $cashflowTaxAmount = ($income - 10000) * $cashflowTaxPercent; //Airbnb skatten
-            $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
-
+            $standardDeduction = $this->getTaxStandardDeduction($taxGroup, 'airbnb', $year);
+            if ($income - $standardDeduction > 0) {
+                $cashflowTaxPercent = $this->getTaxYearly($taxGroup, 'airbnb', $year); //Should avoid hardcoding this extra tax check. Tax on each type within an asset? asset and cashflow taxes?
+                $cashflowTaxAmount = round(($income - $standardDeduction) * $cashflowTaxPercent); //Airbnb skatten
+                $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
+                //echo "cabin: taxType:$taxType, income:$income, cashflowTaxPercent:$cashflowTaxPercent, cashflowTaxAmount:$cashflowTaxAmount\n";
+            }
         } elseif ($taxType == 'rental') {
             //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
             $cashflowTaxAmount = ($income - $expence) * $cashflowTaxPercent;
@@ -83,9 +92,6 @@ class TaxCashflow extends Model
 
         } elseif ($taxType == 'stock') {
             //Hm. Aksjer som selges skattes bare som formuesskatt og ved realisasjon
-            //Antar det er vanligst å skatte av fortjenesten etter at utgifter er trukket fra
-            //FIX: Skjermingsfradrag
-            //FIX: Stor forskjell på skattlegging mot privat 35.2%vs bedrift 0%?.
             $cashflowTaxAmount = 0;
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
@@ -98,7 +104,7 @@ class TaxCashflow extends Model
             $cashflowTaxAmount = 0;
 
         } elseif ($taxType == 'ask') {
-            //Aksjesparekonto. TODO Fix. Kun skatt ved salg??? Ikke årlig
+            //Aksjesparekonto. ToDo. Kun skatt ved salg??? Ikke årlig
             $cashflowTaxAmount = 0; //Ikke årlig skatt på ASK
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
@@ -113,13 +119,13 @@ class TaxCashflow extends Model
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxType == 'bank') {
-            //ToDo: Man skal bare betale skatt av rentene
-            $cashflowTaxAmount = $income * $cashflowTaxPercent; //ToDO FIX
+            //ToDo: Man skal bare betale skatt av rentene dette året........
+            $cashflowTaxAmount = $income * $cashflowTaxPercent; //ToDo
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } elseif ($taxType == 'cash') {
             //ToDo: Man skal bare betale skatt av rentene
-            $cashflowTaxAmount = $income * $cashflowTaxPercent; //ToDO FIX
+            $cashflowTaxAmount = $income * $cashflowTaxPercent; //ToDo
             $cashflowAfterTaxAmount = $income - $expence - $cashflowTaxAmount;
 
         } else {
