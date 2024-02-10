@@ -146,6 +146,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
+Feature complete for now
 
 #### Not a priority, but have been thinking of it.
 - Calculate only 1 year of a mortgage at a time, to avoid this vertical processing problem.
