@@ -310,12 +310,12 @@ class Prognosis
 
                 //#######################################################################################################
                 //Asset tax calculations
-                if ($assetname == 'amundrodveien') {
+                if ($assetname == 'xxx') {
                     //echo "TaxFortuneBefore $assetname.$year, taxType:$taxType, taxProperty:$taxProperty, assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, balanceAmount:".$this->ArrGet("$assetname.$year.mortgage.balanceAmount")."\n";
                 }
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
                 [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
-                if ($assetname == 'amundrodveien') {
+                if ($assetname == 'xxx') {
                     //echo "   TaxFortuneAfter: $assetname.$year assetTaxableInitialAmount:$assetTaxableInitialAmount, assetTaxableAmount:$assetTaxableAmount, assetTaxAmount:$assetTaxAmount,assetTaxAmount:$assetTaxAmount\n";
                 }
 
@@ -359,10 +359,9 @@ class Prognosis
                 //If we sell the asset, how much money is left for us after tax? In sequence has to be after cashflow.
                 //print "Asset4: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
-                $transferedCashfLowAmount = $this->ArrGet("$path.asset.transferedCashflowAmount"); //FIX Transfered cashflow Amount does not exist yet.
-                $transferedChangerateAmount = round($transferedCashfLowAmount * $assetChangerateDecimal);
-                $assetMarketAmount = $assetMarketAmount + $transferedChangerateAmount;
-                $assetTaxableAmount += $transferedCashfLowAmount; //FIX: SHould only add the fortune taxable part of the transfered amount.
+                $transferedCashfLowAmount = $this->ArrGet("$path.cashflow.transferedAmount");
+                $cashflowAfterTaxAmount  += $transferedCashfLowAmount;
+                $cashflowBeforeTaxAmount += $transferedCashfLowAmount;
 
                 //print "   TaxRealization1: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
@@ -391,7 +390,7 @@ class Prognosis
                         'source' => $incomeSource,
                         'repeat' => $incomeRepeat,
                         'amount' => $incomeAmount,
-                        'description' => $this->ArrGetConfig("$assetname.$year.income.description").$incomeExplanation,
+                        'description' => $this->ArrGetConfig("$assetname.$year.income.description").$incomeExplanation.$this->ArrGet("$assetname.$year.income.description"),
                     ];
                 }
 
@@ -404,7 +403,7 @@ class Prognosis
                         'source' => $expenceSource,
                         'repeat' => $expenceRepeat,
                         'amount' => $expenceAmount,
-                        'description' => $this->ArrGetConfig("$assetname.$year.expence.description").$expenceExplanation,
+                        'description' => $this->ArrGetConfig("$assetname.$year.expence.description").$expenceExplanation.$this->ArrGet("$assetname.$year.expence.description"),
                     ];
                 }
 
@@ -459,7 +458,7 @@ class Prognosis
                 $this->ArrSet("$path.cashflow.transfer", $cashflowTransfer);
                 $this->ArrSet("$path.cashflow.source", $cashflowSource);
                 $this->ArrSet("$path.cashflow.repeat", $cashflowRepeat);
-                $this->ArrSet("$path.cashflow.description", $this->ArrGetConfig("$assetname.$year.cashflow.description"));
+                $this->ArrSet("$path.cashflow.description", $this->ArrGetConfig("$assetname.$year.cashflow.description") . $this->ArrGet("$assetname.$year.cashflow.description"));
 
             } //Year loop finished here.
 
@@ -637,7 +636,7 @@ class Prognosis
 
         //print "    Realization amount: $amount, acquisitionAmount: $acquisitionAmount, realizationTaxableAmount: $realizationTaxableAmount, realizationTaxAmount: $realizationTaxAmount, realizationTaxPercent: $realizationTaxPercent\n";
 
-        $transferedToAmount = $amount - $realizationTaxAmount; //The amnount we transfer minus the realizationTax
+        $transferedToAmount = $amount - $realizationTaxAmount; //The amount we transfer minus the realizationTax
 
         if (Str::contains($transferTo, ['mortgage.extraDownpaymentAmount']) && $transferedToAmount > 0) {
             //We see it is an extra $extraDownpaymentAmount for the mortgage, then we recalculate it.
@@ -655,13 +654,15 @@ class Prognosis
 
             //The transfer happens here.
             $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedToAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
-            $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount from $transferOrigin "); //The amount we transfered including the tax - for later reference and calculation
-            $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount to $transferTo "); //The amount we transfered including the tax - for later reference and calculation
+            $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount from $transferOrigin ");
+            $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered -$amount + $realizationTaxAmount (tax) = $transferedToAmount to $transferTo ");
+            echo "#### Transfer from: $transferedOriginPathDescription :" . $this->ArrGet($transferedOriginPathDescription) . "\n";
         }
         if ($transferedToAmount > 0) {
             //Could happen if downpayment of mortgage is finished.
             $this->ArrSet($transferedToPathAmount, $this->ArrGet($transferedToPathAmount) + $transferedToAmount); //The amount we transfered to - for later reference and calculation
             $this->ArrSet($transferedOriginPathAmount, $this->ArrGet($transferedOriginPathAmount) - $transferedFromAmount); //The amount we transfered including the tax - for later reference and calculation
+            echo "#### Transfer from: $transferedOriginPathAmount:" . $this->ArrGet($transferedOriginPathAmount) . "\n";
         }
         //FIX: Should add explanation also on the asset transfered to for easier debug.
         $paidAmount -= $amount;
@@ -1007,7 +1008,8 @@ class Prognosis
         $cashflowBeforeTaxAmount =
             $this->ArrGet("$path.income.amount")
             - $this->ArrGet("$path.expence.amount")
-            + $this->ArrGet("$path.income.transferedAmount");
+            + $this->ArrGet("$path.income.transferedAmount")
+            + $this->ArrGet("$path.cashflow.transferedAmount");
 
         $cashflowAfterTaxAmount =
             $this->ArrGet("$path.income.amount")
@@ -1017,7 +1019,8 @@ class Prognosis
             - $this->ArrGet("$path.asset.taxPropertyAmount") //Minus eiendomsskatt
             - $this->ArrGet("$path.mortgage.termAmount") //Minus terminbetaling på lånet
             + $this->ArrGet("$path.mortgage.taxDeductableAmount") //Plus skattefradrag på renter
-            + $this->ArrGet("$path.income.transferedAmount");
+            + $this->ArrGet("$path.income.transferedAmount")
+            + $this->ArrGet("$path.cashflow.transferedAmount");
 
         $this->ArrSet("$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
         $this->ArrSet("$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
@@ -1053,7 +1056,7 @@ class Prognosis
             if (! $acquisitionAmount) {
                 $acquisitionAmount = $this->ArrGet("$assetname.$prevYear.asset.acquisitionAmount");
             }
-            $acquisitionAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.asset.transferedCashflowAmount");
+            $acquisitionAmount += $this->ArrGet("$path.asset.transferedAmount");
             if ($acquisitionAmount < 0) {
                 $acquisitionAmount = 0;
             }
@@ -1064,7 +1067,7 @@ class Prognosis
             if (! $equityAmount) {
                 $equityAmount = $this->ArrGet("$assetname.$prevYear.asset.equityAmount");
             }
-            $equityAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.asset.transferedCashflowAmount");
+            $equityAmount += $this->ArrGet("$path.asset.transferedAmount");
             if ($equityAmount < 0) {
                 $equityAmount = 0;
             }
@@ -1077,7 +1080,7 @@ class Prognosis
             } else {
                 //echo "    $assetname.$year.asset.paidInitialAmount: $paidAmount\n";
             }
-            $paidAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.asset.transferedCashflowAmount") + $this->ArrGet("$path.mortgage.termAmount");
+            $paidAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.mortgage.termAmount");
             if ($paidAmount < 0) {
                 $paidAmount = 0;
             }

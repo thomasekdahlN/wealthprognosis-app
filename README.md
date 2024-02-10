@@ -146,10 +146,10 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
-TransferCashflow amount konseptet må støttes.
-When an extra downpayment is more than the rest of the mortgage, the amount is not handled correctly. It should be repeated on the original asset until used up, not dissapear.
 
 #### Not a priority, but have been thinking of it.
+- Calculate only 1 year of a mortgage at a time, to avoid this vertical processing problem.
+- All transfers to next year? (to avoid vertical processing problem)
 - Extra nedbetaling av lån skaper masse utfordringer (fordi det påvirker mange verdier som allerede er beregnet og må reberegnes)
 - Should support different tax types within the asset, like separate tax for income vs asset value
 -- Airbnb skatt på inntekt på utleie av hytte blir ikke riktig.

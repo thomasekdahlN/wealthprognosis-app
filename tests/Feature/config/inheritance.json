@@ -69,7 +69,7 @@
             "group": "private",
             "name": "fond",
             "description": "",
-            "active": false,
+            "active": true,
             "tax": "equityfund"
         },
         "2024": {
