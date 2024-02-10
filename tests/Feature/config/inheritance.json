@@ -51,14 +51,14 @@
             "asset": {
                 "name": "inheritance",
                 "description": "",
-                "marketAmount": 2000000,
-                "acquisitionAmount" : 1,
-                "paidAmount": 1,
+                "marketAmount": 2500000,
+                "acquisitionAmount" : 10000,
+                "paidAmount": 10000,
                 "changerate": "changerates.kpi",
                 "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
                 "rule": "100%",
-                "transferX": "fond.$year.asset.marketAmount",
-                "transfer": "house.$year.mortgage.extraDownpaymentAmount",
+                "transfer": "fond.$year.asset.marketAmount",
+                "transferX": "house.$year.mortgage.extraDownpaymentAmount",
                 "repeat": false
             }
         }
@@ -74,7 +74,7 @@
         },
         "2024": {
             "asset": {
-                "marketAmount": 1000,
+                "marketAmount": 10000,
                 "changerate": "changerates.equityfund",
                 "description": "",
                 "repeat": true
