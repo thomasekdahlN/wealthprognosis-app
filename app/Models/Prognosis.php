@@ -656,13 +656,13 @@ class Prognosis
             $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedToAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
             $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount from $transferOrigin $explanation");
             $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered -$amount + $realizationTaxAmount (tax) = $transferedToAmount to $transferTo $explanation");
-            echo "#### Transfer from: $transferedOriginPathDescription :" . $this->ArrGet($transferedOriginPathDescription) . "\n";
+            //echo "#### Transfer from: $transferedOriginPathDescription :" . $this->ArrGet($transferedOriginPathDescription) . "\n";
         }
         if ($transferedToAmount > 0) {
             //Could happen if downpayment of mortgage is finished.
             $this->ArrSet($transferedToPathAmount, $this->ArrGet($transferedToPathAmount) + $transferedToAmount); //The amount we transfered to - for later reference and calculation
             $this->ArrSet($transferedOriginPathAmount, $this->ArrGet($transferedOriginPathAmount) - $transferedFromAmount); //The amount we transfered including the tax - for later reference and calculation
-            echo "#### Transfer from: $transferedOriginPathAmount:" . $this->ArrGet($transferedOriginPathAmount) . "\n";
+            //echo "#### Transfer from: $transferedOriginPathAmount:" . $this->ArrGet($transferedOriginPathAmount) . "\n";
         }
         //FIX: Should add explanation also on the asset transfered to for easier debug.
         $paidAmount -= $amount;
