@@ -1,3 +1,5 @@
+<meta name="google-site-verification" content="sVU5VtIVFfRVyzYylywIA2XMMxLQez6ehHqDndMjI1M" />
+
 ## Wealth prognosis predicts your yearly future economy from now until you die
 
 Makes a qualified prognosis of your economic future year for year until your death. It takes into account your income, expences, assets/liabilities, loans, taxes, inflation and more.
