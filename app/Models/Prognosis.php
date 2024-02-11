@@ -90,11 +90,11 @@ class Prognosis
         'pension' => true,
     ];
 
-    public function __construct(array $config, object $taxcashflow, object $taxfortune, object $taxrealization, object $changerate)
+    public function __construct(array $config, object $taxincome, object $taxfortune, object $taxrealization, object $changerate)
     {
         //$this->test();
         $this->config = $config;
-        $this->taxcashflow = $taxcashflow;
+        $this->taxincome = $taxincome;
         $this->taxfortune = $taxfortune;
         $this->taxrealization = $taxrealization;
         $this->changerate = $changerate;
@@ -215,7 +215,7 @@ class Prognosis
                 //######################################################################################################
                 //Assett
                 //Finn ut om det er det første året med konfig vi har sett på denne asset, vi gjør det ved å se om det finnes noen markedsverdi for forrige år i dataH.
-                $assetMarketAmount = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'marketAmount');
+                $assetMarketInitialAmount = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'marketAmount');
                 $assetTaxableInitialAmount = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'taxableInitialAmount'); //Read from config, because taxable Amount is not related to the assetMarketAmount - typically a cabin is not taxable on a percent of the market value, but a much lower value
                 $assetTaxableAmountOverride = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'taxableAmountOverride');
                 $assetChangerate = $this->configOrPrevValue(false, $assetname, $year, 'asset', 'changerate');
@@ -229,7 +229,7 @@ class Prognosis
                 $assetSource = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'asset', 'source');
                 $assetRepeat = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'asset', 'repeat');
 
-                if ($this->ArrGet("$assetname.$prevYear.asset.marketAmount") <= 0 && $assetMarketAmount > 0) {
+                if ($this->ArrGet("$assetname.$prevYear.asset.marketAmount") <= 0 && $assetMarketInitialAmount > 0) {
                     $assetFirstYear = $year;
                     $firsttime = true;
                     //echo "\n\nFirst time: $assetname.$year\n";
@@ -248,7 +248,7 @@ class Prognosis
                     //print_r($this->dataH[$assetname][$prevYear]['realization']);
                 }
 
-                [$assetMarketAmount, $assetDiffAmount, $realizationTaxShieldAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(false, "$path.asset.marketAmount", $assetMarketAmount, $assetInitialAcquisitionAmount, $realizationPrevTaxShieldAmount, $assetRule, $assetTransfer, $assetSource, 1);
+                [$assetMarketInitialAmount, $assetDiffAmount, $realizationTaxShieldAmount, $assetNewRule, $assetExplanation2] = $this->applyRule(false, "$path.asset.marketAmount", $assetMarketInitialAmount, $assetInitialAcquisitionAmount, $realizationPrevTaxShieldAmount, $assetRule, $assetTransfer, $assetSource, 1);
                 if ($assetDiffAmount > 0) {
                     //$assetMarketAmount -= $assetDiffAmount; //EXPERIMENTAL.
                 }
@@ -261,7 +261,7 @@ class Prognosis
 
                     if ($assetInitialAcquisitionAmount <= 0) {
                         //Only to be set on first run here, not to be recalculated. But if rules or transfers add money, they are added to $assetInitialAcquisitionAmount (not changerates), only real money.
-                        $assetInitialAcquisitionAmount = $assetMarketAmount;
+                        $assetInitialAcquisitionAmount = $assetMarketInitialAmount;
                     }
 
                     if ($assetInitialEquityAmount <= 0) {
@@ -278,7 +278,7 @@ class Prognosis
 
                     if ($assetTaxableInitialAmount <= 0) {
                         //Only to be set on first run here, not to be recalculated. But if rules or transfers add money, they are added to $assetInitialAcquisitionAmount (not changerates), only real money.
-                        $assetTaxableInitialAmount = $assetMarketAmount + $assetDiffAmount;
+                        $assetTaxableInitialAmount = $assetMarketInitialAmount + $assetDiffAmount;
                     } else {
                         //Since it is set from before, we have an override situation.
                         $assetTaxableAmountOverride = true;
@@ -301,7 +301,7 @@ class Prognosis
                 //Calculation of the changerate asset has to be done after paidAmount, equityAmount but before we calculate the Taxes.
                 $transferedAmount = $this->ArrGet("$path.asset.transferedAmount");
 
-                $assetMarketAmount = ($assetMarketAmount + $transferedAmount) * $assetChangerateDecimal;
+                $assetMarketAmount = ($assetMarketInitialAmount + $transferedAmount) * $assetChangerateDecimal;
                 $assetTaxableInitialAmount = round(($assetTaxableInitialAmount + $transferedAmount) * $assetChangerateDecimal); //FIX: Trouble with override special case destrous all marketAmounts after it is set the first time. Does not neccessarily be more taxable if you put more money into it. Special case with house/cabin/rental.
 
                 //print "Asset3: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
@@ -314,9 +314,9 @@ class Prognosis
                     //echo "TaxFortuneBefore $assetname.$year, taxType:$taxType, taxProperty:$taxProperty, assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, balanceAmount:".$this->ArrGet("$assetname.$year.mortgage.balanceAmount")."\n";
                 }
                 //FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
+                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxFortuneAmount, $assetTaxFortuneDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
                 if ($assetname == 'xxx') {
-                    //echo "   TaxFortuneAfter: $assetname.$year assetTaxableInitialAmount:$assetTaxableInitialAmount, assetTaxableAmount:$assetTaxableAmount, assetTaxAmount:$assetTaxAmount,assetTaxAmount:$assetTaxAmount\n";
+                    //echo "   TaxFortuneAfter: $assetname.$year assetTaxableInitialAmount:$assetTaxableInitialAmount, assetTaxableAmount:$assetTaxableAmount, assetTaxAmount:$assetTaxFortuneAmount,assetTaxAmount:$assetTaxFortuneAmount\n";
                 }
 
                 //#######################################################################################################
@@ -327,7 +327,10 @@ class Prognosis
                 $cashflowSource = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'cashflow', 'source');
                 $cashflowRepeat = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'cashflow', 'repeat');
 
-                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->taxcashflow->taxCalculationCashflow(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount);
+                //######################################################################################################
+                $interestAmount = round($assetMarketAmount - $assetMarketInitialAmount); //ToDo - subtract the changerated amount from the initial amount to find the interest amount
+
+                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->taxincome->taxCalculationIncome(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
 
                 $cashflowBeforeTaxAmount =
                     $incomeAmount
@@ -338,13 +341,13 @@ class Prognosis
                     $incomeAmount
                     - $expenceAmount //cashflow basis = inntekt - utgift.
                     - $cashflowTaxAmount //Minus skatt på cashflow (Kan være både positiv og negativ)
-                    - $assetTaxAmount //Minus formuesskatt
+                    - $assetTaxFortuneAmount //Minus formuesskatt
                     - $assetTaxPropertyAmount //Minus eiendomsskatt
                     - $this->ArrGet("$path.mortgage.termAmount") //Minus terminbetaling på lånet
                     + $this->ArrGet("$path.mortgage.taxDeductableAmount") //Plus skattefradrag på renter
                     + $this->ArrGet("$path.income.transferedAmount");
 
-                //echo "$assetname.$year.income.incomeAmount:$incomeAmount,  cashflowAfterTaxAmount: $cashflowAfterTaxAmount, transferedAmunt; " . $this->ArrGet("$path.income.transferedAmount") . "\n";
+                //echo "$assetname.$year.income.incomeAmount:$incomeAmount,expenceAmount:$expenceAmount,interestAmount:$interestAmount, cashflowTaxAmount:$cashflowTaxAmount, cashflowBeforeTaxAmount:$cashflowBeforeTaxAmount, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, transferedAmount; ".$this->ArrGet("$path.income.transferedAmount")."\n";
 
                 $cashflowNewRule = null;
                 if ($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
@@ -416,16 +419,17 @@ class Prognosis
                     $this->ArrSet("$path.asset.taxableAmount", $assetTaxableAmount);
                     $this->ArrSet("$path.asset.taxableInitialAmount", $assetTaxableInitialAmount);
                     $this->ArrSet("$path.asset.taxableAmountOverride", $assetTaxableAmountOverride);
-                    $this->ArrSet("$path.asset.taxDecimal", $assetTaxDecimal);
-                    $this->ArrSet("$path.asset.taxAmount", $assetTaxAmount);
+
+                    if ($assetTaxFortuneAmount > 0) {
+                        $this->ArrSet("$path.asset.taxFortuneDecimal", $assetTaxFortuneDecimal);
+                        $this->ArrSet("$path.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+                    }
+
                     if ($assetTaxablePropertyAmount > 0) {
                         $this->ArrSet("$path.asset.taxablePropertyDecimal", $assetTaxablePropertyPercent);
                         $this->ArrSet("$path.asset.taxablePropertyAmount", $assetTaxablePropertyAmount);
                     }
-                    if ($assetTaxPropertyAmount > 0) {
-                        $this->ArrSet("$path.asset.taxPropertyDecimal", $assetTaxPropertyDecimal);
-                        $this->ArrSet("$path.asset.taxPropertyAmount", $assetTaxPropertyAmount);
-                    }
+
                     $this->ArrSet("$path.asset.changerate", $assetChangerate);
                     $this->ArrSet("$path.asset.changeratePercent", $assetChangeratePercent);
                     if ($assetNewRule) {
@@ -903,11 +907,11 @@ class Prognosis
         $mortgageBalanceAmount = $this->ArrGet("$assetname.$year.mortgage.balanceAmount");
         $assetTaxableAmountOverride = $this->ArrGet("$path.asset.taxableAmountOverride");
 
-        [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxAmount, $assetTaxDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $mortgageBalanceAmount, $assetTaxableAmountOverride);
+        [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxFortuneAmount, $assetTaxFortuneDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $mortgageBalanceAmount, $assetTaxableAmountOverride);
 
         $this->ArrSet("$path.asset.taxableAmount", $assetTaxableAmount);
-        $this->ArrSet("$path.asset.taxDecimal", $assetTaxDecimal);
-        $this->ArrSet("$path.asset.taxAmount", $assetTaxAmount);
+        $this->ArrSet("$path.asset.taxDecimal", $assetTaxFortuneDecimal);
+        $this->ArrSet("$path.asset.taxFortuneAmount", $assetTaxFortuneAmount);
         if ($assetTaxablePropertyAmount > 0) {
             $this->ArrSet("$path.asset.taxablePropertyDecimal", $assetTaxablePropertyPercent);
             $this->ArrSet("$path.asset.taxablePropertyAmount", $assetTaxablePropertyAmount);
@@ -1015,7 +1019,7 @@ class Prognosis
             $this->ArrGet("$path.income.amount")
             - $this->ArrGet("$path.expence.amount") //cashflow basis = inntekt - utgift.
             - $this->ArrGet("$path.cashflow.taxAmount") //Minus skatt på cashflow (Kan være både positiv og negativ)
-            - $this->ArrGet("$path.asset.taxAmount") //Minus formuesskatt
+            - $this->ArrGet("$path.asset.taxFortuneAmount") //Minus formuesskatt
             - $this->ArrGet("$path.asset.taxPropertyAmount") //Minus eiendomsskatt
             - $this->ArrGet("$path.mortgage.termAmount") //Minus terminbetaling på lånet
             + $this->ArrGet("$path.mortgage.taxDeductableAmount") //Plus skattefradrag på renter
@@ -1026,7 +1030,7 @@ class Prognosis
         $this->ArrSet("$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
 
         //echo "postProcessCashFlowYearly: $path\n";
-        if($year >= $this->thisYear) {
+        if ($year >= $this->thisYear) {
             $this->ArrSet("$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.beforeTaxAggregatedAmount"));
             $this->ArrSet("$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount + $this->ArrGet("$assetname.$prevYear.cashflow.afterTaxAggregatedAmount"));
         }
@@ -1265,7 +1269,7 @@ class Prognosis
                 $this->additionToGroup($year, $meta, $assetH[$year], 'asset.paidAmount');
                 $this->additionToGroup($year, $meta, $assetH[$year], 'asset.transferedAmount');
                 $this->additionToGroup($year, $meta, $assetH[$year], 'asset.taxableAmount');
-                $this->additionToGroup($year, $meta, $assetH[$year], 'asset.taxAmount');
+                $this->additionToGroup($year, $meta, $assetH[$year], 'asset.taxFortuneAmount');
                 $this->additionToGroup($year, $meta, $assetH[$year], 'asset.taxablePropertyAmount');
                 $this->additionToGroup($year, $meta, $assetH[$year], 'asset.taxPropertyAmount');
 
@@ -1483,14 +1487,14 @@ class Prognosis
     {
         //ToDo - fortune tax sybtraction level support.
 
-        [$assetTaxAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0));
-        Arr::set($this->totalH, "$year.asset.taxAmount", $assetTaxAmount);
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0));
+        Arr::set($this->totalH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
 
-        [$assetTaxAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0));
-        Arr::set($this->companyH, "$year.asset.taxAmount", $assetTaxAmount);
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0));
+        Arr::set($this->companyH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
 
-        [$assetTaxAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0));
-        Arr::set($this->privateH, "$year.asset.taxAmount", $assetTaxAmount);
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0));
+        Arr::set($this->privateH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
     }
 
     //Calculates on data that is summed up in the group

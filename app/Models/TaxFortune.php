@@ -59,7 +59,7 @@ class TaxFortune extends Model
      */
     public function getFortuneTax($year, $type)
     {
-        return Arr::get($this->taxH, "fortune.$type.yearly", 0) / 100;
+        return Arr::get($this->taxH, "fortune.$type.income", 0) / 100;
     }
 
     /**
@@ -122,7 +122,7 @@ class TaxFortune extends Model
      */
     public function getPropertyTax($taxGroup, $taxProperty, $year)
     {
-        return Arr::get($this->taxH, "property.$taxProperty.yearly", 0) / 100;
+        return Arr::get($this->taxH, "property.$taxProperty.income", 0) / 100;
     }
 
     /**
@@ -167,30 +167,31 @@ class TaxFortune extends Model
 
                 $taxableFortuneAmount = $taxableInitialAmount - $mortgageBalanceAmount;
                 $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
-                $explanation = 'Tax override. ';
+                $explanation .= 'Tax override. ';
                 //echo "   taxableAmount ovveride: taxableInitialAmount:$taxableInitialAmount - mortgageBalanceAmount:$mortgageBalanceAmount\n";
             } else {
-                //Assuming fortuine tax can not be negative and now it is
+                //Assuming fortune tax can not be negative and now it is
 
                 $taxableFortuneAmount = 0;
                 $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
-                $explanation = 'Tax override to zero ';
+                $explanation .= 'Tax override to zero ';
                 //echo "   taxableAmount override negative to 0\n";
             }
         } else {
             $taxablePropertyAmount = round($marketAmount);
             $taxableFortuneAmount = round($marketAmount * $taxableFortunePercent); //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
             //echo "   taxableAmount normal: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent\n";
-            $explanation = 'Market taxable amount. ';
+            $explanation .= 'Market taxable amount. ';
         }
 
         [$taxAmount, $taxPercent, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount);
-        //echo "   taxableAmount normal: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent, taxAmount:$taxAmount taxPercent:$taxPercent\n";
 
         if ($taxProperty) {
             [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation2] = $this->calculatePorpertyTax($year, $taxGroup, $taxProperty, $taxablePropertyAmount);
         }
-        $explanation = $explanation1.$explanation2;
+        $explanation .= $explanation2;
+
+        //echo "   taxCalculationFortuneReturn: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent, taxAmount:$taxAmount taxPercent:$taxPercent, taxablePropertyAmount:$taxablePropertyAmount,taxablePropertyPercent:$taxablePropertyPercent,taxPropertyAmount:$taxPropertyAmount,taxPropertyPercent:$taxPropertyPercent,$explanation\n";
 
         return [$taxableFortuneAmount, $taxableFortunePercent, $taxAmount, $taxPercent, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation];
     }
@@ -221,6 +222,8 @@ class TaxFortune extends Model
 
         // Calculate the taxable property amount after deduction
         $taxablePropertyAmount = ($amount - $taxPropertyDeductionAmount) * $taxablePropertyPercent;
+        //echo "    taxablePropertyAmount:$taxablePropertyAmount = ($amount - $taxPropertyDeductionAmount) * $taxablePropertyPercent\n";
+        //echo "    taxPropertyPercent:$taxPropertyPercent\n";
 
         // Calculate the tax property amount and provide explanation based on the taxable property amount and tax property percent
         if ($taxablePropertyAmount > 0 && $taxPropertyPercent > 0) {

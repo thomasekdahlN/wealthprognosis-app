@@ -4,8 +4,8 @@ namespace App\Exports;
 
 use App\Models\Changerate;
 use App\Models\Prognosis;
-use App\Models\TaxCashflow;
 use App\Models\TaxFortune;
+use App\Models\TaxIncome;
 use App\Models\TaxRealization;
 use Illuminate\Support\Arr;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -110,7 +110,7 @@ class PrognosisExport2
 
         $this->config = json_decode($content, true);
 
-        $this->taxcashflow = new TaxCashflow('tax', $this->economyStartYear, $this->deathYear);
+        $this->taxincome = new TaxIncome('tax', $this->economyStartYear, $this->deathYear);
         $this->taxfortune = new TaxFortune('tax', $this->economyStartYear, $this->deathYear);
         $this->taxrealization = new TaxRealization('tax', $this->economyStartYear, $this->deathYear);
 
@@ -119,7 +119,7 @@ class PrognosisExport2
         //print $this->changerate->getChangeratePercent('otp', '2024') . "\n";
         //print $this->changerate->getChangerateDecimal('otp', '2024') . "\n";
 
-        $prognosis = (new Prognosis($this->config, $this->taxcashflow, $this->taxfortune, $this->taxrealization, $this->changerate));
+        $prognosis = (new Prognosis($this->config, $this->taxincome, $this->taxfortune, $this->taxrealization, $this->changerate));
         //dd($prognosis->privateH);
         $meta = [
             'active' => true,

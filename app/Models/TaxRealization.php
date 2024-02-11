@@ -131,114 +131,137 @@ class TaxRealization extends Model
             echo "\n  taxCalculationRealizationStart $taxGroup.$taxType.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent\n";
         }
 
-        if ($taxType == 'salary') {
-            $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;
+        switch ($taxType) {
+            case 'salary':
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;
+                break;
 
-        } elseif ($taxType == 'pension') {
-            $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;
+            case 'pension':
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;
+                break;
 
-        } elseif ($taxType == 'income') {
-            $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;
+            case 'income':
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;
+                break;
 
-        } elseif ($taxType == 'house') {
-            $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;  //Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
+            case 'house':
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;  //Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
+                break;
 
-        } elseif ($taxType == 'cabin') {
-            $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+            case 'cabin':
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+                break;
 
-        } elseif ($taxType == 'car') {
-            $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;
+            case 'car':
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;
+                break;
 
-        } elseif ($taxType == 'boat') {
-            $realizationTaxableAmount = 0;
-            $realizationTaxAmount = 0;
+            case 'boat':
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;
+                break;
 
-        } elseif ($taxType == 'property') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien skal skattes ved salg
-            }
-
-        } elseif ($taxType == 'rental') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg
-            }
-
-        } elseif ($taxType == 'stock') {
-
-            if ($taxGroup == 'company') {
-                //Fritaksmodellen
-                if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = 0;
-                    $realizationTaxAmount = 0;
-                }
-            } else {
+            case 'property':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg?
+                    $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien skal skattes ved salg
                 }
-            }
+                break;
 
-        } elseif ($taxType == 'bondfund') {
-            if ($amount - $acquisitionAmount > 0) {
+            case 'rental':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg
+                }
+                break;
+
+            case 'stock':
+
+                if ($taxGroup == 'company') {
+                    //Fritaksmodellen
+                    if ($amount - $acquisitionAmount > 0) {
+                        $realizationTaxableAmount = 0;
+                        $realizationTaxAmount = 0;
+                    }
+                } else {
+                    if ($amount - $acquisitionAmount > 0) {
+                        $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                        $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg?
+                    }
+                }
+                break;
+
+            case 'bondfund':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                }
+                break;
+
+            case 'equityfund':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                }
+                break;
+
+            case 'ask':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                }
+                break;
+
+            case 'otp':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                }
+                break;
+
+            case 'ips':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                }
+                break;
+
+            case 'crypto':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                }
+                break;
+
+            case 'gold':
+                if ($amount - $acquisitionAmount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                }
+                break;
+
+            case 'bank':
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
+                $realizationTaxAmount = 0;  //Ingen skatt ved salg.
+                break;
 
-        } elseif ($taxType == 'equityfund') {
-            if ($amount - $acquisitionAmount > 0) {
+            case 'cash':
                 $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
+                $realizationTaxAmount = 0;  //Ingen skatt ved salg.
+                break;
 
-        } elseif ($taxType == 'ask') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
-
-        } elseif ($taxType == 'otp') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
-
-        } elseif ($taxType == 'ips') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
-
-        } elseif ($taxType == 'crypto') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
-
-        } elseif ($taxType == 'gold') {
-            if ($amount - $acquisitionAmount > 0) {
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-            }
-
-        } elseif ($taxType == 'bank') {
-            $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-            $realizationTaxAmount = 0;  //Ingen skatt ved salg.
-
-        } elseif ($taxType == 'cash') {
-            $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-            $realizationTaxAmount = 0;  //Ingen skatt ved salg.
-
-        } elseif ($amount > 0) {
-            $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-            $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+            default:
+                if ($amount > 0) {
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    break;
+                }
         }
 
         //###############################################################################################################

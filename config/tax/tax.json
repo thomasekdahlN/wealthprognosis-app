@@ -1,130 +1,130 @@
 {
     "house": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 25
     },
     "child": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 0
     },
     "cabin": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 30
     },
     "airbnb": {
         "standardDeduction": 10000,
-        "yearly": 22,
+        "income": 22,
         "realization": 0,
         "fortune": 0
     },
     "rental": {
-        "yearly": 22,
+        "income": 22,
         "realization": 22,
         "fortune": 100
     },
     "property": {
         "realization": 0,
         "holmestrand": {
-            "yearly": 0.3,
+            "income": 0.3,
             "fortune": 70,
             "standardDeduction": 1000000
         },
         "ringerike": {
-            "yearly": 0.15,
+            "income": 0.15,
             "fortune": 100,
             "standardDeduction": 400000
         }
     },
     "stock": {
-        "yearly": 0,
+        "income": 0,
         "realization": 37.84,
         "fortune": 80
     },
     "soleproprietorship": {
-        "yearly": 0,
+        "income": 0,
         "realization": 37.84,
         "fortune": 80
     },
     "loantocompany": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 0
     },
     "salary": {
-        "yearly": 50,
+        "income": 50,
         "realization": 0,
         "fortune": 0
     },
     "pension": {
-        "yearly": 22,
+        "income": 22,
         "realization": 0,
         "fortune": 0
     },
     "ips": {
-        "yearly": 22,
+        "income": 22,
         "realization": 0,
         "fortune": 0
     },
     "equityfund": {
-        "yearly": 0,
+        "income": 0,
         "realization": 37.84,
         "fortune": 80
     },
     "bondfund": {
-        "yearly": 0,
+        "income": 0,
         "realization": 22,
         "fortune": 80
     },
     "ask": {
-        "yearly": 0,
+        "income": 0,
         "realization": 37.84,
         "fortune": 80
     },
     "gold": {
-        "yearly": 0,
+        "income": 0,
         "realization": 22,
         "fortune": 100
     },
     "crypto": {
-        "yearly": 0,
+        "income": 0,
         "realization": 22,
         "fortune": 100
     },
     "otp": {
-        "yearly": 0,
+        "income": 0,
         "realization": 22,
         "fortune": 0
     },
     "income": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 100
     },
     "inheritance": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 100
     },
     "car": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 100
     },
     "boat": {
-        "yearly": 0,
+        "income": 0,
         "realization": 0,
         "fortune": 100
     },
     "cash": {
-        "yearly": 22,
+        "income": 22,
         "realization": 0,
         "fortune": 100
     },
     "bank": {
-        "yearly": 22,
+        "income": 22,
         "realization": 0,
         "fortune": 100
     },
@@ -132,12 +132,12 @@
         "standardDeduction": 1700000,
         "low": {
             "amount": 0,
-            "yearly": 1,
+            "income": 1,
             "realization": 0
         },
         "high": {
             "amount": 20000000,
-            "yearly": 1.1,
+            "income": 1.1,
             "realization": 0
         }
     },

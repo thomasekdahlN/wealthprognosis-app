@@ -151,6 +151,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
+Support for yearly tax on interest on money in the bank.
 Feature complete for now
 
 #### Not a priority, but have been thinking of it.

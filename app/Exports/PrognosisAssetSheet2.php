@@ -158,10 +158,10 @@ class PrognosisAssetSheet2
             if (Arr::get($data, 'asset.taxableDecimal') > 0 && Arr::get($data, 'asset.marketAmount') != 0) {
                 $this->worksheet->setCellValue("V$this->rows", Arr::get($data, 'asset.taxableDecimal'));
             }
-            $this->worksheet->setCellValue("W$this->rows", Arr::get($data, 'asset.taxAmount'));
+            $this->worksheet->setCellValue("W$this->rows", Arr::get($data, 'asset.taxFortuneAmount'));
 
-            if (Arr::get($data, 'asset.marketAmount') != 0 && Arr::get($data, 'asset.taxAmount') > 0) {
-                $this->worksheet->setCellValue("X$this->rows", Arr::get($data, 'asset.taxDecimal'));
+            if (Arr::get($data, 'asset.marketAmount') != 0 && Arr::get($data, 'asset.taxFortuneAmount') > 0) {
+                $this->worksheet->setCellValue("X$this->rows", Arr::get($data, 'asset.taxFortuneDecimal'));
             }
 
             $this->worksheet->setCellValue("Y$this->rows", Arr::get($data, 'asset.taxPropertyAmount'));
