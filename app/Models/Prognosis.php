@@ -462,7 +462,7 @@ class Prognosis
                 $this->ArrSet("$path.cashflow.transfer", $cashflowTransfer);
                 $this->ArrSet("$path.cashflow.source", $cashflowSource);
                 $this->ArrSet("$path.cashflow.repeat", $cashflowRepeat);
-                $this->ArrSet("$path.cashflow.description", $cashflowDescription . $this->ArrGetConfig("$path.cashflow.description").$this->ArrGet("$path.cashflow.description"));
+                $this->ArrSet("$path.cashflow.description", $cashflowDescription.$this->ArrGetConfig("$path.cashflow.description").$this->ArrGet("$path.cashflow.description"));
 
             } //Year loop finished here.
 
@@ -1494,7 +1494,7 @@ class Prognosis
         //FIX: We should know the difference between what is actually relaized and what are only a simulation
 
         $taxPercent = 0;
-        if($incomeAmount > 0) {
+        if ($incomeAmount > 0) {
             $taxPercent = $taxAmount / $incomeAmount;
         }
         Arr::set($this->privateH, "$year.cashflow.taxDecimal", $taxPercent);
@@ -1509,12 +1509,11 @@ class Prognosis
         //FIX: We should know the difference between what is actually relaized and what are only a simulation
 
         $taxPercent = 0;
-        if($incomeAmount > 0) {
+        if ($incomeAmount > 0) {
             $taxPercent = $taxAmount / $incomeAmount;
         }
         Arr::set($this->companyH, "$year.cashflow.taxDecimal", $taxPercent);
         Arr::set($this->companyH, "$year.cashflow.taxAmount", $taxAmount);
-
 
         $incomeAmount = Arr::get($this->totalH, "$year.income.amount");
         $taxAmount =
@@ -1525,7 +1524,7 @@ class Prognosis
         //FIX: We should know the difference between what is actually relaized and what are only a simulation
 
         $taxPercent = 0;
-        if($incomeAmount > 0) {
+        if ($incomeAmount > 0) {
             $taxPercent = $taxAmount / $incomeAmount;
         }
         Arr::set($this->totalH, "$year.cashflow.taxDecimal", $taxPercent);

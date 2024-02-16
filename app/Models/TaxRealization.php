@@ -50,6 +50,8 @@ class TaxRealization extends Model
         foreach ($configH as $type => $typeH) {
             $this->taxH[$type] = $typeH;
         }
+
+        $this->taxsalary = new \App\Models\TaxSalary();
     }
 
     /**
@@ -122,6 +124,8 @@ class TaxRealization extends Model
         $numberOfYears = $year - $acquisitionYear;
 
         $realizationTaxPercent = $this->getTaxRealization($taxGroup, $taxType, $year);
+        $realizationTaxShieldAmount = 0;
+        $realizationTaxShieldPercent = 0;
 
         //Forskjell på hva man betaler skatt av
         $realizationTaxableAmount = 0; //The amount to pay tax from. Often calculated as taxof(MarketAmount - acquisitionAmount). We assume we always sell to market value
@@ -219,10 +223,8 @@ class TaxRealization extends Model
                 break;
 
             case 'otp':
-                if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
-                }
+                //OTP skattes som pensjonsinntekt når den realiseres
+                [$realizationTaxAmount, $realizationTaxPercent, $explanation] = $this->taxsalary->calculatesalarytax(false, $year, $amount);
                 break;
 
             case 'ips':
@@ -268,8 +270,10 @@ class TaxRealization extends Model
         //TaxShield handling
         //Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
-        [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $this->taxShield($year, $taxGroup, $taxType, $transfer, $amount, $realizationTaxAmount, $taxShieldPrevAmount);
-
+        if ($taxType == 'stock' || $taxType == 'equityfund' || $taxType == 'bondfund' || $taxType == 'ask' || $taxType == 'loantocompany' || $taxType == 'soleproprietorship') {
+            //Burde hatt en array med de asset typene som har taxShield.
+            [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $this->taxShield($year, $taxGroup, $taxType, $transfer, $amount, $realizationTaxAmount, $taxShieldPrevAmount);
+        }
         //###############################################################################################################
         if ($realizationTaxAmount < 0) {
             $realizationTaxAmount = 0; //Skjermingsfradraget kan ikke være større enn skatten
