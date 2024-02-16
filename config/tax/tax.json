@@ -54,14 +54,39 @@
         "fortune": 0
     },
     "salary": {
-        "income": 50,
-        "realization": 0,
-        "fortune": 0
-    },
-    "pension": {
-        "income": 22,
-        "realization": 0,
-        "fortune": 0
+        "common": {
+            "rate": 22
+        },
+        "socialsecurity": {
+            "rate": 11.4,
+            "deduction": 111399
+        },
+        "bracket":
+        [
+            {
+                "limit": 208050,
+                "rate": 0
+            },
+            {
+                "limit": 292851,
+                "rate": 1.7
+            },
+            {
+                "limit": 670000,
+                "rate": 4
+            },
+            {
+                "limit": 937900,
+                "rate": 13.6
+            },
+            {
+                "limit": 1350000,
+                "rate": 16.6
+            },
+            {
+                "rate": 17.6
+            }
+        ]
     },
     "ips": {
         "income": 22,

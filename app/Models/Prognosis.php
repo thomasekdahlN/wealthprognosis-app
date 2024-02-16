@@ -330,7 +330,7 @@ class Prognosis
                 //######################################################################################################
                 $interestAmount = round($assetMarketAmount - $assetMarketInitialAmount); //ToDo - subtract the changerated amount from the initial amount to find the interest amount
 
-                [$cashflowTaxAmount, $cashflowTaxPercent] = $this->taxincome->taxCalculationIncome(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
+                [$cashflowTaxAmount, $cashflowTaxPercent, $cashflowDescription] = $this->taxincome->taxCalculationIncome(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
 
                 $cashflowBeforeTaxAmount =
                     $incomeAmount
@@ -393,7 +393,7 @@ class Prognosis
                         'source' => $incomeSource,
                         'repeat' => $incomeRepeat,
                         'amount' => $incomeAmount,
-                        'description' => $this->ArrGetConfig("$assetname.$year.income.description").$incomeExplanation.$this->ArrGet("$assetname.$year.income.description"),
+                        'description' => $this->ArrGetConfig("$path.income.description").$incomeExplanation.$this->ArrGet("$path.income.description"),
                     ];
                 }
 
@@ -406,7 +406,7 @@ class Prognosis
                         'source' => $expenceSource,
                         'repeat' => $expenceRepeat,
                         'amount' => $expenceAmount,
-                        'description' => $this->ArrGetConfig("$assetname.$year.expence.description").$expenceExplanation.$this->ArrGet("$assetname.$year.expence.description"),
+                        'description' => $this->ArrGetConfig("$path.expence.description").$expenceExplanation.$this->ArrGet("$path.expence.description"),
                     ];
                 }
 
@@ -449,20 +449,20 @@ class Prognosis
                     $this->ArrSet("$path.realization.taxableAmount", $realizationTaxableAmount);
                     $this->ArrSet("$path.realization.taxAmount", $realizationTaxAmount);
                     $this->ArrSet("$path.realization.taxDecimal", $realizationTaxPercent);
-                    $this->ArrSet("$path.asset.description", $this->ArrGetConfig("$assetname.$year.asset.description").$this->ArrGet("$assetname.$year.asset.description").' Asset rule:'.$assetRule.' '.$assetExplanation1.$assetExplanation2);
+                    $this->ArrSet("$path.asset.description", $this->ArrGetConfig("$path.asset.description").$this->ArrGet("$path.asset.description").' Asset rule:'.$assetRule.' '.$assetExplanation1.$assetExplanation2);
                     //print_r($this->dataH[$assetname][$year]['realization']);
                 }
 
                 //Try to no process the same here as in the post processing step
                 $this->ArrSet("$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
                 $this->ArrSet("$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
-                $this->ArrSet("$path.cashflow.taxAmount", $cashflowTaxAmount);
+                $this->ArrSet("$path.cashflow.taxAmount", $this->ArrGet("$path.cashflow.taxAmount") + $cashflowTaxAmount);
                 $this->ArrSet("$path.cashflow.taxDecimal", $cashflowTaxPercent);
                 $this->ArrSet("$path.cashflow.rule", $cashflowNewRule);
                 $this->ArrSet("$path.cashflow.transfer", $cashflowTransfer);
                 $this->ArrSet("$path.cashflow.source", $cashflowSource);
                 $this->ArrSet("$path.cashflow.repeat", $cashflowRepeat);
-                $this->ArrSet("$path.cashflow.description", $this->ArrGetConfig("$assetname.$year.cashflow.description").$this->ArrGet("$assetname.$year.cashflow.description"));
+                $this->ArrSet("$path.cashflow.description", $cashflowDescription . $this->ArrGetConfig("$path.cashflow.description").$this->ArrGet("$path.cashflow.description"));
 
             } //Year loop finished here.
 
@@ -599,6 +599,7 @@ class Prognosis
 
         [$toAssetname, $toYear, $toType, $toField] = $this->helper->pathToElements($transferTo);
         $transferedToPathAmount = "$toAssetname.$toYear.$toType.transferedAmount";
+        $transferedToPathTaxAmount = "$toAssetname.$toYear.cashflow.taxAmount";
         $transferedToPathDescription = "$toAssetname.$toYear.$toType.description";
         $transferedOriginPathAmount = "$originAssetname.$originYear.$originType.transferedAmount";
         $transferedOriginPathDescription = "$originAssetname.$originYear.$originType.description";
@@ -640,7 +641,7 @@ class Prognosis
 
         //print "    Realization amount: $amount, acquisitionAmount: $acquisitionAmount, realizationTaxableAmount: $realizationTaxableAmount, realizationTaxAmount: $realizationTaxAmount, realizationTaxPercent: $realizationTaxPercent\n";
 
-        $transferedToAmount = $amount - $realizationTaxAmount; //The amount we transfer minus the realizationTax
+        $transferedToAmount = $amount;
 
         if (Str::contains($transferTo, ['mortgage.extraDownpaymentAmount']) && $transferedToAmount > 0) {
             //We see it is an extra $extraDownpaymentAmount for the mortgage, then we recalculate it.
@@ -658,8 +659,9 @@ class Prognosis
 
             //The transfer happens here.
             $this->ArrSet($transferTo, $this->ArrGet($transferTo) + $transferedToAmount); //Changes asset value. The real transfer from this asset to another takes place here, it is added to the already existing amount on the other asset
-            $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount - $realizationTaxAmount (tax) = $transferedToAmount from $transferOrigin $explanation");
-            $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered -$amount + $realizationTaxAmount (tax) = $transferedToAmount to $transferTo $explanation");
+            $this->ArrSet($transferedToPathTaxAmount, $this->ArrGet($transferedToPathTaxAmount) + $realizationTaxAmount);
+            $this->ArrSet($transferedToPathDescription, $this->ArrGet($transferedToPathDescription)."transfered $amount with $realizationTaxAmount (tax) from $transferOrigin $explanation");
+            $this->ArrSet($transferedOriginPathDescription, $this->ArrGet($transferedOriginPathDescription)."transfered $amount with $realizationTaxAmount (tax) to $transferTo $explanation");
             //echo "#### Transfer from: $transferedOriginPathDescription :" . $this->ArrGet($transferedOriginPathDescription) . "\n";
         }
         if ($transferedToAmount > 0) {
@@ -1480,6 +1482,54 @@ class Prognosis
         } else {
             Arr::set($this->privateH, "$year.asset.changeratePercent", 0);
         }
+
+        //###############################################################################################
+        //We calculate the actual total tax percentage on income from all tax amounts on all assets
+        $incomeAmount = Arr::get($this->privateH, "$year.income.amount");
+        $taxAmount =
+            Arr::get($this->privateH, "$year.cashflow.taxAmount") +
+            Arr::get($this->privateH, "$year.asset.taxAmount") +
+            Arr::get($this->privateH, "$year.asset.taxPropertyAmount") +
+            Arr::get($this->privateH, "$year.mortgage.taxDeductableAmount");
+        //FIX: We should know the difference between what is actually relaized and what are only a simulation
+
+        $taxPercent = 0;
+        if($incomeAmount > 0) {
+            $taxPercent = $taxAmount / $incomeAmount;
+        }
+        Arr::set($this->privateH, "$year.cashflow.taxDecimal", $taxPercent);
+        Arr::set($this->privateH, "$year.cashflow.taxAmount", $taxAmount);
+
+        $incomeAmount = Arr::get($this->companyH, "$year.income.amount");
+        $taxAmount =
+            Arr::get($this->companyH, "$year.cashflow.taxAmount") +
+            Arr::get($this->companyH, "$year.asset.taxAmount") +
+            Arr::get($this->companyH, "$year.asset.taxPropertyAmount") +
+            Arr::get($this->companyH, "$year.mortgage.taxDeductableAmount");
+        //FIX: We should know the difference between what is actually relaized and what are only a simulation
+
+        $taxPercent = 0;
+        if($incomeAmount > 0) {
+            $taxPercent = $taxAmount / $incomeAmount;
+        }
+        Arr::set($this->companyH, "$year.cashflow.taxDecimal", $taxPercent);
+        Arr::set($this->companyH, "$year.cashflow.taxAmount", $taxAmount);
+
+
+        $incomeAmount = Arr::get($this->totalH, "$year.income.amount");
+        $taxAmount =
+            Arr::get($this->totalH, "$year.cashflow.taxAmount") +
+            Arr::get($this->totalH, "$year.asset.taxAmount") +
+            Arr::get($this->totalH, "$year.asset.taxPropertyAmount") +
+            Arr::get($this->totalH, "$year.mortgage.taxDeductableAmount");
+        //FIX: We should know the difference between what is actually relaized and what are only a simulation
+
+        $taxPercent = 0;
+        if($incomeAmount > 0) {
+            $taxPercent = $taxAmount / $incomeAmount;
+        }
+        Arr::set($this->totalH, "$year.cashflow.taxDecimal", $taxPercent);
+        Arr::set($this->totalH, "$year.cashflow.taxAmount", $taxAmount);
 
     }
 

@@ -5,7 +5,8 @@
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "70"
+        "deathYear": "70",
+        "description": "Hvis du invetserer samme sum i et utleieobjekt som i et fond - hvordan utvikler de seg da over tid?"
     },
     "house": {
         "meta" : {
@@ -14,13 +15,22 @@
             "name": "House",
             "description": "House with normal mortgage, the rest is put into fund",
             "active" : true,
-            "tax": "house"
+            "tax": "rental",
+            "taxProperty": "ringerike"
         },
         "2024": {
             "income": {
                 "name": "Income",
                 "description": "Income",
-                "amount": 20000,
+                "amount": 13250,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Income",
+                "description": "Income",
+                "amount": 3300,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
@@ -35,12 +45,12 @@
                 "amount": 1500000,
                 "interest": "changerates.interest",
                 "gebyr": 600,
-                "years": 20
+                "years": 25
             },
             "cashflow": {
                 "description": "We transfer the positive cashflow into a fund",
-                "rule": "100%",
-                "transfer": "fond.$year.asset.marketAmount",
+                "ruleX": "100%",
+                "transferX": "fond.$year.asset.marketAmount",
                 "source": "",
                 "repeat": true
             }
@@ -57,7 +67,7 @@
         },
         "2024": {
             "asset": {
-                "marketAmount": 1000,
+                "marketAmount": 1500000,
                 "changerate": "changerates.equityfund",
                 "description": "",
                 "repeat": true
