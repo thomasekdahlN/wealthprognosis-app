@@ -249,31 +249,31 @@ class PrognosisExport2
             ->getStartColor()->setARGB($this->cashflowColor);
 
         //I år - horozontal
-        $row = $this->thisYear - $this->economyStartYear + $verticaloffsett;
+        $row = $verticaloffsett;
         $sheet->getStyle("A$row:AQ$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->thisYearRowColor);
 
         //Prognosis year - horizontal
-        $row = $this->prognoseYear - $this->economyStartYear + $verticaloffsett;
+        $row = $this->prognoseYear - $this->thisYear + $verticaloffsett;
         $sheet->getStyle("A$row:AQ$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->prognoseYearRowColor);
 
         //Pension official - horizontal
-        $row = $this->pensionOfficialYear - $this->economyStartYear + $verticaloffsett;
+        $row = $this->pensionOfficialYear - $this->thisYear + $verticaloffsett;
         $sheet->getStyle("A$row:AQ$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
 
         //Pension wish - horizontal
-        $row = $this->pensionWishYear - $this->economyStartYear + $verticaloffsett;
+        $row = $this->pensionWishYear - $this->thisYear + $verticaloffsett;
         $sheet->getStyle("A$row:AQ$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
 
         //Deathyear - horizontal
-        $row = $this->deathYear - $this->economyStartYear + $verticaloffsett;
+        $row = $this->deathYear - $this->thisYear + $verticaloffsett;
         $sheet->getStyle('A'.$row.':AQ'.$row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->deathYearRowColor);

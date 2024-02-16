@@ -28,6 +28,7 @@ class PrognosisAssetSheet2
     {
         $this->config = $config;
         $this->asset = $asset;
+        $this->thisYear = now()->year;
 
         $this->spreadsheet = $spreadsheet;
 
@@ -114,6 +115,9 @@ class PrognosisAssetSheet2
             if ($year == 'meta') {
                 continue;
             } //Hopp over metadata
+            if ($year < $this->thisYear) {
+                continue;
+            } //Bare generer visuelt fra dette året og fremover. Dette er ikke et historisk verktøy.
 
             $this->worksheet->setCellValue("A$this->rows", $year);
             $this->worksheet->setCellValue("B$this->rows", (int) $year - Arr::get($this->config, 'meta.birthYear'));
