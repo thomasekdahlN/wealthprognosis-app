@@ -221,7 +221,7 @@ class TaxFortune extends Model
         $taxPropertyDeductionAmount = $this->getPropertyTaxStandardDeduction($taxGroup, $taxProperty, $year);
 
         // Calculate the taxable property amount after deduction
-        $taxablePropertyAmount = ($amount - $taxPropertyDeductionAmount) * $taxablePropertyPercent;
+        $taxablePropertyAmount = ($amount * $taxablePropertyPercent) - $taxPropertyDeductionAmount;
         //echo "    taxablePropertyAmount:$taxablePropertyAmount = ($amount - $taxPropertyDeductionAmount) * $taxablePropertyPercent\n";
         //echo "    taxPropertyPercent:$taxPropertyPercent\n";
 

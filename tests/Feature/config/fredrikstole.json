@@ -1,0 +1,78 @@
+{
+    "meta": {
+        "name": "Fredrik Støle",
+        "birthYear": "1995",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "59",
+        "description": "Beregninger ihht Fredrik Støles FIRE podcast"
+    },
+    "house": {
+        "meta" : {
+            "type": "rental",
+            "group": "private",
+            "name": "House",
+            "description": "House with normal mortgage, the rest is put into fund",
+            "active" : true,
+            "tax": "rental",
+            "taxProperty": "ringerike"
+        },
+        "2024": {
+            "income": {
+                "name": "Income",
+                "description": "0.4% av boligverdi. 13333 i 11 mnd hver år = 12221 pr mnd hele året",
+                "amount": 12221,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utfgifter",
+                "description": "Offentlige 0.6% av boligverdi: 8765, Forsikring 0.07% pr mnd 7000,- pr mnd, Vedlikehold: 1% av boligverdi pr år: 2777",
+                "amount": 8765,
+                "factor": 12,
+                "changerate": "changerates.zero",
+                "repeat": true
+            },
+            "asset": {
+                "marketAmount": 3333333,
+                "changerate": "changerates.rental",
+                "description": "",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 2833333,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "years": 30
+            },
+            "cashflow": {
+                "description": "We transfer the positive cashflow into a fund",
+                "ruleX": "100%",
+                "transferX": "fond.$year.asset.marketAmount",
+                "source": "",
+                "repeat": true
+            }
+        }
+    },
+    "fond": {
+        "meta" : {
+            "type": "equityfund",
+            "group": "private",
+            "name": "fond",
+            "description": "Fra cash flow: 9388 x 12 hvert år",
+            "active": true,
+            "tax": "equityfund"
+        },
+        "2024": {
+            "asset": {
+                "marketAmount": 500000,
+                "changerate": "changerates.equityfund",
+                "rule": "+112656",
+                "description": "",
+                "repeat": true
+            }
+        }
+    }
+}
