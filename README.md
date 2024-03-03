@@ -18,6 +18,9 @@ On each asset you can do a rule based addition or subtraction, like adding 5000 
 On each asset you can do an calculation based on other assets value and add it to this asset. Like taking 5% of the salary and add it to OTP (this does not change your salary but it increases your OTP)
 On each asset you can do an transfer to another asset. This will correctly calculate the taxes for the sale involved before transfer. 
 
+#### Licence
+The code is under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007. Free for personal usage and free for non-commercial usage (that means that you do not make money on this software). Contributors wanted. Commercial usage is allowed with a commercial licence - please contact me to obtain a commercial usage. If you want to pay for new functionality, please feel free to contact me.
+
 #### Examples
 - Like taking 1/15 part of a equity fund each year and add it to your income for spending
 - taking 50% of the positive cachflow of one asset to make a extra mortgage downpayment for finish mortgage earlier.
