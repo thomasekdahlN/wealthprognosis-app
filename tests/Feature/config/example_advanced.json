@@ -1,22 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
-        "birthYear": "1975",
+        "name": "Example Advanced Wealth Prognosis",
+        "birthYear": "1985",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "80"
     },
-    "income": {
+    "salary": {
         "meta": {
             "type": "income",
             "group": "private",
-            "name": "Income",
-            "description": "Income",
+            "name": "Lønn",
+            "description": "Lønn",
             "active": true,
             "tax": "salary"
         },
-        "2022": {
+        "2024": {
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -37,9 +37,71 @@
         "$pensionWishYear": {
             "income": {
                 "name": "Income",
-                "description": "Pensioned, no more income from here",
+                "description": "Pensioned, no more salary from here",
                 "amount": 0,
                 "changerate": "changerates.zero",
+                "repeat": false
+            }
+        }
+    },
+    "wife": {
+        "meta": {
+            "type": "wife",
+            "group": "private",
+            "name": "Wife",
+            "description": "Kone - å dele utgifter med",
+            "active": true,
+            "tax": "none"
+        },
+        "2024": {
+            "income": {
+                "description": "Dele reelle utgifter på hus (4000) og mat (3000) - ikke lån - dvs 7000 spart pr mnd",
+                "amount": 7000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        }
+    },
+    "child1": {
+        "meta": {
+            "type": "child",
+            "group": "private",
+            "name": "Child1",
+            "description": "Barnetrygd som inntekter på barn frem til 18 år, utgifter helt til de flytter ut",
+            "active": true,
+            "tax": "none"
+        },
+        "2024": {
+            "income": {
+                "amount": 1000,
+                "factor": 12,
+                "name": "Barnetrygd",
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "amount": 2800,
+                "factor": 12,
+                "name": "Utgifter",
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        },
+        "2042": {
+            "income": {
+                "amount": 0,
+                "factor": 12,
+                "name": "Slutt på barnetrygd",
+                "changerate": "changerates.kpi",
+                "repeat": false
+            }
+        },
+        "2049": {
+            "expence": {
+                "name": "Utgifter",
+                "amount": 0,
+                "description": "Barn flyttet ut av huset ved 25 år",
                 "repeat": false
             }
         }
@@ -49,7 +111,7 @@
             "type": "inheritance",
             "group": "private",
             "name": "inheritance",
-            "description": "inheritance",
+            "description": "Arv som kan prognostiseres om de har gjenlevende foreldre eller andre du kan arve av i fremtiden",
             "active": true,
             "tax": "inheritance"
         },
@@ -94,7 +156,7 @@
             "active": true,
             "tax": "equityfund"
         },
-        "2022": {
+        "2024": {
             "asset": {
                 "rule": "5%",
                 "source": "income.$year.income.amount",
@@ -120,24 +182,24 @@
             "type": "house",
             "group": "private",
             "name": "My house",
-            "description": "Here I live",
+            "description": "Your house, with a apartment that you rent out",
             "active" : true,
             "tax": "house",
-            "taxProperty": "property"
+            "taxProperty": "holmestrand"
         },
-        "2015": {
+        "2024": {
             "asset": {
-                "marketAmount": 3000000,
+                "marketAmount": 4000000,
                 "changerate": "changerates.house",
                 "description": "Bought the house",
                 "repeat": true
             },
             "mortgage": {
-                "amount": 1500000,
+                "amount": 2000000,
                 "interest": "changerates.interest",
                 "gebyr": 600,
                 "tax": 22,
-                "paymentExtra": "home.$year.cashflow.amount",
+                "paymentExtraX": "home.$year.cashflow.amount",
                 "years": 20
             },
             "income": {
@@ -150,35 +212,103 @@
             },
             "expence": {
                 "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+                "description": "Kommunale/Forsikring/Strøm 7300 mnd",
                 "amount": 7300,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
+        }
+    },
+    "cabin": {
+        "meta": {
+            "type": "cabin",
+            "group": "private",
+            "name": "Cabin",
+            "description": "Hytte med litt AirBnb inntekt",
+            "active": true,
+            "tax": "cabin"
         },
-        "2020": {
+        "2024": {
+            "asset": {
+                "marketAmount": 5000000,
+                "acquisitionAmount": 1,
+                "paidAmount": 1,
+                "taxableInitialAmount": 250000,
+                "changerate": "changerates.cabin",
+                "description": "",
+                "repeat": true
+            },
             "income": {
-                "name": "Rental",
-                "description": "Rental 10000 pr month",
-                "amount": 10000,
+                "name": "AirBnB inntekt",
+                "description": "",
+                "amount": 3000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "",
+                "amount": 2000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
         }
-
+    },
+    "rental": {
+        "meta" : {
+            "type": "rental",
+            "group": "private",
+            "name": "Rental",
+            "description": "Rental",
+            "active": true,
+            "tax": "rental",
+            "taxProperty": "ringerike"
+        },
+        "2024": {
+            "asset": {
+                "marketAmount": 4000000,
+                "changerate": "changerates.house",
+                "description": "Kjøpesum",
+                "repeat": true
+            },
+            "income": {
+                "name": "Utleie",
+                "description": "Utleie av leilighet",
+                "amount": 12500,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Kommunale/Forsikring/Strøm,- pr mnd",
+                "amount": 3000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 2000000,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "tax": 22,
+                "years": 25
+            }
+        }
     },
     "crypto": {
         "meta" : {
             "type": "crypto",
             "group": "private",
-            "name": "My Crypto",
-            "description": "Coinbase private",
+            "name": "Crypto",
+            "description": "Crypto",
             "active": true,
             "tax": "crypto"
         },
-        "2022": {
+        "2024": {
             "asset": {
                 "marketAmount": 5000,
                 "changerate": "changerates.crypto",
@@ -196,36 +326,20 @@
             }
         }
     },
-    "fond": {
+    "gold": {
         "meta" : {
-            "type": "equityfund",
+            "type": "gold",
             "group": "private",
-            "name": "fond privat",
-            "description": "",
+            "name": "Gold",
+            "description": "Gold",
             "active": true,
-            "tax": "equityfund"
+            "tax": "gold"
         },
-        "2022": {
+        "2024": {
             "asset": {
-                "marketAmount": 2000000,
-                "changerate": "changerates.equityfund",
+                "marketAmount": 5000,
+                "changerate": "changerates.gold",
                 "description": "",
-                "repeat": true
-            }
-        },
-        "2023": {
-            "asset": {
-                "name": "Monthly savings",
-                "description": "Setter inn 6000,- pr år",
-                "rule": "+6000",
-                "repeat": true
-            }
-        },
-        "2033": {
-            "asset": {
-                "name": "Monthly savings",
-                "description": "Slutter å sette inn 6000,- pr år",
-                "rule": "",
                 "repeat": true
             }
         },
@@ -233,7 +347,7 @@
             "asset": {
                 "rule": "1|$pensionWishYears",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.equityfund",
+                "changerate": "changerates.gold",
                 "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
                 "repeat": true
             }
@@ -248,7 +362,7 @@
             "active": true,
             "tax": "cash"
         },
-        "2022": {
+        "2024": {
             "asset": {
                 "marketAmount": 50000,
                 "changerate": "changerates.cash",
@@ -301,7 +415,7 @@
             "active": true,
             "tax": "boat"
         },
-        "2022": {
+        "2024": {
             "asset": {
                 "marketAmount": 200000,
                 "changerate": "changerates.boat",
@@ -318,20 +432,39 @@
             }
         }
     },
-    "klp": {
+    "CompanyAS": {
+        "meta" : {
+            "type": "stock",
+            "group": "company",
+            "name": "Company AS",
+            "description": "I own stocks here",
+            "active": true,
+            "tax": "stock"
+        },
+        "2024": {
+            "asset": {
+                "marketAmount": 2500000,
+                "changerate": "changerates.stock",
+                "description": "Initielt kjøp",
+                "repeat": true
+            }
+        }
+    },
+    "fond": {
         "meta" : {
             "type": "equityfund",
-            "group": "company",
-            "name": "KLP fond",
-            "description": "",
+            "group": "private",
+            "name": "fond privat",
+            "description": "Has to be the second last asset since we often trasfer from other assets when sold, to this asset",
             "active": true,
             "tax": "equityfund"
         },
-        "2022": {
+        "2024": {
             "asset": {
-                "description": "",
-                "marketAmount": 1000000,
+                "marketAmount": 2000000,
                 "changerate": "changerates.equityfund",
+                "description": "Setter inn 6000,- ekstra pr år",
+                "rule": "+6000",
                 "repeat": true
             }
         },
@@ -345,22 +478,14 @@
             }
         }
     },
-    "CompanyAS": {
-        "meta" : {
-            "type": "stock",
-            "group": "company",
-            "name": "Company AS",
-            "description": "I own stocks here",
+    "income": {
+        "meta": {
+            "type": "income",
+            "group": "private",
+            "name": "Income",
+            "description": "Amount in this asset is not taxed. Everything transfered here is taxed when transfered from fond/otp. Has to be the last asset in the config.",
             "active": true,
-            "tax": "stock"
-        },
-        "2022": {
-            "asset": {
-                "marketAmount": 2500000,
-                "changerate": "changerates.stock",
-                "description": "Initielt kjøp",
-                "repeat": true
-            }
+            "tax": "income"
         }
     }
 }
