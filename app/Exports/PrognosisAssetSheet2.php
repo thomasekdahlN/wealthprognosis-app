@@ -66,7 +66,7 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue('E4', 'Utgift');
         $this->worksheet->setCellValue('I4', 'Lån');
         $this->worksheet->setCellValue('P4', 'Formue');
-        $this->worksheet->setCellValue('U4', 'Formuesskatt');
+        $this->worksheet->setCellValue('U4', 'Skattbarformue');
         $this->worksheet->setCellValue('Y4', 'Eiendomsskatt');
         $this->worksheet->setCellValue('AA4', 'Salg');
         $this->worksheet->setCellValue('AE4', 'Skjermingsfradrag');

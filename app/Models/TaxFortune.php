@@ -167,42 +167,29 @@ class TaxFortune extends Model
         $taxableFortunePercent = $this->getFortuneTaxable($taxGroup, $taxType, $year);
 
         if ($taxableAmountOverride) {
+            //Fortune tax can be negative by the amount of taxableInitualAmount minus mortgage if the asset value had been zero. This is how it is calculated in the tax system.
 
             if ($taxableInitialAmount > 0) {
                 $taxablePropertyAmount = $taxableInitialAmount;
-            } else {
-                $taxablePropertyAmount = 0;
             }
-
-            if ($taxableInitialAmount - $mortgageBalanceAmount > 0) {
-                //Is it still taxable after mortgaeg is deducted.
-                //FIX: Not all assets is allowed to have mortgage deducted. Only rivate house/rental/cabins. Check tax laws.
-
-                $taxableFortuneAmount = $taxableInitialAmount - $mortgageBalanceAmount;
-                $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
-                $explanation .= 'Tax override. ';
-                //echo "   taxableAmount ovveride: taxableInitialAmount:$taxableInitialAmount - mortgageBalanceAmount:$mortgageBalanceAmount\n";
-            } else {
-                //Assuming fortune tax can not be negative and now it is
-
-                $taxableFortuneAmount = 0;
-                $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
-                $explanation .= 'Tax override to zero ';
-                //echo "   taxableAmount override negative to 0\n";
-            }
+            $taxableFortuneAmount = $taxableInitialAmount;
+            $taxableFortunePercent = 0; //If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
+            $explanation .= 'Override taxable. ';
+            //echo "   taxableAmount ovveride: taxableInitialAmount:$taxableInitialAmount - mortgageBalanceAmount:$mortgageBalanceAmount\n";
         } else {
             $taxablePropertyAmount = round($marketAmount);
-            $taxableFortuneAmount = round($marketAmount * $taxableFortunePercent); //Calculate the amount from wich the tax is calculated from the market value if $fortuneTaxableAmount is not set
+            $taxableFortuneAmount = round($marketAmount * $taxableFortunePercent); //Calculate the amount from which the tax is calculated from the market value minus mortgage.
+
             //echo "   taxableAmount normal: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent\n";
-            $explanation .= 'Market taxable amount. ';
+            $explanation .= 'Market taxable. ';
         }
 
-        [$taxAmount, $taxPercent, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount);
+        [$taxAmount, $taxPercent, $taxableFortuneAmount, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount, $mortgageBalanceAmount, false);
 
         if ($taxProperty) {
             [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation2] = $this->calculatePorpertyTax($year, $taxGroup, $taxProperty, $taxablePropertyAmount);
         }
-        $explanation .= $explanation2;
+        $explanation .= $explanation2.$explanation1;
 
         //echo "   taxCalculationFortuneReturn: taxableFortuneAmount:$taxableFortuneAmount, taxableFortunePercent:$taxableFortunePercent, taxAmount:$taxAmount taxPercent:$taxPercent, taxablePropertyAmount:$taxablePropertyAmount,taxablePropertyPercent:$taxablePropertyPercent,taxPropertyAmount:$taxPropertyAmount,taxPropertyPercent:$taxPropertyPercent,$explanation\n";
 
@@ -260,7 +247,7 @@ class TaxFortune extends Model
      * @param  float  $amount  The amount of fortune for the calculation.
      * @return array Returns an array containing the calculated tax amount, tax percent and an explanation.
      */
-    public function calculatefortunetax(bool $debug, int $year, string $taxGroup, float $amount)
+    public function calculatefortunetax(bool $debug, int $year, string $taxGroup, float $amount, float $mortgage, bool $deduct = false)
     {
         $taxAmount = 0;
         $taxPercent = 0;
@@ -277,11 +264,33 @@ class TaxFortune extends Model
         $taxLowLimitAmount = $this->getFortuneTaxAmount($taxGroup, 'low', $year);
         $taxHighLimitAmount = $this->getFortuneTaxAmount($taxGroup, 'high', $year);
 
-        // Calculate the taxable amount after deduction
-        $taxableAmount = $amount - $taxableDeductionAmount;
+        if ($debug) {
+            echo "   calculatefortunetax in: $year.$taxGroup, amount:$amount, mortgage: $mortgage\n";
+        }
+
+        //FIX: Not all assets is allowed to have mortgage deducted. Only rivate house/rental/cabins. Check tax laws.
+        $taxableAmount = $amount - $mortgage;
+
         if ($taxableAmount < 0) {
-            $taxableAmount = 0; // Tax can not go lower than zero
-            $explanation = 'No taxable fortune after deduction. ';
+            //If the taxable amount is negative before deduction, it is because the asset has a mortgage higher than the value of the asset. This is deductable on the fortune tax and should be calculated and returned as negative values reducing fortune taxable and fortune tax
+            //Just pass through and use the taxableAmount as is. Funny that this a if without changing anuthing, but it is here for readability
+            $explanation = 'Negative asset value after deducting mortgage, reducing fortune value. ';
+        } elseif ($deduct) {
+            //We are not deducting from every asset, because we sum the value afterwards and the calculation gets wrong. We only deduct on grouped assets since the deduction is on the total
+            //https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/verdsettingsrabatt-ved-fastsetting-av-formue/
+
+            if ($taxableAmount - $taxableDeductionAmount > 0) {
+                //If the taxable amount is bigger than the deduction, resulting in a postive taxable amount, we use the deduction to reduce the taxable amount
+                //The value can never go negative because of the deduction, so this scenario should never give a negative taxable amount or negative tax
+                $taxableAmount = $taxableAmount - $taxableDeductionAmount; //FIX. We can not deduct on every asset, only on the total - if not this gets very wrong when summed to the totals.
+                $explanation = 'Positive asset value after deducting. ';
+
+            } else {
+                //If the taxable amount is less than the deduction, we set the taxable amount to zero, since nothing taxable and value can not be negative after deduction
+                //The value can never go negative because of the deduction, so this scenario should never give a negative taxable amount or negative tax
+                $taxableAmount = 0;
+                $explanation = 'Asset value set to zero after deducting. ';
+            }
         }
 
         // Calculate the tax amount and percentage based on the amount and the tax limits
@@ -292,23 +301,20 @@ class TaxFortune extends Model
 
             $taxAmount = $taxHighAmount + $taxLowAmount;
             $taxPercent = $taxHighPercent;
-            $explanation = "High fortune tax > $taxHighLimitAmount (".$taxHighPercent * 100 .'%)';
+            $explanation .= "High fortune tax > $taxHighLimitAmount (".$taxHighPercent * 100 .'%)';
 
-        } elseif ($amount <= $taxHighLimitAmount && $taxableAmount > 0) {
+        } elseif ($amount <= $taxHighLimitAmount) {
             // Only fortune tax on more than 1.7million pr 2023
             $taxAmount = $taxableAmount * $taxLowPercent;
             $taxPercent = $taxLowPercent;
-            $explanation = "Low fortune tax < $taxHighLimitAmount (".$taxLowPercent * 100 .'%)';
-
-        } else {
-            $explanation = "No fortune tax on $amount ";
+            $explanation .= "Low fortune tax < $taxHighLimitAmount (".$taxLowPercent * 100 .'%)';
         }
 
         // Print debug information if debug is true
         if ($debug) {
-            echo "   $year.$taxGroup, amount:$amount, taxableAmount: $taxableAmount, taxLowLimitAmount:$taxLowLimitAmount, taxHighLimitAmount:$taxHighLimitAmount, $explanation\n";
+            echo "   calculatefortunetax out: $year.$taxGroup, taxAmount:$taxAmount, taxPercent:$taxPercent, taxableAmount: $taxableAmount, taxLowLimitAmount:$taxLowLimitAmount, taxHighLimitAmount:$taxHighLimitAmount, $explanation\n";
         }
 
-        return [$taxAmount, $taxPercent, $explanation];
+        return [$taxAmount, $taxPercent, $taxableAmount, $explanation];
     }
 }

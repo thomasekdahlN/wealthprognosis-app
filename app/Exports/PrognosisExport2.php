@@ -191,8 +191,8 @@ class PrognosisExport2
 
         $prognosisAsset = new PrognosisAssetSheet2($this->spreadsheet, $this->config, $asset, $meta);
         $this->spreadsheet->addSheet($prognosisAsset->worksheet);
-        If(! $meta['name']) {
-            print "Asset does not  have a name\n";
+        if (! $meta['name']) {
+            echo "Asset does not  have a name\n";
             exit;
         }
 

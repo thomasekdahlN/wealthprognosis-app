@@ -1541,17 +1541,21 @@ class Prognosis
 
     }
 
+    //We can not subtract mortgage again, it is already subtracted in the taxableAmount part, therefore we send in zero as mortgage here.
     private function groupFortuneTax(int $year)
     {
-        //ToDo - fortune tax sybtraction level support.
 
-        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0));
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($this->totalH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($this->totalH, "$year.asset.taxableAmount", $taxableAmount);
         Arr::set($this->totalH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
 
-        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0));
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($this->companyH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($this->companyH, "$year.asset.taxableAmount", $taxableAmount);
         Arr::set($this->companyH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
 
-        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0));
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($this->privateH, "$year.asset.taxableAmount", 0), 0, true);
+        //print "#### $year, assetTaxableAmount: " . Arr::get($this->privateH, "$year.asset.taxableAmount", 0) . " assetTaxFortuneAmount: $assetTaxFortuneAmount\n";
+        Arr::set($this->privateH, "$year.asset.taxableAmount", $taxableAmount);
         Arr::set($this->privateH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
     }
 
@@ -1560,13 +1564,13 @@ class Prognosis
     public function groupFireSaveRate(int $year)
     {
         if (Arr::get($this->totalH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($this->totalH, "$year.fire.savingRate", Arr::get($this->totalH, "$year.fire.incomeAmount", 0) / Arr::get($this->totalH, "$year.fire.savingAmount", 0));
+            Arr::set($this->totalH, "$year.fire.savingRate", Arr::get($this->totalH, "$year.fire.incomeAmount", 0) / Arr::get($this->totalH, "$year.fire.savingAmount", 0), Arr::get($this->totalH, "$year.mortgage.balanceAmount", 0));
         }
         if (Arr::get($this->companyH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($this->companyH, "$year.fire.savingRate", Arr::get($this->companyH, "$year.fire.incomeAmount", 0) / Arr::get($this->companyH, "$year.fire.savingAmount", 0));
+            Arr::set($this->companyH, "$year.fire.savingRate", Arr::get($this->companyH, "$year.fire.incomeAmount", 0) / Arr::get($this->companyH, "$year.fire.savingAmount", 0), Arr::get($this->companyH, "$year.mortgage.balanceAmount", 0));
         }
         if (Arr::get($this->privateH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($this->privateH, "$year.fire.savingRate", Arr::get($this->privateH, "$year.fire.incomeAmount", 0) / Arr::get($this->privateH, "$year.fire.savingAmount", 0));
+            Arr::set($this->privateH, "$year.fire.savingRate", Arr::get($this->privateH, "$year.fire.incomeAmount", 0) / Arr::get($this->privateH, "$year.fire.savingAmount", 0), Arr::get($this->privateH, "$year.mortgage.balanceAmount", 0));
         }
         //FIX: Loop this out for groups.
         //foreach($this->groupH){

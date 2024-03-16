@@ -1,0 +1,46 @@
+{
+    "meta": {
+        "name": "John Doe",
+        "birthYear": "1975",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "82"
+    },
+    "prozeed": {
+        "meta" : {
+            "type": "stock",
+            "group": "company",
+            "name": "Prozeed AS",
+            "description": "Oppkjøps analyse",
+            "active": true,
+            "tax": "stock"
+        },
+        "2022": {
+            "asset": {
+                "marketAmount": 150000,
+                "taxableInitialAmount": 15000,
+                "changerate": "changerates.equityfund",
+                "description": "Initielt kjøp",
+                "repeat": true
+            }
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": 450000,
+                "changerate": "changerates.equityfund",
+                "description": "Sist kjente fusjonert verdi fra 2022",
+                "repeat": true
+            }
+        },
+        "2029": {
+            "income": {
+                "name": "Utbytte fra Prozeed AS",
+                "description": "Utbytte fra Prozeed AS ca 50 000 pr år",
+                "amount": 50000,
+                "changerate": "changerates.zero",
+                "repeat": true
+            }
+        }
+    }
+}

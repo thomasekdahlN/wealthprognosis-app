@@ -134,7 +134,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 * cabin - Hytte
 * car - Bil
 * bank - Bankkonto
-* cash - Kontanter
+* cash - Kontanter[wealth-te-do-not-share-2024-03.json](..%2F..%2FDocuments%2Fwealthprognosis%2Fwealth-te-do-not-share-2024-03.json)
 * child - Barn. Skattefritt men kjekt å klassifisere.
 * crypto - Krypto
 * bondfund - Rentefond
@@ -158,6 +158,8 @@ Support for yearly tax on interest on money in the bank.
 Feature complete for now
 
 #### Not a priority, but have been thinking of it.
+- Support for monstertax on property/boat/airplane/helicopters
+-  Company fortune should be retrieved from the previous year not the current year (tax vise)
 - Calculate only 1 year of a mortgage at a time, to avoid this vertical processing problem.
 - All transfers to next year? (to avoid vertical processing problem)
 - Extra nedbetaling av lån skaper masse utfordringer (fordi det påvirker mange verdier som allerede er beregnet og må reberegnes)
