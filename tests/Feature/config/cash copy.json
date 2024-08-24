@@ -1,0 +1,35 @@
+{
+    "meta": {
+        "name": "John Doe",
+        "birthYear": "1975",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "82"
+    },
+    "cash": {
+        "meta" : {
+            "type": "cash",
+            "group": "private",
+            "name": "Cash",
+            "description": "",
+            "active": true,
+            "tax": "cash"
+        },
+        "2022": {
+            "asset": {
+                "marketAmount": 100000,
+                "changerate": "changerates.cash",
+                "description": "Kontanter p.t.",
+                "repeat": true
+            },
+            "$pensionWishYear": {
+                "rule": "1|$pensionWishYear",
+                "transfer": "income.$year.income.amount",
+                "changerate": "changerates.cash",
+                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen",
+                "repeat": true
+            }
+        }
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "meta": {
+        "name": "Seil charter",
+        "birthYear": "1975",
+        "prognoseYear": "50",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "82"
+    },
+    "company": {
+        "meta": {
+            "type": "stock",
+            "group": "company",
+            "name": "Company AS",
+            "description": "I own stocks here",
+            "active": true,
+            "tax": "stock"
+        },
+        "2024": {
+            "asset": {
+                "marketAmount": 6400000,
+                "changerate": "changerates.boat",
+                "description": "Initielt kjøp båt",
+                "repeat": true
+            },
+            "income": {
+                "amount": 2500000,
+                "changerate": "changerates.kpi",
+                "description": "Initielt kjøp",
+                "repeat": true
+            },
+            "expence": {
+                "amount": 2000000,
+                "changerate": "changerates.kpi",
+                "description": "Initielt kjøp",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 4500000,
+                "interest": "8.5",
+                "gebyr": 600,
+                "tax": 22,
+                "years": 10
+            }
+        }
+    }
+}
