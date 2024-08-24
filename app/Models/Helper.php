@@ -137,6 +137,10 @@ class Helper extends Model
         } elseif ($ruleH[1][0] == '+') {
             $newAmount = $amount + $calcAmount;
             $explanation = "Adding: $amount+($extraAmount*$factor)=$newAmount ";
+        } else {
+            //When no sign is given, we only want the part of the amount. Its like taking this extra amount out of the amount.
+            $newAmount = $amount; //We do not change the original amount
+            $explanation = "Extra amount: $extraAmount*$factor=$calcAmount ";
         }
 
         return [$newAmount, $calcAmount, $explanation];

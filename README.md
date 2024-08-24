@@ -158,8 +158,11 @@ Support for yearly tax on interest on money in the bank.
 Feature complete for now
 
 #### Not a priority, but have been thinking of it.
+- Support for factor on a rule like +1000
+- Support for changerates on rules, like adding 5% to the +1000 rule each year.
 - Support for monstertax on property/boat/airplane/helicopters
 -  Company fortune should be retrieved from the previous year not the current year (tax vise)
+- //https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/verdsettingsrabatt-ved-fastsetting-av-formue/
 - Calculate only 1 year of a mortgage at a time, to avoid this vertical processing problem.
 - All transfers to next year? (to avoid vertical processing problem)
 - Extra nedbetaling av lån skaper masse utfordringer (fordi det påvirker mange verdier som allerede er beregnet og må reberegnes)
@@ -190,6 +193,7 @@ Feature complete for now
 - meta.pensionOfficialYear - Official pension year in your country (67 in noprway)
 - meta.pensionWishYear - When you wish to retire. Maybe you want to retire earlier because of F.I.R.E
 - meta.deathYear - Required. When do you think you die?
+- meta.exportStartYear - Optional. Defaults to last year. The excel sheet created will start at this year.
 
 Your pensionOfficialYear/pensionWishYear will be used to calculate equal payments (like 1/14 of your assets) from your assets until deathYear. So if you live longer, you get less pr year.
 
@@ -204,7 +208,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - meta.name - Required. Shor description of the asset, used in excel tabs
 - meta.description - Optional. Longer description of your asset.
 - meta.active - Required. Valid values true|false. If false, the asset will not be calculated.
-- meta.tax - Required. How this asset is taxed. Valid values income|fond|cash|house|car|inheritance|boat|cabin|crypto|pension|property|rental|salary. What kind of tax is this asset subject to.
+- meta.tax - Required. How this asset is taxed. Valid values income|fond|cash|house|car|inheritance|boat|cabin|crypto|pension|property|rental|salary|none. What kind of tax is this asset subject to.
 
 #### Income
 - income.amount - beløp før skatt

@@ -90,10 +90,13 @@ class PrognosisExport2
         $content = file_get_contents($configfile);
         $this->config = json_decode($content, true);
 
+
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; //We look at economy from 16 years of age
         $this->thisYear = now()->year;
         $this->prevYear = $this->thisYear - 1;
+        $this->exportStartYear = (int) Arr::get($this->config, 'meta.exportStartYear', $this->prevYear);
+        Arr::set($this->config, 'meta.exportStartYear', $this->exportStartYear);
         $this->prognoseYear = (int) $this->birthYear + Arr::get($this->config, 'meta.prognoseYear', 55);
         $this->pensionOfficialYear = (int) $this->birthYear + Arr::get($this->config, 'meta.pensionOfficialYear', 67);
         $this->pensionWishYear = (int) $this->birthYear + Arr::get($this->config, 'meta.pensionWishYear', 63);
@@ -113,7 +116,7 @@ class PrognosisExport2
         $this->leftYears = $this->deathYear - $this->thisYear + 1; //The number of years until you die, used i divisor calculations
         $this->untilPensionYears = $this->pensionYear - $this->thisYear + 1; //The number of years until pension, used i divisor calculations
         $this->totalYears = $this->deathYear - $this->economyStartYear + 1; //Antall år vi gjør beregningen over
-        $this->showYears = $this->deathYear - $this->prevYear + 1; //Antall år vi gjør beregningen over
+        $this->showYears = $this->deathYear - $this->exportStartYear + 1; //Antall år vi visualiserer beregningen
 
         //Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
         $content = str_replace(

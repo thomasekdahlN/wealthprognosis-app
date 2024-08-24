@@ -424,6 +424,7 @@ class Prognosis
 
                 if ($assetMarketAmount > 0) {
                     $this->ArrSet("$path.asset.marketAmount", $assetMarketAmount);
+
                     $this->ArrSet("$path.asset.taxableDecimal", $assetTaxableDecimal);
                     $this->ArrSet("$path.asset.taxableAmount", $assetTaxableAmount);
                     $this->ArrSet("$path.asset.taxableInitialAmount", $assetTaxableInitialAmount);

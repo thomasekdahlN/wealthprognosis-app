@@ -2,10 +2,10 @@
     "meta": {
         "name": "Seil charter",
         "birthYear": "1975",
-        "prognoseYear": "50",
+        "prognoseYear": "57",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "63"
     },
     "company": {
         "meta": {
@@ -26,13 +26,13 @@
             "income": {
                 "amount": 2500000,
                 "changerate": "changerates.kpi",
-                "description": "Initielt kjøp",
+                "description": "Inntekter",
                 "repeat": true
             },
             "expence": {
                 "amount": 2000000,
                 "changerate": "changerates.kpi",
-                "description": "Initielt kjøp",
+                "description": "Utgifter",
                 "repeat": true
             },
             "mortgage": {

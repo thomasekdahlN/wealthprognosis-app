@@ -120,7 +120,11 @@ class TaxIncome extends Model
                     $explanation = $incomeTaxPercent * 100 ."% tax on interest $interestAmount=$incomeTaxAmount";
                 }
                 break;
-
+            case 'none':
+                $incomeTaxAmount = 0;
+                $incomeTaxPercent = 0;
+                $explanation = "Tax type set to none, calculating without tax";
+                break;
                 // For other tax types, calculate income tax after deducting expenses
             default:
                 $incomeTaxAmount = ($income - $expence) * $incomeTaxPercent;

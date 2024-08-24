@@ -271,6 +271,11 @@ class TaxRealization extends Model
                 $realizationTaxAmount = 0;  //Ingen skatt ved salg.
                 break;
 
+            case 'none': //No tax
+                $realizationTaxableAmount = 0;
+                $realizationTaxAmount = 0;
+                break;
+
             default:
                 if ($amount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg

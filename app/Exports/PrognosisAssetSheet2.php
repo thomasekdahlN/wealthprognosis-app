@@ -43,6 +43,7 @@ class PrognosisAssetSheet2
         $this->asset = $asset;
         $this->thisYear = now()->year;
         $this->prevYear = $this->thisYear - 1;
+        $this->exportStartYear = Arr::get($this->config, 'meta.exportStartYear');
 
         $this->spreadsheet = $spreadsheet;
 
@@ -129,7 +130,7 @@ class PrognosisAssetSheet2
             if ($year == 'meta') {
                 continue;
             } //Hopp over metadata
-            if ($year < $this->prevYear) {
+            if ($year < $this->exportStartYear) {
                 continue;
             } //Bare generer visuelt fra dette året og fremover. Dette er ikke et historisk verktøy.
 
@@ -164,6 +165,7 @@ class PrognosisAssetSheet2
             }
 
             $this->worksheet->setCellValue("P$this->rows", Arr::get($data, 'asset.marketAmount'));
+
             if (Arr::get($data, 'asset.changeratePercent') != 0 && Arr::get($data, 'asset.marketAmount') > 0) {
                 $this->worksheet->setCellValue("Q$this->rows", $this->percentToExcel(Arr::get($data, 'asset.changeratePercent')));
             }
