@@ -1,4 +1,5 @@
 <meta name="google-site-verification" content="sVU5VtIVFfRVyzYylywIA2XMMxLQez6ehHqDndMjI1M" />
+<img src="public/logo.png" alt="Logo" width="200"/>
 
 ## Wealth prognosis predicts your yearly future economy from now until you die
 
