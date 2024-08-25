@@ -601,3 +601,21 @@ Før eller etter skatt her?
 }
 }
 }
+
+
+Logo Concepts:
+Integrated Financial Path:
+
+A circular logo with a graph or path that spirals inward, representing the detailed, year-by-year prognosis the software provides. The path could start wide and gradually narrow as it reaches the center, indicating a focused and precise outcome.
+Growing Wealth Tree:
+
+A tree with leaves that look like coins or currency symbols. The roots could represent the different types of taxes and financial metrics the software takes into account, showing that wealth is deeply rooted in careful planning and consideration of all financial aspects.
+Shield with Graph:
+
+A shield symbolizing security, with an upward trending graph within it. This could reflect the dual focus on growing wealth while protecting it through thorough analysis and planning.
+Crystal Ball with Calculator:
+
+A crystal ball that has a subtle outline of a calculator within it, symbolizing the foresight and precision of the software in predicting financial outcomes.
+Circle with Tax Icons:
+
+A circle with various small icons around its border representing different taxes and financial elements (e.g., a small house for property tax, a bag of money for income tax), with a central icon that represents overall wealth, like a growing graph or tree.
