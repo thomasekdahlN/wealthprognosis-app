@@ -118,6 +118,8 @@ class PrognosisExport2
         $this->totalYears = $this->deathYear - $this->economyStartYear + 1; //Antall år vi gjør beregningen over
         $this->showYears = $this->deathYear - $this->exportStartYear + 1; //Antall år vi visualiserer beregningen
 
+        print "totalYears: $this->totalYears, showYears: $this->showYears, exportStartYear: $this->exportStartYear, economyStartYear: $this->economyStartYear\n";
+
         //Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
         $content = str_replace(
             ['$birthYear', '$economyStartYear', '$thisYear', '$prognoseYear', '$pensionOfficialYears', '$pensionWishYears', '$pensionOfficialYear', '$pensionWishYear', '$otpStartYear', '$otpEndYear', '$otpYears', '$deathYear', '$leftYears', '$untilPensionYears'],
@@ -163,9 +165,9 @@ class PrognosisExport2
         }
         //$this->page($prognosis->groupH, $meta);
         //$this->page($prognosis->labelH, $meta); #New, does not exist yet
-
         //#####################################################################
         //Generate the spreadsheet pages
+
         foreach ($prognosis->dataH as $assetname => $asset) {
 
             if (! $asset['meta']['active']) {
@@ -198,7 +200,6 @@ class PrognosisExport2
             echo "Asset does not  have a name\n";
             exit;
         }
-
         $this->spreadsheet->setActiveSheetIndexByName($meta['name']);
         $sheet = $this->spreadsheet->getActiveSheet();
 
@@ -279,22 +280,29 @@ class PrognosisExport2
 
         //Prognosis year - horizontal
         $row = $this->prognoseYear - $this->prevYear + $verticaloffsett;
-        $sheet->getStyle("A$row:AQ$row")->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB($this->prognoseYearRowColor);
+        if($row > $verticaloffsett) {
+            //print "Prognose year: $row = $this->prognoseYear - $this->prevYear + $verticaloffsett\n";
+            $sheet->getStyle("A$row:AQ$row")->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB($this->prognoseYearRowColor);
+        }
 
         //Pension official - horizontal
         $row = $this->pensionOfficialYear - $this->prevYear + $verticaloffsett;
-        $sheet->getStyle("A$row:AQ$row")->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
+        if($row > $verticaloffsett) {
+            //print "Pension official: $row = $this->pensionOfficialYear - $this->prevYear + $verticaloffsett\n";
+            $sheet->getStyle("A$row:AQ$row")->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
+        }
 
         //Pension wish - horizontal
         $row = $this->pensionWishYear - $this->prevYear + $verticaloffsett;
-        $sheet->getStyle("A$row:AQ$row")->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
-
+        if($row > $verticaloffsett) {
+            $sheet->getStyle("A$row:AQ$row")->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
+        }
         //Deathyear - horizontal
         $row = $this->deathYear - $this->prevYear + $verticaloffsett;
         $sheet->getStyle('A'.$row.':AQ'.$row)->getFill()

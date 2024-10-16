@@ -43,7 +43,7 @@ class PrognosisAssetSheet2
         $this->asset = $asset;
         $this->thisYear = now()->year;
         $this->prevYear = $this->thisYear - 1;
-        $this->exportStartYear = Arr::get($this->config, 'meta.exportStartYear');
+        $this->exportStartYear = Arr::get($this->config, 'meta.exportStartYear', $this->prevYear);
 
         $this->spreadsheet = $spreadsheet;
 

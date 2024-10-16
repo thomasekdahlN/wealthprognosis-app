@@ -34,7 +34,7 @@ class Changerate extends Model
     public function __construct(string $prognosis, int $startYear, int $stopYear)
     {
 
-        $startYear = 1970; //Since its so much trouble if we miss a sequenze
+        $startYear = 1950; //Since its so much trouble if we miss a sequenze
 
         $file = config_path("prognosis/$prognosis.json");
         $configH = File::json($file);
