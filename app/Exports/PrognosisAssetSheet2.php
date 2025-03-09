@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -62,7 +63,7 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue('I2', 'Beskrivelse');
         $this->worksheet->setCellValue('J2', $meta['description']);
 
-        //Gruppering av kolonner med navn
+        // Gruppering av kolonner med navn
         $this->worksheet->setCellValue('C4', 'Inntekt');
         $this->worksheet->setCellValue('E4', 'Utgift');
         $this->worksheet->setCellValue('I4', 'Lån');
@@ -77,7 +78,7 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue('AL4', 'Bank');
         $this->worksheet->setCellValue('AN4', 'F.I.R.E');
 
-        //Kolonne headinger
+        // Kolonne headinger
         $this->worksheet->setCellValue("A$this->rowHeader", 'År');
         $this->worksheet->setCellValue("B$this->rowHeader", 'Alder');
         $this->worksheet->setCellValue("C$this->rowHeader", 'Inntekt');
@@ -110,8 +111,8 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("AD$this->rowHeader", '% Skatt');
         $this->worksheet->setCellValue("AE$this->rowHeader", 'Fradrag');
         $this->worksheet->setCellValue("AF$this->rowHeader", '% Fradrag');
-        $this->worksheet->setCellValue("AG$this->rowHeader", 'Brutto'); //Yield
-        $this->worksheet->setCellValue("AH$this->rowHeader", 'Netto'); //Yield
+        $this->worksheet->setCellValue("AG$this->rowHeader", 'Brutto'); // Yield
+        $this->worksheet->setCellValue("AH$this->rowHeader", 'Netto'); // Yield
         $this->worksheet->setCellValue("AI$this->rowHeader", 'Cashflow');
         $this->worksheet->setCellValue("AJ$this->rowHeader", 'Akkumulert');
         $this->worksheet->setCellValue("AK$this->rowHeader", 'Belåningsgrad');
@@ -122,17 +123,17 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("AP$this->rowHeader", 'Sparerate');
         $this->worksheet->setCellValue("AQ$this->rowHeader", 'Description');
 
-        //return;
-        ksort($this->asset); //Sorter på
+        // return;
+        ksort($this->asset); // Sorter på
 
         foreach ($this->asset as $year => $data) {
 
             if ($year == 'meta') {
                 continue;
-            } //Hopp over metadata
+            } // Hopp over metadata
             if ($year < $this->exportStartYear) {
                 continue;
-            } //Bare generer visuelt fra dette året og fremover. Dette er ikke et historisk verktøy.
+            } // Bare generer visuelt fra dette året og fremover. Dette er ikke et historisk verktøy.
 
             $this->worksheet->setCellValue("A$this->rows", $year);
             $this->worksheet->setCellValue("B$this->rows", (int) $year - Arr::get($this->config, 'meta.birthYear'));
@@ -232,7 +233,7 @@ class PrognosisAssetSheet2
         $this->rows--;
     }
 
-    //Really to Excel.
+    // Really to Excel.
     public function percentToExcel(int $percent)
     {
 

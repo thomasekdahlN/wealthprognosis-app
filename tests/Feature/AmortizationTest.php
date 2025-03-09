@@ -13,7 +13,7 @@ class AmortizationTest extends TestCase
      *
      * @return void
      */
-    public function testAmortization()
+    public function test_amortization()
     {
         // Define the config, changerate, dataH, mortgages, and assetname
 
@@ -51,7 +51,7 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_positive_balance()
     {
-        $changerate = new \stdClass();
+        $changerate = new \stdClass;
         $changerate->getChangerate = function () {
             return [5, 0.05, null, ''];
         };
@@ -63,7 +63,7 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_zero_balance()
     {
-        $changerate = new \stdClass();
+        $changerate = new \stdClass;
         $changerate->getChangerate = function () {
             return [5, 0.05, null, ''];
         };
@@ -74,7 +74,7 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_interest_only_years()
     {
-        $changerate = new \stdClass();
+        $changerate = new \stdClass;
         $changerate->getChangerate = function () {
             return [5, 0.05, null, ''];
         };
@@ -85,7 +85,7 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_extra_downpayment()
     {
-        $changerate = new \stdClass();
+        $changerate = new \stdClass;
         $changerate->getChangerate = function () {
             return [5, 0.05, null, ''];
         };
@@ -97,7 +97,7 @@ class AmortizationTest extends TestCase
     public function test_it_throws_error_for_invalid_interest()
     {
         $this->expectException(\Exception::class);
-        $changerate = new \stdClass();
+        $changerate = new \stdClass;
         $changerate->getChangerate = function () {
             return [0, 0, null, ''];
         };

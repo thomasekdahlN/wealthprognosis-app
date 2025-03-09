@@ -10,9 +10,9 @@ class ValueChangeTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function testNegativePercentValueChange(): void
+    public function test_negative_percent_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;
@@ -24,9 +24,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(-500, $depositedAmount);
     }
 
-    public function testPositivePercentValueChange(): void
+    public function test_positive_percent_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;
@@ -38,13 +38,13 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(+500, $depositedAmount);
     }
 
-    public function testNegativeDivisorValueChange(): void
+    public function test_negative_divisor_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;
-        $rule = '-1/4'; //Note that this should count down until 1/1 to use up the rest
+        $rule = '-1/4'; // Note that this should count down until 1/1 to use up the rest
 
         [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
@@ -52,9 +52,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(-250, $depositedAmount);
     }
 
-    public function testPositiveDivisorValueChange(): void
+    public function test_positive_divisor_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;
@@ -66,13 +66,13 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(+250, $depositedAmount);
     }
 
-    public function testNegativeDynamicDivisorValueChange(): void
+    public function test_negative_dynamic_divisor_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $depositedAmount = 0;
         $amount = 1000;
-        $rule = '-1|4'; //Note that this should count down until 1/1 to use up the rest
+        $rule = '-1|4'; // Note that this should count down until 1/1 to use up the rest
 
         [$newValue1, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 1);
 
@@ -81,9 +81,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals('-1/3', $rule);
     }
 
-    public function testPositiveDynamicDivisorValueChange(): void
+    public function test_positive_dynamic_divisor_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $depositedAmount = 0;
         $amount = 1000;
@@ -96,9 +96,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals('+1/3', $rule);
     }
 
-    public function testAdditionValueChange(): void
+    public function test_addition_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $depositedAmount = 0;
         $amount = 1000;
@@ -110,9 +110,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(+500, $depositedAmount);
     }
 
-    public function testSubtractionValueChange(): void
+    public function test_subtraction_value_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 1000;
         $rule = '-500';
@@ -124,9 +124,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(-500, $depositedAmount);
     }
 
-    public function testAdditionRuleToExistingAmountChange(): void
+    public function test_addition_rule_to_existing_amount_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 105000;
         $rule = '+5000';
@@ -138,23 +138,23 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(5000, $depositedAmount);
     }
 
-    public function testIncomeFactorAmountChange(): void
+    public function test_income_factor_amount_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
-        $amount = 40000; //salary pr mont
+        $amount = 40000; // salary pr mont
         $rule = null;
         $depositedAmount = 0;
 
         [$newValue, $depositedAmount, $rule, $explanation] = $calculation->calculateRule($debug, $amount, $depositedAmount, $rule, 12);
 
-        $this->assertEquals(480000, $newValue, 'verdi'); //return salary pr year
+        $this->assertEquals(480000, $newValue, 'verdi'); // return salary pr year
         $this->assertEquals(480000, $depositedAmount, 'deposit');
     }
 
-    public function testFactorAdditionRuleToExistingAmountChange(): void
+    public function test_factor_addition_rule_to_existing_amount_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 100000;
         $rule = '+5000';
@@ -166,9 +166,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(60000, $depositedAmount);
     }
 
-    public function testFactorSubtractionRuleToExistingAmountChange(): void
+    public function test_factor_subtraction_rule_to_existing_amount_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 100000;
         $rule = '-5000';
@@ -180,9 +180,9 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(-60000, $depositedAmount);
     }
 
-    public function testAssetNotFactoredAmountChange(): void
+    public function test_asset_not_factored_amount_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
         $amount = 100000;
         $rule = null;
@@ -194,11 +194,11 @@ class ValueChangeTest extends TestCase
         $this->assertEquals(100000, $depositedAmount);
     }
 
-    public function testEqualsFactoredAmountChange(): void
+    public function test_equals_factored_amount_change(): void
     {
-        $calculation = new Helper();
+        $calculation = new Helper;
         $debug = false;
-        $amount = '40000'; //Example, salary 40K pr month
+        $amount = '40000'; // Example, salary 40K pr month
         $rule = null;
         $depositedAmount = 0;
 

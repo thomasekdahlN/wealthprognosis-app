@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -26,14 +27,14 @@ class TaxSalary extends Model
 
     public $taxH = [];
 
-    //Will be rewritten to support yearly tax differences, just faking for now.
-    //Should probably be a deep nested json structure.
+    // Will be rewritten to support yearly tax differences, just faking for now.
+    // Should probably be a deep nested json structure.
     public function __construct()
     {
 
         $file = config_path('tax/no/no-tax-2025.json');
         $configH = File::json($file);
-        //echo "Leser: '$file'\n";
+        // echo "Leser: '$file'\n";
 
         foreach ($configH as $type => $typeH) {
             $this->taxH[$type] = $typeH;
@@ -60,15 +61,15 @@ class TaxSalary extends Model
     public function calculatesalarytax(bool $debug, int $year, int $amount)
     {
         $explanation = '';
-        $commonTaxAmount = 0; //Fellesskatt
-        $bracketTaxAmount = 0; //Trinnskatt
-        $socialSecurityTaxAmount = 0; //Trygdeavgift
-        $totalTaxAmount = 0; //Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
+        $commonTaxAmount = 0; // Fellesskatt
+        $bracketTaxAmount = 0; // Trinnskatt
+        $socialSecurityTaxAmount = 0; // Trygdeavgift
+        $totalTaxAmount = 0; // Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
 
         $commonTaxPercent = $this->getTaxSalary('private', 'common.rate', $year);
         $socialSecurityTaxPercent = $this->getTaxSalary('private', 'socialsecurity.rate', $year);
         $socialSecurityTaxDeductionAmount = $this->getTaxSalary('private', 'socialsecurity.deduction', $year);
-        $totalTaxPercent = 0; //Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
+        $totalTaxPercent = 0; // Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
 
         $commonTaxAmount = round($amount * $commonTaxPercent);
 
@@ -83,7 +84,7 @@ class TaxSalary extends Model
         $totalTaxAmount = $bracketTaxAmount + $commonTaxAmount + $socialSecurityTaxAmount;
 
         if ($amount > 0) {
-            $totalTaxPercent = round(($totalTaxAmount / $amount), 2); //We calculate a total percentage using the amounts
+            $totalTaxPercent = round(($totalTaxAmount / $amount), 2); // We calculate a total percentage using the amounts
         }
         // Print debug information if debug is true
         if ($debug) {
@@ -105,7 +106,7 @@ class TaxSalary extends Model
 
         $prevLimitAmount = 0;
         foreach ($brackets as $bracket) {
-            //print "Trinn " . $amount . " > " . $bracket['limit'] . "\n";
+            // print "Trinn " . $amount . " > " . $bracket['limit'] . "\n";
             $bracketTaxPercent = $bracket['rate'] / 100;
 
             if (isset($bracket['limit']) && $amount > $bracket['limit']) {
@@ -114,24 +115,24 @@ class TaxSalary extends Model
                 $bracketTotalTaxAmount += $bracketTaxAmount;
 
                 $explanation .= " Bracket ($bracket[limit])$bracket[rate]%=$bracketTaxAmount,";
-                //echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                // echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
             } elseif (isset($bracket['limit'])) {
-                //Amount is lower than limit, we are at the end and calculate the rest of the amount.
+                // Amount is lower than limit, we are at the end and calculate the rest of the amount.
                 $bracketTaxableAmount = $amount - $prevLimitAmount;
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
                 $explanation .= " Bracket ($amount<)".$bracket['limit'].")$bracket[rate]%=$bracketTaxAmount";
-                //echo "Bracket $amount < " . $bracket['limit'] . " taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                // echo "Bracket $amount < " . $bracket['limit'] . " taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
                 break;
             } else {
-                //Not set, then all tax after this is on bigger than logic, we are at the end of the calculation
+                // Not set, then all tax after this is on bigger than logic, we are at the end of the calculation
                 $bracketTaxableAmount = $amount - $prevLimitAmount;
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
                 $explanation .= " Bracket (>$prevLimitAmount)$bracket[rate]%=$bracketTaxAmount";
-                //echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                // echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
                 break;
             }
@@ -139,7 +140,7 @@ class TaxSalary extends Model
         }
 
         if ($amount > 0) {
-            $bracketTotalTaxPercent = round(($bracketTaxAmount / $amount), 2); //We calculate a total percentage using the amounts
+            $bracketTotalTaxPercent = round(($bracketTaxAmount / $amount), 2); // We calculate a total percentage using the amounts
         }
 
         $explanation = " Trinnskatt:$bracketTotalTaxAmount snitt ".$bracketTotalTaxPercent * 100 .'%, '.$explanation;

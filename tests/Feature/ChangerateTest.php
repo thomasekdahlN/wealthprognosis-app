@@ -22,7 +22,7 @@ class ChangerateTest extends TestCase
     /**
      * Tests the convertChangerate method with exceptions that convert a change rate into decimal equivalent.
      */
-    public function testConvertChangerate()
+    public function test_convert_changerate()
     {
         $original = 'changerates.test';
         $year = 2021;

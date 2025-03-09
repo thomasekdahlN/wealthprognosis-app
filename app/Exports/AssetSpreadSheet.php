@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -56,7 +57,7 @@ class AssetSpreadSheet
             foreach ($typeH as $typename => $data) {
 
                 if ($this->rows == 6) {
-                    //Lag header
+                    // Lag header
                     echo $this->alphabet[$this->letter];
                     $this->worksheet->setCellValue($this->alphabet[$this->letter].'5', $typename);
                 }

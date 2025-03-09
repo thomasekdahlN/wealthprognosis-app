@@ -162,6 +162,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 - Support for yearly tax on interest on money in the bank.
 - Support for two different types of stock - sellable and non-sellable (greymarket). Sellable stocks will be sold until zero when you retire. Non-sellable stocks will be kept until you die.
 - Fortune tax is divided into state and municipality tax. Should be calculated separately.
+- Correct the FIRE calulations - the correct is 4% the first year and then KPI adjusted the following years.
 
 #### Not a priority, but have been thinking of it.
 - Support for factor on a rule like +1000

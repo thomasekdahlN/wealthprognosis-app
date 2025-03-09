@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -49,7 +50,7 @@ class PrognosisRealizationSheet2
 
         $this->spreadsheet = $spreadsheet;
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear', 1990);
-        $this->economyStartYear = $this->birthYear + 16; //We look at economy from 16 years of age
+        $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
         $this->deathYear = (int) $this->birthYear + Arr::get($this->config, 'meta.deathYear', 82);
 
         $mask = '£#,##0.00_-';
@@ -65,22 +66,22 @@ class PrognosisRealizationSheet2
         $this->worksheet->setCellValue('D3', 'Skatt ved realisasjon');
         $this->worksheet->setCellValue('E3', 'Verdi etter realisasjon');
 
-        //total
-        //print " $this->economyStartYear <= $this->deathYear\n";
+        // total
+        // print " $this->economyStartYear <= $this->deathYear\n";
         for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
 
-            //print "$year\n";
+            // print "$year\n";
             $this->worksheet->setCellValue("A$this->rows", $year);
             $this->worksheet->setCellValue("B$this->rows", $year - Arr::get($this->config, 'meta.birthYear'));
 
-            //dd($this->totalH);
+            // dd($this->totalH);
 
-            //Total
-            //if(isset($this->totalH[$year])) {
+            // Total
+            // if(isset($this->totalH[$year])) {
             $this->worksheet->setCellValue("C$this->rows", Arr::get($this->totalH, "$year.asset.amount"));
             $this->worksheet->setCellValue("D$this->rows", Arr::get($this->totalH, "$year.tax.amountTaxableRealization"));
             $this->worksheet->setCellValue("E$this->rows", Arr::get($this->totalH, "$year.asset.amount") - Arr::get($this->totalH, "$year.tax.amountTaxableRealization"));
-            //}
+            // }
 
             $this->rows++;
         }

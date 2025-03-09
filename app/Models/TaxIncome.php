@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -26,8 +27,8 @@ class TaxIncome extends Model
 
     public $taxH = [];
 
-    //Will be rewritten to support yearly tax differences, just faking for now.
-    //Should probably be a deep nested json structure.
+    // Will be rewritten to support yearly tax differences, just faking for now.
+    // Should probably be a deep nested json structure.
     public function __construct($config, $startYear, $stopYear)
     {
 
@@ -39,7 +40,7 @@ class TaxIncome extends Model
             $this->taxH[$type] = $typeH;
         }
 
-        $this->taxsalary = new \App\Models\TaxSalary();
+        $this->taxsalary = new \App\Models\TaxSalary;
     }
 
     public function getTaxIncome($taxGroup, $taxType, $year)
@@ -69,7 +70,7 @@ class TaxIncome extends Model
     {
         // Initialize explanation and income tax percent
         $explanation = '';
-        $incomeTaxPercent = $this->getTaxIncome($taxGroup, $taxType, $year); //FIX
+        $incomeTaxPercent = $this->getTaxIncome($taxGroup, $taxType, $year); // FIX
         $incomeTaxAmount = 0;
 
         // Print debug information if debug is true
@@ -123,7 +124,7 @@ class TaxIncome extends Model
             case 'none':
                 $incomeTaxAmount = 0;
                 $incomeTaxPercent = 0;
-                $explanation = "Tax type set to none, calculating without tax";
+                $explanation = 'Tax type set to none, calculating without tax';
                 break;
                 // For other tax types, calculate income tax after deducting expenses
             default:

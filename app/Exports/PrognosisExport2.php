@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -72,7 +73,7 @@ class PrognosisExport2
     {
         $this->configfile = $configfile;
 
-        $this->spreadsheet = new Spreadsheet();
+        $this->spreadsheet = new Spreadsheet;
 
         $this->spreadsheet->getProperties()
             ->setCreator('Thomas Ekdahl')
@@ -85,14 +86,13 @@ class PrognosisExport2
             ->setKeywords('Wealth prognosis')
             ->setCategory('Wealth prognosis');
 
-        $this->spreadsheet->removeSheetByIndex(0); //Siden jeg ikke klarte å navne det første
+        $this->spreadsheet->removeSheetByIndex(0); // Siden jeg ikke klarte å navne det første
         echo "Leser: '$configfile'\n";
         $content = file_get_contents($configfile);
         $this->config = json_decode($content, true);
 
-
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
-        $this->economyStartYear = $this->birthYear + 16; //We look at economy from 16 years of age
+        $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
         $this->thisYear = now()->year;
         $this->prevYear = $this->thisYear - 1;
         $this->exportStartYear = (int) Arr::get($this->config, 'meta.exportStartYear', $this->prevYear);
@@ -101,32 +101,32 @@ class PrognosisExport2
         $this->pensionOfficialYear = (int) $this->birthYear + Arr::get($this->config, 'meta.pensionOfficialYear', 67);
         $this->pensionWishYear = (int) $this->birthYear + Arr::get($this->config, 'meta.pensionWishYear', 63);
         if ($this->pensionWishYear >= $this->birthYear + 63 && $this->pensionWishYear <= $this->birthYear + 67) {
-            $this->otpStartYear = $this->pensionWishYear; //OTP begynner tidligst ved 63, senest ved 67 - men slutter på 77 uansett.
+            $this->otpStartYear = $this->pensionWishYear; // OTP begynner tidligst ved 63, senest ved 67 - men slutter på 77 uansett.
         } elseif ($this->pensionWishYear <= $this->birthYear + 63) {
             $this->otpStartYear = $this->birthYear + 62;
         } elseif ($this->pensionWishYear >= $this->birthYear + 67) {
             $this->otpStartYear = $this->birthYear + 67;
         }
-        $this->otpEndYear = $this->birthYear + 77; //OTP slutter ved 77 uansett
+        $this->otpEndYear = $this->birthYear + 77; // OTP slutter ved 77 uansett
         $this->otpYears = $this->otpEndYear - $this->otpStartYear + 1;
 
         $this->deathYear = (int) $this->birthYear + Arr::get($this->config, 'meta.deathYear', 82);
-        $this->pensionWishYears = $this->deathYear - $this->pensionWishYear + 1; //The number of years you vil live with pension, used i divisor calculations
-        $this->pensionOfficialYears = $this->deathYear - $this->pensionOfficialYear + 1; //The number of years you vil live with pension, used i divisor calculations
-        $this->leftYears = $this->deathYear - $this->thisYear + 1; //The number of years until you die, used i divisor calculations
-        $this->untilPensionYears = $this->pensionYear - $this->thisYear + 1; //The number of years until pension, used i divisor calculations
-        $this->totalYears = $this->deathYear - $this->economyStartYear + 1; //Antall år vi gjør beregningen over
-        $this->showYears = $this->deathYear - $this->exportStartYear + 1; //Antall år vi visualiserer beregningen
+        $this->pensionWishYears = $this->deathYear - $this->pensionWishYear + 1; // The number of years you vil live with pension, used i divisor calculations
+        $this->pensionOfficialYears = $this->deathYear - $this->pensionOfficialYear + 1; // The number of years you vil live with pension, used i divisor calculations
+        $this->leftYears = $this->deathYear - $this->thisYear + 1; // The number of years until you die, used i divisor calculations
+        $this->untilPensionYears = $this->pensionYear - $this->thisYear + 1; // The number of years until pension, used i divisor calculations
+        $this->totalYears = $this->deathYear - $this->economyStartYear + 1; // Antall år vi gjør beregningen over
+        $this->showYears = $this->deathYear - $this->exportStartYear + 1; // Antall år vi visualiserer beregningen
 
-        print "totalYears: $this->totalYears, showYears: $this->showYears, exportStartYear: $this->exportStartYear, economyStartYear: $this->economyStartYear\n";
+        echo "totalYears: $this->totalYears, showYears: $this->showYears, exportStartYear: $this->exportStartYear, economyStartYear: $this->economyStartYear\n";
 
-        //Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
+        // Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
         $content = str_replace(
             ['$birthYear', '$economyStartYear', '$thisYear', '$prognoseYear', '$pensionOfficialYears', '$pensionWishYears', '$pensionOfficialYear', '$pensionWishYear', '$otpStartYear', '$otpEndYear', '$otpYears', '$deathYear', '$leftYears', '$untilPensionYears'],
             [$this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionOfficialYears, $this->pensionWishYears, $this->pensionOfficialYear, $this->pensionWishYear, $this->otpStartYear, $this->otpEndYear, $this->otpYears, $this->deathYear, $this->leftYears, $this->untilPensionYears],
             file_get_contents($configfile));
 
-        //print $content;
+        // print $content;
 
         $this->config = json_decode($content, true);
 
@@ -136,11 +136,11 @@ class PrognosisExport2
 
         $this->changerate = new Changerate($prognosis, $this->economyStartYear, $this->deathYear);
 
-        //print $this->changerate->getChangeratePercent('otp', '2024') . "\n";
-        //print $this->changerate->getChangerateDecimal('otp', '2024') . "\n";
+        // print $this->changerate->getChangeratePercent('otp', '2024') . "\n";
+        // print $this->changerate->getChangerateDecimal('otp', '2024') . "\n";
 
         $prognosis = (new Prognosis($this->config, $this->taxincome, $this->taxfortune, $this->taxrealization, $this->changerate));
-        //dd($prognosis->privateH);
+        // dd($prognosis->privateH);
         $meta = [
             'active' => true,
             'name' => 'Sum total',
@@ -163,16 +163,16 @@ class PrognosisExport2
             $meta['name'] = 'Sum holding';
             $this->page($prognosis->companyH, $meta);
         }
-        //$this->page($prognosis->groupH, $meta);
-        //$this->page($prognosis->labelH, $meta); #New, does not exist yet
-        //#####################################################################
-        //Generate the spreadsheet pages
+        // $this->page($prognosis->groupH, $meta);
+        // $this->page($prognosis->labelH, $meta); #New, does not exist yet
+        // #####################################################################
+        // Generate the spreadsheet pages
 
         foreach ($prognosis->dataH as $assetname => $asset) {
 
             if (! $asset['meta']['active']) {
                 continue;
-            } //Hopp over de inaktive
+            } // Hopp over de inaktive
             if ($generate == 'all' or $generate == $asset['meta']['group']) {
                 $this->page($asset, $asset['meta']);
             }
@@ -183,8 +183,8 @@ class PrognosisExport2
         $this->spreadsheet->setActiveSheetIndexByName('Statistics');
         $sheet = $this->spreadsheet->getActiveSheet();
 
-        //Fix - hva skal vi sette som default når det er totalt dynamisk?
-        //$this->spreadsheet->setActiveSheetIndexByName('Total');
+        // Fix - hva skal vi sette som default når det er totalt dynamisk?
+        // $this->spreadsheet->setActiveSheetIndexByName('Total');
 
         $writer = new Xlsx($this->spreadsheet);
         echo "Lagrer: $exportfile\n";
@@ -205,105 +205,105 @@ class PrognosisExport2
 
         $sheet->getStyle('B6:AP80')->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
 
-        //Kolonner med prosenter i innhold
-        $sheet->getStyle('D6:D80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('F6:F80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+        // Kolonner med prosenter i innhold
+        $sheet->getStyle('D6:D80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('F6:F80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
 
-        $sheet->getStyle('H6:H80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('J6:J80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('O6:O80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('Q6:Q80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+        $sheet->getStyle('H6:H80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('J6:J80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('O6:O80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('Q6:Q80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
 
-        $sheet->getStyle('V6:V80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('X6:X80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('Z6:Z80')->getNumberFormat()->setFormatCode('0.00%;[Red]-0.00%'); //% styling
+        $sheet->getStyle('V6:V80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('X6:X80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('Z6:Z80')->getNumberFormat()->setFormatCode('0.00%;[Red]-0.00%'); // % styling
 
-        $sheet->getStyle('AD6:AD80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('AF6:AF80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+        $sheet->getStyle('AD6:AD80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('AF6:AF80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
 
-        $sheet->getStyle('AG6:AG80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling. Yield
-        $sheet->getStyle('AH6:AH80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling. Yield
+        $sheet->getStyle('AG6:AG80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling. Yield
+        $sheet->getStyle('AH6:AH80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling. Yield
 
-        $sheet->getStyle('AK6:AK80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
-        $sheet->getStyle('AP6:AP80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); //% styling
+        $sheet->getStyle('AK6:AK80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $sheet->getStyle('AP6:AP80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
 
         for ($column = 1; $column <= 34 + 6; $column++) {
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
         }
 
         $verticaloffsett = 6;
-        //Grå Kolonne header
+        // Grå Kolonne header
         $sheet->getStyle('A5:AQ5')->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('CCCCCC');
 
-        //Inntekt - vertikal
+        // Inntekt - vertikal
         $sheet->getStyle('C6:C'.$this->showYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->incomeColor);
 
-        //Utgift - vertikal
+        // Utgift - vertikal
         $sheet->getStyle('E6:E'.$this->showYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->expenceColor);
 
-        //Formue blå - vertikal
+        // Formue blå - vertikal
         $sheet->getStyle('P6:P'.$this->showYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->cashflowColor);
 
-        //Formuesskatt blå - vertikal
+        // Formuesskatt blå - vertikal
         $sheet->getStyle('W6:W'.$this->showYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->expenceColor);
 
-        //Eiendomsskatt blå - vertikal
+        // Eiendomsskatt blå - vertikal
         $sheet->getStyle('Y6:Y'.$this->showYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->expenceColor);
 
-        //Realiseringsskatt blå - vertikal
+        // Realiseringsskatt blå - vertikal
         $sheet->getStyle('AC6:AC'.$this->showYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->expenceColor);
 
-        //Cashflow blå - vertikal
+        // Cashflow blå - vertikal
         $sheet->getStyle('AI6:AI'.$this->showYears + $verticaloffsett - 1)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->cashflowColor);
 
-        //I år - horozontal
+        // I år - horozontal
         $row = $this->thisYear - $this->prevYear + $verticaloffsett;
         $sheet->getStyle("A$row:AQ$row")->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB($this->thisYearRowColor);
 
-        //Prognosis year - horizontal
+        // Prognosis year - horizontal
         $row = $this->prognoseYear - $this->prevYear + $verticaloffsett;
-        if($row > $verticaloffsett) {
-            //print "Prognose year: $row = $this->prognoseYear - $this->prevYear + $verticaloffsett\n";
+        if ($row > $verticaloffsett) {
+            // print "Prognose year: $row = $this->prognoseYear - $this->prevYear + $verticaloffsett\n";
             $sheet->getStyle("A$row:AQ$row")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB($this->prognoseYearRowColor);
         }
 
-        //Pension official - horizontal
+        // Pension official - horizontal
         $row = $this->pensionOfficialYear - $this->prevYear + $verticaloffsett;
-        if($row > $verticaloffsett) {
-            //print "Pension official: $row = $this->pensionOfficialYear - $this->prevYear + $verticaloffsett\n";
+        if ($row > $verticaloffsett) {
+            // print "Pension official: $row = $this->pensionOfficialYear - $this->prevYear + $verticaloffsett\n";
             $sheet->getStyle("A$row:AQ$row")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
         }
 
-        //Pension wish - horizontal
+        // Pension wish - horizontal
         $row = $this->pensionWishYear - $this->prevYear + $verticaloffsett;
-        if($row > $verticaloffsett) {
+        if ($row > $verticaloffsett) {
             $sheet->getStyle("A$row:AQ$row")->getFill()
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB($this->pensionOfficialYearRowColor);
         }
-        //Deathyear - horizontal
+        // Deathyear - horizontal
         $row = $this->deathYear - $this->prevYear + $verticaloffsett;
         $sheet->getStyle('A'.$row.':AQ'.$row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)

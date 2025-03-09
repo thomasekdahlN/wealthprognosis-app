@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -35,14 +36,14 @@ class TaxRealization extends Model
      */
     public $taxH = [];
 
-    //Asset types that will automatically be calculated with tax shield
+    // Asset types that will automatically be calculated with tax shield
     public $taxShieldTypes = [
         'stock' => true,
         'equityfund' => true,
         'bondfund' => true,
         'ask' => true,
-        'loantocompany' => true, //lån til andre, fradrag om det er låm
-        'soleproprietorship' => true, //Enkeltpersonforetak
+        'loantocompany' => true, // lån til andre, fradrag om det er låm
+        'soleproprietorship' => true, // Enkeltpersonforetak
     ];
 
     /**
@@ -64,7 +65,7 @@ class TaxRealization extends Model
             $this->taxH[$type] = $typeH;
         }
 
-        $this->taxsalary = new \App\Models\TaxSalary();
+        $this->taxsalary = new \App\Models\TaxSalary;
     }
 
     /**
@@ -78,8 +79,8 @@ class TaxRealization extends Model
     public function getTaxRealization($taxGroup, $taxType, $year)
     {
         if ($taxGroup == 'company') {
-            //A company does not pay realization tax
-            return 22 / 100; //FIX: Hardcoded tax of all company assets, 22%
+            // A company does not pay realization tax
+            return 22 / 100; // FIX: Hardcoded tax of all company assets, 22%
         }
 
         return Arr::get($this->taxH, "$taxType.realization", 0) / 100;
@@ -97,15 +98,15 @@ class TaxRealization extends Model
     {
         $percent = 0;
 
-        //Note: Not all assets types has tax shield
+        // Note: Not all assets types has tax shield
         if (Arr::get($this->taxShieldTypes, $taxType)) {
-            //Note: All Tax shield percentage are changed by the government yearly.
+            // Note: All Tax shield percentage are changed by the government yearly.
             $percent = Arr::get($this->taxH, "shareholdershield.$year", null);
             if (! isset($percent)) {
-                //Fallback to our prognosis for the comming years if no percentage curve is given
+                // Fallback to our prognosis for the comming years if no percentage curve is given
                 $percent = Arr::get($this->taxH, 'shareholdershield.all', 23);
             }
-            //print "   shareholdershield.$year: $percent%\n";
+            // print "   shareholdershield.$year: $percent%\n";
             $percent = $percent / 100;
         }
 
@@ -140,8 +141,8 @@ class TaxRealization extends Model
         $realizationTaxShieldAmount = 0;
         $realizationTaxShieldPercent = 0;
 
-        //Forskjell på hva man betaler skatt av
-        $realizationTaxableAmount = 0; //The amount to pay tax from. Often calculated as taxof(MarketAmount - acquisitionAmount). We assume we always sell to market value
+        // Forskjell på hva man betaler skatt av
+        $realizationTaxableAmount = 0; // The amount to pay tax from. Often calculated as taxof(MarketAmount - acquisitionAmount). We assume we always sell to market value
         $realizationTaxAmount = 0;
 
         if ($debug && $amount != 0) {
@@ -166,12 +167,12 @@ class TaxRealization extends Model
 
             case 'house':
                 $realizationTaxableAmount = 0;
-                $realizationTaxAmount = 0;  //Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
+                $realizationTaxAmount = 0;  // Salg av eget hus er alltid skattefritt om man har bodd der minst ett år siste 2 år (regne på det?)
                 break;
 
             case 'cabin':
                 $realizationTaxableAmount = 0;
-                $realizationTaxAmount = 0;  //Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
+                $realizationTaxAmount = 0;  // Men må ha hatt hytta mer enn 5 eller 8 år for å bli skattefritt. (regne på det?)
                 break;
 
             case 'car':
@@ -186,126 +187,126 @@ class TaxRealization extends Model
 
             case 'property':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  // verdien nå minus inngangsverdien skal skattes ved salg
                 }
                 break;
 
             case 'rental':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien skal skattes ved salg
                 }
                 break;
 
             case 'stock':
 
                 if ($taxGroup == 'company') {
-                    //Fritaksmodellen
+                    // Fritaksmodellen
                     if ($amount - $acquisitionAmount > 0) {
                         $realizationTaxableAmount = 0;
                         $realizationTaxAmount = 0;
                     }
                 } else {
                     if ($amount - $acquisitionAmount > 0) {
-                        $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                        $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien skal skattes ved salg?
+                        $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                        $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien skal skattes ved salg?
                     }
                 }
                 break;
 
             case 'bondfund':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'equityfund':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'ask':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'otp':
-                //OTP skattes som pensjonsinntekt når den realiseres
+                // OTP skattes som pensjonsinntekt når den realiseres
                 [$realizationTaxAmount, $realizationTaxPercent, $explanation] = $this->taxsalary->calculatesalarytax(false, $year, $amount);
                 break;
 
             case 'ips':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'crypto':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'gold':
                 if ($amount - $acquisitionAmount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'bank':
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = 0;  //Ingen skatt ved salg.
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = 0;  // Ingen skatt ved salg.
                 break;
 
             case 'cash':
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = 0;  //Ingen skatt ved salg.
+                $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                $realizationTaxAmount = 0;  // Ingen skatt ved salg.
                 break;
 
-            case 'none': //No tax
+            case 'none': // No tax
                 $realizationTaxableAmount = 0;
                 $realizationTaxAmount = 0;
                 break;
 
             default:
                 if ($amount > 0) {
-                    $realizationTaxableAmount = $amount - $acquisitionAmount;  //verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  //verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                     break;
                 }
         }
 
-        //###############################################################################################################
-        //TaxShield handling
-        //Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
+        // ###############################################################################################################
+        // TaxShield handling
+        // Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
         if ($taxType == 'stock' || $taxType == 'equityfund' || $taxType == 'bondfund' || $taxType == 'ask' || $taxType == 'loantocompany' || $taxType == 'soleproprietorship') {
-            //Burde hatt en array med de asset typene som har taxShield.
+            // Burde hatt en array med de asset typene som har taxShield.
             [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $this->taxShield($year, $taxGroup, $taxType, $transfer, $amount, $realizationTaxAmount, $taxShieldPrevAmount);
         }
-        //###############################################################################################################
+        // ###############################################################################################################
         if ($realizationTaxAmount < 0) {
-            $realizationTaxAmount = 0; //Skjermingsfradraget kan ikke være større enn skatten
+            $realizationTaxAmount = 0; // Skjermingsfradraget kan ikke være større enn skatten
         }
-        $acquisitionAmount -= $amount; //We remove the transfered amount from the acquisitionAmount
+        $acquisitionAmount -= $amount; // We remove the transfered amount from the acquisitionAmount
         if ($acquisitionAmount < 0) {
-            $acquisitionAmount = 0; //Kjøpsbeløpet kan ikke være negativt.
+            $acquisitionAmount = 0; // Kjøpsbeløpet kan ikke være negativt.
         }
 
         if ($debug) {
             echo "  taxCalculationRealizationEnd $taxGroup.$taxType.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationBeforeShieldTaxAmount: $realizationBeforeShieldTaxAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
         }
 
-        //V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
+        // V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
         return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
     }
 
@@ -316,36 +317,36 @@ class TaxRealization extends Model
 
         $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxGroup, $taxType, $year);
 
-        //Skjermingsfradrag
+        // Skjermingsfradrag
         if ($realizationTaxShieldPercent > 0) {
-            //TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
-            $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); //Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
-            //print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
+            // TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
+            $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); // Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
+            // print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
             $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. ';
         } else {
             $realizationTaxShieldAmount = $taxShieldPrevAmount;
             $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. ';
         }
-        if ($realizationTaxShieldAmount < 0) { //Tax shield can not go below zero.
+        if ($realizationTaxShieldAmount < 0) { // Tax shield can not go below zero.
             $realizationTaxShieldAmount = 0;
         }
 
         if ($transfer) {
             if ($taxGroup == 'private') {
-                //tax shield is only used when tansfering between private assets or from company to private asset - never between company assets.
-                //We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
+                // tax shield is only used when tansfering between private assets or from company to private asset - never between company assets.
+                // We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
                 if ($realizationTaxAmount >= $realizationTaxShieldAmount) {
-                    //print "REDUCING TAX SHIELD1\n";
+                    // print "REDUCING TAX SHIELD1\n";
                     $explanation .= "Taxshield ($realizationTaxShieldAmount) lower than tax ($realizationTaxAmount), using entire shield. ";
 
-                    $realizationTaxAmount -= $realizationTaxShieldAmount; //Reduce the tax amount by the taxShieldAmount
-                    $realizationTaxShieldAmount = 0; //Then taxShieldAmount is used and has to go to zero.
+                    $realizationTaxAmount -= $realizationTaxShieldAmount; // Reduce the tax amount by the taxShieldAmount
+                    $realizationTaxShieldAmount = 0; // Then taxShieldAmount is used and has to go to zero.
                 } else {
                     $explanation .= "Taxshield ($realizationTaxShieldAmount) bigger than tax ($realizationTaxAmount), using part of the shield. ";
 
-                    //print "REDUCING TAX SHIELD2\n";
-                    $realizationTaxShieldAmount -= $realizationTaxAmount; //We reduce it by the amount we used
-                    $realizationTaxAmount = 0; //Then taxAmount is zero, since the entire emount was taxShielded.
+                    // print "REDUCING TAX SHIELD2\n";
+                    $realizationTaxShieldAmount -= $realizationTaxAmount; // We reduce it by the amount we used
+                    $realizationTaxAmount = 0; // Then taxAmount is zero, since the entire emount was taxShielded.
                 }
             } else {
                 $explanation .= "Only taxshield on private group assets, found #$taxGroup#. ";
@@ -354,7 +355,7 @@ class TaxRealization extends Model
             $explanation .= 'Taxshield simulation, not an actual transfer. ';
         }
 
-        //print "    taxShield: $year, amount:$amount, realizationTaxAmount:$realizationTaxAmount, realizationTaxShieldAmount:$realizationTaxShieldAmount, $explanation\n";
+        // print "    taxShield: $year, amount:$amount, realizationTaxAmount:$realizationTaxAmount, realizationTaxShieldAmount:$realizationTaxShieldAmount, $explanation\n";
         return [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
     }
 }

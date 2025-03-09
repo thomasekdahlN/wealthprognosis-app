@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -42,7 +43,7 @@ class ReadFile1 extends Command
      */
     public function handle()
     {
-        //new PrognosisExport($this->argument('configfile'));
+        // new PrognosisExport($this->argument('configfile'));
 
         Excel::store(new PrognosisExport1($this->argument('configfile')), $this->argument('exportfile'));
     }

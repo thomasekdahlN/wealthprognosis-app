@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2024 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
@@ -36,12 +37,12 @@ class Helper extends Model
                 [$newAmount, $calcAmount, $explanation] = $this->calculationPercentage($debug, $amount, $ruleH);
 
             } elseif (preg_match('/(\+|\-)?(\d*)\/(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
-                //When divisor sign is pipe / -Normal divisor
+                // When divisor sign is pipe / -Normal divisor
 
                 [$newAmount, $calcAmount, $explanation] = $this->calculationDivisor($debug, $amount, $ruleH);
 
             } elseif (preg_match('/(\+|\-)?(\d*)\|(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
-                //When divisor sign is pipe | - we dynamically count down divisor according to rules
+                // When divisor sign is pipe | - we dynamically count down divisor according to rules
                 [$newAmount, $calcAmount, $rule, $explanation] = $this->calculationDynamicDivisor($debug, $amount, $ruleH);
 
             } elseif (preg_match('/(\+|\-)?(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
@@ -62,7 +63,7 @@ class Helper extends Model
 
         [$newAmount, $calcAmount, $explanation] = $this->calculationDivisor($debug, $amount, $ruleH);
 
-        $ruleH[3][0]--; //Dynamic divisor, we count down.
+        $ruleH[3][0]--; // Dynamic divisor, we count down.
 
         if ($ruleH[3][0] > 0) {
             $rule = $ruleH[1][0].$ruleH[2][0].'|'.$ruleH[3][0];
@@ -74,7 +75,7 @@ class Helper extends Model
             echo "  calculationDynamicDivisor OUTPUT(amount: $amount, newAmount: $newAmount, calcAmount: $calcAmount, newrule: $rule, explanation: $explanation)\n";
         }
 
-        return [$newAmount, $calcAmount, $rule, $explanation]; //Returns rewritten rule, has to be remembered
+        return [$newAmount, $calcAmount, $rule, $explanation]; // Returns rewritten rule, has to be remembered
     }
 
     public function calculationDivisor(bool $debug, int $amount, array $ruleH)
@@ -90,8 +91,8 @@ class Helper extends Model
             $newAmount = $amount + $divisorAmount;
             $explanation = "Adding division: $amount/$divisor=".$calcAmount;
         } else {
-            //When no sign is given,  we only want the part of the amount. Its like taking this divisor out of the amount.
-            $newAmount = $amount; //We do not change the original amount
+            // When no sign is given,  we only want the part of the amount. Its like taking this divisor out of the amount.
+            $newAmount = $amount; // We do not change the original amount
             $explanation = "Division: $amount/$divisor=".$calcAmount;
         }
 
@@ -115,11 +116,11 @@ class Helper extends Model
             $calcAmount = $newAmount - $amount;
 
         } else {
-            //When no sign is given, we only want the part of the amount. Its like taking this percentage out of the amount.
-            $newAmount = $amount; //We do not change the original amount
+            // When no sign is given, we only want the part of the amount. Its like taking this percentage out of the amount.
+            $newAmount = $amount; // We do not change the original amount
             $calcAmount = round($amount * ($percent / 100));
             $explanation = "$percent% of $amount=$calcAmount";
-            //$diffAmount = $newAmount - $amount;
+            // $diffAmount = $newAmount - $amount;
         }
 
         return [$newAmount, $calcAmount, $explanation];
@@ -138,8 +139,8 @@ class Helper extends Model
             $newAmount = $amount + $calcAmount;
             $explanation = "Adding: $amount+($extraAmount*$factor)=$newAmount ";
         } else {
-            //When no sign is given, we only want the part of the amount. Its like taking this extra amount out of the amount.
-            $newAmount = $amount; //We do not change the original amount
+            // When no sign is given, we only want the part of the amount. Its like taking this extra amount out of the amount.
+            $newAmount = $amount; // We do not change the original amount
             $explanation = "Extra amount: $extraAmount*$factor=$calcAmount ";
         }
 
