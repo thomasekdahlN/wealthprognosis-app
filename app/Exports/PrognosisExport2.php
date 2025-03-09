@@ -118,7 +118,7 @@ class PrognosisExport2
         $this->totalYears = $this->deathYear - $this->economyStartYear + 1; // Antall år vi gjør beregningen over
         $this->showYears = $this->deathYear - $this->exportStartYear + 1; // Antall år vi visualiserer beregningen
 
-        echo "totalYears: $this->totalYears, showYears: $this->showYears, exportStartYear: $this->exportStartYear, economyStartYear: $this->economyStartYear\n";
+        // echo "totalYears: $this->totalYears, showYears: $this->showYears, exportStartYear: $this->exportStartYear, economyStartYear: $this->economyStartYear\n";
 
         // Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
         $content = str_replace(

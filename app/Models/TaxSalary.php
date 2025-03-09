@@ -47,9 +47,14 @@ class TaxSalary extends Model
         return Arr::get($this->taxH, "$taxType.income", 0) / 100;
     }
 
-    public function getTaxSalary($taxGroup, $taxType, $year)
+    public function getTax($taxGroup, $taxType, $year)
     {
         return Arr::get($this->taxH, "salary.$taxType", 0) / 100;
+    }
+
+    public function getDeduction($taxGroup, $taxType, $year)
+    {
+        return Arr::get($this->taxH, "salary.$taxType", 0);
     }
 
     public function getTaxBracket($taxGroup, $year)
@@ -66,18 +71,22 @@ class TaxSalary extends Model
         $socialSecurityTaxAmount = 0; // Trygdeavgift
         $totalTaxAmount = 0; // Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
 
-        $commonTaxPercent = $this->getTaxSalary('private', 'common.rate', $year);
-        $socialSecurityTaxPercent = $this->getTaxSalary('private', 'socialsecurity.rate', $year);
-        $socialSecurityTaxDeductionAmount = $this->getTaxSalary('private', 'socialsecurity.deduction', $year);
+        $commonTaxPercent = $this->getTax('private', 'common.rate', $year);
+        $commonTaxDeductionAmount = $this->commonDeduction($year, $amount);
+
+        $socialSecurityTaxPercent = $this->getTax('private', 'socialsecurity.rate', $year);
+        $socialSecurityTaxDeductionAmount = $this->getDeduction('private', 'socialsecurity.deduction', $year);
         $totalTaxPercent = 0; // Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
 
-        $commonTaxAmount = round($amount * $commonTaxPercent);
-
-        $socialSecurityTaxableAmount = ($amount - $socialSecurityTaxDeductionAmount);
+        $socialSecurityTaxableAmount = $amount; // Man betaler trygdeavgift av hele lønnen uten fradrag
         if ($socialSecurityTaxableAmount > 0) {
             $socialSecurityTaxAmount = round($socialSecurityTaxableAmount * $socialSecurityTaxPercent);
         }
-        [$bracketTaxAmount, $bracketTaxPercent, $explanation] = $this->calculateBracketTax(true, $year, $amount);
+
+        $commonTaxableAmount = $amount - $socialSecurityTaxAmount - $commonTaxDeductionAmount; // Man betaler fellesskatt av lønnen etter at trygdeavgidt og minstefradraget er trukket fra
+        $commonTaxAmount = round($commonTaxableAmount * $commonTaxPercent);
+
+        [$bracketTaxAmount, $bracketTaxPercent, $explanation] = $this->calculateBracketTax(true, $year, $amount); // Man betaler trinnskatt av hele lønnen uten fradrag
 
         $explanation = ' Fellesskatt: '.$commonTaxPercent * 100 ."% gir $commonTaxAmount skatt, Trygdeavgift ".$socialSecurityTaxPercent * 100 ."% gir $socialSecurityTaxAmount skatt ".$explanation;
 
@@ -88,7 +97,7 @@ class TaxSalary extends Model
         }
         // Print debug information if debug is true
         if ($debug) {
-            echo "   $year.salary, amount:$amount, totalTaxAmount:$totalTaxAmount, totalTaxPercent:".$totalTaxPercent * 100 .", $explanation\n";
+            echo "   $year amount:$amount, commonTaxDeductionAmount:$commonTaxDeductionAmount, commonTaxableAmount:$commonTaxableAmount, totalTaxAmount:$totalTaxAmount, totalTaxPercent:".$totalTaxPercent * 100 .", $explanation\n";
         }
 
         return [$totalTaxAmount, $totalTaxPercent, $explanation];
@@ -96,6 +105,7 @@ class TaxSalary extends Model
 
     public function calculateBracketTax(bool $debug, int $year, int $amount)
     {
+        $count = 0;
         $explanation = '';
         $brackets = $this->getTaxBracket('private', 'bracket', $year);
 
@@ -114,7 +124,7 @@ class TaxSalary extends Model
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
 
-                $explanation .= " Bracket ($bracket[limit])$bracket[rate]%=$bracketTaxAmount,";
+                $explanation .= " Bracket$count ($bracket[limit])$bracket[rate]%=$bracketTaxAmount,";
                 // echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
             } elseif (isset($bracket['limit'])) {
@@ -122,7 +132,7 @@ class TaxSalary extends Model
                 $bracketTaxableAmount = $amount - $prevLimitAmount;
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
-                $explanation .= " Bracket ($amount<)".$bracket['limit'].")$bracket[rate]%=$bracketTaxAmount";
+                $explanation .= " Bracket$count ($amount<)".$bracket['limit'].")$bracket[rate]%=$bracketTaxAmount";
                 // echo "Bracket $amount < " . $bracket['limit'] . " taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
                 break;
@@ -131,12 +141,13 @@ class TaxSalary extends Model
                 $bracketTaxableAmount = $amount - $prevLimitAmount;
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
-                $explanation .= " Bracket (>$prevLimitAmount)$bracket[rate]%=$bracketTaxAmount";
+                $explanation .= " Bracket$count (>$prevLimitAmount)$bracket[rate]%=$bracketTaxAmount";
                 // echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
                 break;
             }
             $prevLimitAmount = $bracket['limit'];
+            $count++;
         }
 
         if ($amount > 0) {
@@ -146,5 +157,25 @@ class TaxSalary extends Model
         $explanation = " Trinnskatt:$bracketTotalTaxAmount snitt ".$bracketTotalTaxPercent * 100 .'%, '.$explanation;
 
         return [$bracketTotalTaxAmount, $bracketTotalTaxPercent, $explanation];
+    }
+
+    // Beregning av minstefradrag
+    public function commonDeduction($year, $amount)
+    {
+        $minAmount = $this->getDeduction('private', 'deduction.min', $year);
+        $maxAmount = $this->getDeduction('private', 'deduction.max', $year);
+        $percent = $this->getTax('private', 'deduction.percent', $year);
+
+        $deduction = $amount * $percent;
+        if ($deduction > $maxAmount) {
+            $deduction = $maxAmount;
+        }
+        if ($deduction < $minAmount) {
+            $deduction = $minAmount;
+        }
+
+        // echo "amount: $amount, min: $minAmount, max: $maxAmount, percent: $percent, deduction: $deduction\n";
+
+        return $deduction;
     }
 }

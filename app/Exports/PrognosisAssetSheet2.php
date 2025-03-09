@@ -98,7 +98,7 @@ class PrognosisAssetSheet2
         $this->worksheet->setCellValue("Q$this->rowHeader", '%Endr');
         $this->worksheet->setCellValue("R$this->rowHeader", 'Markedsverdi fratrukket lån');
         $this->worksheet->setCellValue("S$this->rowHeader", 'Anskaffelsesverdi');
-        $this->worksheet->setCellValue("T$this->rowHeader", 'Finans kostnader)');
+        $this->worksheet->setCellValue("T$this->rowHeader", 'Betalt (akkumulert)');
         $this->worksheet->setCellValue("U$this->rowHeader", 'Skattbar');
         $this->worksheet->setCellValue("V$this->rowHeader", '% skattbar');
         $this->worksheet->setCellValue("W$this->rowHeader", 'Skatt');

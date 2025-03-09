@@ -57,9 +57,13 @@
         "common": {
             "rate": 22
         },
+        "deduction": {
+            "min": 4000,
+            "max": 92000,
+            "percent": 44
+        },
         "socialsecurity": {
-            "rate": 11.4,
-            "deduction": 111399
+            "rate": 7.7
         },
         "bracket":
         [

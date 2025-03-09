@@ -58,8 +58,8 @@ class AssetSpreadSheet
 
                 if ($this->rows == 6) {
                     // Lag header
-                    echo $this->alphabet[$this->letter];
-                    $this->worksheet->setCellValue($this->alphabet[$this->letter].'5', $typename);
+                    // echo $this->alphabet[$this->letter];
+                    // $this->worksheet->setCellValue($this->alphabet[$this->letter].'5', $typename);
                 }
 
                 if ($typeH['total']['amount'] > 0) {

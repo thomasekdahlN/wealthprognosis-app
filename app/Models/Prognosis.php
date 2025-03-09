@@ -1104,6 +1104,8 @@ class Prognosis
                 // echo "    $assetname.$year.asset.paidInitialAmount: $paidAmount\n";
             }
             $paidAmount += $this->ArrGet("$path.asset.transferedAmount") + $this->ArrGet("$path.mortgage.termAmount");
+            // echo "    $assetname.$year.asset.paidAmount: $paidAmount\n";
+
             if ($paidAmount < 0) {
                 $paidAmount = 0;
             }

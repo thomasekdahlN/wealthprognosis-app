@@ -55,11 +55,12 @@
     },
     "salary": {
         "common": {
-            "rate": 22
+            "rate": 22,
+            "deduction": 104450
         },
         "socialsecurity": {
-            "rate": 11.4,
-            "deduction": 111399
+            "rate": 7.8,
+            "deduction": 0
         },
         "bracket":
         [
