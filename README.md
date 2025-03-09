@@ -73,13 +73,13 @@ total, company (total company summary), private (total private summary), income 
 * [salary-otp](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
 
 ### How to run
-php artisan ReadFile2 yourassetconfig.json realistic/positive/negative/tenpercent/zero/variable all/private/company
+php artisan ReadFile2 yourassetconfig.json realistic|positive|negative|tenpercent|zero|variable all|private|company
 
 php artisan ReadFile2 tests/Feature/config/example.json realistic private
 
 tests/Feature/config/example.json = path to your asset definition.
-realistic/positive/negative are standard prognosis. You can copy and make your own, just place them in the same directory. tenpercent/zero/variable is just for manual testing.
-all/private/comapny - run the prognosis for only, private, only company or both.
+realistic|positive|negative are standard prognosis. You can copy and make your own, just place them in the same directory. tenpercent/zero/variable is just for manual testing.
+all|private|company - run the prognosis for only, private, only company or both.
 
 Output:
 The command will automatically generate [excel](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
@@ -107,17 +107,17 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 ### Support for more sophisticated dynamics in income/expence/asset - 
 
 rule - support:
--- +10% - Adds 10% to amount
--- -10% - Subtracts 10% from amount
--- 10% - Calculates 10% of the amount
--- +1000 - Adds 1000 to amount
--- -1000 - Subtracts 1000 from amount
--- +1/10 - Adds 1 tenth of the amount yearly
--- -1/10 - Subtracts 1 tenth of the amount yearly
--- 1/10 - Calculates 1/10 of the amount. Does not change the amount
--- +1|10 - Adds 1 tenth of the amount yearly, and subtracts nevner with one(so next value is 1/9, then 1/8, 1/7 etc)
--- -1|10 - Subtracts 1 tenth of the amount yearly. Then subtracts nevner with one. (so next value is 1/9, then 1/8, 1/7 etc). Perfect for usage to i.e empty an asset over 10 years.
--- 1|10 - Calculates 1|10 of the amount. Does not change the amount.
+- +10% - Adds 10% to amount
+- -10% - Subtracts 10% from amount
+- 10% - Calculates 10% of the amount
+- +1000 - Adds 1000 to amount
+- -1000 - Subtracts 1000 from amount
+- +1/10 - Adds 1 tenth of the amount yearly
+- -1/10 - Subtracts 1 tenth of the amount yearly
+- 1/10 - Calculates 1/10 of the amount. Does not change the amount
+- +1|10 - Adds 1 tenth of the amount yearly, and subtracts nevner with one(so next value is 1/9, then 1/8, 1/7 etc)
+- -1|10 - Subtracts 1 tenth of the amount yearly. Then subtracts nevner with one. (so next value is 1/9, then 1/8, 1/7 etc). Perfect for usage to i.e empty an asset over 10 years.
+- 1|10 - Calculates 1|10 of the amount. Does not change the amount.
 
 **source**
 
@@ -155,13 +155,13 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
-Support for two different types of stock - sellable and non-sellable (greymarket). Sellable stocks will be sold until zero when you retire. Non-sellable stocks will be kept until you die.
-Check calculations for property tax
-Check calculations for bracket tax
-Support for personfradrag in tax calculations - calculating a bit too high now
-Support for reading tax configurations pr year and country (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
-Support for yearly tax on interest on money in the bank.
-Fortune tax is divided into state and municipality tax. Should be calculated separately.
+- Check calculations for property tax
+- Check calculations for bracket tax
+- Support for personfradrag in tax calculations - calculating a bit too high now
+- Support for reading tax configurations pr year and country (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
+- Support for yearly tax on interest on money in the bank.
+- Support for two different types of stock - sellable and non-sellable (greymarket). Sellable stocks will be sold until zero when you retire. Non-sellable stocks will be kept until you die.
+- Fortune tax is divided into state and municipality tax. Should be calculated separately.
 
 #### Not a priority, but have been thinking of it.
 - Support for factor on a rule like +1000
