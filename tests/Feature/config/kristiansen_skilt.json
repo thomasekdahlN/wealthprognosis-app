@@ -1,0 +1,191 @@
+{
+    "meta": {
+        "name": "Example Advanced Wealth Prognosis",
+        "birthYear": "1952",
+        "prognoseYear": "72",
+        "pensionOfficialYear": "67",
+        "pensionWishYear": "63",
+        "deathYear": "100"
+    },
+    "salary": {
+        "meta": {
+            "type": "income",
+            "group": "private",
+            "name": "Pensjon",
+            "description": "Pensjon",
+            "active": true,
+            "tax": "salary"
+        },
+        "2023": {
+            "income": {
+                "name": "Income",
+                "description": "Income 500 000 før skatt",
+                "amount": 41666,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Expences",
+                "description": "",
+                "amount": 1000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        }
+    },
+    "house": {
+        "meta" : {
+            "type": "house",
+            "group": "private",
+            "name": "Hus",
+            "description": "Ødekjærveien 59, 50/40",
+            "active" : true,
+            "tax": "house"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": 6000000,
+                "changerate": "changerates.house",
+                "description": "Regner på 100% andeler",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 4000000,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "years": 30,
+                "interestOnlyYears": 29
+            },
+            "income": {
+                "name": "Rental",
+                "description": "Rental 8000 pr month, minus 250 pr time for egeninnsats",
+                "amount": 8000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Kommunale 1080 /Forsikring: 1790 / Strøm 3000 mnd",
+                "amount": 6950,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        }
+    },
+    "brygge": {
+        "meta": {
+            "type": "cabin",
+            "group": "private",
+            "name": "Brygge",
+            "description": "Brygge",
+            "active": true,
+            "tax": "cabin"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": 50000,
+                "changerate": "changerates.cabin",
+                "description": "",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "",
+                "amount": 100,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        }
+    },
+    "cash": {
+        "meta" : {
+            "type": "cash",
+            "group": "private",
+            "name": "Kontanter fra 3 kontoer - egne",
+            "description": "",
+            "active": true,
+            "tax": "cash"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": 363799,
+                "changerate": "changerates.cash",
+                "description": "Kontanter p.t.",
+                "repeat": true
+            }
+        }
+    },
+    "car": {
+        "meta" : {
+            "type": "car",
+            "group": "private",
+            "name": "Bil",
+            "description": "",
+            "active": true,
+            "tax": "car"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": 160000,
+                "changerate": "changerates.car",
+                "description": "verditap",
+                "repeat": true
+            },
+            "mortgage": {
+                "amount": 160000,
+                "interest": "changerates.interest",
+                "gebyr": 600,
+                "years": 7
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Forsikring: 10898/12=908",
+                "amount": 2000,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        }
+    },
+    "boat": {
+        "meta" : {
+            "type": "boat",
+            "group": "private",
+            "name": "Sting 530",
+            "description": "Sting 530 75Hk E-Tec 2014 modell",
+            "active": true,
+            "tax": "boat"
+        },
+        "2023": {
+            "asset": {
+                "marketAmount": 150000,
+                "changerate": "changerates.boat",
+                "description": "verditap",
+                "repeat": true
+            },
+            "expence": {
+                "name": "Utgifter",
+                "description": "Forsikring: 2423",
+                "amount": 201,
+                "factor": 12,
+                "changerate": "changerates.kpi",
+                "repeat": true
+            }
+        }
+    },
+    "income": {
+        "meta": {
+            "type": "income",
+            "group": "private",
+            "name": "Income",
+            "description": "Amount in this asset is not taxed. Everything transfered here is taxed when transfered from fond/otp. Has to be the last asset in the config.",
+            "active": true,
+            "tax": "income"
+        }
+    }
+}
