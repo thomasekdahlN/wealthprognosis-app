@@ -52,19 +52,27 @@ class Prognosis
     //FIX: Kanskje feil å regne inn otp her? Der kan man jo ikke velge.
     //Assets som man kan selge deler av hvert år for å finansiere FIRE. Huset ditt kan du f.eks ikke selge deler av. Dette brukes for å beregne potensiell inntekt fra salg av disse assets.
     public $firePartSalePossibleTypes = [
+        'boat' => false,
+        'car' => false,
+        'house' => false,
+        'rental' => false,
+        'cabin' => false,
         'crypto' => true,
         'bondfund' => true,
         'equityfund' => true,
         'stock' => false,
         'otp' => true,
         'ask' => true,
-        'ips' => true,
         'cash' => true,
         'bank' => true,
+        'ips' => true,
+        'pension' => true,
     ];
 
     //Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
     public $fireSavingTypes = [
+        'boat' => false,
+        'car' => false,
         'house' => true,
         'rental' => true,
         'cabin' => true,

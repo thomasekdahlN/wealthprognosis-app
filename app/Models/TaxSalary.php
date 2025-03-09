@@ -31,7 +31,7 @@ class TaxSalary extends Model
     public function __construct()
     {
 
-        $file = config_path('tax/tax.json');
+        $file = config_path('tax/no/no-tax-2025.json');
         $configH = File::json($file);
         //echo "Leser: '$file'\n";
 

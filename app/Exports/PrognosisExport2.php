@@ -130,9 +130,9 @@ class PrognosisExport2
 
         $this->config = json_decode($content, true);
 
-        $this->taxincome = new TaxIncome('tax', $this->economyStartYear, $this->deathYear);
-        $this->taxfortune = new TaxFortune('tax', $this->economyStartYear, $this->deathYear);
-        $this->taxrealization = new TaxRealization('tax', $this->economyStartYear, $this->deathYear);
+        $this->taxincome = new TaxIncome('no/no-tax-2025', $this->economyStartYear, $this->deathYear);
+        $this->taxfortune = new TaxFortune('no/no-tax-2025', $this->economyStartYear, $this->deathYear);
+        $this->taxrealization = new TaxRealization('no/no-tax-2025', $this->economyStartYear, $this->deathYear);
 
         $this->changerate = new Changerate($prognosis, $this->economyStartYear, $this->deathYear);
 

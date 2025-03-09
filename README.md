@@ -155,8 +155,13 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 * stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
 
 ### Functionality on the priority wishlist:
+Support for two different types of stock - sellable and non-sellable (greymarket). Sellable stocks will be sold until zero when you retire. Non-sellable stocks will be kept until you die.
+Check calculations for property tax
+Check calculations for bracket tax
+Support for personfradrag in tax calculations - calculating a bit too high now
+Support for reading tax configurations pr year and country (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
 Support for yearly tax on interest on money in the bank.
-Feature complete for now
+Fortune tax is divided into state and municipality tax. Should be calculated separately.
 
 #### Not a priority, but have been thinking of it.
 - Support for factor on a rule like +1000
