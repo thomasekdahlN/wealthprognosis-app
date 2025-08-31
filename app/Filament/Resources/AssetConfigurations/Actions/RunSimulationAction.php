@@ -7,7 +7,7 @@ use App\Models\SimulationConfiguration;
 use App\Services\PrognosisSimulationService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -37,14 +37,21 @@ class RunSimulationAction extends Action
                     ->schema([
                         Radio::make('prognosis_type')
                             ->label('Prognosis Type')
-                            ->description('Select the economic scenario for the simulation')
                             ->options([
-                                'realistic' => 'Realistic - Balanced economic assumptions',
-                                'positive' => 'Positive - Optimistic economic growth',
-                                'negative' => 'Negative - Conservative/pessimistic scenario',
-                                'tenpercent' => 'Ten Percent - High growth scenario',
-                                'zero' => 'Zero Growth - No growth scenario',
-                                'variable' => 'Variable - Mixed scenario with variations',
+                                'realistic' => 'Realistic',
+                                'positive' => 'Positive',
+                                'negative' => 'Negative',
+                                'tenpercent' => 'Ten Percent',
+                                'zero' => 'Zero Growth',
+                                'variable' => 'Variable',
+                            ])
+                            ->descriptions([
+                                'realistic' => 'Balanced economic assumptions',
+                                'positive' => 'Optimistic economic growth',
+                                'negative' => 'Conservative/pessimistic scenario',
+                                'tenpercent' => 'High growth scenario',
+                                'zero' => 'No growth scenario',
+                                'variable' => 'Mixed scenario with variations',
                             ])
                             ->default('realistic')
                             ->required()
@@ -53,11 +60,15 @@ class RunSimulationAction extends Action
 
                         Radio::make('asset_scope')
                             ->label('Asset Scope')
-                            ->description('Choose which assets to include in the simulation')
                             ->options([
-                                'both' => 'Both Private & Business - Complete portfolio simulation',
-                                'private' => 'Private Only - Personal assets and investments',
-                                'business' => 'Business Only - Business assets and company holdings',
+                                'both' => 'Both Private & Business',
+                                'private' => 'Private Only',
+                                'business' => 'Business Only',
+                            ])
+                            ->descriptions([
+                                'both' => 'Complete portfolio simulation',
+                                'private' => 'Personal assets and investments',
+                                'business' => 'Business assets and company holdings',
                             ])
                             ->default('both')
                             ->required()

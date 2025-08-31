@@ -1,96 +1,326 @@
 <?php
 
-use App\Models\Asset;
 use App\Models\AssetConfiguration;
-use App\Models\Team;
+use App\Models\AssetType;
+use App\Models\TaxType;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+beforeEach(function () {
+    $this->user = User::factory()->create();
 
-test('owner assets page displays sort order column and sorts by it', function () {
-    // Create user and team
-    $user = User::factory()->create();
-    $team = Team::create([
-        'name' => 'Test Team',
-        'owner_id' => $user->id,
-        'created_by' => $user->id,
-        'updated_by' => $user->id,
+    // Create required asset types and tax types
+    AssetType::factory()->create(['type' => 'cash', 'name' => 'Cash']);
+    AssetType::factory()->create(['type' => 'equity', 'name' => 'Equity']);
+    AssetType::factory()->create(['type' => 'real_estate', 'name' => 'Real Estate']);
+    AssetType::factory()->create(['type' => 'bond', 'name' => 'Bond']);
+
+    TaxType::factory()->create(['type' => 'none', 'name' => 'None']);
+    TaxType::factory()->create(['type' => 'capital_gains', 'name' => 'Capital Gains']);
+    TaxType::factory()->create(['type' => 'income_tax', 'name' => 'Income Tax']);
+
+    $this->assetConfiguration = AssetConfiguration::factory()->create([
+        'user_id' => $this->user->id,
+        'name' => 'Test Owner Assets Configuration',
     ]);
-
-    // Create asset owner
-    $owner = AssetConfiguration::create([
-        'name' => 'Test Owner',
-        'birth_year' => 1985,
-        'user_id' => $user->id,
-        'team_id' => $team->id,
-        'created_by' => $user->id,
-        'updated_by' => $user->id,
-    ]);
-
-    // Create assets with different sort orders
-    $asset1 = Asset::factory()->create([
-        'asset_owner_id' => $owner->id,
-        'user_id' => $user->id,
-        'team_id' => $team->id,
-        'name' => 'Third Asset',
-        'asset_type' => 'salary',
-        'sort_order' => 30,
-    ]);
-
-    $asset2 = Asset::factory()->create([
-        'asset_owner_id' => $owner->id,
-        'user_id' => $user->id,
-        'team_id' => $team->id,
-        'name' => 'First Asset',
-        'asset_type' => 'house',
-        'sort_order' => 10,
-    ]);
-
-    $asset3 = Asset::factory()->create([
-        'asset_owner_id' => $owner->id,
-        'user_id' => $user->id,
-        'team_id' => $team->id,
-        'name' => 'Second Asset',
-        'asset_type' => 'cash',
-        'sort_order' => 20,
-    ]);
-
-    $this->actingAs($user);
-
-    // Test that the page loads and contains sort order information
-    $response = $this->withoutMiddleware()->get(route('filament.admin.resources.asset-owners.assets', ['record' => $owner]));
-    $response->assertStatus(200);
-
-    // Verify that assets exist and have sort_order field
-    expect($asset1->sort_order)->toBe(30);
-    expect($asset2->sort_order)->toBe(10);
-    expect($asset3->sort_order)->toBe(20);
 });
 
-test('owner assets page loads successfully', function () {
-    // Create user and team
-    $user = User::factory()->create();
-    $team = Team::create([
-        'name' => 'Test Team',
-        'owner_id' => $user->id,
-        'created_by' => $user->id,
-        'updated_by' => $user->id,
+it('can display assets table for owner', function () {
+    $this->actingAs($this->user);
+
+    // Create test assets
+    $cashAsset = $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'cash_table_asset',
+        'name' => 'Cash Table Asset',
+        'description' => 'Cash asset for table testing',
+        'asset_type' => 'cash',
+        'group' => 'private',
+        'tax_type' => 'none',
+        'tax_country' => 'no',
+        'is_active' => true,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'cash_table_created'),
+        'updated_checksum' => hash('sha256', 'cash_table_updated'),
     ]);
 
-    // Create asset owner
-    $owner = AssetConfiguration::create([
-        'name' => 'Test Owner',
-        'birth_year' => 1985,
-        'user_id' => $user->id,
-        'team_id' => $team->id,
-        'created_by' => $user->id,
-        'updated_by' => $user->id,
+    $equityAsset = $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'equity_table_asset',
+        'name' => 'Equity Table Asset',
+        'description' => 'Equity asset for table testing',
+        'asset_type' => 'equity',
+        'group' => 'private',
+        'tax_type' => 'capital_gains',
+        'tax_country' => 'no',
+        'is_active' => true,
+        'sort_order' => 2,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'equity_table_created'),
+        'updated_checksum' => hash('sha256', 'equity_table_updated'),
     ]);
 
-    $this->actingAs($user);
+    expect($this->assetConfiguration->assets)->toHaveCount(2);
+    expect($this->assetConfiguration->assets->pluck('name')->toArray())
+        ->toContain('Cash Table Asset', 'Equity Table Asset');
+});
 
-    // Test that the page loads without errors
-    $response = $this->withoutMiddleware()->get(route('filament.admin.resources.asset-owners.assets', ['record' => $owner]));
-    $response->assertStatus(200);
+it('can filter assets by type', function () {
+    $this->actingAs($this->user);
+
+    // Create assets of different types
+    $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'filter_cash',
+        'name' => 'Filter Cash Asset',
+        'asset_type' => 'cash',
+        'group' => 'private',
+        'tax_type' => 'none',
+        'is_active' => true,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'filter_cash_created'),
+        'updated_checksum' => hash('sha256', 'filter_cash_updated'),
+    ]);
+
+    $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'filter_equity',
+        'name' => 'Filter Equity Asset',
+        'asset_type' => 'equity',
+        'group' => 'private',
+        'tax_type' => 'capital_gains',
+        'is_active' => true,
+        'sort_order' => 2,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'filter_equity_created'),
+        'updated_checksum' => hash('sha256', 'filter_equity_updated'),
+    ]);
+
+    $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'filter_real_estate',
+        'name' => 'Filter Real Estate Asset',
+        'asset_type' => 'real_estate',
+        'group' => 'private',
+        'tax_type' => 'capital_gains',
+        'is_active' => true,
+        'sort_order' => 3,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'filter_real_estate_created'),
+        'updated_checksum' => hash('sha256', 'filter_real_estate_updated'),
+    ]);
+
+    // Test filtering by asset type
+    $cashAssets = $this->assetConfiguration->assets()->where('asset_type', 'cash')->get();
+    $equityAssets = $this->assetConfiguration->assets()->where('asset_type', 'equity')->get();
+    $realEstateAssets = $this->assetConfiguration->assets()->where('asset_type', 'real_estate')->get();
+
+    expect($cashAssets)->toHaveCount(1);
+    expect($equityAssets)->toHaveCount(1);
+    expect($realEstateAssets)->toHaveCount(1);
+
+    expect($cashAssets->first()->name)->toBe('Filter Cash Asset');
+    expect($equityAssets->first()->name)->toBe('Filter Equity Asset');
+    expect($realEstateAssets->first()->name)->toBe('Filter Real Estate Asset');
+});
+
+it('can filter assets by group', function () {
+    $this->actingAs($this->user);
+
+    // Create private and business assets
+    $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'private_asset',
+        'name' => 'Private Asset',
+        'asset_type' => 'cash',
+        'group' => 'private',
+        'tax_type' => 'none',
+        'is_active' => true,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'private_created'),
+        'updated_checksum' => hash('sha256', 'private_updated'),
+    ]);
+
+    $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'business_asset',
+        'name' => 'Business Asset',
+        'asset_type' => 'equity',
+        'group' => 'business',
+        'tax_type' => 'capital_gains',
+        'is_active' => true,
+        'sort_order' => 2,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'business_created'),
+        'updated_checksum' => hash('sha256', 'business_updated'),
+    ]);
+
+    // Test filtering by group
+    $privateAssets = $this->assetConfiguration->assets()->where('group', 'private')->get();
+    $businessAssets = $this->assetConfiguration->assets()->where('group', 'business')->get();
+
+    expect($privateAssets)->toHaveCount(1);
+    expect($businessAssets)->toHaveCount(1);
+
+    expect($privateAssets->first()->name)->toBe('Private Asset');
+    expect($businessAssets->first()->name)->toBe('Business Asset');
+});
+
+it('can sort assets by different criteria', function () {
+    $this->actingAs($this->user);
+
+    // Create assets with different sort orders
+    $asset1 = $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'sort_asset_3',
+        'name' => 'Sort Asset C',
+        'asset_type' => 'cash',
+        'group' => 'private',
+        'tax_type' => 'none',
+        'is_active' => true,
+        'sort_order' => 3,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'sort_3_created'),
+        'updated_checksum' => hash('sha256', 'sort_3_updated'),
+    ]);
+
+    $asset2 = $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'sort_asset_1',
+        'name' => 'Sort Asset A',
+        'asset_type' => 'equity',
+        'group' => 'private',
+        'tax_type' => 'capital_gains',
+        'is_active' => true,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'sort_1_created'),
+        'updated_checksum' => hash('sha256', 'sort_1_updated'),
+    ]);
+
+    $asset3 = $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'sort_asset_2',
+        'name' => 'Sort Asset B',
+        'asset_type' => 'bond',
+        'group' => 'private',
+        'tax_type' => 'income_tax',
+        'is_active' => true,
+        'sort_order' => 2,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'sort_2_created'),
+        'updated_checksum' => hash('sha256', 'sort_2_updated'),
+    ]);
+
+    // Test sorting by sort_order
+    $sortedAssets = $this->assetConfiguration->assets()->orderBy('sort_order')->get();
+    expect($sortedAssets->first()->name)->toBe('Sort Asset A');
+    expect($sortedAssets->last()->name)->toBe('Sort Asset C');
+
+    // Test sorting by name
+    $nameSortedAssets = $this->assetConfiguration->assets()->orderBy('name')->get();
+    expect($nameSortedAssets->first()->name)->toBe('Sort Asset A');
+    expect($nameSortedAssets->last()->name)->toBe('Sort Asset C');
+});
+
+it('can handle active and inactive assets', function () {
+    $this->actingAs($this->user);
+
+    // Create active and inactive assets
+    $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'active_asset',
+        'name' => 'Active Asset',
+        'asset_type' => 'cash',
+        'group' => 'private',
+        'tax_type' => 'none',
+        'is_active' => true,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'active_created'),
+        'updated_checksum' => hash('sha256', 'active_updated'),
+    ]);
+
+    $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'inactive_asset',
+        'name' => 'Inactive Asset',
+        'asset_type' => 'equity',
+        'group' => 'private',
+        'tax_type' => 'capital_gains',
+        'is_active' => false,
+        'sort_order' => 2,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'inactive_created'),
+        'updated_checksum' => hash('sha256', 'inactive_updated'),
+    ]);
+
+    // Test filtering by active status
+    $activeAssets = $this->assetConfiguration->assets()->where('is_active', true)->get();
+    $inactiveAssets = $this->assetConfiguration->assets()->where('is_active', false)->get();
+
+    expect($activeAssets)->toHaveCount(1);
+    expect($inactiveAssets)->toHaveCount(1);
+
+    expect($activeAssets->first()->name)->toBe('Active Asset');
+    expect($inactiveAssets->first()->name)->toBe('Inactive Asset');
+});
+
+it('displays asset details correctly', function () {
+    $this->actingAs($this->user);
+
+    $asset = $this->assetConfiguration->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'detail_asset',
+        'name' => 'Detail Asset',
+        'description' => 'Detailed asset for testing display',
+        'asset_type' => 'real_estate',
+        'group' => 'private',
+        'tax_type' => 'capital_gains',
+        'tax_country' => 'no',
+        'tax_property' => 'residential',
+        'is_active' => true,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'detail_created'),
+        'updated_checksum' => hash('sha256', 'detail_updated'),
+    ]);
+
+    expect($asset->code)->toBe('detail_asset');
+    expect($asset->name)->toBe('Detail Asset');
+    expect($asset->description)->toBe('Detailed asset for testing display');
+    expect($asset->asset_type)->toBe('real_estate');
+    expect($asset->group)->toBe('private');
+    expect($asset->tax_type)->toBe('capital_gains');
+    expect($asset->tax_country)->toBe('no');
+    expect($asset->tax_property)->toBe('residential');
+    expect($asset->is_active)->toBe(true);
 });

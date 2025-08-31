@@ -104,7 +104,7 @@ class SimulationAsset extends Model
 
     public function simulationAssetYears(): HasMany
     {
-        return $this->hasMany(SimulationAssetYear::class);
+        return $this->hasMany(SimulationAssetYear::class, 'asset_id');
     }
 
     // Helper methods

@@ -29,7 +29,7 @@ class PrognosisSimulationService
         ]);
 
         // Get the asset configuration
-        $assetConfiguration = AssetConfiguration::with(['assets.assetYears', 'assets.assetType', 'assets.taxType'])
+        $assetConfiguration = AssetConfiguration::with(['assets.years', 'assets.assetType'])
             ->findOrFail($assetConfigurationId);
 
         // Create simulation configuration record
@@ -90,14 +90,14 @@ class PrognosisSimulationService
     protected function copyAssetsToSimulation(AssetConfiguration $assetConfig, SimulationConfiguration $simulationConfig, string $assetScope): void
     {
         $assetsQuery = $assetConfig->assets()->where('is_active', true);
-        
+
         if ($assetScope === 'private') {
             $assetsQuery->where('group', 'private');
         } elseif ($assetScope === 'business') {
             $assetsQuery->where('group', 'business');
         }
-        
-        $assets = $assetsQuery->with('assetYears')->get();
+
+        $assets = $assetsQuery->with('years')->get();
 
         foreach ($assets as $asset) {
             // Create simulation asset
@@ -122,14 +122,14 @@ class PrognosisSimulationService
             ]);
 
             // Copy asset years
-            foreach ($asset->assetYears as $assetYear) {
+            foreach ($asset->years as $assetYear) {
                 SimulationAssetYear::create([
                     'user_id' => Auth::id(),
                     'team_id' => Auth::user()->currentTeam?->id,
                     'year' => $assetYear->year,
                     'asset_id' => $simulationAsset->id,
                     'asset_configuration_id' => $simulationConfig->id,
-                    
+
                     // Income data
                     'income_name' => 'Income from ' . $asset->name,
                     'income_description' => 'Generated income from asset',
@@ -140,7 +140,7 @@ class PrognosisSimulationService
                     'income_source' => $asset->asset_type,
                     'income_changerate' => $assetYear->change_rate_type,
                     'income_repeat' => true,
-                    
+
                     // Expense data
                     'expence_name' => 'Expenses for ' . $asset->name,
                     'expence_description' => 'Operating expenses for asset',
@@ -151,7 +151,7 @@ class PrognosisSimulationService
                     'expence_source' => $asset->asset_type,
                     'expence_changerate' => $assetYear->change_rate_type,
                     'expence_repeat' => true,
-                    
+
                     // Asset data
                     'asset_name' => $asset->name,
                     'asset_description' => $asset->description,
@@ -165,7 +165,7 @@ class PrognosisSimulationService
                     'asset_transfer' => 'none',
                     'asset_source' => $asset->asset_type,
                     'asset_repeat' => true,
-                    
+
                     // Mortgage data (if applicable)
                     'mortgage_name' => null,
                     'mortgage_description' => null,
@@ -176,7 +176,7 @@ class PrognosisSimulationService
                     'mortgage_extra_downpayment_amount' => null,
                     'mortgage_gebyr' => 0,
                     'mortgage_tax' => 0,
-                    
+
                     // Audit fields
                     'created_by' => Auth::id(),
                     'updated_by' => Auth::id(),
@@ -195,7 +195,7 @@ class PrognosisSimulationService
         // For now, we'll store the results in the simulation configuration's tags field
         // In a more advanced implementation, you might want to create additional tables
         // to store the detailed yearly results
-        
+
         $simulationConfig->update([
             'tags' => array_merge($simulationConfig->tags ?? [], [
                 'simulation_completed',
@@ -241,7 +241,7 @@ class PrognosisSimulationService
         // Reconstruct results from stored data
         // This is a simplified version - in a full implementation you might
         // want to store the complete results in a separate table
-        
+
         return [
             'simulation_configuration' => $simulationConfig,
             'assets' => $simulationConfig->simulationAssets,

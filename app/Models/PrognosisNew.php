@@ -85,18 +85,18 @@ class PrognosisNew
 
         // Get filtered assets based on scope
         $assets = $this->getFilteredAssets();
-        
+
         // Initialize yearly data structure
         $this->initializeYearlyData();
-        
+
         // Process each asset for each year
         foreach ($assets as $asset) {
             $this->processAssetOverTime($asset);
         }
-        
+
         // Calculate summary statistics
         $this->calculateSummaryStats();
-        
+
         // Prepare final results
         $this->results = [
             'configuration' => [
@@ -128,15 +128,15 @@ class PrognosisNew
     protected function getFilteredAssets()
     {
         $query = $this->assetConfiguration->assets()->where('is_active', true);
-        
+
         if ($this->assetScope === 'private') {
             $query->where('group', 'private');
         } elseif ($this->assetScope === 'business') {
             $query->where('group', 'business');
         }
         // 'both' includes all assets
-        
-        return $query->with(['assetYears', 'assetType', 'taxType'])->get();
+
+        return $query->with(['years', 'assetType'])->get();
     }
 
     /**
@@ -164,7 +164,7 @@ class PrognosisNew
     protected function processAssetOverTime(Asset $asset): void
     {
         // Get the most recent asset year data as baseline
-        $baselineAssetYear = $asset->assetYears()
+        $baselineAssetYear = $asset->years()
             ->where('year', '<=', $this->startYear)
             ->orderBy('year', 'desc')
             ->first();
@@ -175,9 +175,9 @@ class PrognosisNew
             return;
         }
 
-        $currentMarketAmount = $baselineAssetYear->market_amount;
-        $currentAcquisitionAmount = $baselineAssetYear->acquisition_amount;
-        $currentEquityAmount = $baselineAssetYear->equity_amount;
+        $currentMarketAmount = $baselineAssetYear->asset_market_amount ?? 0;
+        $currentAcquisitionAmount = $baselineAssetYear->asset_acquisition_amount ?? 0;
+        $currentEquityAmount = $baselineAssetYear->asset_equity_amount ?? 0;
 
         // Get growth rate for this asset type
         $growthRate = $this->getGrowthRateForAsset($asset);
@@ -221,9 +221,9 @@ class PrognosisNew
             'asset_name' => $asset->name,
             'asset_type' => $asset->asset_type,
             'group' => $asset->group,
-            'start_value' => $baselineAssetYear->market_amount,
+            'start_value' => $baselineAssetYear->asset_market_amount,
             'end_value' => $currentMarketAmount,
-            'total_growth' => $currentMarketAmount - $baselineAssetYear->market_amount,
+            'total_growth' => $currentMarketAmount - $baselineAssetYear->asset_market_amount,
             'growth_rate' => $growthRate,
         ];
     }
@@ -234,7 +234,7 @@ class PrognosisNew
     protected function getGrowthRateForAsset(Asset $asset): float
     {
         $scenario = $this->economicScenarios[$this->prognosisType];
-        
+
         return match($asset->asset_type) {
             'equity', 'stock', 'mutual_fund' => $scenario['stock_growth'],
             'bond', 'fixed_income' => $scenario['bond_growth'],
@@ -250,16 +250,16 @@ class PrognosisNew
     protected function calculateYearlyIncome(AssetYear $assetYear, int $year): float
     {
         $income = $assetYear->income_amount;
-        
+
         if ($assetYear->income_factor === 'monthly') {
             $income *= 12;
         }
-        
+
         // Apply inflation adjustment
         $yearsFromStart = $year - $this->startYear;
         $inflationRate = $this->economicScenarios[$this->prognosisType]['inflation'];
         $income *= pow(1 + $inflationRate, $yearsFromStart);
-        
+
         return $income;
     }
 
@@ -269,31 +269,34 @@ class PrognosisNew
     protected function calculateYearlyExpenses(AssetYear $assetYear, int $year): float
     {
         $expenses = $assetYear->expence_amount;
-        
+
         if ($assetYear->expence_factor === 'monthly') {
             $expenses *= 12;
         }
-        
+
         // Apply inflation adjustment
         $yearsFromStart = $year - $this->startYear;
         $inflationRate = $this->economicScenarios[$this->prognosisType]['inflation'];
         $expenses *= pow(1 + $inflationRate, $yearsFromStart);
-        
+
         return $expenses;
     }
 
     /**
      * Calculate yearly taxes (simplified calculation)
      */
-    protected function calculateYearlyTaxes(Asset $asset, float $marketAmount, float $acquisitionAmount, float $income): float
+    protected function calculateYearlyTaxes(Asset $asset, ?float $marketAmount, ?float $acquisitionAmount, ?float $income): float
     {
         $taxes = 0;
-        
+        $marketAmount = $marketAmount ?? 0;
+        $acquisitionAmount = $acquisitionAmount ?? 0;
+        $income = $income ?? 0;
+
         // Income tax on income
         if ($income > 0) {
             $taxes += $income * 0.25; // Simplified 25% income tax
         }
-        
+
         // Capital gains tax (simplified)
         if ($asset->tax_type === 'capital_gains') {
             $capitalGains = max(0, $marketAmount - $acquisitionAmount);
@@ -301,12 +304,12 @@ class PrognosisNew
                 $taxes += $capitalGains * 0.20; // Simplified 20% capital gains tax
             }
         }
-        
+
         // Wealth tax (simplified)
         if ($marketAmount > 2000000) { // Above 2M NOK
             $taxes += ($marketAmount - 2000000) * 0.01; // 1% wealth tax
         }
-        
+
         return $taxes;
     }
 
@@ -317,19 +320,23 @@ class PrognosisNew
     {
         $firstYear = $this->yearlyData[$this->startYear] ?? [];
         $lastYear = $this->yearlyData[$this->endYear] ?? [];
-        
+
         $totalAssetsStart = $firstYear['total_assets'] ?? 0;
         $totalAssetsEnd = $lastYear['total_assets'] ?? 0;
-        
+
         $totalIncome = array_sum(array_column($this->yearlyData, 'total_income'));
         $totalExpenses = array_sum(array_column($this->yearlyData, 'total_expenses'));
         $totalTaxes = array_sum(array_column($this->yearlyData, 'total_taxes'));
-        
+
         // Calculate FIRE metrics
         $fireAchieved = false;
         $fireYear = null;
-        $fireAmount = $totalExpenses * 25; // 4% rule
-        
+
+        // Use first year's expenses as baseline for FIRE calculation
+        $firstYearData = reset($this->yearlyData);
+        $annualExpenses = $firstYearData ? $firstYearData['total_expenses'] : 0;
+        $fireAmount = $annualExpenses * 25; // 4% rule
+
         foreach ($this->yearlyData as $year => $data) {
             if ($data['total_assets'] >= $fireAmount && !$fireAchieved) {
                 $fireAchieved = true;
@@ -337,7 +344,7 @@ class PrognosisNew
                 break;
             }
         }
-        
+
         return [
             'total_assets_start' => $totalAssetsStart,
             'total_assets_end' => $totalAssetsEnd,
