@@ -1,0 +1,187 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\AssetCategory;
+use App\Models\AssetType;
+use App\Models\TaxType;
+use App\Models\User;
+use App\Models\Team;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class ConsolidatedAssetTypeMigrationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_consolidated_migration_creates_all_fields()
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create();
+
+        $this->artisan('db:seed', ['--class' => 'TaxTypeSeeder']);
+        $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
+        $this->artisan('db:seed', ['--class' => 'AssetTypeSeeder']);
+
+        $assetType = AssetType::factory()->create([
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'type' => 'test_consolidated',
+            'name' => 'Test Consolidated Asset',
+            'description' => 'Testing all consolidated fields',
+            'category' => 'Test Category',
+            'icon' => 'heroicon-o-star',
+            'color' => 'blue',
+            'is_active' => true,
+            'is_private' => true,
+            'is_company' => false,
+            'is_tax_optimized' => true,
+            'is_fire_sellable' => true,
+            'sort_order' => 99,
+            'created_checksum' => 'test_checksum_created',
+            'updated_checksum' => 'test_checksum_updated',
+        ]);
+
+        // Test all fields exist and are properly set
+        $this->assertEquals('test_consolidated', $assetType->type);
+        $this->assertEquals('Test Consolidated Asset', $assetType->name);
+        $this->assertEquals('blue', $assetType->color);
+        $this->assertTrue($assetType->is_active);
+        $this->assertTrue($assetType->is_private);
+        $this->assertFalse($assetType->is_company);
+        $this->assertTrue($assetType->is_tax_optimized);
+        $this->assertTrue($assetType->is_fire_sellable);
+        $this->assertEquals('test_checksum_created', $assetType->created_checksum);
+        $this->assertEquals('test_checksum_updated', $assetType->updated_checksum);
+    }
+
+    public function test_fire_sellable_functionality()
+    {
+        $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
+        $this->artisan('db:seed', ['--class' => 'AssetTypeSeeder']);
+
+        // Update some assets to be FIRE sellable
+        AssetType::whereIn('type', ['equityfund', 'stock'])->update(['is_fire_sellable' => true]);
+
+        // Test FIRE sellable scope
+        $fireSellableAssets = AssetType::fireSellable()->get();
+        $this->assertGreaterThanOrEqual(2, $fireSellableAssets->count());
+
+        $types = $fireSellableAssets->pluck('type')->toArray();
+        $this->assertContains('equityfund', $types);
+        $this->assertContains('stock', $types);
+    }
+
+    public function test_all_relationships_work_together()
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create();
+
+        $this->artisan('db:seed', ['--class' => 'TaxTypeSeeder']);
+        $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
+        $this->artisan('db:seed', ['--class' => 'AssetTypeSeeder']);
+
+        // Get related models (use first available ones if specific ones don't exist)
+        $taxType = TaxType::first();
+        $category = AssetCategory::first();
+
+        // Create asset type with all relationships
+        $assetType = AssetType::factory()->create([
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'type' => 'test_relationships',
+            'name' => 'Test Relationships',
+            'category' => 'Investment Funds',
+            'icon' => 'heroicon-o-chart-bar',
+            'color' => 'success',
+            'is_active' => true,
+            'is_fire_sellable' => true,
+            'tax_type_id' => $taxType?->id,
+            'asset_category_id' => $category?->id,
+        ]);
+
+        // Test all relationships
+        $this->assertEquals($taxType->name, $assetType->taxType->name);
+        $this->assertEquals($category->name, $assetType->assetCategory->name);
+        $this->assertTrue($taxType->assetTypes->contains($assetType));
+        $this->assertTrue($category->assetTypes->contains($assetType));
+    }
+
+    public function test_checksum_fields_work()
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create();
+
+        $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
+
+        $createdChecksum = hash('sha256', 'test_created');
+        $updatedChecksum = hash('sha256', 'test_updated');
+
+        $assetType = AssetType::factory()->create([
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'type' => 'test_checksum',
+            'name' => 'Test Checksum',
+            'category' => 'Test',
+            'created_checksum' => $createdChecksum,
+            'updated_checksum' => $updatedChecksum,
+        ]);
+
+        $this->assertEquals($createdChecksum, $assetType->created_checksum);
+        $this->assertEquals($updatedChecksum, $assetType->updated_checksum);
+
+        // Test that checksums are in fillable array
+        $this->assertTrue(in_array('created_checksum', $assetType->getFillable()));
+        $this->assertTrue(in_array('updated_checksum', $assetType->getFillable()));
+    }
+
+    public function test_fire_sellable_form_and_table_integration()
+    {
+        $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
+        $this->artisan('db:seed', ['--class' => 'AssetTypeSeeder']);
+
+        // Test that FIRE sellable field is in fillable array
+        $assetType = new AssetType;
+        $this->assertTrue(in_array('is_fire_sellable', $assetType->getFillable()));
+
+        // Test that FIRE sellable field is cast as boolean
+        $casts = $assetType->getCasts();
+        $this->assertEquals('boolean', $casts['is_fire_sellable']);
+
+        // Test creating asset with FIRE sellable flag
+        $user = User::factory()->create();
+        $team = Team::factory()->create();
+
+        $fireSellableAsset = AssetType::factory()->create([
+            'user_id' => $user->id,
+            'team_id' => $team->id,
+            'type' => 'fire_test',
+            'name' => 'FIRE Test Asset',
+            'category' => 'Investment',
+            'is_fire_sellable' => true,
+        ]);
+
+        $this->assertTrue($fireSellableAsset->is_fire_sellable);
+    }
+
+    public function test_consolidated_migration_no_duplicate_columns()
+    {
+        // This test ensures the migration runs without errors
+        // If there were duplicate columns, the migration would have failed
+        $this->assertTrue(true);
+
+        // Verify the table structure has all expected columns
+        $columns = \Schema::getColumnListing('asset_types');
+
+        $expectedColumns = [
+            'id', 'user_id', 'team_id', 'type', 'name', 'description', 'category', 'icon', 'color',
+            'is_active', 'is_private', 'is_company', 'is_tax_optimized', 'is_fire_sellable',
+            'sort_order', 'asset_category_id', 'tax_type_id', 'created_by', 'updated_by',
+            'created_checksum', 'updated_checksum', 'created_at', 'updated_at',
+        ];
+
+        foreach ($expectedColumns as $column) {
+            $this->assertContains($column, $columns, "Column {$column} should exist in asset_types table");
+        }
+    }
+}

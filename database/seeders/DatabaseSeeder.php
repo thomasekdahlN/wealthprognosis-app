@@ -13,11 +13,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $this->call([
+            UserSeeder::class,
+            TeamSeeder::class,
+            AssetTypeSeeder::class,
+            TaxTypeSeeder::class,
+            AssetCategorySeeder::class,
+            AssetConfigurationSeeder::class,
+            DemoAssetConfigurationSeeder::class,
+            AiInstructionSeeder::class,
+            TaxConfigurationSeeder::class,
+            ChangeRateConfigurationSeeder::class,
+            PrognosisSeeder::class,
+            // SampleScenarioSeeder::class, // Skip - Scenario model doesn't exist
+            // JsonConfigImportSeeder::class, // Skip this for now - may need JSON files
+        ]);
     }
 }
