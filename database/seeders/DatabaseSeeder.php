@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             ChangeRateConfigurationSeeder::class,
             PrognosisSeeder::class,
             // SampleScenarioSeeder::class, // Skip - Scenario model doesn't exist
-            // JsonConfigImportSeeder::class, // Skip this for now - may need JSON files
+            JsonConfigImportSeeder::class, // Import JSON configuration files
         ]);
     }
 }

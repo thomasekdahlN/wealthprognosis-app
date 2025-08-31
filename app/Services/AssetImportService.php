@@ -35,9 +35,9 @@ class AssetImportService
     }
 
     /**
-     * Import JSON configuration file and create AssetOwner with all related assets
+     * Import JSON configuration file and create AssetConfiguration with all related assets
      */
-    public function importFromFile(string $filePath): AssetOwner
+    public function importFromFile(string $filePath): AssetConfiguration
     {
         if (! file_exists($filePath)) {
             throw new \InvalidArgumentException("Configuration file not found: {$filePath}");
@@ -58,7 +58,7 @@ class AssetImportService
     /**
      * Import from JSON string content
      */
-    public function importFromJson(string $jsonContent, ?string $sourceName = null, ?Carbon $fileCreatedAt = null, ?Carbon $fileUpdatedAt = null): AssetOwner
+    public function importFromJson(string $jsonContent, ?string $sourceName = null, ?Carbon $fileCreatedAt = null, ?Carbon $fileUpdatedAt = null): AssetConfiguration
     {
         $decodedConfig = json_decode($jsonContent, true);
 
@@ -87,10 +87,10 @@ class AssetImportService
         $this->fileUpdatedAt = $fileUpdatedAt;
 
         return DB::transaction(function () use ($sourceName) {
-            // Create AssetOwner from meta data
-            $assetOwner = $this->createAssetOwner($sourceName);
+            // Create AssetConfiguration from meta data
+            $assetConfiguration = $this->createAssetConfiguration($sourceName);
 
-            // Reset sort order counter for this asset owner
+            // Reset sort order counter for this asset configuration
             $this->currentSortOrder = 1;
 
             // Process each asset section in the JSON
@@ -105,18 +105,18 @@ class AssetImportService
                     continue;
                 }
 
-                $asset = $this->createAssetFromSection($assetOwner, $key, $section);
+                $asset = $this->createAssetFromSection($assetConfiguration, $key, $section);
                 if ($asset === null) {
                     continue; // Skip this asset if it couldn't be created due to invalid type
                 }
             }
 
             Log::info('AssetImportService: Import completed', [
-                'asset_owner_id' => $assetOwner->id,
-                'assets_created' => $assetOwner->assets()->count(),
+                'asset_configuration_id' => $assetConfiguration->id,
+                'assets_created' => $assetConfiguration->assets()->count(),
             ]);
 
-            return $assetOwner;
+            return $assetConfiguration;
         });
     }
 
@@ -151,13 +151,13 @@ class AssetImportService
     }
 
     /**
-     * Create AssetOwner from meta section
+     * Create AssetConfiguration from meta section
      */
-    protected function createAssetOwner(?string $sourceName = null): AssetOwner
+    protected function createAssetConfiguration(?string $sourceName = null): AssetConfiguration
     {
         $meta = Arr::get($this->config, 'meta', []);
 
-        $name = Arr::get($meta, 'name', $sourceName ?? 'Imported Asset Owner');
+        $name = Arr::get($meta, 'name', $sourceName ?? 'Imported Asset Configuration');
         $birthYear = (int) Arr::get($meta, 'birthYear');
         $prognoseAge = (int) Arr::get($meta, 'prognoseAge');
         $pensionOfficialAge = (int) Arr::get($meta, 'pensionOfficialAge');
@@ -190,35 +190,35 @@ class AssetImportService
             'updated_checksum' => hash('sha256', $name.'_updated'),
         ];
 
-        // Create the asset owner
-        $assetOwner = AssetConfiguration::create($data);
+        // Create the asset configuration
+        $assetConfiguration = AssetConfiguration::create($data);
 
         // Set file timestamps if provided
         if ($this->fileCreatedAt || $this->fileUpdatedAt) {
-            AssetConfiguration::withoutTimestamps(function () use ($assetOwner) {
+            AssetConfiguration::withoutTimestamps(function () use ($assetConfiguration) {
                 if ($this->fileCreatedAt) {
-                    $assetOwner->created_at = $this->fileCreatedAt;
+                    $assetConfiguration->created_at = $this->fileCreatedAt;
                 }
                 if ($this->fileUpdatedAt) {
-                    $assetOwner->updated_at = $this->fileUpdatedAt;
+                    $assetConfiguration->updated_at = $this->fileUpdatedAt;
                 }
-                $assetOwner->save();
+                $assetConfiguration->save();
             });
-            $assetOwner->refresh(); // Refresh to get the updated timestamps
+            $assetConfiguration->refresh(); // Refresh to get the updated timestamps
         }
 
-        Log::info('AssetImportService: Created AssetOwner', [
-            'id' => $assetOwner->id,
-            'name' => $assetOwner->name,
+        Log::info('AssetImportService: Created AssetConfiguration', [
+            'id' => $assetConfiguration->id,
+            'name' => $assetConfiguration->name,
         ]);
 
-        return $assetOwner;
+        return $assetConfiguration;
     }
 
     /**
      * Create Asset from a section in the JSON config
      */
-    protected function createAssetFromSection(AssetOwner $assetOwner, string $sectionKey, array $section): ?Asset
+    protected function createAssetFromSection(AssetConfiguration $assetConfiguration, string $sectionKey, array $section): ?Asset
     {
         $meta = $section['meta'];
 
@@ -235,7 +235,7 @@ class AssetImportService
         }
 
         $data = [
-            'asset_owner_id' => $assetOwner->id,
+            'asset_configuration_id' => $assetConfiguration->id,
             'user_id' => $this->user->id,
             'team_id' => $this->teamId,
             'name' => Arr::get($meta, 'name', $sectionKey),
@@ -307,7 +307,7 @@ class AssetImportService
             'team_id' => $this->teamId,
             'year' => $year,
             'asset_id' => $asset->id,
-            'asset_owner_id' => $asset->asset_owner_id,
+            'asset_configuration_id' => $asset->asset_configuration_id,
 
             // Income data
             'income_name' => Arr::get($yearData, 'income.name'),
@@ -438,7 +438,7 @@ class AssetImportService
     /**
      * Static method for easy tinker usage
      */
-    public static function importFile(string $filePath, ?User $user = null, ?int $teamId = null): AssetOwner
+    public static function importFile(string $filePath, ?User $user = null, ?int $teamId = null): AssetConfiguration
     {
         $service = new static($user, $teamId);
 
@@ -448,7 +448,7 @@ class AssetImportService
     /**
      * Import from JSON string for tinker usage
      */
-    public static function importJson(string $jsonContent, ?string $sourceName = null, ?User $user = null, ?int $teamId = null): AssetOwner
+    public static function importJson(string $jsonContent, ?string $sourceName = null, ?User $user = null, ?int $teamId = null): AssetConfiguration
     {
         $service = new static($user, $teamId);
 
@@ -458,7 +458,7 @@ class AssetImportService
     /**
      * Import a test file from the test config directory
      */
-    public static function importTestFile(string $filename, ?User $user = null, ?int $teamId = null): AssetOwner
+    public static function importTestFile(string $filename, ?User $user = null, ?int $teamId = null): AssetConfiguration
     {
         $testPath = base_path('tests/Feature/config/'.$filename);
         if (! str_ends_with($filename, '.json')) {

@@ -60,12 +60,12 @@ class JsonConfigImportSeeder extends Seeder
             try {
                 $this->command->line("Importing: {$filename}");
 
-                $assetOwner = $importService->importFromFile($filePath);
+                $assetConfiguration = $importService->importFromFile($filePath);
 
-                $assetsCount = $assetOwner->assets()->count();
-                $yearsCount = $assetOwner->assets()->withCount('years')->get()->sum('years_count');
+                $assetsCount = $assetConfiguration->assets()->count();
+                $yearsCount = $assetConfiguration->assets()->withCount('years')->get()->sum('years_count');
 
-                $this->command->info("  ✅ Created: {$assetOwner->name} (ID: {$assetOwner->id}) - {$assetsCount} assets, {$yearsCount} year entries");
+                $this->command->info("  ✅ Created: {$assetConfiguration->name} (ID: {$assetConfiguration->id}) - {$assetsCount} assets, {$yearsCount} year entries");
                 $successCount++;
 
             } catch (\Exception $e) {
@@ -85,12 +85,12 @@ class JsonConfigImportSeeder extends Seeder
             $this->command->error("  ❌ Failed imports: {$errorCount} files");
         }
 
-        $totalAssetOwners = \App\Models\AssetConfiguration::where('user_id', $user->id)->count();
+        $totalAssetConfigurations = \App\Models\AssetConfiguration::where('user_id', $user->id)->count();
         $totalAssets = \App\Models\Asset::where('user_id', $user->id)->count();
         $totalYears = \App\Models\AssetYear::where('user_id', $user->id)->count();
 
         $this->command->info("  📈 Total created for user {$user->id}:");
-        $this->command->info("     - Asset Owners: {$totalAssetOwners}");
+        $this->command->info("     - Asset Configurations: {$totalAssetConfigurations}");
         $this->command->info("     - Assets: {$totalAssets}");
         $this->command->info("     - Asset Years: {$totalYears}");
     }
