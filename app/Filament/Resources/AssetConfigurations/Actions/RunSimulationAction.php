@@ -28,6 +28,7 @@ class RunSimulationAction extends Action
             ->icon('heroicon-o-calculator')
             ->color('primary')
             ->size('lg')
+            ->visible(true)
             ->modalHeading('Run Financial Simulation')
             ->modalDescription('Create a detailed financial projection based on this asset configuration.')
             ->modalWidth('2xl')

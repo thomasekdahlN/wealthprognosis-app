@@ -12,7 +12,7 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\IconPicker;
+
 
 class SimulationConfigurationForm
 {
@@ -86,8 +86,10 @@ class SimulationConfigurationForm
                 ->default(false)
                 ->helperText('Make this simulation visible to other users'),
 
-            IconPicker::make('icon')
+            TextInput::make('icon')
                 ->label('Icon')
+                ->placeholder('heroicon-o-chart-bar')
+                ->helperText('Enter a Heroicon name (e.g., heroicon-o-chart-bar)')
                 ->nullable(),
 
             FileUpload::make('image')

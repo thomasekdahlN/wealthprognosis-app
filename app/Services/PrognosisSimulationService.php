@@ -75,10 +75,10 @@ class PrognosisSimulationService
             'public' => false,
             'risk_tolerance' => $this->mapPrognosisTypeToRiskTolerance($prognosisType),
             'tags' => [$prognosisType, $assetScope, 'simulation'],
-            'user_id' => Auth::id(),
-            'team_id' => Auth::user()->currentTeam?->id,
-            'created_by' => Auth::id(),
-            'updated_by' => Auth::id(),
+            'user_id' => Auth::id() ?? $assetConfig->user_id,
+            'team_id' => Auth::user()?->currentTeam?->id ?? $assetConfig->team_id,
+            'created_by' => Auth::id() ?? $assetConfig->user_id,
+            'updated_by' => Auth::id() ?? $assetConfig->user_id,
             'created_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope')) . '_created'),
             'updated_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope')) . '_updated'),
         ]);
@@ -113,10 +113,10 @@ class PrognosisSimulationService
                 'tax_country' => $asset->tax_country,
                 'is_active' => $asset->is_active,
                 'sort_order' => $asset->sort_order,
-                'user_id' => Auth::id(),
-                'team_id' => Auth::user()->currentTeam?->id,
-                'created_by' => Auth::id(),
-                'updated_by' => Auth::id(),
+                'user_id' => Auth::id() ?? $asset->user_id,
+                'team_id' => Auth::user()?->currentTeam?->id ?? $asset->team_id,
+                'created_by' => Auth::id() ?? $asset->user_id,
+                'updated_by' => Auth::id() ?? $asset->user_id,
                 'created_checksum' => hash('sha256', json_encode($asset->toArray()) . '_created'),
                 'updated_checksum' => hash('sha256', json_encode($asset->toArray()) . '_updated'),
             ]);
@@ -124,8 +124,8 @@ class PrognosisSimulationService
             // Copy asset years
             foreach ($asset->years as $assetYear) {
                 SimulationAssetYear::create([
-                    'user_id' => Auth::id(),
-                    'team_id' => Auth::user()->currentTeam?->id,
+                    'user_id' => Auth::id() ?? $assetYear->user_id,
+                    'team_id' => Auth::user()?->currentTeam?->id ?? $assetYear->team_id,
                     'year' => $assetYear->year,
                     'asset_id' => $simulationAsset->id,
                     'asset_configuration_id' => $simulationConfig->id,
@@ -178,8 +178,8 @@ class PrognosisSimulationService
                     'mortgage_tax' => 0,
 
                     // Audit fields
-                    'created_by' => Auth::id(),
-                    'updated_by' => Auth::id(),
+                    'created_by' => Auth::id() ?? $assetYear->user_id,
+                    'updated_by' => Auth::id() ?? $assetYear->user_id,
                     'created_checksum' => hash('sha256', json_encode($assetYear->toArray()) . '_created'),
                     'updated_checksum' => hash('sha256', json_encode($assetYear->toArray()) . '_updated'),
                 ]);

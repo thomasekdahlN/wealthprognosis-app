@@ -67,12 +67,22 @@ class AssetConfigurationsTable
             ->filters([])
             ->toggleColumnsTriggerAction(fn ($action) => $action->modalHeading('Choose columns'))
             ->actions([
+                Action::make('test_simulation')
+                    ->label('Test Simulation')
+                    ->icon('heroicon-o-play')
+                    ->color('success')
+                    ->action(function () {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Test Action Works!')
+                            ->success()
+                            ->send();
+                    }),
                 RunSimulationAction::make(),
                 Action::make('dashboard')
                     ->label('Dashboard')
                     ->icon('heroicon-o-chart-bar')
                     ->color('primary')
-                    ->url(fn (\App\Models\AssetConfiguration $record) => route('filament.admin.pages.dashboard', ['asset_owner_id' => $record->id]))
+                    ->url(fn (\App\Models\AssetConfiguration $record) => route('filament.admin.pages.dashboard', ['asset_configuration_id' => $record->id]))
                     ->openUrlInNewTab(false),
             ])
             ->defaultSort('name')
