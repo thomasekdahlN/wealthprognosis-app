@@ -85,11 +85,11 @@ class ListAssetYears extends ListRecords
 
         $crumbs = [];
         // Map is [url => label]
-        $crumbs[\App\Filament\Resources\AssetOwners\AssetOwnerResource::getUrl('index')] = __('Owners');
+        $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('index')] = __('Configurations');
 
         if ($ownerId) {
             $owner = AssetConfiguration::find($ownerId);
-            $crumbs[\App\Filament\Resources\AssetOwners\AssetOwnerResource::getUrl('assets', ['record' => $ownerId])] = $owner?->name ?? (__('Owner').' #'.$ownerId);
+            $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $ownerId])] = $owner?->name ?? (__('Configuration').' #'.$ownerId);
         }
 
         if ($assetId) {

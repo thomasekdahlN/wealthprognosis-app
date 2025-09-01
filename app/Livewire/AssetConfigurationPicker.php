@@ -8,27 +8,27 @@ use Livewire\Component;
 
 class AssetConfigurationPicker extends Component
 {
-    public ?int $selectedAssetOwnerId = null;
+    public ?int $selectedAssetConfigurationId = null;
     public bool $showDropdown = false;
     public string $search = '';
 
     public function mount(): void
     {
-        $this->selectedAssetOwnerId = AssetConfigurationSessionService::getActiveAssetOwnerId();
+        $this->selectedAssetConfigurationId = AssetConfigurationSessionService::getActiveAssetOwnerId();
 
-        // Auto-select first owner if none is selected
-        if (!$this->selectedAssetOwnerId) {
-            $firstOwner = AssetConfiguration::query()->orderBy('name')->first();
-            if ($firstOwner) {
-                $this->selectedAssetOwnerId = $firstOwner->id;
-                AssetConfigurationSessionService::setActiveAssetOwner($firstOwner);
+        // Auto-select first configuration if none is selected
+        if (!$this->selectedAssetConfigurationId) {
+            $firstConfiguration = AssetConfiguration::query()->orderBy('name')->first();
+            if ($firstConfiguration) {
+                $this->selectedAssetConfigurationId = $firstConfiguration->id;
+                AssetConfigurationSessionService::setActiveAssetOwner($firstConfiguration);
             }
         }
     }
 
     public function selectAssetConfiguration(?int $assetConfigurationId): void
     {
-        $this->selectedAssetOwnerId = $assetConfigurationId;
+        $this->selectedAssetConfigurationId = $assetConfigurationId;
 
         if ($assetConfigurationId) {
             $assetConfiguration = AssetConfiguration::find($assetConfigurationId);
@@ -74,7 +74,7 @@ class AssetConfigurationPicker extends Component
 
     public function getSelectedAssetConfigurationProperty(): ?AssetConfiguration
     {
-        return $this->selectedAssetOwnerId ? AssetConfiguration::find($this->selectedAssetOwnerId) : null;
+        return $this->selectedAssetConfigurationId ? AssetConfiguration::find($this->selectedAssetConfigurationId) : null;
     }
 
     public function render()

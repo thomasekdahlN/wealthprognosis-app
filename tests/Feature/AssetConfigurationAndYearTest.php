@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class AssetOwnerAndYearTest extends TestCase
+class AssetConfigurationAndYearTest extends TestCase
 {
     use RefreshDatabase;
 

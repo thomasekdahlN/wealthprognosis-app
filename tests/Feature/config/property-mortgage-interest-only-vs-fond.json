@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Avdragsfri-Astrid - Rentefri-Strategien fra Askim",
+        "description": "Interest-only mortgage strategy comparison with fund investment alternatives",
         "birthYear": "1995",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "70"
+        "deathYear": "70",
+        "icon": "heroicon-o-calculator",
+        "color": "#8b5cf6",
+        "tags": ["interest-only", "mortgage", "strategy", "comparison"]
     },
     "house": {
         "meta" : {

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('asset_id')->constrained('assets')->onDelete('cascade');
             $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade');
 
-            $table->string('income_name')->nullable();
             $table->text('income_description')->nullable();
             $table->decimal('income_amount', 15, 2)->nullable();
             $table->enum('income_factor', ['monthly', 'yearly'])->nullable();
@@ -27,7 +26,6 @@ return new class extends Migration
             $table->string('income_changerate')->nullable();
             $table->boolean('income_repeat')->default(false);
 
-            $table->string('expence_name')->nullable();
             $table->text('expence_description')->nullable();
             $table->decimal('expence_amount', 15, 2)->nullable();
             $table->enum('expence_factor', ['monthly', 'yearly'])->nullable();
@@ -37,7 +35,6 @@ return new class extends Migration
             $table->string('expence_changerate')->nullable();
             $table->boolean('expence_repeat')->default(false);
 
-            $table->string('asset_name')->nullable();
             $table->text('asset_description')->nullable();
             $table->decimal('asset_market_amount', 15, 2)->nullable();
             $table->decimal('asset_acquisition_amount', 15, 2)->nullable();
@@ -50,7 +47,6 @@ return new class extends Migration
             $table->string('asset_source')->nullable();
             $table->boolean('asset_repeat')->default(true);
 
-            $table->string('mortgage_name')->nullable();
             $table->text('mortgage_description')->nullable();
             $table->decimal('mortgage_amount', 15, 2)->nullable();
             $table->smallInteger('mortgage_years')->nullable();

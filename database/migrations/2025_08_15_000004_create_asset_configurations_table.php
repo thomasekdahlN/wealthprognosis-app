@@ -40,6 +40,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('asset_owners');
+        Schema::dropIfExists('asset_configurations');
     }
 };

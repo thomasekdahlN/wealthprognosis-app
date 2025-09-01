@@ -56,7 +56,7 @@ class ConfigurationAssets extends ListRecords implements HasTable
 
     public function getHeader(): ?View
     {
-        return view('filament.resources.asset-owners.pages.owner-assets-header', [
+        return view('filament.resources.asset-configurations.pages.configuration-assets-header', [
             'record' => $this->record,
             'aiEvaluationResults' => $this->aiEvaluationResults,
         ]);
@@ -64,7 +64,7 @@ class ConfigurationAssets extends ListRecords implements HasTable
 
     protected function getTableQuery(): Builder
     {
-        return Asset::query()->where('asset_owner_id', $this->record->id);
+        return Asset::query()->where('asset_configuration_id', $this->record->id);
     }
 
     protected function getTableColumns(): array
@@ -278,7 +278,7 @@ class ConfigurationAssets extends ListRecords implements HasTable
                 ->modalDescription('Are you sure you want to clear the AI evaluation results? This action cannot be undone.')
                 ->modalSubmitActionLabel('Clear Results'),
             Action::make('back')
-                ->label(__('Back to owners'))
+                ->label(__('Back to configurations'))
                 ->url(AssetConfigurationResource::getUrl('index')),
         ];
     }

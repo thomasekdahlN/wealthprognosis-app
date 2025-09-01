@@ -45,17 +45,17 @@ class AssetConfigurationSessionService
     }
 
     /**
-     * Get the active asset owner name for display
+     * Get the active asset configuration name for display
      */
     public static function getActiveAssetOwnerName(): string
     {
-        $assetOwner = self::getActiveAssetOwner();
+        $assetConfiguration = self::getActiveAssetOwner();
 
-        return $assetOwner ? $assetOwner->name : 'No Asset Owner Selected';
+        return $assetConfiguration ? $assetConfiguration->name : 'No Asset Configuration Selected';
     }
 
     /**
-     * Check if an asset owner is currently active
+     * Check if an asset configuration is currently active
      */
     public static function hasActiveAssetOwner(): bool
     {
@@ -63,7 +63,7 @@ class AssetConfigurationSessionService
     }
 
     /**
-     * Get all available asset owners for the current user
+     * Get all available asset configurations for the current user
      */
     public static function getAvailableAssetOwners(): \Illuminate\Database\Eloquent\Collection
     {

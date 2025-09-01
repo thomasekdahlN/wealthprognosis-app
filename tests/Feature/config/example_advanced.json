@@ -50,12 +50,12 @@
     },
     "wife": {
         "meta": {
-            "type": "wife",
+            "type": "income",
             "group": "private",
             "name": "Wife",
             "description": "Kone - å dele utgifter med",
             "active": true,
-            "tax": "none"
+            "tax": "salary"
         },
         "2024": {
             "income": {

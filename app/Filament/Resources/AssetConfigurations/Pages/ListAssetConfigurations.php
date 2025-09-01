@@ -65,7 +65,7 @@ class ListAssetConfigurations extends ListRecords
 
                         // Import using the service
                         $importService = new AssetImportService(Auth::user());
-                        $assetOwner = $importService->importFromFile($filePath);
+                        $assetConfiguration = $importService->importFromFile($filePath);
 
                         // Clean up uploaded file
                         Storage::disk('local')->delete($jsonFile);
@@ -73,12 +73,12 @@ class ListAssetConfigurations extends ListRecords
                         // Show success notification
                         Notification::make()
                             ->title('Assets Imported Successfully!')
-                            ->body("Created asset owner '{$assetOwner->name}' with {$assetOwner->assets()->count()} assets")
+                            ->body("Created asset configuration '{$assetConfiguration->name}' with {$assetConfiguration->assets()->count()} assets")
                             ->success()
                             ->duration(5000)
                             ->send();
 
-                        // Refresh the table to show the new asset owner
+                        // Refresh the table to show the new asset configuration
                         $this->dispatch('$refresh');
 
                     } catch (\Exception $e) {

@@ -75,13 +75,13 @@ class AssetImportServiceTest extends TestCase
         ]);
 
         $service = new AssetImportService($this->user);
-        $assetOwner = $service->importFromJson($jsonContent, 'test-config');
+        $assetConfiguration = $service->importFromJson($jsonContent, 'test-config');
 
-        // Assert AssetOwner was created correctly
-        $this->assertInstanceOf(AssetConfiguration::class, $assetOwner);
-        $this->assertEquals('Test Owner', $assetOwner->name);
-        $this->assertEquals(1980, $assetOwner->birth_year);
-        $this->assertEquals(50, $assetOwner->prognose_age);
+        // Assert AssetConfiguration was created correctly
+        $this->assertInstanceOf(AssetConfiguration::class, $assetConfiguration);
+        $this->assertEquals('Test Owner', $assetConfiguration->name);
+        $this->assertEquals(1980, $assetConfiguration->birth_year);
+        $this->assertEquals(50, $assetConfigurationetOwner->prognose_age);
         $this->assertEquals(67, $assetOwner->pension_official_age);
         $this->assertEquals(63, $assetOwner->pension_wish_age);
         $this->assertEquals(82, $assetOwner->death_age);

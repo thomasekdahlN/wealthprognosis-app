@@ -25,7 +25,7 @@ class AssetYear extends Model
         'team_id',
         'year',
         'asset_id',
-        'asset_owner_id',
+        'asset_configuration_id',
         'income_name',
         'income_description',
         'income_amount',
@@ -100,7 +100,7 @@ class AssetYear extends Model
 
     public function assetConfiguration(): BelongsTo
     {
-        return $this->belongsTo(AssetConfiguration::class);
+        return $this->belongsTo(AssetConfiguration::class, 'asset_configuration_id');
     }
 
     // Factor enum constants

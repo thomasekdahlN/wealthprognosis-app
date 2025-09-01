@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\AssetConfiguration;
 use App\Services\AssetImportService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
@@ -53,12 +54,36 @@ class JsonConfigImportSeeder extends Seeder
         $importService = new AssetImportService($user);
         $successCount = 0;
         $errorCount = 0;
+        $skippedCount = 0;
 
         foreach ($jsonFiles as $filePath) {
             $filename = basename($filePath);
 
             try {
                 $this->command->line("Importing: {$filename}");
+
+                // First, read the JSON to get the name
+                $jsonContent = File::get($filePath);
+                $data = json_decode($jsonContent, true);
+
+                if (!$data || !isset($data['meta']['name'])) {
+                    $this->command->warn("  ⚠️  Skipping {$filename}: Invalid JSON or missing meta.name");
+                    $skippedCount++;
+                    continue;
+                }
+
+                $configName = $data['meta']['name'];
+
+                // Check if this configuration already exists for this user
+                $existingConfig = AssetConfiguration::where('user_id', $user->id)
+                    ->where('name', $configName)
+                    ->first();
+
+                if ($existingConfig) {
+                    $this->command->warn("  ⚠️  Skipping {$filename}: Configuration '{$configName}' already exists (ID: {$existingConfig->id})");
+                    $skippedCount++;
+                    continue;
+                }
 
                 $assetConfiguration = $importService->importFromFile($filePath);
 
@@ -81,6 +106,9 @@ class JsonConfigImportSeeder extends Seeder
 
         $this->command->info("\n📊 Import Summary:");
         $this->command->info("  ✅ Successfully imported: {$successCount} files");
+        if ($skippedCount > 0) {
+            $this->command->warn("  ⚠️  Skipped (already exist): {$skippedCount} files");
+        }
         if ($errorCount > 0) {
             $this->command->error("  ❌ Failed imports: {$errorCount} files");
         }

@@ -28,7 +28,7 @@ class AssetConfigurationResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        // Explicitly requested: Assets menu should lead to Asset Owners listing
+        // Explicitly requested: Assets menu should lead to Asset Configurations listing
         return true;
     }
 

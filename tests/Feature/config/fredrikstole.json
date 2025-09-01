@@ -1,12 +1,15 @@
 {
     "meta": {
         "name": "Fredrik Støle - FIRE-Helten fra Haugesund",
+        "description": "Beregninger ihht Fredrik Støles FIRE podcast",
         "birthYear": "1995",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
         "deathYear": "59",
-        "description": "Beregninger ihht Fredrik Støles FIRE podcast"
+        "icon": "heroicon-o-fire",
+        "color": "#dc2626",
+        "tags": ["FIRE", "podcast", "early-retirement", "haugesund"]
     },
     "house": {
         "meta" : {

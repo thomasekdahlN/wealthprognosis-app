@@ -29,13 +29,13 @@ class EditAssetYear extends EditRecord
     public function getBreadcrumbs(): array
     {
         $record = $this->getRecord();
-        $ownerName = optional($record->assetOwner)->name;
+        $ownerName = optional($record->assetConfiguration)->name;
         $assetName = optional($record->asset)->name;
 
         $crumbs = [];
-        $crumbs[__('Owners')] = \App\Filament\Resources\AssetOwners\AssetOwnerResource::getUrl('index');
-        if ($record->assetOwner) {
-            $crumbs[$record->assetOwner->name] = \App\Filament\Resources\AssetOwners\AssetOwnerResource::getUrl('assets', ['record' => $record->asset_owner_id]);
+        $crumbs[__('Configurations')] = \App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('index');
+        if ($record->assetConfiguration) {
+            $crumbs[$record->assetConfiguration->name] = \App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $record->asset_configuration_id]);
         }
         if ($record->asset) {
             $crumbs[$record->asset->name] = null;

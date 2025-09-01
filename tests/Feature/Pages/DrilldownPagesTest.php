@@ -50,27 +50,27 @@ class DrilldownPagesTest extends TestCase
             'tax_country' => 'no',
             'is_active' => true,
             'user_id' => $this->user->id,
-            'asset_owner_id' => $this->owner->id,
+            'asset_configuration_id' => $this->owner->id,
         ]);
 
         $this->year = AssetYear::create([
             'user_id' => $this->user->id,
             'asset_id' => $this->asset->id,
-            'asset_owner_id' => $this->owner->id,
+            'asset_configuration_id' => $this->owner->id,
             'year' => 2024,
         ]);
     }
 
     public function test_owner_index_is_accessible(): void
     {
-        $url = \App\Filament\Resources\AssetOwners\AssetOwnerResource::getUrl('index');
+        $url = \App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('index');
         $response = $this->withoutMiddleware()->get($url);
         $response->assertStatus(200);
     }
 
     public function test_owner_row_links_to_assets_list(): void
     {
-        $url = route('filament.admin.resources.asset-owners.assets', ['record' => $this->owner->getKey()]);
+        $url = route('filament.admin.resources.asset-configurations.assets', ['record' => $this->owner->getKey()]);
         $response = $this->withoutMiddleware()->get($url);
         $response->assertStatus(200);
     }

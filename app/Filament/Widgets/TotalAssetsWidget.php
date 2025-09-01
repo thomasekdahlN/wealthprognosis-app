@@ -10,11 +10,11 @@ class TotalAssetsWidget extends BaseWidget
 {
     protected static ?int $sort = 0; // Row 1: Asset Overview
 
-    protected ?int $assetOwnerId = null;
+    protected ?int $assetConfigurationId = null;
 
     public function mount(): void
     {
-        $this->assetOwnerId = request()->get('asset_owner_id');
+        $this->assetConfigurationId = request()->get('asset_configuration_id') ?? request()->get('asset_owner_id');
     }
 
     protected function getStats(): array
@@ -33,9 +33,9 @@ class TotalAssetsWidget extends BaseWidget
         $totalPortfolio = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            // Apply asset owner filtering if specified
-            if ($this->assetOwnerId) {
-                $query->where('asset_owner_id', $this->assetOwnerId);
+            // Apply asset configuration filtering if specified
+            if ($this->assetConfigurationId) {
+                $query->where('asset_configuration_id', $this->assetConfigurationId);
             }
         })
             ->where('year', $currentYear)

@@ -67,8 +67,8 @@ class AssetYearForm
                         ->required()
                         ->visible(fn ($livewire) => $livewire instanceof CreateAssetYearPage)
                         ->columnSpan(3),
-                    Select::make('asset_owner_id')
-                        ->relationship('assetOwner', 'name')
+                    Select::make('asset_configuration_id')
+                        ->relationship('assetConfiguration', 'name')
                         ->searchable()
                         ->preload()
                         ->visible(fn ($livewire) => $livewire instanceof CreateAssetYearPage)
@@ -233,11 +233,11 @@ class AssetYearForm
                                     return [];
                                 }
                                 $current = \App\Models\Asset::query()->find($assetId);
-                                if (! $current || ! $current->asset_owner_id) {
+                                if (! $current || ! $current->asset_configuration_id) {
                                     return [];
                                 }
                                 $assets = \App\Models\Asset::query()
-                                    ->where('asset_owner_id', $current->asset_owner_id)
+                                    ->where('asset_configuration_id', $current->asset_configuration_id)
                                     ->where('sort_order', '>', $current->sort_order)
                                     ->orderBy('sort_order')
                                     ->get(['id', 'name', 'asset_type']);
@@ -261,11 +261,11 @@ class AssetYearForm
                                     return [];
                                 }
                                 $current = \App\Models\Asset::query()->find($assetId);
-                                if (! $current || ! $current->asset_owner_id) {
+                                if (! $current || ! $current->asset_configuration_id) {
                                     return [];
                                 }
                                 $assets = \App\Models\Asset::query()
-                                    ->where('asset_owner_id', $current->asset_owner_id)
+                                    ->where('asset_configuration_id', $current->asset_configuration_id)
                                     ->where('sort_order', '<', $current->sort_order)
                                     ->orderBy('sort_order')
                                     ->get(['id', 'name', 'asset_type']);
@@ -349,11 +349,11 @@ class AssetYearForm
                                     return [];
                                 }
                                 $current = \App\Models\Asset::query()->find($assetId);
-                                if (! $current || ! $current->asset_owner_id) {
+                                if (! $current || ! $current->asset_configuration_id) {
                                     return [];
                                 }
                                 $assets = \App\Models\Asset::query()
-                                    ->where('asset_owner_id', $current->asset_owner_id)
+                                    ->where('asset_configuration_id', $current->asset_configuration_id)
                                     ->where('sort_order', '>', $current->sort_order)
                                     ->orderBy('sort_order')
                                     ->get(['id', 'name', 'asset_type']);
@@ -377,11 +377,11 @@ class AssetYearForm
                                     return [];
                                 }
                                 $current = \App\Models\Asset::query()->find($assetId);
-                                if (! $current || ! $current->asset_owner_id) {
+                                if (! $current || ! $current->asset_configuration_id) {
                                     return [];
                                 }
                                 $assets = \App\Models\Asset::query()
-                                    ->where('asset_owner_id', $current->asset_owner_id)
+                                    ->where('asset_configuration_id', $current->asset_configuration_id)
                                     ->where('sort_order', '<', $current->sort_order)
                                     ->orderBy('sort_order')
                                     ->get(['id', 'name', 'asset_type']);

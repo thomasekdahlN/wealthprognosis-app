@@ -17,10 +17,10 @@ class AssetFactory extends Factory
     public function definition(): array
     {
         $user = \App\Models\User::factory()->create();
-        $assetOwner = \App\Models\AssetConfiguration::factory()->create(['user_id' => $user->id]);
+        $assetConfiguration = \App\Models\AssetConfiguration::factory()->create(['user_id' => $user->id]);
 
         return [
-            'asset_owner_id' => $assetOwner->id,
+            'asset_configuration_id' => $assetConfiguration->id,
             'user_id' => $user->id,
             'team_id' => $user->current_team_id,
             'name' => $this->faker->words(2, true),
