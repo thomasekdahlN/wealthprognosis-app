@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Pensjon-Petter - Pensjonsplanleggeren fra Porsgrunn",
+        "description": "Comprehensive pension planning combining state pension and occupational pension strategies",
         "birthYear": "1985",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-user-circle",
+        "color": "#0891b2",
+        "tags": ["pension", "otp", "state-pension", "planning"]
     },
     "salary": {
         "meta": {

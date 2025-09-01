@@ -1,16 +1,28 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Berit Barnetrygd - Mammaen med Milliondrømmer",
+        "description": "Complete family financial planning including child benefits, education costs, and long-term family expenses",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-users",
+        "color": "#7c3aed",
+        "tags": ["family", "children", "benefits", "education"]
     },
-    "child1": {
-        "2007": {
+    "child": {
+        "meta": {
+            "type": "child",
+            "group": "private",
+            "name": "Emma - First Child (Born 2020)",
+            "description": "Financial planning for first child including benefits, education, and living expenses",
+            "active": true,
+            "tax": "child"
+        },
+        "2020": {
             "income": {
-                "name": "Barnetrygd",
+                "name": "barnetrygd",
                 "description": "Barnetrygd",
                 "amount": 1766,
                 "factor": 12,
@@ -18,51 +30,33 @@
                 "repeat": true
             },
             "expence": {
-                "name": "Expences",
-                "description": "",
-                "amount": 3000,
+                "name": "Utgifter",
+                "description": "Utgifter",
+                "amount": 2000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
         },
-        "2013": {
+        "2026": {
             "income": {
-                "name": "Barnetrygd beløp redusert etter 6 år",
-                "description": "Barnetrygd",
+                "name": "barnetrygd",
+                "description": "Barnetrygd redusert etter 6 år",
                 "amount": 1310,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
         },
-        "2024": {
+        "2038": {
             "income": {
-                "name": "Barnetrygd slutt",
-                "description": "Barnetrygd",
-                "amount": 1310,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": false
-            }
-        },
-        "2029": {
-            "expence": {
-                "name": "Expences",
-                "description": "Slutt på sponsing av barn",
+                "name": "barnetrygd",
+                "description": "Barnetrygd stopper ved 18 år",
                 "amount": 0,
                 "factor": 12,
-                "changerate": "changerates.kpi",
+                "changerate": "changerates.zero",
                 "repeat": false
             }
-        },
-        "meta": {
-            "type": "child",
-            "group": "private",
-            "name": "child1",
-            "description": "Income and expences related to children",
-            "active": true,
-            "tax": "salary"
         }
     }
 }

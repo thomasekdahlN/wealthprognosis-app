@@ -1,18 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Bjørn Bil - Elbilpioneren fra Trondheim",
+        "description": "Strategic transition from traditional to electric vehicles with cost analysis and environmental benefits",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-bolt",
+        "color": "#10b981",
+        "tags": ["electric", "vehicle", "sustainability", "transport"]
     },
     "car": {
-        "meta" : {
+        "meta": {
             "type": "car",
             "group": "private",
-            "name": "Avensis",
-            "description": "",
+            "name": "Tesla Model Y - Electric Vehicle",
+            "description": "Premium electric SUV with lower operating costs and environmental benefits",
             "active": true,
             "tax": "car"
         },
@@ -25,8 +29,8 @@
             },
             "expence": {
                 "name": "Utgifter",
-                "description": "Drivstoff/Forsikring/Vedlikehold/Bompenger 4000,- pr mnd",
-                "amount": 4000,
+                "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
+                "amount": 2000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true

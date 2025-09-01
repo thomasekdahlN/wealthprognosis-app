@@ -1,12 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Sammenligning-Siri - Eiendom vs Fond Eksperten",
+        "description": "Comparison analysis between property investment with mortgage vs fund investment strategies",
         "birthYear": "1995",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
         "deathYear": "70",
-        "description": "Hvis du invetserer samme sum i et utleieobjekt som i et fond - hvordan utvikler de seg da over tid?"
+        "icon": "heroicon-o-scale",
+        "color": "#f59e0b",
+        "tags": ["comparison", "property", "funds", "mortgage", "analysis"]
     },
     "house": {
         "meta" : {

@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Test-Trygve - Oppkjøpsanalytikeren fra Tønsberg",
+        "description": "Business acquisition analysis and company stock evaluation for investment decisions",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-beaker",
+        "color": "#6b7280",
+        "tags": ["test", "acquisition", "analysis", "business"]
     },
     "prozeed": {
         "meta" : {

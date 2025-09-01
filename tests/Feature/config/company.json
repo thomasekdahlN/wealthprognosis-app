@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Bedrifts-Bjørg - Direktøren fra Drammen",
+        "description": "Company stock ownership and business investment portfolio management",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-building-office",
+        "color": "#dc2626",
+        "tags": ["company", "stocks", "business", "corporate"]
     },
     "company": {
         "meta": {

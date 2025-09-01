@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Eiendoms-Erik - Utleiemagnaten fra Elverum",
+        "description": "Rental property investment with income generation and property appreciation",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-building-office",
+        "color": "#059669",
+        "tags": ["property", "rental", "investment", "income"]
     },
     "property": {
         "meta" : {

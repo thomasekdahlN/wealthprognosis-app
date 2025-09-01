@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Pensjonsfond-Petra - Fondsguruen fra Porsgrunn",
+        "description": "Pension fund investment strategy combining state pension with private fund investments",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-chart-pie",
+        "color": "#8b5cf6",
+        "tags": ["pension", "funds", "investment", "retirement"]
     },
     "salary": {
         "meta": {

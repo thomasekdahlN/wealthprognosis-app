@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "Example Advanced Wealth Prognosis",
+        "name": "Avansert-Astrid - Formuesguruen fra Fredrikstad",
+        "description": "Advanced wealth management with complex asset structures and sophisticated financial planning",
         "birthYear": "1985",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "80"
+        "deathYear": "80",
+        "icon": "heroicon-o-academic-cap",
+        "color": "#8b5cf6",
+        "tags": ["advanced", "complex", "wealth", "sophisticated"]
     },
     "salary": {
         "meta": {

@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Låne-Lasse - Boliglånseksperten fra Hamar",
+        "description": "Advanced mortgage strategies including interest-only periods and payment optimization",
         "birthYear": "1995",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "48"
+        "deathYear": "48",
+        "icon": "heroicon-o-home",
+        "color": "#dc2626",
+        "tags": ["mortgage", "interest-only", "optimization", "property"]
     },
     "house1": {
         "meta": {

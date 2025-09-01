@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "Seil charter",
+        "name": "Seilbåt-Senna - Seilbåtkongen fra Sandefjord",
+        "description": "Sailing boat charter business with company structure and seasonal income",
         "birthYear": "1975",
         "prognoseYear": "57",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "63"
+        "deathYear": "63",
+        "icon": "heroicon-o-paper-boat",
+        "color": "#0ea5e9",
+        "tags": ["charter", "sailing", "business", "seasonal"]
     },
     "company": {
         "meta": {

@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Overførings-Olav - Pengeflyt-Professoren",
+        "description": "Advanced cashflow transfer strategies and financial optimization techniques",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-arrows-right-left",
+        "color": "#06b6d4",
+        "tags": ["cashflow", "transfer", "optimization", "advanced"]
     },
     "salary": {
         "meta": {

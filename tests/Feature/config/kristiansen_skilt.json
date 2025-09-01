@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "Example Advanced Wealth Prognosis",
+        "name": "Skilt-Solveig - Den Enslige Pensjonisten fra Skien",
+        "description": "Divorced senior citizen managing retirement finances and estate planning independently",
         "birthYear": "1952",
         "prognoseYear": "72",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "100"
+        "deathYear": "100",
+        "icon": "heroicon-o-heart-broken",
+        "color": "#ef4444",
+        "tags": ["divorced", "senior", "independent", "estate"]
     },
     "salary": {
         "meta": {

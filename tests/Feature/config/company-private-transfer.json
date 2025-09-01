@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Selskap-Sven - Aksjonæren fra Ålesund",
+        "description": "Strategic transfers between company and private investments for tax optimization",
         "birthYear": "1995",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "62"
+        "deathYear": "62",
+        "icon": "heroicon-o-building-office-2",
+        "color": "#7c3aed",
+        "tags": ["company", "private", "transfer", "tax-optimization"]
     },
     "fondcompany": {
         "meta" : {

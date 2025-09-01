@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "Example Advanced Wealth Prognosis",
+        "name": "Kristiansen-Kåre - Pensjonisten fra Kristiansund",
+        "description": "Comprehensive retirement planning with pension optimization and estate management",
         "birthYear": "1952",
         "prognoseYear": "72",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "100"
+        "deathYear": "100",
+        "icon": "heroicon-o-user-group",
+        "color": "#059669",
+        "tags": ["pension", "retirement", "estate", "senior"]
     },
     "salary": {
         "meta": {

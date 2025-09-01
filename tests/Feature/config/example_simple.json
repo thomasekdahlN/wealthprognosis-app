@@ -1,18 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Even Enklel Eksempel - fra Groruddalen",
+        "description": "Comprehensive financial independence portfolio with diversified investments and strategic planning",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-fire",
+        "color": "#dc2626",
+        "tags": ["FIRE", "complete", "diversified", "strategic"]
     },
     "income": {
         "meta": {
             "type": "income",
             "group": "private",
-            "name": "Income",
-            "description": "Income",
+            "name": "Senior Software Engineer Salary",
+            "description": "Full-time software engineering position with annual increases",
             "active": true,
             "tax": "salary"
         },
@@ -36,8 +40,8 @@
         },
         "$pensionWishYear": {
             "income": {
-                "name": "Income",
-                "description": "Pensioned, no more income from here",
+                "name": "Pension",
+                "description": "Pensioned, no more salary from here",
                 "amount": 0,
                 "changerate": "changerates.zero",
                 "repeat": false
@@ -48,20 +52,24 @@
         "meta": {
             "type": "inheritance",
             "group": "private",
-            "name": "inheritance",
-            "description": "inheritance",
+            "name": "Family Inheritance",
+            "description": "Expected inheritance from parents' estate",
             "active": true,
             "tax": "inheritance"
         },
-        "2037": {
+        "2040": {
             "asset": {
                 "name": "inheritance",
                 "description": "",
-                "marketAmount": 1000000,
-                "acquisitionAmount" : 1,
-                "paidAmount": 1,
+                "marketAmount": 2500000,
+                "acquisitionAmount": 10000,
+                "paidAmount": 10000,
                 "changerate": "changerates.kpi",
-                "repeat": true
+                "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
+                "rule": "100%",
+                "transfer": "fond.$year.asset.marketAmount",
+                "transferX": "house.$year.mortgage.extraDownpaymentAmount",
+                "repeat": false
             }
         }
     },
@@ -69,15 +77,15 @@
         "meta": {
             "type": "pension",
             "group": "private",
-            "name": "Folketrygden",
-            "description": "Folketrygden",
+            "name": "Norwegian State Pension (Folketrygd)",
+            "description": "Government pension starting at official retirement age",
             "active": true,
-            "tax": "pension"
+            "tax": "salary"
         },
         "$pensionOfficialYear": {
             "income": {
-                "name": "Folketrygden",
-                "description": "Folketrygden fra $pensionOfficialYear",
+                "name": "Pension",
+                "description": "Pension from $pensionOfficialYear",
                 "amount": 15000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
@@ -86,17 +94,17 @@
         }
     },
     "otp": {
-        "meta" : {
-            "type": "equityfund",
+        "meta": {
+            "type": "otp",
             "group": "private",
-            "name": "OTP",
-            "description": "OTP",
+            "name": "Occupational Pension (OTP)",
+            "description": "Employer-sponsored pension with 5% annual contributions",
             "active": true,
-            "tax": "equityfund"
+            "tax": "otp"
         },
         "2023": {
             "asset": {
-                "amount": 500000,
+                "marketAmount": 2000000,
                 "rule": "5%",
                 "source": "income.$year.income.amount",
                 "changerate": "changerates.otp",
@@ -108,7 +116,6 @@
             "asset": {
                 "rule": "1|$otpYears",
                 "transfer": "income.$year.income.amount",
-                "source": "",
                 "changerate": "changerates.otp",
                 "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
                 "repeat": true
@@ -116,14 +123,13 @@
         }
     },
     "house": {
-        "meta" : {
+        "meta": {
             "type": "house",
             "group": "private",
-            "name": "My house",
-            "description": "Here I live",
-            "active" : true,
-            "tax": "house",
-            "taxProperty": "property"
+            "name": "Oslo Apartment - Primary Residence",
+            "description": "Modern 3-bedroom apartment in central Oslo with mortgage",
+            "active": true,
+            "tax": "house"
         },
         "2023": {
             "asset": {
@@ -141,98 +147,75 @@
                 "repeat": true
             },
             "mortgage": {
-                "amount": 1500000,
+                "amount": 1000000,
                 "interest": "changerates.interest",
-                "gebyr": 600,
-                "tax": 22,
-                "paymentExtra": "home.$year.cashflow.amount",
                 "years": 20
             }
         }
     },
     "fond": {
-        "meta" : {
+        "meta": {
             "type": "equityfund",
             "group": "private",
-            "name": "fond privat",
-            "description": "",
+            "name": "Global Equity Fund Portfolio",
+            "description": "Diversified equity fund investments for long-term growth",
             "active": true,
             "tax": "equityfund"
         },
-        "2022": {
+        "2023": {
             "asset": {
-                "amount": 2000000,
-                "rule": "+6000",
+                "marketAmount": 10000,
                 "changerate": "changerates.equityfund",
-                "description": "Første innskudd på 2 millioner",
-                "repeat": true
-            }
-        },
-        "2033": {
-            "asset": {
-                "name": "Monthly savings",
-                "description": "Slutter å sette inn 6000,- pr år",
-                "rule": "",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "asset": {
-                "rule": "1|$pensionWishYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.equityfund",
-                "description": "Uttak fra $pensionWishYear, -1/$pensionWishYears",
+                "description": "",
                 "repeat": true
             }
         }
     },
     "cash": {
-        "meta" : {
+        "meta": {
             "type": "cash",
             "group": "private",
-            "name": "Cash",
-            "description": "",
+            "name": "Emergency Fund & Cash Reserves",
+            "description": "High-yield savings account for emergencies and opportunities",
             "active": true,
             "tax": "cash"
         },
-        "2022": {
+        "2023": {
             "asset": {
-                "marketAmount": 50000,
+                "marketAmount": 100000,
                 "changerate": "changerates.cash",
                 "description": "Kontanter p.t.",
                 "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "asset": {
-                "rule": "1|$pensionWishYears",
+            },
+            "$pensionWishYear": {
+                "rule": "1|$pensionWishYear",
                 "transfer": "income.$year.income.amount",
-                "changerate": "changerates.equityfund",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
+                "changerate": "changerates.cash",
+                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen",
                 "repeat": true
             }
         }
     },
     "car": {
-        "meta" : {
+        "meta": {
             "type": "car",
             "group": "private",
-            "name": "Avensis",
-            "description": "",
+            "name": "Tesla Model Y - Electric Vehicle",
+            "description": "Electric vehicle with lower operating costs and depreciation",
             "active": true,
             "tax": "car"
         },
-        "2020": {
+        "2023": {
             "asset": {
-                "marketAmount": 50000,
+                "marketAmount": 200000,
                 "changerate": "changerates.car",
                 "description": "verditap",
                 "repeat": true
             },
             "expence": {
                 "name": "Utgifter",
-                "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
-                "amount": 3000,
+                "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
+                "amount": 2000,
                 "factor": 12,
                 "changerate": "changerates.kpi",
                 "repeat": true

@@ -1,22 +1,26 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Kontant-Kari - Sparegrisen fra Stavanger",
+        "description": "Strategic cash management with emergency funds, high-yield savings, and liquidity optimization",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-banknotes",
+        "color": "#059669",
+        "tags": ["cash", "emergency", "liquidity", "savings"]
     },
     "cash": {
-        "meta" : {
+        "meta": {
             "type": "cash",
             "group": "private",
-            "name": "Cash",
-            "description": "",
+            "name": "Emergency Fund - High-Yield Savings",
+            "description": "6-month emergency fund in high-yield savings account for financial security",
             "active": true,
             "tax": "cash"
         },
-        "2022": {
+        "2023": {
             "asset": {
                 "marketAmount": 100000,
                 "changerate": "changerates.cash",

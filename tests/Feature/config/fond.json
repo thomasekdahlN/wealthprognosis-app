@@ -1,18 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Fonda Fondsen - Den Unge Sparegris",
+        "description": "Early career professional building wealth through systematic fund investments and compound growth",
         "birthYear": "2005",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "70"
+        "deathYear": "70",
+        "icon": "heroicon-o-chart-bar-square",
+        "color": "#3b82f6",
+        "tags": ["young", "professional", "funds", "compound", "growth"]
     },
     "income": {
         "meta": {
             "type": "income",
             "group": "private",
-            "name": "Income",
-            "description": "Income",
+            "name": "Software Developer Salary",
+            "description": "Entry-level to senior software developer career progression",
             "active": true,
             "tax": "salary"
         },
@@ -35,7 +39,7 @@
             }
         },
         "$pensionWishYear": {
-            "income" : {
+            "income": {
                 "name": "Pension",
                 "description": "Pensioned, no more salary from here",
                 "amount": 0,
@@ -45,11 +49,11 @@
         }
     },
     "fond": {
-        "meta" : {
+        "meta": {
             "type": "equityfund",
             "group": "private",
-            "name": "fond",
-            "description": "",
+            "name": "Global Equity Index Fund",
+            "description": "Low-cost global equity index fund for long-term wealth building",
             "active": true,
             "tax": "equityfund"
         },

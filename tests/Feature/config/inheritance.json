@@ -1,18 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Arving-Arne - Millionæren som Venter på Mormor",
+        "description": "Strategic financial planning incorporating expected inheritance and optimal wealth transfer strategies",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-gift",
+        "color": "#8b5cf6",
+        "tags": ["inheritance", "wealth-transfer", "family", "estate"]
     },
     "house": {
         "meta": {
             "type": "house",
             "group": "private",
-            "name": "My house",
-            "description": "Here I live",
+            "name": "Arne Arving",
+            "description": "Established family home in Stavanger with remaining mortgage to be paid off",
             "active": true,
             "tax": "house"
         },
@@ -42,8 +46,8 @@
         "meta": {
             "type": "inheritance",
             "group": "private",
-            "name": "inheritance",
-            "description": "inheritance",
+            "name": "Parents' Estate Inheritance",
+            "description": "Expected inheritance from parents' estate including property and investments",
             "active": true,
             "tax": "inheritance"
         },
@@ -52,7 +56,7 @@
                 "name": "inheritance",
                 "description": "",
                 "marketAmount": 2500000,
-                "acquisitionAmount" : 10000,
+                "acquisitionAmount": 10000,
                 "paidAmount": 10000,
                 "changerate": "changerates.kpi",
                 "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
@@ -64,11 +68,11 @@
         }
     },
     "fond": {
-        "meta" : {
+        "meta": {
             "type": "equityfund",
             "group": "private",
-            "name": "fond",
-            "description": "",
+            "name": "Diversified Investment Portfolio",
+            "description": "Long-term investment portfolio enhanced by inheritance allocation",
             "active": true,
             "tax": "equityfund"
         },

@@ -1,18 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
-        "birthYear": "1995",
+        "name": "Bosse Boligeier - Huslånshelten fra Bergen",
+        "description": "Primary residence ownership with mortgage optimization and property appreciation analysis",
+        "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "62"
+        "deathYear": "82",
+        "icon": "heroicon-o-home",
+        "color": "#059669",
+        "tags": ["house", "mortgage", "property", "homeowner"]
     },
     "house": {
         "meta": {
             "type": "house",
             "group": "private",
-            "name": "My house",
-            "description": "Here I live",
+            "name": "Bergen Family Home",
+            "description": "4-bedroom family home in desirable Bergen neighborhood with mountain views",
             "active": true,
             "tax": "house"
         },
@@ -32,7 +36,7 @@
                 "repeat": true
             },
             "mortgage": {
-                "amount": 1500000,
+                "amount": 1000000,
                 "interest": "changerates.interest",
                 "years": 20
             }

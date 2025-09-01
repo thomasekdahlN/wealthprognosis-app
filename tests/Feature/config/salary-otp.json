@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Lønn-Lars - Lønnsarbeideren fra Lillehammer",
+        "description": "Salary worker with occupational pension combining employment income and pension planning",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-banknotes",
+        "color": "#059669",
+        "tags": ["salary", "employment", "otp", "worker"]
     },
     "salary": {
         "meta": {

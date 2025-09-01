@@ -1,12 +1,16 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "iPhone-Iver - Apple-Aksjonæren fra Arendal",
+        "description": "Comparison analysis between buying iPhones vs investing in Apple stock over time",
         "birthYear": "1987",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
         "deathYear": "37",
-        "exportStartYear": "2007"
+        "exportStartYear": "2007",
+        "icon": "heroicon-o-device-phone-mobile",
+        "color": "#000000",
+        "tags": ["apple", "iphone", "stocks", "comparison", "tech"]
     },
     "iphone": {
         "meta" : {

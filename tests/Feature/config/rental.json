@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Utleie-Ulla - Leieboligdronningen fra Larvik",
+        "description": "Multi-property rental business with primary residence and rental income optimization",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-key",
+        "color": "#7c3aed",
+        "tags": ["rental", "multi-property", "income", "landlord"]
     },
     "house": {
         "meta" : {

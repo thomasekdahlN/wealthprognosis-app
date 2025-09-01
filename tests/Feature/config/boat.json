@@ -1,22 +1,26 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Kaptein Knut - Seilkongen fra Sørlandet",
+        "description": "Norwegian coastal lifestyle with recreational boating and potential charter income opportunities",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-paper-boat",
+        "color": "#0ea5e9",
+        "tags": ["boat", "recreation", "coastal", "lifestyle"]
     },
     "boat": {
-        "meta" : {
+        "meta": {
             "type": "boat",
             "group": "private",
-            "name": "Boat",
-            "description": "",
+            "name": "Jeanneau Sun Odyssey 349 - Sailing Yacht",
+            "description": "35-foot sailing yacht for coastal cruising and potential charter opportunities",
             "active": true,
             "tax": "boat"
         },
-        "2022": {
+        "2023": {
             "asset": {
                 "marketAmount": 200000,
                 "changerate": "changerates.boat",

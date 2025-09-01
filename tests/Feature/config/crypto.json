@@ -1,18 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Krypto-Kåre - Kryptokongen fra Kristiansand",
+        "description": "Strategic cryptocurrency investment with diversified digital assets and DeFi opportunities",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-currency-dollar",
+        "color": "#f59e0b",
+        "tags": ["crypto", "bitcoin", "ethereum", "defi", "blockchain"]
     },
     "crypto": {
-        "meta" : {
+        "meta": {
             "type": "crypto",
             "group": "private",
-            "name": "My Crypto",
-            "description": "Coinbase private",
+            "name": "Bitcoin & Ethereum Portfolio",
+            "description": "Long-term cryptocurrency holdings as digital store of value and inflation hedge",
             "active": true,
             "tax": "crypto"
         },

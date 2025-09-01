@@ -1,11 +1,15 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "KPI-Knut - Inflasjonseksperten fra Kongsberg",
+        "description": "Consumer Price Index tracking and inflation-adjusted financial planning",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-chart-bar",
+        "color": "#f97316",
+        "tags": ["kpi", "inflation", "tracking", "economics"]
     },
     "kpi": {
         "meta" : {

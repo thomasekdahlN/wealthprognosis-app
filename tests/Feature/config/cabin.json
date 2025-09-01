@@ -1,18 +1,22 @@
 {
     "meta": {
-        "name": "John Doe",
+        "name": "Heidi Hytteeier - Fjellkongen av Lillehammer",
+        "description": "Comprehensive cabin investment analysis with rental income and mortgage optimization",
         "birthYear": "1975",
         "prognoseYear": "50",
         "pensionOfficialYear": "67",
         "pensionWishYear": "63",
-        "deathYear": "82"
+        "deathYear": "82",
+        "icon": "heroicon-o-home-modern",
+        "color": "#059669",
+        "tags": ["cabin", "rental", "investment", "mountain"]
     },
     "cabin": {
-        "meta" : {
+        "meta": {
             "type": "cabin",
             "group": "private",
-            "name": "Cabin",
-            "description": "Address",
+            "name": "Lillehammer Mountain Cabin",
+            "description": "Premium mountain cabin with rental potential in Lillehammer ski resort area",
             "active": true,
             "tax": "cabin"
         },
