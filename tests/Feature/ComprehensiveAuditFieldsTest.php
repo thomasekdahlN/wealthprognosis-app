@@ -184,7 +184,7 @@ class ComprehensiveAuditFieldsTest extends TestCase
 
         $tables = [
             'teams', 'prognoses', 'assets', 'asset_types',
-            'asset_categories', 'tax_types', 'asset_owners',
+            'asset_categories', 'tax_types', 'asset_configurations',
             'asset_years', 'tax_configurations', 'prognosis_change_rates',
             'ai_instructions',
         ];

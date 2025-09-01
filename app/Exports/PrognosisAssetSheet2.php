@@ -48,7 +48,9 @@ class PrognosisAssetSheet2
 
         $this->spreadsheet = $spreadsheet;
 
-        $this->worksheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, $meta['name']);
+        // Excel sheet titles must be 31 characters or less
+        $sheetTitle = strlen($meta['name']) > 31 ? substr($meta['name'], 0, 31) : $meta['name'];
+        $this->worksheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, $sheetTitle);
 
         $this->worksheet->setCellValue('A1', $meta['name']);
 

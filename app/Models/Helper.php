@@ -23,8 +23,14 @@ class Helper extends Model
 {
     use HasFactory;
 
-    public function calculateRule(bool $debug, int $amount, int $acquisitionAmount, string $rule, int $factor = 1)
+    public function calculateRule(bool $debug, int $amount, int $acquisitionAmount, ?string $rule, int $factor = 1)
     {
+        // Handle null rule - multiply by factor
+        if ($rule === null) {
+            $factorAmount = $amount * $factor;
+            return [$factorAmount, $factorAmount, null, "Multiplied by factor: $amount * $factor = $factorAmount"];
+        }
+
         $totalAmount = 0;
         $explanation = null;
 
@@ -66,7 +72,13 @@ class Helper extends Model
         $ruleH[3][0]--; // Dynamic divisor, we count down.
 
         if ($ruleH[3][0] > 0) {
-            $rule = $ruleH[1][0].$ruleH[2][0].'|'.$ruleH[3][0];
+            // If there's no sign (empty), only show the denominator part
+            if (empty($ruleH[1][0])) {
+                $rule = '|'.$ruleH[3][0];
+            } else {
+                // Use '/' for the returned rule format (not '|')
+                $rule = $ruleH[1][0].$ruleH[2][0].'/'.$ruleH[3][0];
+            }
         }
 
         $explanation .= " rewritten rule: $rule";
@@ -81,19 +93,22 @@ class Helper extends Model
     public function calculationDivisor(bool $debug, int $amount, array $ruleH)
     {
         $divisor = $ruleH[3][0];
-        $calcAmount = round($amount / $divisor);
+        $baseCalcAmount = round($amount / $divisor);
 
         if ($ruleH[1][0] == '-') {
-            $newAmount = $amount - $calcAmount;
-            $explanation = "Subtracting division: $amount/$divisor=".$calcAmount;
+            $newAmount = $amount - $baseCalcAmount;
+            $calcAmount = -$baseCalcAmount; // Apply negative sign to calcAmount
+            $explanation = "Subtracting division: $amount/$divisor=".$baseCalcAmount;
 
         } elseif ($ruleH[1][0] == '+') {
-            $newAmount = $amount + $divisorAmount;
-            $explanation = "Adding division: $amount/$divisor=".$calcAmount;
+            $newAmount = $amount + $baseCalcAmount;
+            $calcAmount = $baseCalcAmount; // Positive calcAmount
+            $explanation = "Adding division: $amount/$divisor=".$baseCalcAmount;
         } else {
             // When no sign is given,  we only want the part of the amount. Its like taking this divisor out of the amount.
             $newAmount = $amount; // We do not change the original amount
-            $explanation = "Division: $amount/$divisor=".$calcAmount;
+            $calcAmount = $baseCalcAmount; // Positive calcAmount
+            $explanation = "Division: $amount/$divisor=".$baseCalcAmount;
         }
 
         return [$newAmount, $calcAmount, $explanation];
@@ -129,19 +144,26 @@ class Helper extends Model
     public function calculationPlusMinus(bool $debug, int $amount, array $ruleH, int $factor = 1)
     {
         $extraAmount = $ruleH[2][0];
-        $calcAmount = round($extraAmount * $factor);
+        // Handle empty or non-numeric values
+        if (empty($extraAmount) || !is_numeric($extraAmount)) {
+            $extraAmount = 0;
+        }
+        $baseCalcAmount = round($extraAmount * $factor);
 
         if ($ruleH[1][0] == '-') {
-            $newAmount = $amount - $calcAmount;
+            $newAmount = $amount - $baseCalcAmount;
+            $calcAmount = -$baseCalcAmount; // Apply negative sign to calcAmount
             $explanation = "Subtracting: $amount-($extraAmount*$factor)=$newAmount ";
 
         } elseif ($ruleH[1][0] == '+') {
-            $newAmount = $amount + $calcAmount;
+            $newAmount = $amount + $baseCalcAmount;
+            $calcAmount = $baseCalcAmount; // Positive calcAmount
             $explanation = "Adding: $amount+($extraAmount*$factor)=$newAmount ";
         } else {
             // When no sign is given, we only want the part of the amount. Its like taking this extra amount out of the amount.
             $newAmount = $amount; // We do not change the original amount
-            $explanation = "Extra amount: $extraAmount*$factor=$calcAmount ";
+            $calcAmount = $baseCalcAmount; // Positive calcAmount
+            $explanation = "Extra amount: $extraAmount*$factor=$baseCalcAmount ";
         }
 
         return [$newAmount, $calcAmount, $explanation];
@@ -154,13 +176,13 @@ class Helper extends Model
         $type = null;
         $field = null;
 
-        if (preg_match('/(\w+).(\w+).(\w+).(\w+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
+        if (preg_match('/(\w+)\.(\w+)\.(\w+)\.(\w+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
             $assetname = $matchesH[1][0];
             $year = $matchesH[2][0];
             $type = $matchesH[3][0];
             $field = $matchesH[4][0];
         } else {
-            echo "ERRROR: pathToElements($path)\n";
+            throw new \Exception("Invalid path format: $path");
         }
 
         return [$assetname, $year, $type, $field];

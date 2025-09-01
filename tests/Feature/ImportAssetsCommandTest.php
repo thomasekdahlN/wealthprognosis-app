@@ -39,18 +39,18 @@ class ImportAssetsCommandTest extends TestCase
             ->expectsOutput('✅ Import completed successfully!')
             ->assertExitCode(0);
 
-        // Verify the asset owner was created
-        $this->assertDatabaseHas('asset_owners', [
-            'name' => 'Marina Svendsen',
+        // Verify the asset configuration was created
+        $this->assertDatabaseHas('asset_configurations', [
+            'name' => 'Kaptein Knut - Seilkongen fra Sørlandet',
             'user_id' => $this->user->id,
         ]);
 
         // Verify assets were created (or skipped due to invalid asset types)
-        $assetOwner = AssetConfiguration::where('user_id', $this->user->id)->first();
-        $this->assertNotNull($assetOwner);
+        $assetConfiguration = AssetConfiguration::where('user_id', $this->user->id)->first();
+        $this->assertNotNull($assetConfiguration);
         // The test file contains asset types that don't exist, so assets may be skipped
-        // We just verify the asset owner was created successfully
-        $this->assertGreaterThanOrEqual(0, $assetOwner->assets()->count());
+        // We just verify the asset configuration was created successfully
+        $this->assertGreaterThanOrEqual(0, $assetConfiguration->assets()->count());
     }
 
     public function test_command_fails_with_missing_file(): void

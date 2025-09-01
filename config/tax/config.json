@@ -1,0 +1,24 @@
+{
+  "salary": {
+    "cashflow": 20,
+    "income": 20,
+    "yearly": 20
+  },
+  "pension": {
+    "cashflow": 20,
+    "income": 20,
+    "yearly": 20
+  },
+  "unknown": {
+    "cashflow": 20,
+    "income": 16,
+    "yearly": 16
+  },
+  "low": {
+    "fortune": 20,
+    "realization": 22
+  },
+  "stock": {
+    "realization": 22
+  }
+}

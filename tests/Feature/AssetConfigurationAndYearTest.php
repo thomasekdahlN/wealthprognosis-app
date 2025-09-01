@@ -54,7 +54,7 @@ class AssetConfigurationAndYearTest extends TestCase
         ]);
 
         $asset = Asset::create([
-            'asset_owner_id' => $owner->id,
+            'asset_configuration_id' => $owner->id,
             'user_id' => $user->id,
             'team_id' => $team->id,
             'code' => 'salary-001',
@@ -77,8 +77,7 @@ class AssetConfigurationAndYearTest extends TestCase
             'team_id' => $team->id,
             'year' => 2024,
             'asset_id' => $asset->id,
-            'asset_owner_id' => $owner->id,
-            'income_name' => 'Income',
+            'asset_configuration_id' => $owner->id,
             'income_description' => 'Income',
             'income_amount' => 40000,
             'income_rule' => null,
@@ -86,7 +85,6 @@ class AssetConfigurationAndYearTest extends TestCase
             'income_source' => 'salary-001.$year.income.amount',
             'income_changerate' => 'changerates.kpi',
             'income_repeat' => true,
-            'expence_name' => 'Expences',
             'expence_description' => '',
             'expence_amount' => 15000,
             'expence_factor' => 'monthly',
@@ -95,7 +93,6 @@ class AssetConfigurationAndYearTest extends TestCase
             'expence_source' => 'manual',
             'expence_changerate' => 'changerates.kpi',
             'expence_repeat' => true,
-            'asset_name' => 'inheritance',
             'asset_description' => '',
             'asset_market_amount' => 0,
             'asset_acquisition_amount' => 0,
@@ -107,7 +104,6 @@ class AssetConfigurationAndYearTest extends TestCase
             'asset_transfer' => null,
             'asset_source' => 'manual',
             'asset_repeat' => true,
-            'mortgage_name' => 'inheritance',
             'mortgage_description' => '',
             'mortgage_amount' => 0,
             'mortgage_years' => 0,
@@ -126,7 +122,7 @@ class AssetConfigurationAndYearTest extends TestCase
         $this->assertSame(1, $asset->years()->count());
 
         // Basic schema expectations
-        $this->assertTrue(\Schema::hasTable('asset_owners'));
+        $this->assertTrue(\Schema::hasTable('asset_configurations'));
         $this->assertTrue(\Schema::hasTable('asset_years'));
     }
 }

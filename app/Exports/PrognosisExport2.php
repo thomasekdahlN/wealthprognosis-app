@@ -200,7 +200,9 @@ class PrognosisExport2
             echo "Asset does not  have a name\n";
             exit;
         }
-        $this->spreadsheet->setActiveSheetIndexByName($meta['name']);
+        // Excel sheet titles must be 31 characters or less - use same truncation as in PrognosisAssetSheet2
+        $sheetTitle = strlen($meta['name']) > 31 ? substr($meta['name'], 0, 31) : $meta['name'];
+        $this->spreadsheet->setActiveSheetIndexByName($sheetTitle);
         $sheet = $this->spreadsheet->getActiveSheet();
 
         $sheet->getStyle('B6:AP80')->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');

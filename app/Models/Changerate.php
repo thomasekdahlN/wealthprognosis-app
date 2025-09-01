@@ -16,17 +16,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 
 /**
  * Class Changerate
  */
-class Changerate extends Model
+class Changerate
 {
-    use HasFactory;
 
     public $changerateH = [];
 
@@ -37,8 +33,8 @@ class Changerate extends Model
 
         $startYear = 1950; // Since its so much trouble if we miss a sequenze
 
-        $file = config_path("prognosis/$prognosis.json");
-        $configH = File::json($file);
+        $file = __DIR__ . "/../../config/prognosis/$prognosis.json";
+        $configH = json_decode(file_get_contents($file), true);
         echo "Leser prognose fra : '$file'\n";
 
         foreach ($configH as $type => $typeH) {

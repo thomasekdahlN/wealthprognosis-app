@@ -20,6 +20,9 @@ return new class extends Migration
             $table->integer('death_age')->nullable();
             $table->integer('export_start_age')->nullable();
             $table->boolean('public')->default(false);
+            $table->string('tax_country', 2)->default('no')->after('risk_tolerance')->comment('Country code for tax calculations (no, se, ch, etc.)');
+            $table->string('prognosis_type')->default('realistic')->after('tax_country')->comment('Prognosis scenario type (realistic, positive, negative, tenpercent, zero, variable)');
+            $table->string('group')->default('private')->after('prognosis_type')->comment('Asset group filter (private, company, or both)');
             $table->string('icon')->nullable();
             $table->string('image')->nullable();
             $table->string('color')->nullable();

@@ -15,7 +15,8 @@ class ChangeRateNavigationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->get('/admin/prognosis-change-rates');
+            ->withoutMiddleware()
+            ->get('/admin/change-rate-scenarios');
 
         $response->assertStatus(200);
     }
@@ -25,7 +26,8 @@ class ChangeRateNavigationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->get('/admin/prognosis-change-assets?scenario=realistic');
+            ->withoutMiddleware()
+            ->get('/admin/change-rate-assets?scenario=realistic');
 
         $response->assertStatus(200);
     }
@@ -35,7 +37,8 @@ class ChangeRateNavigationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->get('/admin/prognosis-change-table?scenario=realistic&asset=equityfund');
+            ->withoutMiddleware()
+            ->get('/admin/change-rate-table?scenario=realistic&asset=equityfund');
 
         $response->assertStatus(200);
     }

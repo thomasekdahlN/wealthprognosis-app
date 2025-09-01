@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade');
 
             //Income
-            $table->decimal('income_amount', 15, 2)->nullable();
             $table->text('income_description')->nullable();
+            $table->decimal('income_amount', 15, 2)->nullable();
             $table->enum('income_factor', ['monthly', 'yearly'])->nullable();
             $table->string('income_rule')->nullable();
             $table->string('income_transfer')->nullable();
@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string('income_source')->nullable();
             $table->string('income_changerate')->nullable();
             $table->boolean('income_repeat')->default(false);
+
+            //Expence
             $table->text('expence_description')->nullable();
             $table->decimal('expence_amount', 15, 2)->nullable();
             $table->enum('expence_factor', ['monthly', 'yearly'])->nullable();

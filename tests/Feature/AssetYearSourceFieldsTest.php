@@ -60,8 +60,7 @@ it('can set income source fields', function () {
         'income_repeat' => true,
         'expence_amount' => 500,
         'expence_factor' => 'yearly',
-        'change_rate_type' => 'cash',
-        'start_year' => date('Y'),
+        'asset_changerate' => 'cash',
         'sort_order' => 1,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,
@@ -96,8 +95,7 @@ it('can set expense source fields', function () {
         'expence_transfer' => 'none',
         'expence_changerate' => 'inflation',
         'expence_repeat' => true,
-        'change_rate_type' => 'cash',
-        'start_year' => date('Y'),
+        'asset_changerate' => 'cash',
         'sort_order' => 1,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,
@@ -132,8 +130,6 @@ it('can set asset source fields', function () {
         'income_factor' => 'yearly',
         'expence_amount' => 600,
         'expence_factor' => 'yearly',
-        'change_rate_type' => 'equity',
-        'start_year' => date('Y'),
         'sort_order' => 1,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,
@@ -164,8 +160,7 @@ it('handles different change rate types', function () {
         'income_factor' => 'yearly',
         'expence_amount' => 200,
         'expence_factor' => 'yearly',
-        'change_rate_type' => 'cash',
-        'start_year' => date('Y'),
+        'asset_changerate' => 'cash',
         'sort_order' => 1,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,
@@ -173,7 +168,7 @@ it('handles different change rate types', function () {
         'updated_checksum' => hash('sha256', 'cash_rate_updated'),
     ]);
 
-    expect($cashAssetYear->change_rate_type)->toBe('cash');
+    expect($cashAssetYear->asset_changerate)->toBe('cash');
 
     // Create equity asset for equity change rate test
     $equityAsset = $this->assetConfiguration->assets()->create([
@@ -204,8 +199,7 @@ it('handles different change rate types', function () {
         'income_factor' => 'yearly',
         'expence_amount' => 1000,
         'expence_factor' => 'yearly',
-        'change_rate_type' => 'equity',
-        'start_year' => date('Y'),
+        'asset_changerate' => 'equity',
         'sort_order' => 1,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,
@@ -213,7 +207,7 @@ it('handles different change rate types', function () {
         'updated_checksum' => hash('sha256', 'equity_rate_updated'),
     ]);
 
-    expect($equityAssetYear->change_rate_type)->toBe('equity');
+    expect($equityAssetYear->asset_changerate)->toBe('equity');
 });
 
 it('validates source field combinations', function () {
@@ -237,8 +231,7 @@ it('validates source field combinations', function () {
         'expence_source' => 'fees',
         'expence_rule' => 'fixed',
         'expence_transfer' => 'deduct',
-        'change_rate_type' => 'equity',
-        'start_year' => date('Y'),
+        'asset_changerate' => 'equity',
         'sort_order' => 1,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,

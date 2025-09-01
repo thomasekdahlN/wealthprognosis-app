@@ -80,7 +80,6 @@ class AssetYearForm
             Grid::make(2)->schema([
                 Section::make('Income')
                     ->schema([
-                        TextInput::make('income_name'),
                         RichEditor::make('income_description')->columnSpanFull()->extraAttributes(['style' => 'min-height: calc(1.5rem * 8);']),
                         TextInput::make('income_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK'),
                         Select::make('income_factor')
@@ -190,7 +189,6 @@ class AssetYearForm
 
                 Section::make('Expense')
                     ->schema([
-                        TextInput::make('expence_name'),
                         RichEditor::make('expence_description')->columnSpanFull()->extraAttributes(['style' => 'min-height: calc(1.5rem * 8);']),
                         TextInput::make('expence_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK'),
                         Select::make('expence_factor')

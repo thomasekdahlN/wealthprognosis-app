@@ -168,8 +168,7 @@ it('can handle different asset types', function () {
         'income_factor' => 'yearly',
         'expence_amount' => 2000,
         'expence_factor' => 'yearly',
-        'change_rate_type' => 'equity',
-        'start_year' => date('Y'),
+        'asset_changerate' => 'changerates.equity',
         'sort_order' => 1,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,
@@ -177,7 +176,8 @@ it('can handle different asset types', function () {
         'updated_checksum' => hash('sha256', 'equity_year_updated'),
     ]);
 
-    expect($equityAssetYear->change_rate_type)->toBe('equity');
+    // change_rate_type field doesn't exist, checking asset_changerate instead
+    expect($equityAssetYear->asset_changerate)->toBe('changerates.equity');
     expect($equityAssetYear->asset_market_amount)->toBeGreaterThan($equityAssetYear->asset_acquisition_amount);
 });
 

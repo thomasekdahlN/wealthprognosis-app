@@ -81,15 +81,15 @@ class AssetImportServiceTest extends TestCase
         $this->assertInstanceOf(AssetConfiguration::class, $assetConfiguration);
         $this->assertEquals('Test Owner', $assetConfiguration->name);
         $this->assertEquals(1980, $assetConfiguration->birth_year);
-        $this->assertEquals(50, $assetConfigurationetOwner->prognose_age);
-        $this->assertEquals(67, $assetOwner->pension_official_age);
-        $this->assertEquals(63, $assetOwner->pension_wish_age);
-        $this->assertEquals(82, $assetOwner->death_age);
-        $this->assertEquals($this->user->id, $assetOwner->user_id);
+        $this->assertEquals(50, $assetConfiguration->prognose_age);
+        $this->assertEquals(67, $assetConfiguration->pension_official_age);
+        $this->assertEquals(63, $assetConfiguration->pension_wish_age);
+        $this->assertEquals(82, $assetConfiguration->death_age);
+        $this->assertEquals($this->user->id, $assetConfiguration->user_id);
 
         // Assert Asset was created
-        $this->assertEquals(1, $assetOwner->assets()->count());
-        $asset = $assetOwner->assets()->first();
+        $this->assertEquals(1, $assetConfiguration->assets()->count());
+        $asset = $assetConfiguration->assets()->first();
         $this->assertEquals('Test House', $asset->name);
         $this->assertEquals('house', $asset->asset_type);
         $this->assertEquals('private', $asset->group);
@@ -101,7 +101,8 @@ class AssetImportServiceTest extends TestCase
         $assetYear = $asset->years()->first();
         $this->assertEquals(2023, $assetYear->year);
         $this->assertEquals(3000000, $assetYear->asset_market_amount);
-        $this->assertEquals('House Expenses', $assetYear->expence_name);
+        // expence_name field has been removed, checking description instead
+        $this->assertNotNull($assetYear->expence_description);
         $this->assertEquals(7300, $assetYear->expence_amount);
         $this->assertEquals('monthly', $assetYear->expence_factor);
     }
@@ -118,13 +119,13 @@ class AssetImportServiceTest extends TestCase
         $assetOwner = $service->importFromFile($testFile);
 
         $this->assertInstanceOf(AssetConfiguration::class, $assetOwner);
-        $this->assertEquals('Marina Svendsen', $assetOwner->name);
+        $this->assertEquals('Kaptein Knut - Seilkongen fra Sørlandet', $assetOwner->name);
         $this->assertEquals(1975, $assetOwner->birth_year);
 
         // Should have one boat asset
         $this->assertEquals(1, $assetOwner->assets()->count());
         $asset = $assetOwner->assets()->first();
-        $this->assertEquals('Sailing Yacht \'Sea Breeze\'', $asset->name);
+        $this->assertEquals('Jeanneau Sun Odyssey 349 - Sailing Yacht', $asset->name);
         $this->assertEquals('boat', $asset->asset_type);
     }
 
@@ -139,9 +140,9 @@ class AssetImportServiceTest extends TestCase
         $assetOwner = AssetImportService::importFile($testFile, $this->user);
 
         $this->assertInstanceOf(AssetConfiguration::class, $assetOwner);
-        $this->assertDatabaseHas('asset_owners', [
+        $this->assertDatabaseHas('asset_configurations', [
             'id' => $assetOwner->id,
-            'name' => 'Lars Kristiansen',
+            'name' => 'Kontant-Kari - Sparegrisen fra Stavanger',
             'user_id' => $this->user->id,
         ]);
     }
@@ -159,7 +160,7 @@ class AssetImportServiceTest extends TestCase
         $assetOwner = AssetImportService::importTestFile($filename, $this->user);
 
         $this->assertInstanceOf(AssetConfiguration::class, $assetOwner);
-        $this->assertDatabaseHas('asset_owners', [
+        $this->assertDatabaseHas('asset_configurations', [
             'id' => $assetOwner->id,
             'user_id' => $this->user->id,
         ]);
