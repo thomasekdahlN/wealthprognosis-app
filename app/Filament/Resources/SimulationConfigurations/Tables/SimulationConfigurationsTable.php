@@ -69,7 +69,48 @@ class SimulationConfigurationsTable
                     })
                     ->formatStateUsing(fn (string $state): string =>
                         \App\Models\SimulationConfiguration::RISK_TOLERANCE_LEVELS[$state] ?? $state
-                    ),
+                    )
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('tax_country')
+                    ->label('Tax Country')
+                    ->badge()
+                    ->color('info')
+                    ->formatStateUsing(fn (string $state): string =>
+                        \App\Models\SimulationConfiguration::getTaxCountries()[$state] ?? strtoupper($state)
+                    )
+                    ->toggleable(),
+
+                TextColumn::make('prognosis_type')
+                    ->label('Prognosis')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'realistic' => 'success',
+                        'positive' => 'info',
+                        'negative' => 'danger',
+                        'tenpercent' => 'warning',
+                        'zero' => 'gray',
+                        'variable' => 'primary',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string =>
+                        \App\Models\SimulationConfiguration::PROGNOSIS_TYPES[$state] ?? $state
+                    )
+                    ->toggleable(),
+
+                TextColumn::make('group')
+                    ->label('Group')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'private' => 'success',
+                        'company' => 'warning',
+                        'both' => 'info',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string =>
+                        \App\Models\SimulationConfiguration::GROUP_TYPES[$state] ?? $state
+                    )
+                    ->toggleable(),
 
                 IconColumn::make('public')
                     ->label('Public')
@@ -104,6 +145,21 @@ class SimulationConfigurationsTable
                 SelectFilter::make('risk_tolerance')
                     ->label('Risk Tolerance')
                     ->options(\App\Models\SimulationConfiguration::RISK_TOLERANCE_LEVELS)
+                    ->multiple(),
+
+                SelectFilter::make('tax_country')
+                    ->label('Tax Country')
+                    ->options(\App\Models\SimulationConfiguration::getTaxCountries())
+                    ->multiple(),
+
+                SelectFilter::make('prognosis_type')
+                    ->label('Prognosis Type')
+                    ->options(\App\Models\SimulationConfiguration::PROGNOSIS_TYPES)
+                    ->multiple(),
+
+                SelectFilter::make('group')
+                    ->label('Asset Group')
+                    ->options(\App\Models\SimulationConfiguration::GROUP_TYPES)
                     ->multiple(),
 
                 SelectFilter::make('asset_configuration_id')

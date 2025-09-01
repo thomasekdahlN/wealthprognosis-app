@@ -20,12 +20,14 @@ class PrognosisSimulationService
     {
         $assetConfigurationId = $simulationData['asset_configuration_id'];
         $prognosisType = $simulationData['prognosis_type'];
-        $assetScope = $simulationData['asset_scope'];
+        $assetScope = $simulationData['group'] ?? $simulationData['asset_scope']; // Support both field names
+        $taxCountry = $simulationData['tax_country'] ?? 'no';
 
         Log::info('Starting PrognosisSimulationService', [
             'asset_configuration_id' => $assetConfigurationId,
             'prognosis_type' => $prognosisType,
             'asset_scope' => $assetScope,
+            'tax_country' => $taxCountry,
         ]);
 
         // Get the asset configuration
@@ -33,7 +35,7 @@ class PrognosisSimulationService
             ->findOrFail($assetConfigurationId);
 
         // Create simulation configuration record
-        $simulationConfig = $this->createSimulationConfiguration($assetConfiguration, $prognosisType, $assetScope);
+        $simulationConfig = $this->createSimulationConfiguration($assetConfiguration, $prognosisType, $assetScope, $taxCountry);
 
         // Copy assets to simulation tables
         $this->copyAssetsToSimulation($assetConfiguration, $simulationConfig, $assetScope);
@@ -60,12 +62,12 @@ class PrognosisSimulationService
     /**
      * Create simulation configuration record
      */
-    protected function createSimulationConfiguration(AssetConfiguration $assetConfig, string $prognosisType, string $assetScope): SimulationConfiguration
+    protected function createSimulationConfiguration(AssetConfiguration $assetConfig, string $prognosisType, string $assetScope, string $taxCountry = 'no'): SimulationConfiguration
     {
         return SimulationConfiguration::create([
             'asset_configuration_id' => $assetConfig->id,
             'name' => "Simulation - {$assetConfig->name} ({$prognosisType})",
-            'description' => "Financial simulation using {$prognosisType} scenario for {$assetScope} assets",
+            'description' => "Financial simulation using {$prognosisType} scenario for {$assetScope} assets with {$taxCountry} tax system",
             'birth_year' => $assetConfig->birth_year,
             'prognose_age' => $assetConfig->prognose_age,
             'pension_official_age' => $assetConfig->pension_official_age,
@@ -74,13 +76,16 @@ class PrognosisSimulationService
             'export_start_age' => $assetConfig->export_start_age,
             'public' => false,
             'risk_tolerance' => $this->mapPrognosisTypeToRiskTolerance($prognosisType),
-            'tags' => [$prognosisType, $assetScope, 'simulation'],
+            'tax_country' => $taxCountry,
+            'prognosis_type' => $prognosisType,
+            'group' => $assetScope,
+            'tags' => [$prognosisType, $assetScope, $taxCountry, 'simulation'],
             'user_id' => Auth::id() ?? $assetConfig->user_id,
             'team_id' => Auth::user()?->currentTeam?->id ?? $assetConfig->team_id,
             'created_by' => Auth::id() ?? $assetConfig->user_id,
             'updated_by' => Auth::id() ?? $assetConfig->user_id,
-            'created_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope')) . '_created'),
-            'updated_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope')) . '_updated'),
+            'created_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope', 'taxCountry')) . '_created'),
+            'updated_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope', 'taxCountry')) . '_updated'),
         ]);
     }
 

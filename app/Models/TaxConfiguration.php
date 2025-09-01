@@ -78,6 +78,7 @@ class TaxConfiguration extends Model
     public const COUNTRIES = [
         'no' => 'Norway',
         'se' => 'Sweden',
+        'ch' => 'Switzerland',
         'dk' => 'Denmark',
         'us' => 'United States',
         'en' => 'United Kingdom',

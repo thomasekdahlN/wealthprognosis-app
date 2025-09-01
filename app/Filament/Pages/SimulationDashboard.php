@@ -3,13 +3,19 @@
 namespace App\Filament\Pages;
 
 use App\Models\SimulationConfiguration;
-use Filament\Pages\Page;
+use App\Filament\Widgets\SimulationStatsOverviewWidget;
+use App\Filament\Widgets\SimulationFireAnalysisWidget;
+use App\Filament\Widgets\SimulationNetWorthChartWidget;
+use App\Filament\Widgets\SimulationCashFlowChartWidget;
+use App\Filament\Widgets\SimulationAssetAllocationChartWidget;
+use App\Filament\Widgets\SimulationTaxAnalysisWidget;
+use Filament\Pages\Dashboard;
 use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Support\Htmlable;
 
-class SimulationDashboard extends Page
+class SimulationDashboard extends Dashboard
 {
-    protected string $view = 'filament.pages.simulation-dashboard';
+    protected static string $routePath = '/simulation-dashboard';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -19,22 +25,42 @@ class SimulationDashboard extends Page
     {
         $simulationConfigurationId = request()->query('simulation_configuration_id');
 
+        // Validate that simulation_configuration_id parameter is provided
         if (!$simulationConfigurationId) {
-            throw new Halt(404);
+            session()->flash('error', 'No simulation configuration ID provided. Please access this dashboard through the "Dashboard" button in the Simulations list.');
+
+            // Redirect to simulations list instead of showing 404
+            redirect()->route('filament.admin.resources.simulation-configurations.index');
+            return;
         }
 
+        // Validate that the ID is numeric
+        if (!is_numeric($simulationConfigurationId)) {
+            session()->flash('error', 'Invalid simulation configuration ID format. Please check the URL and try again.');
+            throw new Halt(400);
+        }
+
+        // Try to find the simulation configuration
         $this->simulationConfiguration = SimulationConfiguration::with([
             'assetConfiguration',
             'simulationAssets.simulationAssetYears'
         ])->find($simulationConfigurationId);
 
+        // Check if simulation configuration exists
         if (!$this->simulationConfiguration) {
+            session()->flash('error', "Simulation configuration with ID {$simulationConfigurationId} not found. It may have been deleted or you may not have access to it.");
             throw new Halt(404);
         }
 
         // Check if user has access to this simulation
         if ($this->simulationConfiguration->user_id !== auth()->id()) {
+            session()->flash('error', 'You do not have permission to view this simulation. Please check that you are logged in with the correct account.');
             throw new Halt(403);
+        }
+
+        // Validate that the simulation has data
+        if ($this->simulationConfiguration->simulationAssets->isEmpty()) {
+            session()->flash('warning', 'This simulation configuration has no assets configured. Please add assets to see meaningful data.');
         }
     }
 
@@ -68,77 +94,45 @@ class SimulationDashboard extends Page
         return "Based on {$config->name} • {$assetsCount} assets • {$yearsCount} projections • Created " . $this->simulationConfiguration->created_at->diffForHumans();
     }
 
-    protected function getViewData(): array
+    public function getWidgets(): array
     {
         if (!$this->simulationConfiguration) {
             return [];
         }
 
-        // Calculate summary statistics
-        $simulationAssets = $this->simulationConfiguration->simulationAssets;
-        $totalStartValue = 0;
-        $totalEndValue = 0;
-        $totalIncome = 0;
-        $totalExpenses = 0;
+        return [
+            SimulationStatsOverviewWidget::class,
+            SimulationFireAnalysisWidget::class,
+            SimulationTaxAnalysisWidget::class,
+            SimulationNetWorthChartWidget::class,
+            SimulationCashFlowChartWidget::class,
+            SimulationAssetAllocationChartWidget::class,
+        ];
+    }
 
-        foreach ($simulationAssets as $asset) {
-            $assetYears = $asset->simulationAssetYears;
-            if ($assetYears->isNotEmpty()) {
-                $firstYear = $assetYears->sortBy('year')->first();
-                $lastYear = $assetYears->sortBy('year')->last();
+    public function getColumns(): int
+    {
+        return 2;
+    }
 
-                $totalStartValue += $firstYear->asset_market_amount ?? 0;
-                $totalEndValue += $lastYear->asset_market_amount ?? 0;
+    protected function getHeaderWidgets(): array
+    {
+        return [];
+    }
 
-                foreach ($assetYears as $year) {
-                    $totalIncome += $year->income_amount ?? 0;
-                    $totalExpenses += $year->expence_amount ?? 0;
-                }
-            }
-        }
+    protected function getFooterWidgets(): array
+    {
+        return [];
+    }
 
-        $netGrowth = $totalEndValue - $totalStartValue;
-        $netIncome = $totalIncome - $totalExpenses;
-
+    public function getWidgetData(): array
+    {
         return [
             'simulationConfiguration' => $this->simulationConfiguration,
-            'summary' => [
-                'total_start_value' => $totalStartValue,
-                'total_end_value' => $totalEndValue,
-                'net_growth' => $netGrowth,
-                'total_income' => $totalIncome,
-                'total_expenses' => $totalExpenses,
-                'net_income' => $netIncome,
-                'assets_count' => $simulationAssets->count(),
-                'years_span' => $this->getYearsSpan(),
-            ]
         ];
     }
 
-    protected function getYearsSpan(): array
-    {
-        if (!$this->simulationConfiguration) {
-            return ['start' => null, 'end' => null, 'duration' => 0];
-        }
 
-        $allYears = $this->simulationConfiguration->simulationAssets
-            ->flatMap(fn($asset) => $asset->simulationAssetYears->pluck('year'))
-            ->unique()
-            ->sort();
-
-        if ($allYears->isEmpty()) {
-            return ['start' => null, 'end' => null, 'duration' => 0];
-        }
-
-        $startYear = $allYears->first();
-        $endYear = $allYears->last();
-
-        return [
-            'start' => $startYear,
-            'end' => $endYear,
-            'duration' => $endYear - $startYear + 1,
-        ];
-    }
 
     public static function getRoutes(): array
     {

@@ -16,9 +16,14 @@ class TaxConfigurationSeeder extends Seeder
         // Clear existing tax configurations
         TaxConfiguration::truncate();
 
-        // Load Norwegian tax configurations
-        foreach ([2020, 2021, 2022, 2023, 2024, 2025] as $year) {
-            $this->loadTaxConfiguration('no', $year);
+        // Load tax configurations for all countries
+        $countries = ['no', 'se', 'ch'];
+        $years = [2020, 2021, 2022, 2023, 2024, 2025];
+
+        foreach ($countries as $countryCode) {
+            foreach ($years as $year) {
+                $this->loadTaxConfiguration($countryCode, $year);
+            }
         }
     }
 

@@ -7,6 +7,7 @@ use App\Models\Scopes\TeamScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
@@ -22,6 +23,50 @@ class SimulationConfiguration extends Model
         'moderate' => 'Moderate',
         'moderate_aggressive' => 'Moderate Aggressive',
         'aggressive' => 'Aggressive',
+    ];
+
+    public static function getTaxCountries(): array
+    {
+        $taxPath = config_path('tax');
+        $countries = [];
+
+        if (File::exists($taxPath)) {
+            $directories = File::directories($taxPath);
+
+            foreach ($directories as $directory) {
+                $countryCode = basename($directory);
+
+                // Map country codes to readable names
+                $countryName = match($countryCode) {
+                    'no' => 'Norway',
+                    'se' => 'Sweden',
+                    'ch' => 'Switzerland',
+                    'dk' => 'Denmark',
+                    'us' => 'United States',
+                    'en' => 'United Kingdom',
+                    default => strtoupper($countryCode)
+                };
+
+                $countries[$countryCode] = $countryName;
+            }
+        }
+
+        return $countries;
+    }
+
+    public const PROGNOSIS_TYPES = [
+        'realistic' => 'Realistic',
+        'positive' => 'Positive',
+        'negative' => 'Negative',
+        'tenpercent' => 'Ten Percent',
+        'zero' => 'Zero Growth',
+        'variable' => 'Variable',
+    ];
+
+    public const GROUP_TYPES = [
+        'private' => 'Private Assets Only',
+        'company' => 'Company Assets Only',
+        'both' => 'Both Private & Company',
     ];
 
     protected static function booted(): void
@@ -60,6 +105,9 @@ class SimulationConfiguration extends Model
         'color',
         'tags',
         'risk_tolerance',
+        'tax_country',
+        'prognosis_type',
+        'group',
         'user_id',
         'team_id',
         'created_by',

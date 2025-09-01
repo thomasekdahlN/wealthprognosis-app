@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
             $table->integer('year');
-            $table->foreignId('asset_id')->constrained('assets')->onDelete('cascade');
+            $table->foreignId('asset_id')->constrained('simulation_assets')->onDelete('cascade');
             $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade');
 
             //Income
@@ -88,8 +88,8 @@ return new class extends Migration
             $table->decimal('mortgage_interest_amount', 15, 2)->nullable();
             $table->decimal('mortgage_principal_amount', 15, 2)->nullable();
             $table->decimal('mortgage_balance_amount', 15, 2)->nullable();
-            $table->decimal('mortgage_extra_downpayment_amount')->nullable();
-            $table->decimal('mortgage_transfered_amount')->nullable();
+            $table->decimal('mortgage_extra_downpayment_amount', 15, 2)->nullable();
+            $table->decimal('mortgage_transfered_amount', 15, 2)->nullable();
             $table->string('mortgage_interest_percent')->nullable();
             $table->integer('mortgage_years')->nullable();
             $table->decimal('mortgage_gebyr_amount', 15, 2)->nullable();

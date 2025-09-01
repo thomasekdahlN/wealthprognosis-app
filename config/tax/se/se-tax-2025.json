@@ -1,0 +1,178 @@
+{
+    "house": {
+        "income": 0,
+        "realization": 22,
+        "fortune": 0
+    },
+    "child": {
+        "income": 0,
+        "realization": 0,
+        "fortune": 0
+    },
+    "cabin": {
+        "income": 0,
+        "realization": 22,
+        "fortune": 0
+    },
+    "airbnb": {
+        "standardDeduction": 50000,
+        "income": 32,
+        "realization": 0,
+        "fortune": 0
+    },
+    "rental": {
+        "income": 32,
+        "realization": 22,
+        "fortune": 0
+    },
+    "property": {
+        "realization": 22,
+        "stockholm": {
+            "income": 0.75,
+            "fortune": 0,
+            "standardDeduction": 0
+        },
+        "gothenburg": {
+            "income": 0.70,
+            "fortune": 0,
+            "standardDeduction": 0
+        }
+    },
+    "stock": {
+        "income": 30,
+        "realization": 30,
+        "fortune": 0
+    },
+    "soleproprietorship": {
+        "income": 32,
+        "realization": 30,
+        "fortune": 0
+    },
+    "loantocompany": {
+        "income": 30,
+        "realization": 0,
+        "fortune": 0
+    },
+    "salary": {
+        "common": {
+            "rate": 32
+        },
+        "deduction": {
+            "min": 13000,
+            "max": 100000,
+            "percent": 25
+        },
+        "socialsecurity": {
+            "rate": 7.0
+        },
+        "bracket": [
+            {
+                "limit": 540700,
+                "rate": 0
+            },
+            {
+                "rate": 20
+            }
+        ]
+    },
+    "ips": {
+        "income": 0,
+        "realization": 0,
+        "fortune": 0
+    },
+    "equityfund": {
+        "income": 30,
+        "realization": 30,
+        "fortune": 0
+    },
+    "bondfund": {
+        "income": 30,
+        "realization": 30,
+        "fortune": 0
+    },
+    "ask": {
+        "income": 30,
+        "realization": 30,
+        "fortune": 0
+    },
+    "gold": {
+        "income": 0,
+        "realization": 30,
+        "fortune": 0
+    },
+    "crypto": {
+        "income": 0,
+        "realization": 30,
+        "fortune": 0
+    },
+    "otp": {
+        "income": 32,
+        "realization": 30,
+        "fortune": 0
+    },
+    "income": {
+        "income": 32,
+        "realization": 0,
+        "fortune": 0
+    },
+    "inheritance": {
+        "income": 0,
+        "realization": 0,
+        "fortune": 0
+    },
+    "car": {
+        "income": 0,
+        "realization": 0,
+        "fortune": 0
+    },
+    "boat": {
+        "income": 0,
+        "realization": 0,
+        "fortune": 0
+    },
+    "cash": {
+        "income": 30,
+        "realization": 0,
+        "fortune": 0
+    },
+    "bank": {
+        "income": 30,
+        "realization": 0,
+        "fortune": 0
+    },
+    "fortune": {
+        "standardDeduction": 0,
+        "low": {
+            "amount": 0,
+            "income": 0,
+            "realization": 0
+        },
+        "high": {
+            "amount": 0,
+            "income": 0,
+            "realization": 0
+        }
+    },
+    "shareholdershield": {
+        "2007": 2.2,
+        "2008": 2.2,
+        "2009": 2.2,
+        "2010": 2.2,
+        "2011": 2.2,
+        "2012": 2.2,
+        "2013": 2.2,
+        "2014": 2.2,
+        "2015": 2.2,
+        "2016": 2.2,
+        "2017": 2.2,
+        "2018": 2.2,
+        "2019": 2.2,
+        "2020": 2.2,
+        "2021": 2.2,
+        "2022": 2.2,
+        "2023": 2.2,
+        "2024": 2.2,
+        "2025": 2.2,
+        "all": 2.2
+    }
+}

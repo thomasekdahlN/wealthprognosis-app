@@ -12,12 +12,45 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 
 class RunSimulationAction extends Action
 {
     public static function getDefaultName(): ?string
     {
         return 'run_simulation';
+    }
+
+    /**
+     * Get available tax countries from the config/tax folder structure
+     */
+    protected function getAvailableTaxCountries(): array
+    {
+        $taxPath = config_path('tax');
+        $countries = [];
+
+        if (File::exists($taxPath)) {
+            $directories = File::directories($taxPath);
+
+            foreach ($directories as $directory) {
+                $countryCode = basename($directory);
+
+                // Map country codes to readable names
+                $countryName = match($countryCode) {
+                    'no' => 'Norway',
+                    'se' => 'Sweden',
+                    'ch' => 'Switzerland',
+                    'dk' => 'Denmark',
+                    'us' => 'United States',
+                    'en' => 'United Kingdom',
+                    default => strtoupper($countryCode)
+                };
+
+                $countries[$countryCode] = $countryName;
+            }
+        }
+
+        return $countries;
     }
 
     protected function setUp(): void
@@ -34,8 +67,21 @@ class RunSimulationAction extends Action
             ->modalWidth('2xl')
             ->form([
                 Section::make('Simulation Parameters')
-                    ->description('Choose the simulation type and scope for your financial projection.')
+                    ->description('Choose the simulation type, tax country, and scope for your financial projection.')
                     ->schema([
+                        Radio::make('tax_country')
+                            ->label('Tax Country')
+                            ->options($this->getAvailableTaxCountries())
+                            ->descriptions([
+                                'no' => 'Norwegian tax system with wealth tax and progressive income tax',
+                                'se' => 'Swedish tax system with capital gains tax and municipal tax',
+                                'ch' => 'Swiss tax system with cantonal variations and wealth tax',
+                            ])
+                            ->default('no')
+                            ->required()
+                            ->inline(false)
+                            ->columnSpanFull(),
+
                         Radio::make('prognosis_type')
                             ->label('Prognosis Type')
                             ->options([
@@ -62,16 +108,16 @@ class RunSimulationAction extends Action
                         Radio::make('asset_scope')
                             ->label('Asset Scope')
                             ->options([
-                                'both' => 'Both Private & Business',
                                 'private' => 'Private Only',
                                 'business' => 'Business Only',
+                                'both' => 'Both Private & Business',
                             ])
                             ->descriptions([
-                                'both' => 'Complete portfolio simulation',
                                 'private' => 'Personal assets and investments',
                                 'business' => 'Business assets and company holdings',
+                                'both' => 'Complete portfolio simulation',
                             ])
-                            ->default('both')
+                            ->default('private')
                             ->required()
                             ->inline(false)
                             ->columnSpanFull(),
@@ -92,8 +138,9 @@ class RunSimulationAction extends Action
                     // Prepare simulation data
                     $simulationData = [
                         'asset_configuration_id' => $record->id,
+                        'tax_country' => $data['tax_country'],
                         'prognosis_type' => $data['prognosis_type'],
-                        'asset_scope' => $data['asset_scope'],
+                        'group' => $data['asset_scope'], // Map asset_scope to group field
                         'start_year' => date('Y'),
                         'end_year' => $record->birth_year + $record->death_age,
                     ];

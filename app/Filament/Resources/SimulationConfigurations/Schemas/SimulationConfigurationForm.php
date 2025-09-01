@@ -6,16 +6,50 @@ use App\Models\AssetConfiguration;
 use App\Models\SimulationConfiguration;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\File;
 
 
 class SimulationConfigurationForm
 {
+    /**
+     * Get available tax countries from the config/tax folder structure
+     */
+    protected static function getAvailableTaxCountries(): array
+    {
+        $taxPath = config_path('tax');
+        $countries = [];
+
+        if (File::exists($taxPath)) {
+            $directories = File::directories($taxPath);
+
+            foreach ($directories as $directory) {
+                $countryCode = basename($directory);
+
+                // Map country codes to readable names
+                $countryName = match($countryCode) {
+                    'no' => 'Norway',
+                    'se' => 'Sweden',
+                    'ch' => 'Switzerland',
+                    'dk' => 'Denmark',
+                    'us' => 'United States',
+                    'en' => 'United Kingdom',
+                    default => strtoupper($countryCode)
+                };
+
+                $countries[$countryCode] = $countryName;
+            }
+        }
+
+        return $countries;
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
@@ -112,6 +146,37 @@ class SimulationConfigurationForm
                 ->default('moderate')
                 ->required()
                 ->helperText('Select your financial risk tolerance level for investment decisions'),
+
+            Radio::make('tax_country')
+                ->label('Tax Country')
+                ->options(static::getAvailableTaxCountries())
+                ->descriptions([
+                    'no' => 'Norwegian tax system with wealth tax and progressive income tax',
+                    'se' => 'Swedish tax system with capital gains tax and municipal tax',
+                    'ch' => 'Swiss tax system with cantonal variations and wealth tax',
+                ])
+                ->default('no')
+                ->required()
+                ->inline(false)
+                ->columnSpanFull(),
+
+            Select::make('prognosis_type')
+                ->label('Prognosis Type')
+                ->options(SimulationConfiguration::PROGNOSIS_TYPES)
+                ->default('realistic')
+                ->required()
+                ->helperText('Select the economic scenario for growth rate projections'),
+
+            Select::make('group')
+                ->label('Asset Group Filter')
+                ->options([
+                    'private' => 'Private Assets Only',
+                    'company' => 'Company Assets Only',
+                    'both' => 'Both Private & Company',
+                ])
+                ->default('private')
+                ->required()
+                ->helperText('Choose which asset groups to include in the simulation'),
         ]);
     }
 }
