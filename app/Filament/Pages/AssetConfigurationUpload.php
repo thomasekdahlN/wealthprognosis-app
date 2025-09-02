@@ -31,6 +31,7 @@ class AssetConfigurationUpload extends Page implements HasForms
 
     protected static ?int $navigationSort = 20;
 
+
     // protected static ?string $navigationGroup = 'Analysis';
 
     public array $data = [
@@ -313,6 +314,6 @@ class AssetConfigurationUpload extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return true;
+        return false;
     }
 }

@@ -202,6 +202,15 @@ class SimulationAssets extends Page implements HasTable
                     'simulation_configuration_id' => $this->simulationConfiguration->id
                 ])),
 
+            Action::make('export_excel')
+                ->label('Export Excel')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('success')
+                ->action(function () {
+                    $path = \App\Services\SimulationExportService::export($this->simulationConfiguration);
+                    $this->dispatch('download-file', url: route('download.analysis', ['file' => basename($path)]), filename: basename($path));
+                }),
+
             Action::make('back_to_simulations')
                 ->label('Back to Simulations')
                 ->icon('heroicon-o-arrow-left')

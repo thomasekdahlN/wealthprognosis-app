@@ -16,3 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+use App\Http\Controllers\AnalysisDownloadController;
+
+Route::get('/download/analysis/{file}', [AnalysisDownloadController::class, 'download'])->name('download.analysis');
+

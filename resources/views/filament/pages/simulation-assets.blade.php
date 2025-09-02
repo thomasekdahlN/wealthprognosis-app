@@ -143,3 +143,26 @@
     @endif
 </x-filament-panels::page>
 
+
+
+@push('scripts')
+<script>
+    document.addEventListener('livewire:init', () => {
+        // Listen for download-file events dispatched from Livewire actions
+        window.addEventListener('download-file', (event) => {
+            const detail = event?.detail || {};
+            const url = detail.url || event.url; // support both shapes
+            const filename = detail.filename || event.filename || '';
+            if (!url) return;
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
+</script>
+@endpush
