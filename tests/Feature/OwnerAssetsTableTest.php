@@ -20,11 +20,11 @@ beforeEach(function () {
 
     $this->assetConfiguration = AssetConfiguration::factory()->create([
         'user_id' => $this->user->id,
-        'name' => 'Test Owner Assets Configuration',
+        'name' => 'Test Configuration Assets',
     ]);
 });
 
-it('can display assets table for owner', function () {
+it('can display assets table for configuration', function () {
     $this->actingAs($this->user);
 
     // Create test assets

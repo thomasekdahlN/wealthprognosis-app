@@ -33,7 +33,7 @@ class AssetsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
-            ->recordUrl(fn (\App\Models\Asset $record) => route('filament.admin.resources.asset-years.index', ['owner' => $record->asset_owner_id, 'asset' => $record->id]))
+            ->recordUrl(fn (\App\Models\Asset $record) => route('filament.admin.resources.asset-years.index', ['configuration' => $record->asset_configuration_id, 'asset' => $record->id]))
 
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('asset_type')

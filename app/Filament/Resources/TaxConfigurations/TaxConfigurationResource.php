@@ -18,7 +18,7 @@ class TaxConfigurationResource extends Resource
 {
     protected static ?string $model = TaxConfiguration::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3BottomRight;
 
     protected static \UnitEnum|string|null $navigationGroup = 'Setup';
 
@@ -90,4 +90,15 @@ class TaxConfigurationResource extends Resource
             'edit' => EditTaxConfiguration::route('/{country}/{year}/{record}/edit'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'secondary';
+    }
+
 }

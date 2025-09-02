@@ -22,13 +22,13 @@ class DemoAssetConfigurationSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             $owner = AssetConfiguration::create([
-                'name' => "Owner {$i}",
-                'description' => 'Demo owner',
+                'name' => "Configuration {$i}",
+                'description' => 'Demo configuration',
                 'public' => (bool) random_int(0, 1),
                 'icon' => 'heroicon-o-user-circle',
-                'image' => 'database/seeders/files/seed/owners/owner-'.$i.'.svg',
+                'image' => 'database/seeders/files/seed/configurations/configuration-'.$i.'.svg',
                 'color' => Arr::random(['#64748b', '#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6']),
-                'tags' => ['demo', 'owner-'.$i],
+                'tags' => ['demo', 'configuration-'.$i],
                 'birth_year' => rand(1960, 1995),
                 'prognose_age' => 50,
                 'pension_official_age' => 67,

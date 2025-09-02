@@ -23,12 +23,12 @@ class AiEvaluationService
     }
 
     /**
-     * Evaluate an asset owner using a specific AI instruction
+     * Evaluate an asset configuration using a specific AI instruction
      */
-    public function evaluateAssetOwner(AssetConfiguration $assetOwner, AiInstruction $instruction): array
+    public function evaluateAssetConfiguration(AssetConfiguration $assetConfiguration, AiInstruction $instruction): array
     {
-        // Export asset owner to JSON
-        $jsonData = AssetExportService::toJsonString($assetOwner);
+        // Export asset configuration to JSON
+        $jsonData = AssetExportService::toJsonString($assetConfiguration);
 
         // Build the user prompt with the JSON data
         $userPrompt = $instruction->buildUserPrompt(['json_data' => $jsonData]);
@@ -43,8 +43,8 @@ class AiEvaluationService
         );
 
         return [
-            'asset_configuration_id' => $assetOwner->id,
-            'asset_configuration_name' => $assetOwner->name,
+            'asset_configuration_id' => $assetConfiguration->id,
+            'asset_configuration_name' => $assetConfiguration->name,
             'instruction_id' => $instruction->id,
             'instruction_name' => $instruction->name,
             'model' => $instruction->model,
@@ -56,9 +56,9 @@ class AiEvaluationService
     }
 
     /**
-     * Evaluate an asset owner using multiple AI instructions
+     * Evaluate an asset configuration using multiple AI instructions
      */
-    public function evaluateWithMultipleInstructions(AssetConfiguration $assetOwner, array $instructionIds = []): array
+    public function evaluateWithMultipleInstructions(AssetConfiguration $assetConfiguration, array $instructionIds = []): array
     {
         $query = AiInstruction::active()->ordered();
 
@@ -76,11 +76,11 @@ class AiEvaluationService
 
         foreach ($instructions as $instruction) {
             try {
-                $result = $this->evaluateAssetOwner($assetOwner, $instruction);
+                $result = $this->evaluateAssetConfiguration($assetConfiguration, $instruction);
                 $results[] = $result;
 
                 Log::info('AI evaluation completed', [
-                    'asset_configuration_id' => $assetOwner->id,
+                    'asset_configuration_id' => $assetConfiguration->id,
                     'instruction_id' => $instruction->id,
                     'success' => $result['success'],
                 ]);
@@ -88,7 +88,7 @@ class AiEvaluationService
             } catch (\Exception $e) {
                 $errorResult = [
                     'asset_configuration_id' => $assetOwner->id,
-                    'asset_configuration_name' => $assetOwner->name,
+                    'asset_configuration_name' => $assetConfiguration->name,
                     'instruction_id' => $instruction->id,
                     'instruction_name' => $instruction->name,
                     'model' => $instruction->model,
@@ -101,7 +101,7 @@ class AiEvaluationService
                 $results[] = $errorResult;
 
                 Log::error('AI evaluation failed', [
-                    'asset_configuration_id' => $assetOwner->id,
+                    'asset_configuration_id' => $assetConfiguration->id,
                     'instruction_id' => $instruction->id,
                     'error' => $e->getMessage(),
                 ]);

@@ -122,11 +122,11 @@ class AssetYearForm
                                     return [];
                                 }
                                 $current = \App\Models\Asset::query()->find($assetId);
-                                if (! $current || ! $current->asset_owner_id) {
+                                if (! $current || ! $current->asset_configuration_id) {
                                     return [];
                                 }
                                 $assets = \App\Models\Asset::query()
-                                    ->where('asset_owner_id', $current->asset_owner_id)
+                                    ->where('asset_configuration_id', $current->asset_configuration_id)
                                     ->where('sort_order', '>', $current->sort_order)
                                     ->orderBy('sort_order')
                                     ->get(['id', 'name', 'asset_type']);
@@ -140,7 +140,7 @@ class AssetYearForm
                             })
                             ->nullable()
                             ->default(null)
-                            ->helperText('Transfer income to another asset. Select from assets with higher sort order within the same owner.'),
+                            ->helperText('Transfer income to another asset. Select from assets with higher sort order within the same configuration.'),
                         Select::make('income_source')
                             ->label('Income Source')
                             ->searchable()
@@ -150,11 +150,11 @@ class AssetYearForm
                                     return [];
                                 }
                                 $current = \App\Models\Asset::query()->find($assetId);
-                                if (! $current || ! $current->asset_owner_id) {
+                                if (! $current || ! $current->asset_configuration_id) {
                                     return [];
                                 }
                                 $assets = \App\Models\Asset::query()
-                                    ->where('asset_owner_id', $current->asset_owner_id)
+                                    ->where('asset_configuration_id', $current->asset_configuration_id)
                                     ->where('sort_order', '<', $current->sort_order)
                                     ->orderBy('sort_order')
                                     ->get(['id', 'name', 'asset_type']);
@@ -168,7 +168,7 @@ class AssetYearForm
                             })
                             ->nullable()
                             ->default(null)
-                            ->helperText('Source of income from another asset. Select from assets with lower sort order within the same owner.'),
+                            ->helperText('Source of income from another asset. Select from assets with lower sort order within the same configuration.'),
                         Select::make('income_changerate')
                             ->label('Income Change Rate')
                             ->options(self::getChangeRateOptions())
@@ -249,7 +249,7 @@ class AssetYearForm
                             })
                             ->nullable()
                             ->default(null)
-                            ->helperText('Transfer expense to another asset. Select from assets with higher sort order within the same owner.'),
+                            ->helperText('Transfer expense to another asset. Select from assets with higher sort order within the same configuration.'),
                         Select::make('expence_source')
                             ->label('Expense Source')
                             ->searchable()
@@ -277,7 +277,7 @@ class AssetYearForm
                             })
                             ->nullable()
                             ->default(null)
-                            ->helperText('Source of expense from another asset. Select from assets with lower sort order within the same owner.'),
+                            ->helperText('Source of expense from another asset. Select from assets with lower sort order within the same configuration.'),
                         Select::make('expence_changerate')
                             ->label('Expense Change Rate')
                             ->options(self::getChangeRateOptions())
@@ -365,7 +365,7 @@ class AssetYearForm
                             })
                             ->nullable()
                             ->default(null)
-                            ->helperText('Transfer asset value to another asset. Select from assets with higher sort order within the same owner.'),
+                            ->helperText('Transfer asset value to another asset. Select from assets with higher sort order within the same configuration.'),
                         Select::make('asset_source')
                             ->label('Asset Source')
                             ->searchable()
@@ -393,7 +393,7 @@ class AssetYearForm
                             })
                             ->nullable()
                             ->default(null)
-                            ->helperText('Source of asset value from another asset. Select from assets with lower sort order within the same owner.'),
+                            ->helperText('Source of asset value from another asset. Select from assets with lower sort order within the same configuration.'),
                         Toggle::make('asset_repeat')->label('Repeat Asset'),
                     ])
                     ->visible(function ($get): bool {

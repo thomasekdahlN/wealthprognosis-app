@@ -14,18 +14,18 @@ abstract class BaseAssetConfigurationWidget extends Widget
     public function mount(): void
     {
         // Get asset_configuration_id from the session service for consistency
-        $this->assetConfigurationId = AssetConfigurationSessionService::getActiveAssetOwnerId();
+        $this->assetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
 
         // Also check for request parameter (for backwards compatibility)
         if (!$this->assetConfigurationId) {
-            $this->assetConfigurationId = request()->get('asset_configuration_id') ?? request()->get('asset_owner_id');
+            $this->assetConfigurationId = request()->get('asset_configuration_id') ?? request()->get('asset_configuration_id');
         }
     }
 
     protected function getAssetConfigurationId(): ?int
     {
         // Always get the most current value from session
-        return AssetConfigurationSessionService::getActiveAssetOwnerId() ?? $this->assetConfigurationId;
+        return AssetConfigurationSessionService::getActiveAssetConfigurationId() ?? $this->assetConfigurationId;
     }
 
     protected function getFilteredAssetQuery(): Builder

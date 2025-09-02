@@ -22,7 +22,7 @@ class ListEvents extends ListRecords
 
     public function getHeading(): string
     {
-        $assetConfiguration = AssetConfigurationSessionService::getActiveAssetOwner();
+        $assetConfiguration = AssetConfigurationSessionService::getActiveAssetConfiguration();
         if ($assetConfiguration) {
             return 'Future Asset Events - ' . $assetConfiguration->name;
         }

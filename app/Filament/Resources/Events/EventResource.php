@@ -26,7 +26,7 @@ class EventResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $currentYear = (int) date('Y');
-        $activeAssetOwnerId = \App\Services\AssetConfigurationSessionService::getActiveAssetOwnerId();
+        $activeAssetConfigurationId = \App\Services\AssetConfigurationSessionService::getActiveAssetConfigurationId();
 
         $query = parent::getEloquentQuery()
             ->with(['configuration', 'assetType'])
@@ -34,9 +34,9 @@ class EventResource extends Resource
                 $query->where('year', '>', $currentYear);
             });
 
-        // Filter by active asset owner if one is selected
-        if ($activeAssetOwnerId) {
-            $query->where('assets.asset_configuration_id', $activeAssetOwnerId);
+        // Filter by active asset configuration if one is selected
+        if ($activeAssetConfigurationId) {
+            $query->where('assets.asset_configuration_id', $activeAssetConfigurationId);
         }
 
         return $query;

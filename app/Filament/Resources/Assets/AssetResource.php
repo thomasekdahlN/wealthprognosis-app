@@ -19,7 +19,7 @@ class AssetResource extends Resource
 {
     protected static ?string $model = Asset::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -39,12 +39,12 @@ class AssetResource extends Resource
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        $query = parent::getEloquentQuery()->with(['owner', 'assetType']);
+        $query = parent::getEloquentQuery()->with(['configuration', 'assetType']);
 
-        // Filter by active asset owner if one is selected
-        $activeAssetOwnerId = AssetConfigurationSessionService::getActiveAssetOwnerId();
-        if ($activeAssetOwnerId) {
-            $query->where('asset_configuration_id', $activeAssetOwnerId);
+        // Filter by active asset configuration if one is selected
+        $activeAssetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
+        if ($activeAssetConfigurationId) {
+            $query->where('asset_configuration_id', $activeAssetConfigurationId);
         }
 
         return $query;
@@ -75,4 +75,15 @@ class AssetResource extends Resource
             'edit' => EditAsset::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'info';
+    }
+
 }

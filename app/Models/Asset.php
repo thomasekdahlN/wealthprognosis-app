@@ -94,10 +94,11 @@ class Asset extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function owner(): BelongsTo
-    {
-        return $this->belongsTo(AssetConfiguration::class, 'asset_configuration_id');
-    }
+    // Deprecated: owner() has been replaced by configuration()
+    // public function owner(): BelongsTo
+    // {
+    //     return $this->belongsTo(AssetConfiguration::class, 'asset_configuration_id');
+    // }
 
     public function configuration(): BelongsTo
     {

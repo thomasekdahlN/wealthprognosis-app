@@ -19,7 +19,7 @@ class NetWorthTrendChart extends ChartWidget
     protected function getData(): array
     {
         $user = Auth::user();
-        $activeScenario = AssetConfigurationSessionService::getActiveAssetOwner();
+        $activeScenario = AssetConfigurationSessionService::getActiveAssetConfiguration();
 
         if (! $activeScenario) {
             return [

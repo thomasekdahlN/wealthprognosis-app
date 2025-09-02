@@ -199,7 +199,7 @@ class SimulationConfigurationsTable
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([50, 100, 150])
             ->recordUrl(fn (\App\Models\SimulationConfiguration $record) =>
-                \App\Filament\Resources\SimulationConfigurations\SimulationConfigurationResource::getUrl('edit', ['record' => $record->getKey()])
+                \App\Filament\Resources\SimulationConfigurations\SimulationConfigurationResource::getUrl('view', ['record' => $record->getKey()])
             );
     }
 }

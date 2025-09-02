@@ -161,7 +161,7 @@ class ConfigurationAssets extends ListRecords implements HasTable
 
                     } catch (\Exception $e) {
                         Log::error('JSON export failed', [
-                            'asset_owner_id' => $this->record->id,
+                            'asset_configuration_id' => $this->record->id,
                             'error' => $e->getMessage(),
                             'trace' => $e->getTraceAsString(),
                         ]);

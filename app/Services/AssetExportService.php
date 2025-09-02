@@ -8,11 +8,11 @@ use Illuminate\Support\Str;
 
 class AssetExportService
 {
-    protected AssetConfiguration $assetOwner;
+    protected AssetConfiguration $assetConfiguration;
 
-    public function __construct(AssetConfiguration $assetOwner)
+    public function __construct(AssetConfiguration $assetConfiguration)
     {
-        $this->assetOwner = $assetOwner;
+        $this->assetConfiguration = $assetConfiguration;
     }
 
     /**
@@ -32,7 +32,7 @@ class AssetExportService
     {
         if (! $filePath) {
             $exportDate = now()->format('Y-m-d');
-            $filename = $exportDate.'_'.Str::slug($this->assetOwner->name).'_'.$this->assetOwner->id.'.json';
+            $filename = $exportDate.'_'.Str::slug($this->assetConfiguration->name).'_'.$this->assetConfiguration->id.'.json';
             $filePath = 'exports/'.$filename;
         }
 
@@ -237,9 +237,9 @@ class AssetExportService
     /**
      * Static method for easy usage
      */
-    public static function export(AssetConfiguration $assetOwner, ?string $filePath = null): string
+    public static function export(AssetConfiguration $assetConfiguration, ?string $filePath = null): string
     {
-        $service = new static($assetOwner);
+        $service = new static($assetConfiguration);
 
         return $service->toFile($filePath);
     }
@@ -247,9 +247,9 @@ class AssetExportService
     /**
      * Static method to get JSON string
      */
-    public static function toJsonString(AssetConfiguration $assetOwner): string
+    public static function toJsonString(AssetConfiguration $assetConfiguration): string
     {
-        $service = new static($assetOwner);
+        $service = new static($assetConfiguration);
 
         return $service->toJson();
     }

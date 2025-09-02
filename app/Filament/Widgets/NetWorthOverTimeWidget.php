@@ -11,21 +11,21 @@ class NetWorthOverTimeWidget extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    protected ?int $assetOwnerId = null;
+    protected ?int $assetConfigurationId = null;
 
     public function mount(): void
     {
-        $this->assetOwnerId = request()->get('asset_owner_id');
+        $this->assetConfigurationId = request()->get('asset_configuration_id');
     }
 
     public function getHeading(): string
     {
         $heading = 'Net Worth Over Time';
 
-        if ($this->assetOwnerId) {
-            $assetOwner = \App\Models\AssetConfiguration::find($this->assetOwnerId);
-            if ($assetOwner) {
-                $heading = 'Net Worth Over Time - '.$assetOwner->name;
+        if ($this->assetConfigurationId) {
+            $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigurationId);
+            if ($assetConfiguration) {
+                $heading = 'Net Worth Over Time - '.$assetConfiguration->name;
             }
         }
 

@@ -212,7 +212,7 @@ class CreateAiAssistedConfigurationAction extends Action
                     DB::commit();
 
                     // Set the new configuration as active
-                    \App\Services\AssetConfigurationSessionService::setActiveAssetOwner($assetConfiguration);
+                    \App\Services\AssetConfigurationSessionService::setActiveAssetConfiguration($assetConfiguration);
 
                     // Show success notification
                     Notification::make()

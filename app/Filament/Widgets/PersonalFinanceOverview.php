@@ -14,7 +14,7 @@ class PersonalFinanceOverview extends BaseWidget
     protected function getStats(): array
     {
         $user = Auth::user();
-        $activeScenario = AssetConfigurationSessionService::getActiveAssetOwner();
+        $activeScenario = AssetConfigurationSessionService::getActiveAssetConfiguration();
 
         if (! $activeScenario) {
             return [

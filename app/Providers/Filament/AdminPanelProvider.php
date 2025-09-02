@@ -33,6 +33,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandName(fn () => $this->getBrandName())
             ->brandLogo(fn () => $this->getBrandLogo())
             ->maxContentWidth(Width::Full)
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('4.5rem')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -86,15 +88,15 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         FilamentView::registerRenderHook(
-            PanelsRenderHook::SIDEBAR_NAV_START,
-            fn (): string => Blade::render('<div class="mb-4 px-3"><livewire:asset-configuration-picker /></div>')
+            PanelsRenderHook::TOPBAR_END,
+            fn (): string => Blade::render('<div class="px-2"><livewire:asset-configuration-picker /></div>')
         );
     }
 
     protected function getBrandName(): string
     {
         $appName = config('app.name', 'Laravel');
-        $activeAssetConfiguration = \App\Services\AssetConfigurationSessionService::getActiveAssetOwner();
+        $activeAssetConfiguration = \App\Services\AssetConfigurationSessionService::getActiveAssetConfiguration();
 
         if ($activeAssetConfiguration) {
             return $appName . ' - ' . $activeAssetConfiguration->name;
@@ -105,13 +107,13 @@ class AdminPanelProvider extends PanelProvider
 
     protected function getBrandLogo(): ?string
     {
-        $activeAssetConfiguration = \App\Services\AssetConfigurationSessionService::getActiveAssetOwner();
+        $activeAssetConfiguration = \App\Services\AssetConfigurationSessionService::getActiveAssetConfiguration();
 
         if ($activeAssetConfiguration && $activeAssetConfiguration->icon) {
             $iconName = $activeAssetConfiguration->icon;
             $iconColor = $activeAssetConfiguration->color ?? 'inherit';
 
-            return view('components.owner-brand-logo', [
+            return view('components.asset-configuration-brand-logo', [
                 'iconName' => $iconName,
                 'iconColor' => $iconColor
             ])->render();

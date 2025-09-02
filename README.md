@@ -17,7 +17,7 @@ Supports normal annuitets mortgage and extra downpayments.
 
 On each asset you can do a rule based addition or subtraction, like adding 5000 to a equity fund every month.
 On each asset you can do an calculation based on other assets value and add it to this asset. Like taking 5% of the salary and add it to OTP (this does not change your salary but it increases your OTP)
-On each asset you can do an transfer to another asset. This will correctly calculate the taxes for the sale involved before transfer. 
+On each asset you can do an transfer to another asset. This will correctly calculate the taxes for the sale involved before transfer.
 
 #### Licence
 The code is under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007. Free for personal usage and free for non-commercial usage (that means that you do not make money on this software). Contributors wanted. Commercial usage is allowed with a commercial licence - please contact me to obtain a commercial usage. If you want to pay for new functionality, please feel free to contact me.
@@ -35,7 +35,7 @@ Your asset configuration can then be run with different prognossis, like realist
 Each asset can have a changerate, that can be different for each year on how the asset behaves. The different prognosis configurations has different yearly change paths for each type of asset or you can make your own.
 Assets can both increase and decrease in value based on the changerates.
 
-#### Example: 
+#### Example:
 - Change path for interest can på 4% in 2023, 6% in 2024 and then 5% in 2025, etc
 - Change path for your car or boat would be -10% in 2023, -10% in 2024 and then -10% in 2025, etc
 It then sums everything up and shows you all the details on how your economy behaves.
@@ -84,6 +84,26 @@ all|private|company - run the prognosis for only, private, only company or both.
 Output:
 The command will automatically generate [excel](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
 
+
+### CLI: Export Asset Configurations
+
+Use the assets:export command to export one or more asset configurations to JSON files.
+
+Examples:
+
+- Export a single configuration by ID:
+
+  php artisan assets:export 123
+
+- Export a single configuration to a specific path:
+
+  php artisan assets:export 123 --path=/tmp/my-config.json
+
+- Export all configurations:
+
+  php artisan assets:export --all
+
+
 Reads your economic setup as a json file and provides a detail spreadsheet with analysis of your future economy until your death.
 
 ### Supports
@@ -104,7 +124,7 @@ Reads your economic setup as a json file and provides a detail spreadsheet with 
 - F.I.R.E % = FIRE income / FIRE expence = How close you are to fire
 - F.I.R.E SavingRate = FIRE cashflow / FIRE income (in progress)
 
-### Support for more sophisticated dynamics in income/expence/asset - 
+### Support for more sophisticated dynamics in income/expence/asset -
 
 rule - support:
 - +10% - Adds 10% to amount
@@ -178,12 +198,12 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 - Når man betaler ned et lån og det blir penger igjen etter extraDownpayment så repeteres ikke det gjenværende beløpet på asset'en den kom fra. Både riktig og galt når repeat er false.... Men reglene skal ikke repeteres (eller må vi ha separat repeat på ulike deler)
 - Supporting tax prognosis, not just use this years taxes
 - Property tax should use the tax value of year-2 (Holmestrand at least))
-- Company fortune tax for private person should use the tax value of year-2 
-- rename group => owner [private|company]
+- Company fortune tax for private person should use the tax value of year-2
+- rename group => configuration [private|company]
 - Support for selling parts of partsellable assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
 - Tax configuration pr year and countries (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
 - Take into account the number of years you have owned an asset regardign tax calculation on i.e house and cabin.
-- Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)- 
+- Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)-
 - Klassifisere F.I.R.E oppnåelse pr år
 - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
 - Refactoring and cleanup of code
@@ -310,7 +330,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 
 #### asset
 - asset.marketAmount - Markedsverdien på en asset
-- asset.marketMortgageDeductedAmount - Markedsverdien ved salg hensyntatt restlån men ikke skatt : asset.amount - mortgage.balanceAmount 
+- asset.marketMortgageDeductedAmount - Markedsverdien ved salg hensyntatt restlån men ikke skatt : asset.amount - mortgage.balanceAmount
 - asset.acquisitionAmount - Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.
 - asset.acquisitionInitialAmount - Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere
 - asset.equityAmount - Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.
@@ -318,7 +338,7 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 - asset.paidAmount - Finanskostnader. Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.
 - asset.paidInitialAmount - Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere
 - asset.transferedAmount - Hva du har overført til/fra denne asset. Kan være både positivt og negativt beløp.  (fra transfer, source eller rule). Ikke changerate.
-- asset.mortageRateDecimal- Hvor mye i % av en asset som er lånt. Belåningsgrad. 
+- asset.mortageRateDecimal- Hvor mye i % av en asset som er lånt. Belåningsgrad.
 - asset.taxableDecimal - Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av
 - asset.taxableAmount - Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av minus lån. Denne er dynamisk og regnes ut fra asset.taxableInitialAmount - mortgage.balanceAmount. Kan ikke overstyres direkte.
 - asset.taxableInitialAmount - Skattbart beløp før lånet er trukket fra. Dvs det er det samme som asset.taxableAmount hvis det ikke er lån, men vi må holde det tilgjengelig og justere det for å kunne finne det igjen når et lån er nedbetaøt. Trenger aldri vises. Kun for beregninger. Blir justert årlig.
@@ -358,9 +378,9 @@ How much potential the bank sees in your income - expences
 #### fire (F.I.R.E) - beregnes på income, expence, asset, mortgage, cashflow
 Før eller etter skatt her?
 - fire.percent - % uttaket du vil ta fra assetsa når FIRE er oppnådd.
-- fire.incomeAmount - F.I.R.E inntekt - Basert på 4% uttak av assets som er definert i $firePartSalePossibleTypes. Dvs det du kan leve av av sparemidler. Har en del spørsmål her mtp fratrekk av lån/renter/skatt 
+- fire.incomeAmount - F.I.R.E inntekt - Basert på 4% uttak av assets som er definert i $firePartSalePossibleTypes. Dvs det du kan leve av av sparemidler. Har en del spørsmål her mtp fratrekk av lån/renter/skatt
 - fire.expenceAmount - F.I.R.E utgift - Dine faktiske utgifter ihht config
-- fire.rateDecimal - fire.incomeAmount / fire.expenceAmount . Hvor nærme du er å nå FIRE 
+- fire.rateDecimal - fire.incomeAmount / fire.expenceAmount . Hvor nærme du er å nå FIRE
 - fire.cashFlowAmount - fire.incomeAmount - fire.expenceAmount
 - fire.savingAmount - sparebeløp. Hvor mye du sparer pr år. Medberegnet avdrag men ikke renter.Regnes på assets av typen $fireSavingTypes[house, rental, cabin, crypto, fond, stock, otp, ask, pension]
 - fire.savingRateDecimal - fire.savingAmount (hvor mye som regnes som sparing) / income.amount (mot dine totale inntekter)

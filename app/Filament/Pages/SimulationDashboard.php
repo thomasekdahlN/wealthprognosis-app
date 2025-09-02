@@ -10,6 +10,7 @@ use App\Filament\Widgets\SimulationCashFlowChartWidget;
 use App\Filament\Widgets\SimulationAssetAllocationChartWidget;
 use App\Filament\Widgets\SimulationTaxAnalysisWidget;
 use Filament\Pages\Dashboard;
+use Filament\Actions\Action;
 use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -18,6 +19,10 @@ class SimulationDashboard extends Dashboard
     protected static string $routePath = '/simulation-dashboard';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    protected string $view = 'filament.pages.simulation-dashboard';
+
+
 
     public ?SimulationConfiguration $simulationConfiguration = null;
 
@@ -123,6 +128,42 @@ class SimulationDashboard extends Dashboard
     protected function getFooterWidgets(): array
     {
         return [];
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        $breadcrumbs = [];
+
+        $breadcrumbs[route('filament.admin.resources.simulation-configurations.index')] = 'Simulations';
+
+        if ($this->simulationConfiguration) {
+            $breadcrumbs[] = $this->simulationConfiguration->name; // Current page (no URL)
+        }
+
+        return $breadcrumbs;
+    }
+
+    protected function getHeaderActions(): array
+    {
+        if (!$this->simulationConfiguration) {
+            return [];
+        }
+
+        return [
+            Action::make('assets')
+                ->label('Assets')
+                ->icon('heroicon-o-building-office-2')
+                ->color('primary')
+                ->url(route('filament.admin.pages.simulation-assets', [
+                    'simulation_configuration_id' => $this->simulationConfiguration->id
+                ])),
+
+            Action::make('back_to_simulations')
+                ->label('Back to Simulations')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(route('filament.admin.resources.simulation-configurations.index')),
+        ];
     }
 
     public function getWidgetData(): array

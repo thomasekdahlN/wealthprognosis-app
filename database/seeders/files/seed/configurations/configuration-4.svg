@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
   <rect width="400" height="200" fill="#eab308"/>
-  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#000" font-size="24">Owner 4</text>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#000" font-size="24">Configuration 4</text>
 </svg>
 

@@ -13,7 +13,7 @@ class PrognosisResource extends Resource
 {
     protected static ?string $model = Prognosis::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBarSquare;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPresentationChartLine;
 
     protected static \UnitEnum|string|null $navigationGroup = 'Setup';
 

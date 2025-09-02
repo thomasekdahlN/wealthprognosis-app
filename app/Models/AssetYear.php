@@ -152,7 +152,7 @@ class AssetYear extends Model
     public static function getSourceValidationRules(int $assetId): array
     {
         $asset = Asset::find($assetId);
-        if (! $asset || ! $asset->asset_owner_id) {
+        if (! $asset || ! $asset->asset_configuration_id) {
             return [
                 'income_source' => 'nullable|string',
                 'expence_source' => 'nullable|string',
@@ -160,8 +160,8 @@ class AssetYear extends Model
             ];
         }
 
-        // Get valid source asset codes/IDs with lower sort order and same owner
-        $validAssets = Asset::where('asset_owner_id', $asset->asset_owner_id)
+        // Get valid source asset codes/IDs with lower sort order and same configuration
+        $validAssets = Asset::where('asset_configuration_id', $asset->asset_configuration_id)
             ->where('sort_order', '<', $asset->sort_order)
             ->get();
 

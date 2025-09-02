@@ -8,79 +8,55 @@ use Illuminate\Support\Facades\Session;
 
 class AssetConfigurationSessionService
 {
-    private const SESSION_KEY = 'active_asset_owner_id';
+    private const NEW_SESSION_KEY = 'active_asset_configuration_id';
 
-    /**
-     * Get the currently active asset owner
-     */
-    public static function getActiveAssetOwner(): ?AssetConfiguration
+    // New API (preferred)
+    public static function getActiveAssetConfiguration(): ?AssetConfiguration
     {
-        $assetOwnerId = Session::get(self::SESSION_KEY);
-
-        if (!$assetOwnerId) {
-            return null;
-        }
-
-        return AssetConfiguration::find($assetOwnerId);
+        $id = Session::get(self::NEW_SESSION_KEY);
+        return $id ? AssetConfiguration::find($id) : null;
     }
 
-    /**
-     * Set the active asset owner
-     */
-    public static function setActiveAssetOwner(?AssetConfiguration $assetOwner): void
+    public static function setActiveAssetConfiguration(?AssetConfiguration $assetConfiguration): void
     {
-        if ($assetOwner) {
-            Session::put(self::SESSION_KEY, $assetOwner->id);
+        if ($assetConfiguration) {
+            Session::put(self::NEW_SESSION_KEY, $assetConfiguration->id);
+
         } else {
-            Session::forget(self::SESSION_KEY);
+            Session::forget(self::NEW_SESSION_KEY);
+
         }
     }
 
-    /**
-     * Get the active asset owner ID
-     */
-    public static function getActiveAssetOwnerId(): ?int
+    public static function getActiveAssetConfigurationId(): ?int
     {
-        return Session::get(self::SESSION_KEY);
+        return Session::get(self::NEW_SESSION_KEY);
     }
 
-    /**
-     * Get the active asset configuration name for display
-     */
-    public static function getActiveAssetOwnerName(): string
+    public static function getActiveAssetConfigurationName(): string
     {
-        $assetConfiguration = self::getActiveAssetOwner();
-
+        $assetConfiguration = self::getActiveAssetConfiguration();
         return $assetConfiguration ? $assetConfiguration->name : 'No Asset Configuration Selected';
     }
 
-    /**
-     * Check if an asset configuration is currently active
-     */
-    public static function hasActiveAssetOwner(): bool
+    public static function hasActiveAssetConfiguration(): bool
     {
-        return Session::has(self::SESSION_KEY) && self::getActiveAssetOwner() !== null;
+        return Session::has(self::NEW_SESSION_KEY) && self::getActiveAssetConfiguration() !== null;
     }
 
-    /**
-     * Get all available asset configurations for the current user
-     */
-    public static function getAvailableAssetOwners(): \Illuminate\Database\Eloquent\Collection
+    public static function getAvailableAssetConfigurations(): \Illuminate\Database\Eloquent\Collection
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return collect();
         }
 
-        return AssetConfiguration::query()
-            ->orderBy('name')
-            ->get();
+        return AssetConfiguration::query()->orderBy('name')->get();
     }
 
-    /**
-     * Clear the active asset owner session
-     */
-    public static function clearActiveAssetOwner(): void
+    public static function clearActiveAssetConfiguration(): void
     {
-        Session::forget(self::SESSION_KEY);
+        Session::forget(self::NEW_SESSION_KEY);
     }
+
+
 }

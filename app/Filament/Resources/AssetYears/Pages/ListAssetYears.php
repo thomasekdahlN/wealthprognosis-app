@@ -64,12 +64,12 @@ class ListAssetYears extends ListRecords
 
     protected function getTableQuery(): Builder
     {
-        $ownerId = request()->get('owner');
+        $configurationId = request()->get('configuration');
         $assetId = request()->get('asset');
 
         $query = AssetYear::query();
-        if ($ownerId) {
-            $query->where('asset_owner_id', $ownerId);
+        if ($configurationId) {
+            $query->where('asset_configuration_id', $configurationId);
         }
         if ($assetId) {
             $query->where('asset_id', $assetId);
@@ -80,16 +80,16 @@ class ListAssetYears extends ListRecords
 
     public function getBreadcrumbs(): array
     {
-        $ownerId = (int) request()->get('owner');
+        $configurationId = (int) request()->get('configuration');
         $assetId = (int) request()->get('asset');
 
         $crumbs = [];
         // Map is [url => label]
         $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('index')] = __('Configurations');
 
-        if ($ownerId) {
-            $owner = AssetConfiguration::find($ownerId);
-            $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $ownerId])] = $owner?->name ?? (__('Configuration').' #'.$ownerId);
+        if ($configurationId) {
+            $configuration = AssetConfiguration::find($configurationId);
+            $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $configurationId])] = $configuration?->name ?? (__('Configuration').' #'.$configurationId);
         }
 
         if ($assetId) {

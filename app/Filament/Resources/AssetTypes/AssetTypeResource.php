@@ -19,7 +19,7 @@ class AssetTypeResource extends Resource
 {
     protected static ?string $model = AssetType::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
     protected static UnitEnum|string|null $navigationGroup = 'Setup';
 
@@ -64,4 +64,15 @@ class AssetTypeResource extends Resource
             'edit' => EditAssetType::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+
 }

@@ -18,7 +18,7 @@ class TaxTypeResource extends Resource
 {
     protected static ?string $model = TaxType::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
 
     protected static \UnitEnum|string|null $navigationGroup = 'Setup';
 
@@ -58,4 +58,15 @@ class TaxTypeResource extends Resource
             'edit' => EditTaxType::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
 }

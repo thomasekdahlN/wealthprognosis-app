@@ -40,9 +40,9 @@ class ConfigAssets extends Page implements HasTable
 
         if ($recordId) {
             $this->record = AssetConfiguration::findOrFail($recordId);
-            AssetConfigurationSessionService::setActiveAssetOwner($this->record);
+            AssetConfigurationSessionService::setActiveAssetConfiguration($this->record);
         } else {
-            $this->record = AssetConfigurationSessionService::getActiveAssetOwner();
+            $this->record = AssetConfigurationSessionService::getActiveAssetConfiguration();
         }
 
         if (!$this->record) {

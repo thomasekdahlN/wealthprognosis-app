@@ -14,14 +14,14 @@ class ExportAssets extends Command
      *
      * @var string
      */
-    protected $signature = 'assets:export {asset-owner-id?} {--path= : Custom file path for export} {--all : Export all asset owners}';
+    protected $signature = 'assets:export {asset-configuration-id?} {--path= : Custom file path for export} {--all : Export all asset configurations}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Export asset owner data to JSON configuration file';
+    protected $description = 'Export asset configuration data to JSON file';
 
     /**
      * Execute the console command.
@@ -30,12 +30,12 @@ class ExportAssets extends Command
     {
         try {
             if ($this->option('all')) {
-                return $this->exportAllAssetOwners();
+                return $this->exportAllAssetConfigurations();
             }
 
-            $assetOwnerId = $this->argument('asset-owner-id');
-            if (! $assetOwnerId) {
-                $this->error('Please provide an asset-owner-id or use --all to export all asset owners');
+            $assetConfigurationId = $this->argument('asset-configuration-id');
+            if (! $assetConfigurationId) {
+                $this->error('Please provide an asset-configuration-id or use --all to export all asset configurations');
 
                 return Command::FAILURE;
             }
@@ -43,25 +43,25 @@ class ExportAssets extends Command
             $customPath = $this->option('path');
 
             // Find the asset owner
-            $assetOwner = AssetConfiguration::with(['assets.years'])->find($assetOwnerId);
+            $assetConfiguration = AssetConfiguration::with(['assets.years'])->find($assetConfigurationId);
 
-            if (! $assetOwner) {
-                $this->error("Asset owner not found with ID: {$assetOwnerId}");
+            if (! $assetConfiguration) {
+                $this->error("Asset configuration not found with ID: {$assetConfigurationId}");
 
                 return Command::FAILURE;
             }
 
-            $this->info("Exporting asset owner: {$assetOwner->name} (ID: {$assetOwner->id})");
+            $this->info("Exporting asset configuration: {$assetConfiguration->name} (ID: {$assetConfiguration->id})");
 
             // Export to file
-            $filePath = AssetExportService::export($assetOwner, $customPath);
+            $filePath = AssetExportService::export($assetConfiguration, $customPath);
 
             $this->info('✅ Export completed successfully!');
             $this->info("File saved to: {$filePath}");
 
             // Show summary
-            $assetsCount = $assetOwner->assets()->count();
-            $yearsCount = $assetOwner->assets()->withCount('years')->get()->sum('years_count');
+            $assetsCount = $assetConfiguration->assets()->count();
+            $yearsCount = $assetConfiguration->assets()->withCount('years')->get()->sum('years_count');
 
             $this->info('Exported data:');
             $this->line("  - Assets: {$assetsCount}");
@@ -72,7 +72,7 @@ class ExportAssets extends Command
         } catch (\Exception $e) {
             $this->error("Export failed: {$e->getMessage()}");
             Log::error('Asset export command failed', [
-                'asset_owner_id' => $this->argument('asset-owner-id'),
+                'asset_configuration_id' => $this->argument('asset-configuration-id'),
                 'custom_path' => $this->option('path'),
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -83,35 +83,35 @@ class ExportAssets extends Command
     }
 
     /**
-     * Export all asset owners
+     * Export all asset configurations
      */
-    protected function exportAllAssetOwners(): int
+    protected function exportAllAssetConfigurations(): int
     {
-        $assetOwners = AssetConfiguration::with(['assets.years'])->get();
+        $assetConfigurations = AssetConfiguration::with(['assets.years'])->get();
 
-        if ($assetOwners->isEmpty()) {
-            $this->warn('No asset owners found to export');
+        if ($assetConfigurations->isEmpty()) {
+            $this->warn('No asset configurations found to export');
 
             return Command::SUCCESS;
         }
 
-        $this->info("Exporting {$assetOwners->count()} asset owners...");
+        $this->info("Exporting {$assetConfigurations->count()} asset configurations...");
 
         $successCount = 0;
         $errorCount = 0;
 
-        foreach ($assetOwners as $assetOwner) {
+        foreach ($assetConfigurations as $assetConfiguration) {
             try {
-                $this->line("Exporting: {$assetOwner->name} (ID: {$assetOwner->id})");
+                $this->line("Exporting: {$assetConfiguration->name} (ID: {$assetConfiguration->id})");
 
-                $filePath = AssetExportService::export($assetOwner);
+                $filePath = AssetExportService::export($assetConfiguration);
 
                 $this->info('  ✅ Exported to: '.basename($filePath));
                 $successCount++;
 
             } catch (\Exception $e) {
-                $this->error("  ❌ Failed to export {$assetOwner->name}: {$e->getMessage()}");
-                Log::error("Failed to export asset owner {$assetOwner->id}", [
+                $this->error("  ❌ Failed to export {$assetConfiguration->name}: {$e->getMessage()}");
+                Log::error("Failed to export asset configuration {$assetConfiguration->id}", [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
@@ -120,9 +120,9 @@ class ExportAssets extends Command
         }
 
         $this->info("\n📊 Export Summary:");
-        $this->info("  ✅ Successfully exported: {$successCount} asset owners");
+        $this->info("  ✅ Successfully exported: {$successCount} asset configurations");
         if ($errorCount > 0) {
-            $this->error("  ❌ Failed exports: {$errorCount} asset owners");
+            $this->error("  ❌ Failed exports: {$errorCount} asset configurations");
         }
 
         return $successCount > 0 ? Command::SUCCESS : Command::FAILURE;

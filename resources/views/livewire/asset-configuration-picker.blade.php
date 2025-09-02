@@ -1,8 +1,8 @@
-<div class="fi-sidebar-item-button relative">
+<div class="relative">
     <button
         wire:click="toggleDropdown"
         type="button"
-        class="fi-sidebar-item-button flex w-full items-center gap-x-3 rounded-lg px-3 py-2 text-start outline-none transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
+        class="inline-flex w-auto items-center gap-x-2.5 rounded-lg px-2.5 py-1.5 text-start outline-none transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
         :class="{ 'bg-gray-50 dark:bg-white/5': @js($showDropdown) }"
     >
         <div class="fi-sidebar-item-icon flex h-6 w-6 items-center justify-center">
@@ -64,7 +64,7 @@
                             type="button"
                             class="fi-dropdown-list-item flex w-full items-center gap-x-3 px-3 py-2 text-start text-sm outline-none transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
                             @class([
-                                'bg-gray-50 dark:bg-white/5' => $selectedAssetOwnerId === $assetConfiguration->id,
+                                'bg-gray-50 dark:bg-white/5' => $selectedAssetConfigurationId === $assetConfiguration->id,
                             ])
                         >
                             <div class="flex h-6 w-6 items-center justify-center">
@@ -109,7 +109,7 @@
                     </button>
                 @else
                     <div class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                        No asset owners available
+                        No asset configurations available
                     </div>
                 @endif
             </div>

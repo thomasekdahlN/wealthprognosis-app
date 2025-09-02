@@ -14,14 +14,14 @@ class AssetConfigurationPicker extends Component
 
     public function mount(): void
     {
-        $this->selectedAssetConfigurationId = AssetConfigurationSessionService::getActiveAssetOwnerId();
+        $this->selectedAssetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
 
         // Auto-select first configuration if none is selected
         if (!$this->selectedAssetConfigurationId) {
             $firstConfiguration = AssetConfiguration::query()->orderBy('name')->first();
             if ($firstConfiguration) {
                 $this->selectedAssetConfigurationId = $firstConfiguration->id;
-                AssetConfigurationSessionService::setActiveAssetOwner($firstConfiguration);
+                AssetConfigurationSessionService::setActiveAssetConfiguration($firstConfiguration);
             }
         }
     }
@@ -32,9 +32,9 @@ class AssetConfigurationPicker extends Component
 
         if ($assetConfigurationId) {
             $assetConfiguration = AssetConfiguration::find($assetConfigurationId);
-            AssetConfigurationSessionService::setActiveAssetOwner($assetConfiguration);
+            AssetConfigurationSessionService::setActiveAssetConfiguration($assetConfiguration);
         } else {
-            AssetConfigurationSessionService::clearActiveAssetOwner();
+            AssetConfigurationSessionService::clearActiveAssetConfiguration();
         }
 
         $this->showDropdown = false;

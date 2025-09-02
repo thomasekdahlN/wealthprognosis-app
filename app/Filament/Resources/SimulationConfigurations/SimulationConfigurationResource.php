@@ -5,6 +5,7 @@ namespace App\Filament\Resources\SimulationConfigurations;
 use App\Filament\Resources\SimulationConfigurations\Pages\CreateSimulationConfiguration;
 use App\Filament\Resources\SimulationConfigurations\Pages\EditSimulationConfiguration;
 use App\Filament\Resources\SimulationConfigurations\Pages\ListSimulationConfigurations;
+use App\Filament\Resources\SimulationConfigurations\Pages\ViewSimulationConfiguration;
 use App\Filament\Resources\SimulationConfigurations\Schemas\SimulationConfigurationForm;
 use App\Filament\Resources\SimulationConfigurations\Tables\SimulationConfigurationsTable;
 use App\Models\SimulationConfiguration;
@@ -50,6 +51,7 @@ class SimulationConfigurationResource extends Resource
         return [
             'index' => ListSimulationConfigurations::route('/'),
             'create' => CreateSimulationConfiguration::route('/create'),
+            'view' => ViewSimulationConfiguration::route('/{record}'),
             'edit' => EditSimulationConfiguration::route('/{record}/edit'),
         ];
     }

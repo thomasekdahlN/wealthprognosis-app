@@ -16,7 +16,7 @@ class AssetConfigurationAndYearTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_creates_asset_owner_assets_and_yearly_data_with_audit_fields(): void
+    public function test_creates_asset_configuration_assets_and_yearly_data_with_audit_fields(): void
     {
         $user = User::factory()->create();
         $team = Team::create([

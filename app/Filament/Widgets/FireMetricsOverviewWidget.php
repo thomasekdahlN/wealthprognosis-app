@@ -10,11 +10,11 @@ class FireMetricsOverviewWidget extends BaseWidget
 {
     protected static ?int $sort = 2; // Row 3: FIRE Metrics
 
-    public ?int $assetOwnerId = null;
+    public ?int $assetConfigurationId = null;
 
-    public function mount(?int $assetOwnerId = null): void
+    public function mount(?int $assetConfigurationId = null): void
     {
-        $this->assetOwnerId = $assetOwnerId ?? request()->get('asset_owner_id') ?? session('dashboard_asset_owner_id');
+        $this->assetConfigurationId = $assetConfigurationId ?? request()->get('asset_configuration_id') ?? session('dashboard_asset_configuration_id');
     }
 
     protected function getStats(): array

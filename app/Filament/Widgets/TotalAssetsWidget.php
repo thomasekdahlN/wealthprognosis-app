@@ -14,7 +14,7 @@ class TotalAssetsWidget extends BaseWidget
 
     public function mount(): void
     {
-        $this->assetConfigurationId = request()->get('asset_configuration_id') ?? request()->get('asset_owner_id');
+        $this->assetConfigurationId = request()->get('asset_configuration_id');
     }
 
     protected function getStats(): array

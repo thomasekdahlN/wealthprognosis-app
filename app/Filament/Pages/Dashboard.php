@@ -12,29 +12,29 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Dashboard';
 
-    public ?int $assetOwnerId = null;
+    public ?int $assetConfigurationId = null;
 
     public function mount(Request $request): void
     {
         // Use session service for consistency
-        $this->assetOwnerId = AssetConfigurationSessionService::getActiveAssetOwnerId();
+        $this->assetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
 
         // Also check for URL parameter (for backwards compatibility)
-        if (!$this->assetOwnerId && $request->get('asset_owner_id')) {
-            $urlAssetOwnerId = $request->get('asset_owner_id');
-            $assetOwner = \App\Models\AssetConfiguration::find($urlAssetOwnerId);
-            if ($assetOwner) {
-                AssetConfigurationSessionService::setActiveAssetOwner($assetOwner);
-                $this->assetOwnerId = $urlAssetOwnerId;
+        if (!$this->assetConfigurationId && $request->get('asset_configuration_id')) {
+            $urlAssetConfigurationId = $request->get('asset_configuration_id');
+            $assetConfiguration = \App\Models\AssetConfiguration::find($urlAssetConfigurationId);
+            if ($assetConfiguration) {
+                AssetConfigurationSessionService::setActiveAssetConfiguration($assetConfiguration);
+                $this->assetConfigurationId = $urlAssetConfigurationId;
             }
         }
     }
 
     public function getHeading(): string
     {
-        $assetOwner = AssetConfigurationSessionService::getActiveAssetOwner();
-        if ($assetOwner) {
-            return 'Dashboard - '.$assetOwner->name;
+        $assetConfiguration = AssetConfigurationSessionService::getActiveAssetConfiguration();
+        if ($assetConfiguration) {
+            return 'Dashboard - '.$assetConfiguration->name;
         }
 
         return 'Wealthprognosis '.now()->year;
@@ -59,12 +59,12 @@ class Dashboard extends BaseDashboard
     {
         return [
             'heading' => $this->getHeading(),
-            'asset_owner_id' => $this->assetOwnerId,
+            'asset_configuration_id' => $this->assetConfigurationId,
         ];
     }
 
-    public function getAssetOwnerId(): ?int
+    public function getAssetConfigurationId(): ?int
     {
-        return $this->assetOwnerId;
+        return $this->assetConfigurationId;
     }
 }

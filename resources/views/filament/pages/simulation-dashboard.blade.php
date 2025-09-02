@@ -1,5 +1,5 @@
 <x-filament-panels::page>
-    @if($simulationConfiguration)
+    @if($this->simulationConfiguration)
         <div class="space-y-4">
             <!-- Header with Tabs and Organized Info -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -7,16 +7,16 @@
                 <div class="px-6 pt-4 pb-3 border-b border-blue-200 dark:border-blue-700">
                     <x-filament::tabs>
                         <x-filament::tabs.item
-                            :active="false"
-                            tag="a"
-                            :href="route('filament.admin.pages.simulation-dashboard', ['simulation_configuration_id' => $simulationConfiguration->id])"
+                            :active="true"
                             icon="heroicon-o-chart-bar"
                         >
                             Dashboard
                         </x-filament::tabs.item>
 
                         <x-filament::tabs.item
-                            :active="true"
+                            :active="false"
+                            tag="a"
+                            :href="route('filament.admin.pages.simulation-assets', ['simulation_configuration_id' => $this->simulationConfiguration->id])"
                             icon="heroicon-o-building-office-2"
                         >
                             Assets
@@ -34,29 +34,29 @@
                                 Settings
                             </h4>
                             <div class="space-y-2">
-                                @if($simulationConfiguration->tax_country)
+                                @if($this->simulationConfiguration->tax_country)
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-600 dark:text-gray-400">Tax Country:</span>
                                         <x-filament::badge color="primary">
-                                            {{ strtoupper($simulationConfiguration->tax_country) }}
+                                            {{ strtoupper($this->simulationConfiguration->tax_country) }}
                                         </x-filament::badge>
                                     </div>
                                 @endif
 
-                                @if($simulationConfiguration->prognosis_type)
+                                @if($this->simulationConfiguration->prognosis_type)
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-600 dark:text-gray-400">Scenario:</span>
                                         <x-filament::badge color="success">
-                                            {{ ucfirst($simulationConfiguration->prognosis_type) }}
+                                            {{ ucfirst($this->simulationConfiguration->prognosis_type) }}
                                         </x-filament::badge>
                                     </div>
                                 @endif
 
-                                @if($simulationConfiguration->risk_tolerance)
+                                @if($this->simulationConfiguration->risk_tolerance)
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-600 dark:text-gray-400">Risk Tolerance:</span>
                                         <x-filament::badge color="warning">
-                                            {{ $simulationConfiguration->risk_tolerance_label }}
+                                            {{ $this->simulationConfiguration->risk_tolerance_label }}
                                         </x-filament::badge>
                                     </div>
                                 @endif
@@ -73,15 +73,15 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-600 dark:text-gray-400">Created:</span>
                                     <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                        {{ $simulationConfiguration->created_at->format('M j, Y') }}
+                                        {{ $this->simulationConfiguration->created_at->format('M j, Y') }}
                                     </span>
                                 </div>
 
-                                @if($simulationConfiguration->birth_year)
+                                @if($this->simulationConfiguration->birth_year)
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-600 dark:text-gray-400">Birth Year:</span>
                                         <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $simulationConfiguration->birth_year }}
+                                            {{ $this->simulationConfiguration->birth_year }}
                                         </span>
                                     </div>
                                 @endif
@@ -95,10 +95,10 @@
                                 Details
                             </h4>
                             <div class="space-y-2">
-                                @if($simulationConfiguration->description)
+                                @if($this->simulationConfiguration->description)
                                     <div class="text-sm text-gray-600 dark:text-gray-400">
                                         <div class="line-clamp-2">
-                                            {!! Str::limit(strip_tags($simulationConfiguration->description), 100) !!}
+                                            {!! Str::limit(strip_tags($this->simulationConfiguration->description), 100) !!}
                                         </div>
                                     </div>
                                 @else
@@ -112,26 +112,52 @@
                 </div>
             </div>
 
-            <!-- Notice about read-only data -->
-            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <x-filament::icon icon="heroicon-o-information-circle" class="w-5 h-5 text-blue-400" />
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
-                            Read-Only Simulation Data
-                        </h3>
-                        <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-                            <p>This data is from a simulation and is read-only. All values are calculated based on the simulation parameters and cannot be modified.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Dashboard Content -->
+            <div class="space-y-6">
+                @php
+                    $headerWidgets = $this->getHeaderWidgets();
+                    $widgets = $this->getWidgets();
+                    $footerWidgets = $this->getFooterWidgets();
+                @endphp
 
-            <!-- Assets Table -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
-                {{ $this->table }}
+                @if (count($headerWidgets) > 0)
+                    <x-filament-widgets::widgets
+                        :columns="$this->getColumns()"
+                        :data="
+                            [
+                                ...$this->getWidgetData(),
+                                ...$this->getViewData(),
+                            ]
+                        "
+                        :widgets="$headerWidgets"
+                    />
+                @endif
+
+                @if (count($widgets) > 0)
+                    <x-filament-widgets::widgets
+                        :columns="$this->getColumns()"
+                        :data="
+                            [
+                                ...$this->getWidgetData(),
+                                ...$this->getViewData(),
+                            ]
+                        "
+                        :widgets="$widgets"
+                    />
+                @endif
+
+                @if (count($footerWidgets) > 0)
+                    <x-filament-widgets::widgets
+                        :columns="$this->getColumns()"
+                        :data="
+                            [
+                                ...$this->getWidgetData(),
+                                ...$this->getViewData(),
+                            ]
+                        "
+                        :widgets="$footerWidgets"
+                    />
+                @endif
             </div>
         </div>
     @else
@@ -142,4 +168,3 @@
         </div>
     @endif
 </x-filament-panels::page>
-
