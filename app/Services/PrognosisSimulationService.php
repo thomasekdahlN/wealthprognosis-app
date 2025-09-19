@@ -136,7 +136,7 @@ class PrognosisSimulationService
                     'asset_configuration_id' => $simulationConfig->id,
 
                     // Income data
-                    'income_name' => 'Income from ' . $asset->name,
+
                     'income_description' => 'Generated income from asset',
                     'income_amount' => $assetYear->income_amount,
                     'income_factor' => $assetYear->income_factor,

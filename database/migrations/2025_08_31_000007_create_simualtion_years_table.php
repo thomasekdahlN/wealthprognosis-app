@@ -13,9 +13,9 @@ return new class extends Migration
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
-            $table->integer('year');
-            $table->foreignId('asset_id')->constrained('simulation_assets')->onDelete('cascade');
-            $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade');
+            $table->integer('year')->index();
+            $table->foreignId('asset_id')->constrained('simulation_assets')->onDelete('cascade')->index();
+            $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade')->index();
 
             //Income
             $table->text('income_description')->nullable();

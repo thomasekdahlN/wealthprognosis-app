@@ -10,21 +10,21 @@ class AssetAllocationByTaxType extends ChartWidget
 {
     protected static ?int $sort = 21;
 
-    protected ?int $assetOwnerId = null;
+    protected ?int $assetConfigId = null;
 
     public function mount(): void
     {
-        $this->assetOwnerId = request()->get('asset_owner_id');
+        $this->assetConfigId = request()->get('asset_configuration_id') ?? request()->get('asset_config_id');
     }
 
     public function getHeading(): string
     {
         $heading = 'Asset Allocation by Tax Type ('.now()->year.')';
 
-        if ($this->assetOwnerId) {
-            $assetOwner = \App\Models\AssetConfiguration::find($this->assetOwnerId);
-            if ($assetOwner) {
-                $heading = 'Asset Allocation by Tax Type - '.$assetOwner->name.' ('.now()->year.')';
+        if ($this->assetConfigId) {
+            $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigId);
+            if ($assetConfiguration) {
+                $heading = 'Asset Allocation by Tax Type - '.$assetConfiguration->name.' ('.now()->year.')';
             }
         }
 
@@ -48,9 +48,9 @@ class AssetAllocationByTaxType extends ChartWidget
         $assetGroups = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            // Apply asset owner filtering if specified
-            if ($this->assetOwnerId) {
-                $query->where('asset_owner_id', $this->assetOwnerId);
+            // Apply asset configuration filtering if specified
+            if ($this->assetConfigId) {
+                $query->where('asset_configuration_id', $this->assetConfigId);
             }
         })
             ->where('year', '<=', $currentYear) // Don't go beyond current year

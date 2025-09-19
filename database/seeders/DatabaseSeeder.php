@@ -8,25 +8,22 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         $this->call([
             UserSeeder::class,
             TeamSeeder::class,
-            AssetTypeSeeder::class,
-            TaxTypeSeeder::class,
-            AssetCategorySeeder::class,
+            TaxTypesFromConfigSeeder::class, // Seed tax types first (from config)
+            AssetCategorySeeder::class,      // Then categories
+            AssetTypeSeeder::class,          // Then asset types (will link to tax types)
             AssetConfigurationSeeder::class,
-            DemoAssetConfigurationSeeder::class,
             AiInstructionSeeder::class,
             TaxConfigurationSeeder::class,
-            ChangeRateConfigurationSeeder::class,
             PrognosisSeeder::class,
+            ChangeRateConfigurationSeeder::class,
             // SampleScenarioSeeder::class, // Skip - Scenario model doesn't exist
-            JsonConfigImportSeeder::class, // Import JSON configuration files
+            JsonConfigImportSeeder::class,   // Import JSON configuration files
         ]);
     }
 }

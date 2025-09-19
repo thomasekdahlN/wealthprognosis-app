@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\AssetType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Log;
 
 class AssetTypeSeeder extends Seeder
 {
@@ -12,6 +13,9 @@ class AssetTypeSeeder extends Seeder
      */
     public function run(): void
     {
+        // Ensure Tax Types are available as dependency
+        $this->call(TaxTypesFromConfigSeeder::class);
+
         // Get or create a default user for seeding
         $user = \App\Models\User::first();
         if (! $user) {
@@ -747,11 +751,18 @@ class AssetTypeSeeder extends Seeder
                 $taxCode = 'income';
             }
 
-            // Lookup tax type id
+            // Lookup tax type id with guard
             $taxTypeId = \App\Models\TaxType::where('type', $taxCode)->value('id');
-            if ($taxTypeId) {
-                $assetType['tax_type_id'] = $taxTypeId;
+            if (! $taxTypeId) {
+                // Attempt to auto-heal by seeding tax types, then retry once
+                $this->call(TaxTypesFromConfigSeeder::class);
+                $taxTypeId = \App\Models\TaxType::where('type', $taxCode)->value('id');
             }
+            if (! $taxTypeId) {
+                Log::error("AssetTypeSeeder: TaxType '{$taxCode}' not found for asset type '{$code}'. Ensure TaxTypeSeeder runs before AssetTypeSeeder.");
+                throw new \RuntimeException("Missing TaxType '{$taxCode}' required by AssetType '{$code}'.");
+            }
+            $assetType['tax_type_id'] = $taxTypeId;
 
             AssetType::updateOrCreate(
                 ['type' => $assetType['type']],

@@ -9,11 +9,18 @@ use Illuminate\Support\Number;
 
 class SimulationFireAnalysisWidget extends BaseWidget
 {
+    protected static bool $isLazy = false;
+
     public ?SimulationConfiguration $simulationConfiguration = null;
 
-    public function mount(): void
+    public function mount(?SimulationConfiguration $simulationConfiguration = null): void
     {
-        // Get simulation_configuration_id from request
+        if ($simulationConfiguration) {
+            $this->simulationConfiguration = $simulationConfiguration;
+            return;
+        }
+
+        // Fallback: Get simulation_configuration_id from request
         $simulationConfigurationId = request()->get('simulation_configuration_id');
 
         if ($simulationConfigurationId) {
@@ -102,7 +109,7 @@ class SimulationFireAnalysisWidget extends BaseWidget
                 ->icon('heroicon-o-banknotes')
                 ->color('success'),
 
-            Stat::make('FIRE Progress', number_format($fireProgress, 1) . '%')
+            Stat::make('Current Progress', number_format($fireProgress, 1) . '%')
                 ->description($fireAchieved ? 'FIRE achieved!' : 'Progress to financial independence')
                 ->icon($fireAchieved ? 'heroicon-o-check-circle' : 'heroicon-o-clock')
                 ->color($fireAchieved ? 'success' : ($fireProgress > 50 ? 'warning' : 'danger')),
@@ -118,9 +125,14 @@ class SimulationFireAnalysisWidget extends BaseWidget
                 ->color('warning'),
 
             Stat::make('Passive Income', Number::currency($annualPassiveIncome, 'NOK'))
-                ->description('4% safe withdrawal rate')
+                ->description('4% Safe Withdrawal Rate')
                 ->icon('heroicon-o-arrow-down-circle')
                 ->color('success'),
+
+            Stat::make('Safe Withdrawal Rate', '4%')
+                ->description('Common heuristic for sustainable withdrawals')
+                ->icon('heroicon-o-scale')
+                ->color('info'),
 
             Stat::make('Expense Coverage', number_format($expenseCoverage, 1) . '%')
                 ->description($expenseCoverage >= 100 ? 'Expenses fully covered' : 'Partial expense coverage')

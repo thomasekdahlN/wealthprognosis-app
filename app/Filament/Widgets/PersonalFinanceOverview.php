@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ class PersonalFinanceOverview extends BaseWidget
     protected function getStats(): array
     {
         $user = Auth::user();
-        $activeScenario = AssetConfigurationSessionService::getActiveAssetConfiguration();
+        $activeScenario = app(CurrentAssetConfiguration::class)->get();
 
         if (! $activeScenario) {
             return [

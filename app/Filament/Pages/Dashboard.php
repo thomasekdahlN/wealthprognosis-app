@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Http\Request;
 
@@ -17,14 +17,14 @@ class Dashboard extends BaseDashboard
     public function mount(Request $request): void
     {
         // Use session service for consistency
-        $this->assetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
+        $this->assetConfigurationId = app(CurrentAssetConfiguration::class)->id();
 
         // Also check for URL parameter (for backwards compatibility)
         if (!$this->assetConfigurationId && $request->get('asset_configuration_id')) {
             $urlAssetConfigurationId = $request->get('asset_configuration_id');
             $assetConfiguration = \App\Models\AssetConfiguration::find($urlAssetConfigurationId);
             if ($assetConfiguration) {
-                AssetConfigurationSessionService::setActiveAssetConfiguration($assetConfiguration);
+                app(CurrentAssetConfiguration::class)->set($assetConfiguration);
                 $this->assetConfigurationId = $urlAssetConfigurationId;
             }
         }
@@ -32,7 +32,7 @@ class Dashboard extends BaseDashboard
 
     public function getHeading(): string
     {
-        $assetConfiguration = AssetConfigurationSessionService::getActiveAssetConfiguration();
+        $assetConfiguration = app(CurrentAssetConfiguration::class)->get();
         if ($assetConfiguration) {
             return 'Dashboard - '.$assetConfiguration->name;
         }

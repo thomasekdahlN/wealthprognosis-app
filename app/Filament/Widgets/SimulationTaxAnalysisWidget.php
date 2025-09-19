@@ -9,11 +9,18 @@ use Illuminate\Support\Number;
 
 class SimulationTaxAnalysisWidget extends BaseWidget
 {
+    protected static bool $isLazy = false;
+
     public ?SimulationConfiguration $simulationConfiguration = null;
 
-    public function mount(): void
+    public function mount(?SimulationConfiguration $simulationConfiguration = null): void
     {
-        // Get simulation_configuration_id from request
+        if ($simulationConfiguration) {
+            $this->simulationConfiguration = $simulationConfiguration;
+            return;
+        }
+
+        // Fallback: Get simulation_configuration_id from request
         $simulationConfigurationId = request()->get('simulation_configuration_id');
 
         if ($simulationConfigurationId) {
@@ -102,6 +109,11 @@ class SimulationTaxAnalysisWidget extends BaseWidget
                 ->description('Peak annual tax payment')
                 ->icon('heroicon-o-arrow-up')
                 ->color('danger'),
+
+            Stat::make('Tax Efficiency Score', number_format(100 - min(100, $effectiveTaxRate), 2) . '%')
+                ->description('Higher is better')
+                ->icon('heroicon-o-bolt')
+                ->color($effectiveTaxRate < 20 ? 'success' : ($effectiveTaxRate < 30 ? 'warning' : 'danger')),
 
             Stat::make('Lowest Tax Year', Number::currency($minTaxYear, 'NOK'))
                 ->description('Minimum annual tax payment')

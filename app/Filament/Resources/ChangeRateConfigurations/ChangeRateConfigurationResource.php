@@ -49,4 +49,14 @@ class ChangeRateConfigurationResource extends Resource
             'create' => CreateChangeRateConfiguration::route('/create'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'secondary';
+    }
 }

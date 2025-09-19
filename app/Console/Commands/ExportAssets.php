@@ -42,7 +42,7 @@ class ExportAssets extends Command
 
             $customPath = $this->option('path');
 
-            // Find the asset owner
+            // Find the asset configuration
             $assetConfiguration = AssetConfiguration::with(['assets.years'])->find($assetConfigurationId);
 
             if (! $assetConfiguration) {

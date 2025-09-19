@@ -20,10 +20,6 @@ class SimulationDashboard extends Dashboard
 
     protected static bool $shouldRegisterNavigation = false;
 
-    protected string $view = 'filament.pages.simulation-dashboard';
-
-
-
     public ?SimulationConfiguration $simulationConfiguration = null;
 
     public function mount(): void
@@ -33,10 +29,7 @@ class SimulationDashboard extends Dashboard
         // Validate that simulation_configuration_id parameter is provided
         if (!$simulationConfigurationId) {
             session()->flash('error', 'No simulation configuration ID provided. Please access this dashboard through the "Dashboard" button in the Simulations list.');
-
-            // Redirect to simulations list instead of showing 404
-            redirect()->route('filament.admin.resources.simulation-configurations.index');
-            return;
+            throw new Halt(404);
         }
 
         // Validate that the ID is numeric
@@ -151,7 +144,7 @@ class SimulationDashboard extends Dashboard
 
         return [
             Action::make('assets')
-                ->label('Assets')
+                ->label('View Detailed Assets')
                 ->icon('heroicon-o-building-office-2')
                 ->color('primary')
                 ->url(route('filament.admin.pages.simulation-assets', [

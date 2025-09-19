@@ -25,7 +25,7 @@
                 "name": "Income",
                 "description": "Income",
                 "amount": 40000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -33,7 +33,7 @@
                 "name": "Expences",
                 "description": "",
                 "amount": 15000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -87,7 +87,7 @@
                 "name": "Pension",
                 "description": "Pension from $pensionOfficialYear",
                 "amount": 15000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -142,7 +142,7 @@
                 "name": "Utgifter",
                 "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
                 "amount": 7300,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -216,7 +216,7 @@
                 "name": "Utgifter",
                 "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
                 "amount": 2000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }

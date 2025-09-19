@@ -11,21 +11,21 @@ class SavingsRateOverTimeWidget extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    protected ?int $assetOwnerId = null;
+    protected ?int $assetConfigId = null;
 
     public function mount(): void
     {
-        $this->assetOwnerId = request()->get('asset_owner_id');
+        $this->assetConfigId = request()->get('asset_configuration_id') ?? request()->get('asset_config_id');
     }
 
     public function getHeading(): string
     {
         $heading = 'Savings Rate Over Time';
 
-        if ($this->assetOwnerId) {
-            $assetOwner = \App\Models\AssetConfiguration::find($this->assetOwnerId);
-            if ($assetOwner) {
-                $heading = 'Savings Rate Over Time - '.$assetOwner->name;
+        if ($this->assetConfigId) {
+            $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigId);
+            if ($assetConfiguration) {
+                $heading = 'Savings Rate Over Time - '.$assetConfiguration->name;
             }
         }
 
@@ -47,9 +47,9 @@ class SavingsRateOverTimeWidget extends ChartWidget
         $years = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            // Apply asset owner filtering if specified
-            if ($this->assetOwnerId) {
-                $query->where('asset_owner_id', $this->assetOwnerId);
+            // Apply asset configuration filtering if specified
+            if ($this->assetConfigId) {
+                $query->where('asset_configuration_id', $this->assetConfigId);
             }
         })
             ->where('year', '<=', now()->year) // Don't go beyond current year
@@ -71,9 +71,9 @@ class SavingsRateOverTimeWidget extends ChartWidget
             $incomeRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
                 $query->where('user_id', $user->id)->where('is_active', true);
 
-                // Apply asset owner filtering if specified
-                if ($this->assetOwnerId) {
-                    $query->where('asset_owner_id', $this->assetOwnerId);
+                // Apply asset configuration filtering if specified
+                if ($this->assetConfigId) {
+                    $query->where('asset_configuration_id', $this->assetConfigId);
                 }
             })
                 ->where('year', $year)
@@ -91,9 +91,9 @@ class SavingsRateOverTimeWidget extends ChartWidget
             $expenseRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
                 $query->where('user_id', $user->id)->where('is_active', true);
 
-                // Apply asset owner filtering if specified
-                if ($this->assetOwnerId) {
-                    $query->where('asset_owner_id', $this->assetOwnerId);
+                // Apply asset configuration filtering if specified
+                if ($this->assetConfigId) {
+                    $query->where('asset_configuration_id', $this->assetConfigId);
                 }
             })
                 ->where('year', $year)

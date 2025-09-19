@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Events\Pages;
 
 use App\Filament\Resources\Events\EventResource;
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Resources\Pages\ListRecords;
 
 class ListEvents extends ListRecords
@@ -22,7 +22,7 @@ class ListEvents extends ListRecords
 
     public function getHeading(): string
     {
-        $assetConfiguration = AssetConfigurationSessionService::getActiveAssetConfiguration();
+        $assetConfiguration = app(CurrentAssetConfiguration::class)->get();
         if ($assetConfiguration) {
             return 'Future Asset Events - ' . $assetConfiguration->name;
         }

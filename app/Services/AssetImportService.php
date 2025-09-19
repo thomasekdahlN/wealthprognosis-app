@@ -310,7 +310,7 @@ class AssetImportService
             'asset_configuration_id' => $asset->asset_configuration_id,
 
             // Income data
-            'income_name' => Arr::get($yearData, 'income.name'),
+
             'income_description' => Arr::get($yearData, 'income.description'),
             'income_amount' => (float) Arr::get($yearData, 'income.amount', 0),
             'income_factor' => $this->convertFactorToEnum(Arr::get($yearData, 'income.factor', 1)),
@@ -321,7 +321,7 @@ class AssetImportService
             'income_repeat' => (bool) Arr::get($yearData, 'income.repeat', false),
 
             // Expense data
-            'expence_name' => Arr::get($yearData, 'expence.name'),
+
             'expence_description' => Arr::get($yearData, 'expence.description'),
             'expence_amount' => (float) Arr::get($yearData, 'expence.amount', 0),
             'expence_factor' => $this->convertFactorToEnum(Arr::get($yearData, 'expence.factor', 1)),
@@ -332,7 +332,7 @@ class AssetImportService
             'expence_repeat' => (bool) Arr::get($yearData, 'expence.repeat', false),
 
             // Asset data
-            'asset_name' => Arr::get($yearData, 'asset.name'),
+
             'asset_description' => Arr::get($yearData, 'asset.description'),
             'asset_market_amount' => (float) Arr::get($yearData, 'asset.marketAmount', 0),
             'asset_acquisition_amount' => (float) Arr::get($yearData, 'asset.acquisitionAmount', 0),
@@ -346,7 +346,7 @@ class AssetImportService
             'asset_repeat' => (bool) Arr::get($yearData, 'asset.repeat', false),
 
             // Mortgage data
-            'mortgage_name' => Arr::get($yearData, 'mortgage.name'),
+
             'mortgage_description' => Arr::get($yearData, 'mortgage.description'),
             'mortgage_amount' => (float) Arr::get($yearData, 'mortgage.amount', 0),
             'mortgage_years' => (int) Arr::get($yearData, 'mortgage.years', 0),

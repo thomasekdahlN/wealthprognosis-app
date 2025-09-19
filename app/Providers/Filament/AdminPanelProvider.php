@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets') // Disabled to manually control widgets
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 // ROW 1: Asset Overview (sort = 0) - 4 stats in 1 widget = 4 per row
                 \App\Filament\Widgets\AssetOverviewWidget::class,
@@ -91,12 +91,25 @@ class AdminPanelProvider extends PanelProvider
             PanelsRenderHook::TOPBAR_END,
             fn (): string => Blade::render('<div class="px-2"><livewire:asset-configuration-picker /></div>')
         );
+
+        // Global download handler for pages
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_END,
+            fn (): string => Blade::render('<script>document.addEventListener("livewire:init",()=>{window.addEventListener("download-file",(event)=>{const d=event?.detail||{};const url=d.url||event.url;const filename=d.filename||event.filename||"";if(!url)return;const a=document.createElement("a");a.href=url;a.download=filename;a.style.display="none";document.body.appendChild(a);a.click();document.body.removeChild(a);});});</script>')
+        );
+
+        // Wide table behavior (page-wide horizontal scroll, no inner scroll)
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_END,
+            fn (): string => Blade::render('<style>.wide-table .fi-ta .overflow-x-auto{overflow-x:visible!important}.wide-table .fi-ta table{width:max-content!important;min-width:max-content!important}</style><script>document.addEventListener("livewire:init",()=>{window.addEventListener("wide-table-enable",()=>{try{document.documentElement.classList.add("wide-table");document.documentElement.style.setProperty("overflow-x","auto","important");document.body.style.setProperty("overflow-x","auto","important");const sels=[".fi-layout",".fi-main",".fi-body",".fi-content",".fi-section",".fi-simple-layout"];sels.forEach(sel=>document.querySelectorAll(sel).forEach(el=>el.style.setProperty("overflow-x","visible","important")));}catch(e){}});});</script>')
+        );
     }
+
 
     protected function getBrandName(): string
     {
         $appName = config('app.name', 'Laravel');
-        $activeAssetConfiguration = \App\Services\AssetConfigurationSessionService::getActiveAssetConfiguration();
+        $activeAssetConfiguration = app(\App\Services\CurrentAssetConfiguration::class)->get();
 
         if ($activeAssetConfiguration) {
             return $appName . ' - ' . $activeAssetConfiguration->name;
@@ -105,9 +118,10 @@ class AdminPanelProvider extends PanelProvider
         return $appName;
     }
 
+
     protected function getBrandLogo(): ?string
     {
-        $activeAssetConfiguration = \App\Services\AssetConfigurationSessionService::getActiveAssetConfiguration();
+        $activeAssetConfiguration = app(\App\Services\CurrentAssetConfiguration::class)->get();
 
         if ($activeAssetConfiguration && $activeAssetConfiguration->icon) {
             $iconName = $activeAssetConfiguration->icon;

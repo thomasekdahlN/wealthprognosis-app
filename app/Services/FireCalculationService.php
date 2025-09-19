@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class FireCalculationService
 {
-    public static function getFinancialData(?int $assetOwnerId = null): array
+    public static function getFinancialData(?int $assetConfigId = null): array
     {
         $user = Auth::user();
         $currentYear = now()->year;
@@ -21,17 +21,20 @@ class FireCalculationService
             }
         }
 
-        // Use provided asset owner ID, or get from request/session if not provided
-        if ($assetOwnerId === null) {
-            $assetOwnerId = request()->get('asset_owner_id') ?? session('dashboard_asset_owner_id');
+        // Accept both new and legacy keys: asset_configuration_id (preferred) and asset_owner_id (legacy)
+        if ($assetConfigId === null) {
+            $assetConfigId = request()->get('asset_configuration_id')
+                ?? session('dashboard_asset_configuration_id')
+                ?? request()->get('asset_owner_id')
+                ?? session('dashboard_asset_owner_id');
         }
 
         // Calculate FIRE-sellable assets (Investment Assets)
-        $totalAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetOwnerId) {
+        $totalAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetOwnerId) {
-                $query->where('asset_owner_id', $assetOwnerId);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
             }
 
             $query->whereHas('assetType', function ($assetTypeQuery) {
@@ -43,11 +46,11 @@ class FireCalculationService
             ->sum('asset_market_amount') ?? 0;
 
         // Calculate ALL assets for Net Worth
-        $allAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetOwnerId) {
+        $allAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetOwnerId) {
-                $query->where('asset_owner_id', $assetOwnerId);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
             }
         })
             ->where('year', $currentYear)
@@ -55,22 +58,22 @@ class FireCalculationService
             ->sum('asset_market_amount') ?? 0;
 
         // Calculate total liabilities
-        $totalLiabilities = AssetYear::whereHas('asset', function ($query) use ($user, $assetOwnerId) {
+        $totalLiabilities = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetOwnerId) {
-                $query->where('asset_owner_id', $assetOwnerId);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
             }
         })
             ->where('year', $currentYear)
             ->sum('mortgage_amount') ?? 0;
 
         // Calculate monthly income
-        $incomeRecords = AssetYear::whereHas('asset', function ($query) use ($user, $assetOwnerId) {
+        $incomeRecords = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetOwnerId) {
-                $query->where('asset_owner_id', $assetOwnerId);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
             }
         })
             ->where('year', $currentYear)
@@ -87,11 +90,11 @@ class FireCalculationService
         });
 
         // Calculate monthly expenses
-        $expenseRecords = AssetYear::whereHas('asset', function ($query) use ($user, $assetOwnerId) {
+        $expenseRecords = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetOwnerId) {
-                $query->where('asset_owner_id', $assetOwnerId);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
             }
         })
             ->where('year', $currentYear)
@@ -120,7 +123,8 @@ class FireCalculationService
         return [
             'user' => $user,
             'currentYear' => $currentYear,
-            'assetOwnerId' => $assetOwnerId,
+            'assetConfigurationId' => $assetConfigId,
+            'assetOwnerId' => $assetConfigId,
             'totalAssets' => $totalAssets, // FIRE-sellable assets
             'allAssets' => $allAssets, // All assets
             'totalLiabilities' => $totalLiabilities,
@@ -142,6 +146,7 @@ class FireCalculationService
         return [
             'user' => null,
             'currentYear' => now()->year,
+            'assetConfigurationId' => null,
             'assetOwnerId' => null,
             'totalAssets' => 0,
             'allAssets' => 0,

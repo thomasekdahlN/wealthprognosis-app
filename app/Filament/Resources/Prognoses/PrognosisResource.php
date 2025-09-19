@@ -101,4 +101,14 @@ class PrognosisResource extends Resource
             'edit' => Pages\EditPrognosis::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'secondary';
+    }
 }

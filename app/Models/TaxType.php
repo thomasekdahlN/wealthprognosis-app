@@ -17,7 +17,6 @@ class TaxType extends Model
         'type',
         'name',
         'description',
-        'default_rate',
         'is_active',
         'sort_order',
         'created_by',
@@ -27,7 +26,6 @@ class TaxType extends Model
     ];
 
     protected $casts = [
-        'default_rate' => 'decimal:4',
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];

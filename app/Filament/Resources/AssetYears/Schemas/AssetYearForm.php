@@ -169,12 +169,13 @@ class AssetYearForm
                             ->nullable()
                             ->default(null)
                             ->helperText('Source of income from another asset. Select from assets with lower sort order within the same configuration.'),
-                        Select::make('income_changerate')
+                        TextInput::make('income_changerate')
                             ->label('Income Change Rate')
-                            ->options(self::getChangeRateOptions())
-                            ->default('changerates.kpi')
-                            ->searchable()
-                            ->helperText('Select the change rate type for income calculations'),
+                            ->placeholder('e.g. 2.5 or changerates.kpi')
+                            ->datalist(array_keys(self::getChangeRateOptions()))
+                            ->nullable()
+                            ->default(null)
+                            ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         Toggle::make('income_repeat')->label('Repeat Income'),
                     ])
                     ->visible(function ($get): bool {
@@ -278,12 +279,13 @@ class AssetYearForm
                             ->nullable()
                             ->default(null)
                             ->helperText('Source of expense from another asset. Select from assets with lower sort order within the same configuration.'),
-                        Select::make('expence_changerate')
+                        TextInput::make('expence_changerate')
                             ->label('Expense Change Rate')
-                            ->options(self::getChangeRateOptions())
-                            ->default('changerates.kpi')
-                            ->searchable()
-                            ->helperText('Select the change rate type for expense calculations'),
+                            ->placeholder('e.g. 2.5 or changerates.kpi')
+                            ->datalist(array_keys(self::getChangeRateOptions()))
+                            ->nullable()
+                            ->default(null)
+                            ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         Toggle::make('expence_repeat')->label('Repeat Expense'),
                     ])
                     ->visible(function ($get): bool {
@@ -307,12 +309,13 @@ class AssetYearForm
                         TextInput::make('asset_equity_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK'),
                         TextInput::make('asset_taxable_initial_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK'),
                         TextInput::make('asset_paid_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK'),
-                        Select::make('asset_changerate')
+                        TextInput::make('asset_changerate')
                             ->label('Asset Change Rate')
-                            ->options(self::getChangeRateOptions())
-                            ->default('changerates.kpi')
-                            ->searchable()
-                            ->helperText('Select the change rate type for asset value calculations'),
+                            ->placeholder('e.g. 2.5 or changerates.kpi')
+                            ->datalist(array_keys(self::getChangeRateOptions()))
+                            ->nullable()
+                            ->default(null)
+                            ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         TextInput::make('asset_rule')
                             ->label('Asset Rule')
                             ->rules([new AssetRuleValidation])

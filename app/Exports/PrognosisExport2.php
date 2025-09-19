@@ -205,39 +205,21 @@ class PrognosisExport2
         $this->spreadsheet->setActiveSheetIndexByName($sheetTitle);
         $sheet = $this->spreadsheet->getActiveSheet();
 
-        $sheet->getStyle('B6:AP80')->getNumberFormat()->setFormatCode('#,##;[Red]-#,##');
-
-        // Kolonner med prosenter i innhold
-        $sheet->getStyle('D6:D80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('F6:F80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-
-        $sheet->getStyle('H6:H80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('J6:J80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('O6:O80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('Q6:Q80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-
-        $sheet->getStyle('V6:V80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('X6:X80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('Z6:Z80')->getNumberFormat()->setFormatCode('0.00%;[Red]-0.00%'); // % styling
-
-        $sheet->getStyle('AD6:AD80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('AF6:AF80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-
-        $sheet->getStyle('AG6:AG80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling. Yield
-        $sheet->getStyle('AH6:AH80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling. Yield
-
-        $sheet->getStyle('AK6:AK80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
-        $sheet->getStyle('AP6:AP80')->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%'); // % styling
+        $meta = [
+            'thisYear' => $this->thisYear,
+            'prevYear' => $this->prevYear,
+            'prognoseYear' => $this->prognoseYear,
+            'pensionOfficialYear' => $this->pensionOfficialYear,
+            'pensionWishYear' => $this->pensionWishYear,
+            'deathYear' => $this->deathYear,
+        ];
+        \App\Services\ExcelFormatting::applyCommonAssetSheetFormatting($sheet, $meta);
 
         for ($column = 1; $column <= 34 + 6; $column++) {
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
         }
 
         $verticaloffsett = 6;
-        // Grå Kolonne header
-        $sheet->getStyle('A5:AQ5')->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('CCCCCC');
 
         // Inntekt - vertikal
         $sheet->getStyle('C6:C'.$this->showYears + $verticaloffsett - 1)->getFill()
@@ -312,3 +294,4 @@ class PrognosisExport2
             ->getStartColor()->setARGB($this->deathYearRowColor);
     }
 }
+

@@ -40,14 +40,6 @@ class TaxTypesTable
                         return $state;
                     }),
 
-                TextColumn::make('default_rate')
-                    ->label('Default Rate')
-                    ->numeric(decimalPlaces: 2, locale: \App\Helpers\AmountHelper::getNorwegianLocale())
-                    ->suffix('%')
-                    ->sortable()
-                    ->alignEnd()
-                    ->color(fn ($state) => $state > 20 ? 'danger' : ($state > 10 ? 'warning' : 'success')),
-
                 TextColumn::make('sort_order')
                     ->label('Order')
                     ->sortable()

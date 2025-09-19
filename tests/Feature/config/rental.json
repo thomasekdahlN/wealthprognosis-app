@@ -32,7 +32,7 @@
                 "name": "Rental",
                 "description": "Rental 10500 pr month",
                 "amount": 10500,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -40,7 +40,7 @@
                 "name": "Utgifter",
                 "description": "Kommunale/Forsikring/Strøm 2600 mnd",
                 "amount": 2600,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },

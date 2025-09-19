@@ -7,14 +7,21 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationAssetAllocationChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Asset Allocation Over Time';
+    protected static bool $isLazy = false;
+
+    protected ?string $heading = 'Portfolio Allocation Evolution';
     protected static ?int $sort = 6;
 
     public ?SimulationConfiguration $simulationConfiguration = null;
 
-    public function mount(): void
+    public function mount(?SimulationConfiguration $simulationConfiguration = null): void
     {
-        // Get simulation_configuration_id from request
+        if ($simulationConfiguration) {
+            $this->simulationConfiguration = $simulationConfiguration;
+            return;
+        }
+
+        // Fallback: Get simulation_configuration_id from request
         $simulationConfigurationId = request()->get('simulation_configuration_id');
 
         if ($simulationConfigurationId) {

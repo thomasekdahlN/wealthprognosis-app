@@ -13,56 +13,62 @@ class TeamSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create default team with ID = 1
-        $defaultTeam = Team::create([
-            'id' => 1,
-            'name' => 'Default Team',
-            'description' => 'Default team for all users',
-            'owner_id' => 1, // Will be set to first user
-            'is_active' => true,
-            'settings' => [],
-            'created_by' => 1,
-            'updated_by' => 1,
-            'created_checksum' => hash('sha256', 'default_team_created'),
-            'updated_checksum' => hash('sha256', 'default_team_updated'),
-        ]);
+        // Resolve users by email to avoid hard-coded IDs
+        $thomas = User::firstWhere('email', 'thomas@ekdahl.no');
+        $tommy = User::firstWhere('email', 'tommyl@coretrek.no');
+        $fallbackUserId = User::query()->min('id') ?? 1;
 
-        echo "Created default team (ID: {$defaultTeam->id})\n";
+        // Create or update default team with ID = 1
+        $defaultTeam = Team::updateOrCreate(
+            ['id' => 1],
+            [
+                'name' => 'Default Team',
+                'description' => 'Default team for all users',
+                'owner_id' => $thomas?->id ?? $fallbackUserId,
+                'is_active' => true,
+                'settings' => [],
+                'created_by' => $thomas?->id ?? $fallbackUserId,
+                'updated_by' => $thomas?->id ?? $fallbackUserId,
+                'created_checksum' => hash('sha256', 'default_team_created'),
+                'updated_checksum' => hash('sha256', 'default_team_updated'),
+            ]
+        );
 
-        // Create second team for tommyl user
-        $secondTeam = Team::create([
-            'id' => 2,
-            'name' => 'Tommy Team',
-            'description' => 'Team for Tommy L user',
-            'owner_id' => 2, // Tommy L
-            'is_active' => true,
-            'settings' => [],
-            'created_by' => 2,
-            'updated_by' => 2,
-            'created_checksum' => hash('sha256', 'tommy_team_created'),
-            'updated_checksum' => hash('sha256', 'tommy_team_updated'),
-        ]);
+        echo "Ensured default team (ID: {$defaultTeam->id}) exists\n";
 
-        echo "Created second team (ID: {$secondTeam->id})\n";
+        // Create or update second team for Tommy user
+        $secondTeam = Team::updateOrCreate(
+            ['id' => 2],
+            [
+                'name' => 'Tommy Team',
+                'description' => 'Team for Tommy L user',
+                'owner_id' => $tommy?->id ?? $thomas?->id ?? $fallbackUserId,
+                'is_active' => true,
+                'settings' => [],
+                'created_by' => $tommy?->id ?? $thomas?->id ?? $fallbackUserId,
+                'updated_by' => $tommy?->id ?? $thomas?->id ?? $fallbackUserId,
+                'created_checksum' => hash('sha256', 'tommy_team_created'),
+                'updated_checksum' => hash('sha256', 'tommy_team_updated'),
+            ]
+        );
 
-        // Add users to their respective teams
+        echo "Ensured second team (ID: {$secondTeam->id}) exists\n";
+
+        // Add users to their respective teams if not already added, and set current team by email
         $users = User::all();
         foreach ($users as $user) {
-            if ($user->id === 1) {
-                // Thomas Ekdahl -> Team 1
+            if ($user->email === 'thomas@ekdahl.no') {
                 $defaultTeam->addUser($user, 'owner');
-                $user->current_team_id = 1;
-                echo "Added user {$user->name} to default team (ID: 1)\n";
-            } elseif ($user->id === 2) {
-                // Tommy L -> Team 2
+                $user->current_team_id = $defaultTeam->id;
+                echo "Ensured user {$user->name} is owner of default team (ID: {$defaultTeam->id})\n";
+            } elseif ($user->email === 'tommyl@coretrek.no') {
                 $secondTeam->addUser($user, 'owner');
-                $user->current_team_id = 2;
-                echo "Added user {$user->name} to second team (ID: 2)\n";
+                $user->current_team_id = $secondTeam->id;
+                echo "Ensured user {$user->name} is owner of second team (ID: {$secondTeam->id})\n";
             } else {
-                // Any other users -> Team 1
                 $defaultTeam->addUser($user, 'member');
-                $user->current_team_id = 1;
-                echo "Added user {$user->name} to default team (ID: 1)\n";
+                $user->current_team_id = $defaultTeam->id;
+                echo "Ensured user {$user->name} is member of default team (ID: {$defaultTeam->id})\n";
             }
 
             $user->save();

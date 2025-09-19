@@ -47,7 +47,11 @@ class ChooseCountry extends Page implements HasTable
         return $table
             ->columns([
                 TextColumn::make('name')->label('Country')->searchable(),
-                TextColumn::make('code')->label('Code')->badge(),
+                TextColumn::make('code')
+                    ->label('Country (Code)')
+                    ->formatStateUsing(fn ($state, array $record) => sprintf('%s (%s)', (string) ($record['name'] ?? strtoupper((string) $state)), strtoupper((string) $state)))
+                    ->badge()
+                    ->searchable(),
             ])
             ->records(fn () => $this->getTableRecords())
             ->paginated(false)

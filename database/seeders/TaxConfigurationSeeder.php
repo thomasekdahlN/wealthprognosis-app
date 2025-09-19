@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\TaxConfiguration;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
 
 class TaxConfigurationSeeder extends Seeder
 {
@@ -13,8 +14,8 @@ class TaxConfigurationSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing tax configurations
-        TaxConfiguration::truncate();
+        // Idempotent load: upsert per (country, year, tax_type)
+        // TaxConfiguration::truncate();
 
         // Load tax configurations for all countries
         $countries = ['no', 'se', 'ch'];
@@ -45,14 +46,18 @@ class TaxConfigurationSeeder extends Seeder
             return;
         }
 
+        // Use file system timestamps for audit fields
+        $createdAt = Carbon::createFromTimestamp(@filectime($filePath) ?: @filemtime($filePath));
+        $updatedAt = Carbon::createFromTimestamp(@filemtime($filePath) ?: time());
+
         foreach ($taxData as $assetType => $config) {
-            $this->createTaxConfiguration($countryCode, $year, $assetType, $config);
+            $this->createTaxConfiguration($countryCode, $year, $assetType, $config, $createdAt, $updatedAt);
         }
 
         $this->command->info("Loaded tax configuration for {$countryCode} {$year}");
     }
 
-    private function createTaxConfiguration(string $countryCode, int $year, string $assetType, array $config): void
+    private function createTaxConfiguration(string $countryCode, int $year, string $assetType, array $config, Carbon $createdAt, Carbon $updatedAt): void
     {
         // Get or create a default user for seeding
         $user = \App\Models\User::first();
@@ -83,48 +88,58 @@ class TaxConfigurationSeeder extends Seeder
             // Property tax with municipality-specific configurations
             foreach ($config as $municipality => $municipalityConfig) {
                 if (is_array($municipalityConfig)) {
-                    TaxConfiguration::create([
-                        'user_id' => $user->id,
-                        'team_id' => $team->id,
-                        'created_by' => $user->id,
-                        'updated_by' => $user->id,
-                        'created_checksum' => hash('sha256', 'tax_config_created_'.$countryCode.'_'.$year.'_'.$assetType.'_'.$municipality),
-                        'updated_checksum' => hash('sha256', 'tax_config_updated_'.$countryCode.'_'.$year.'_'.$assetType.'_'.$municipality),
+                    $model = TaxConfiguration::updateOrCreate(
+                        [
+                            'country_code' => $countryCode,
+                            'year' => $year,
+                            'tax_type' => "{$assetType}_{$municipality}",
+                        ],
+                        [
+                            'user_id' => $user->id,
+                            'team_id' => $team->id,
+                            'created_by' => $user->id,
+                            'updated_by' => $user->id,
+                            'created_checksum' => hash('sha256', 'tax_config_created_'.$countryCode.'_'.$year.'_'.$assetType.'_'.$municipality),
+                            'updated_checksum' => hash('sha256', 'tax_config_updated_'.$countryCode.'_'.$year.'_'.$assetType.'_'.$municipality),
+                            'is_active' => true,
+                            'description' => ucfirst($municipality).' municipality',
+                            'configuration' => $municipalityConfig,
+                        ]
+                    );
 
-                        'country_code' => $countryCode,
-                        'year' => $year,
-                        'tax_type' => "{$assetType}_{$municipality}",
-                        'income_tax_rate' => $municipalityConfig['income'] ?? 0,
-                        'realization_tax_rate' => $municipalityConfig['realization'] ?? 0,
-                        'fortune_tax_rate' => $municipalityConfig['fortune'] ?? 0,
-                        'standard_deduction' => $municipalityConfig['standardDeduction'] ?? 0,
-                        'is_active' => true,
-                        'description' => ucfirst($municipality).' municipality',
-                        'configuration_data' => $municipalityConfig,
-                    ]);
+                    // Apply file timestamps to created_at/updated_at
+                    $model->timestamps = false;
+                    $model->created_at = $createdAt;
+                    $model->updated_at = $updatedAt;
+                    $model->saveQuietly();
                 }
             }
         } else {
             // Standard asset configuration
-            TaxConfiguration::create([
-                'user_id' => $user->id,
-                'team_id' => $team->id,
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-                'created_checksum' => hash('sha256', 'tax_config_created_'.$countryCode.'_'.$year.'_'.$assetType),
-                'updated_checksum' => hash('sha256', 'tax_config_updated_'.$countryCode.'_'.$year.'_'.$assetType),
+            $model = TaxConfiguration::updateOrCreate(
+                [
+                    'country_code' => $countryCode,
+                    'year' => $year,
+                    'tax_type' => $assetType,
+                ],
+                [
+                    'user_id' => $user->id,
+                    'team_id' => $team->id,
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                    'created_checksum' => hash('sha256', 'tax_config_created_'.$countryCode.'_'.$year.'_'.$assetType),
+                    'updated_checksum' => hash('sha256', 'tax_config_updated_'.$countryCode.'_'.$year.'_'.$assetType),
+                    'is_active' => true,
+                    'description' => ucfirst($assetType),
+                    'configuration' => $config,
+                ]
+            );
 
-                'country_code' => $countryCode,
-                'year' => $year,
-                'tax_type' => $assetType,
-                'income_tax_rate' => $config['income'] ?? 0,
-                'realization_tax_rate' => $config['realization'] ?? 0,
-                'fortune_tax_rate' => $config['fortune'] ?? 0,
-                'standard_deduction' => $config['standardDeduction'] ?? 0,
-                'is_active' => true,
-                'description' => ucfirst($assetType),
-                'configuration_data' => $config,
-            ]);
+            // Apply file timestamps to created_at/updated_at
+            $model->timestamps = false;
+            $model->created_at = $createdAt;
+            $model->updated_at = $updatedAt;
+            $model->saveQuietly();
         }
     }
 }

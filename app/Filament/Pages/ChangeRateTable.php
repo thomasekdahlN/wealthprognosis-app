@@ -24,8 +24,10 @@ class ChangeRateTable extends Page implements HasForms, HasTable
     use InteractsWithForms, InteractsWithTable;
 
     protected static bool $shouldRegisterNavigation = false;
-
     protected string $view = 'filament.pages.change-rate-table';
+
+
+
 
     public string $scenario;
 
@@ -98,13 +100,16 @@ class ChangeRateTable extends Page implements HasForms, HasTable
                 TextColumn::make('year')
                     ->label('Year')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->alignEnd(),
 
                 TextInputColumn::make('change_rate')
                     ->label('Change Rate (%)')
                     ->type('number')
                     ->step(0.01)
-                    ->rules(['required', 'numeric'])
+                    ->rules(['required', 'numeric', 'regex:/^-?\d+(?:\.\d{1,2})?$/'])
+                    ->getStateUsing(fn ($record) => $record?->change_rate !== null ? number_format((float) $record->change_rate, 2, '.', '') : null)
+                    ->alignEnd()
                     ->sortable(),
 
                 TextInputColumn::make('description')
@@ -112,12 +117,23 @@ class ChangeRateTable extends Page implements HasForms, HasTable
                     ->placeholder('Optional description'),
 
                 ToggleColumn::make('is_active')
-                    ->label('Active')
-                    ->sortable(),
+                    ->label('Active'),
+
+                TextColumn::make('updated_at')
+                    ->label('Updated At')
+                    ->dateTime('Y-m-d H:i')
+                    ->sortable()
+                    ->alignEnd(),
+
+                TextColumn::make('updated_by')
+                    ->label('Updated By')
+                    ->formatStateUsing(fn ($state, $record): string => $record->updatedBy?->name ?? (string) $state)
+                    ->searchable(),
             ])
+            ->recordClasses(fn ($record) => (int) $record->year === (int) now()->year ? 'bg-primary-50 dark:bg-primary-900/30' : null)
             ->defaultSort('year', 'asc')
             ->headerActions([
-                CreateAction::make()
+                Action::make('add_year')
                     ->label('Add Year')
                     ->icon('heroicon-m-plus')
                     ->action(function () {
@@ -156,18 +172,45 @@ class ChangeRateTable extends Page implements HasForms, HasTable
                 ->icon('heroicon-m-arrow-left')
                 ->color('gray')
                 ->action(function () {
-                    return redirect()->route('filament.admin.pages.prognosis-change-assets', [
+                    return redirect()->route('filament.admin.pages.change-rate-assets', [
                         'scenario' => $this->scenario,
                     ]);
                 }),
-
             Action::make('back_to_scenarios')
                 ->label('← All Scenarios')
                 ->icon('heroicon-m-home')
                 ->color('gray')
                 ->action(function () {
-                    return redirect()->route('filament.admin.pages.prognosis-change-rates');
+                    return redirect()->route('filament.admin.pages.change-rate-scenarios');
                 }),
+        ];
+    }
+
+    public function getWidgetData(): array
+    {
+        return [
+            'scenario' => $this->scenario,
+            'asset' => $this->asset,
+        ];
+    }
+
+
+    protected function getHeaderWidgets(): array
+    {
+        return [];
+    }
+
+    public function getWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\ChangeRateTrendWidget::class,
+        ];
+    }
+
+    public function getColumns(): int|string|array
+    {
+        return [
+            'default' => 1,
         ];
     }
 }

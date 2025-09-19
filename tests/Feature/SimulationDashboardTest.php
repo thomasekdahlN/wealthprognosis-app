@@ -323,12 +323,12 @@ it('handles simulation with no data gracefully', function () {
 
 it('can instantiate all dashboard widgets without errors', function () {
     $widgets = [
-        \App\Filament\Widgets\SimulationOverviewWidget::class,
-        \App\Filament\Widgets\FireAnalysisWidget::class,
-        \App\Filament\Widgets\TaxAnalysisWidget::class,
-        \App\Filament\Widgets\NetWorthProjectionChart::class,
-        \App\Filament\Widgets\CashFlowProjectionChart::class,
-        \App\Filament\Widgets\AssetAllocationOverTimeChart::class,
+        \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
+        \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
+        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
+        \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
     foreach ($widgets as $widgetClass) {
@@ -356,9 +356,9 @@ it('widgets calculate correct financial metrics', function () {
 
 it('chart widgets generate valid chart data', function () {
     $chartWidgets = [
-        \App\Filament\Widgets\NetWorthProjectionChart::class,
-        \App\Filament\Widgets\CashFlowProjectionChart::class,
-        \App\Filament\Widgets\AssetAllocationOverTimeChart::class,
+        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
+        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
+        \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
     foreach ($chartWidgets as $widgetClass) {
@@ -465,12 +465,12 @@ it('catches php syntax errors in page class', function () {
 it('catches widget instantiation syntax errors', function () {
     // Test that all widget classes can be instantiated without syntax errors
     $widgetClasses = [
-        \App\Filament\Widgets\SimulationOverviewWidget::class,
-        \App\Filament\Widgets\FireAnalysisWidget::class,
-        \App\Filament\Widgets\TaxAnalysisWidget::class,
-        \App\Filament\Widgets\NetWorthProjectionChart::class,
-        \App\Filament\Widgets\CashFlowProjectionChart::class,
-        \App\Filament\Widgets\AssetAllocationOverTimeChart::class,
+        \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
+        \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
+        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
+        \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
     foreach ($widgetClasses as $widgetClass) {
@@ -514,12 +514,12 @@ it('validates all dashboard components can be instantiated', function () {
 
     // Test all widget classes
     $widgetClasses = [
-        \App\Filament\Widgets\SimulationOverviewWidget::class,
-        \App\Filament\Widgets\FireAnalysisWidget::class,
-        \App\Filament\Widgets\TaxAnalysisWidget::class,
-        \App\Filament\Widgets\NetWorthProjectionChart::class,
-        \App\Filament\Widgets\CashFlowProjectionChart::class,
-        \App\Filament\Widgets\AssetAllocationOverTimeChart::class,
+        \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
+        \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
+        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
+        \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
     foreach ($widgetClasses as $widgetClass) {
@@ -620,32 +620,32 @@ it('catches BadMethodCallException in HTTP dashboard access', function () {
 it('validates widget base classes and methods to prevent getColumns errors', function () {
     // Test that widgets extend the correct base classes and have required methods
     $widgetTests = [
-        \App\Filament\Widgets\SimulationOverviewWidget::class => [
+        \App\Filament\Widgets\SimulationStatsOverviewWidget::class => [
             'base_class' => \Filament\Widgets\StatsOverviewWidget::class,
             'required_methods' => ['getStats'],
             'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
         ],
-        \App\Filament\Widgets\FireAnalysisWidget::class => [
+        \App\Filament\Widgets\SimulationFireAnalysisWidget::class => [
             'base_class' => \Filament\Widgets\StatsOverviewWidget::class,
             'required_methods' => ['getStats'],
             'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
         ],
-        \App\Filament\Widgets\TaxAnalysisWidget::class => [
+        \App\Filament\Widgets\SimulationTaxAnalysisWidget::class => [
             'base_class' => \Filament\Widgets\StatsOverviewWidget::class,
             'required_methods' => ['getStats'],
             'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
         ],
-        \App\Filament\Widgets\NetWorthProjectionChart::class => [
+        \App\Filament\Widgets\SimulationNetWorthChartWidget::class => [
             'base_class' => \Filament\Widgets\ChartWidget::class,
             'required_methods' => ['getData', 'getType'],
             'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
         ],
-        \App\Filament\Widgets\CashFlowProjectionChart::class => [
+        \App\Filament\Widgets\SimulationCashFlowChartWidget::class => [
             'base_class' => \Filament\Widgets\ChartWidget::class,
             'required_methods' => ['getData', 'getType'],
             'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
         ],
-        \App\Filament\Widgets\AssetAllocationOverTimeChart::class => [
+        \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class => [
             'base_class' => \Filament\Widgets\ChartWidget::class,
             'required_methods' => ['getData', 'getType'],
             'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']

@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('type')->unique();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('default_rate', 8, 4)->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
             $table->foreignId('created_by')->nullable()->constrained('users');

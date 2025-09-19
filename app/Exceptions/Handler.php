@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use Filament\Support\Exceptions\Halt;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -38,13 +40,30 @@ class Handler extends ExceptionHandler
 
     /**
      * Register the exception handling callbacks for the application.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     */
+    public function render($request, Throwable $e): Response
+    {
+        if ($e instanceof Halt) {
+            // Filament Halt is used to short-circuit page rendering with a status code.
+            // Convert to a plain HTTP response so tests can assert the correct status.
+            $message = (string) $e->getMessage();
+            $status = is_numeric($message) ? (int) $message : 403;
+
+            $status = ($status >= 100 && $status < 600) ? $status : 403;
+
+            return response('', $status);
+        }
+
+        return parent::render($request, $e);
     }
 }

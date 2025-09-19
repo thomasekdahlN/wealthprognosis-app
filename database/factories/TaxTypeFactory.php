@@ -25,7 +25,6 @@ class TaxTypeFactory extends Factory
             'type' => $this->faker->unique()->slug(2),
             'name' => $this->faker->words(2, true),
             'description' => $this->faker->sentence(),
-            'default_rate' => $this->faker->randomFloat(4, 0, 50),
             'is_active' => $this->faker->boolean(80),
             'sort_order' => $this->faker->numberBetween(1, 100),
             'user_id' => $user->id,

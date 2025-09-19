@@ -64,7 +64,9 @@ class AssetTypeTaxTypeRelationTest extends TestCase
         $this->assertNotNull($equityAsset, 'Equity fund asset type should exist');
         $this->assertNotNull($equityAsset->taxType, 'Equity fund should have tax type');
 
-        $this->assertEquals('Capital Gains Tax', $equityAsset->taxType->name);
+        // With 1:1 mapping from config, the name comes from config/tax/tax_types.json
+        $this->assertEquals('realization', $equityAsset->taxType->type);
+        $this->assertEquals('Realization', $equityAsset->taxType->name);
     }
 
     public function test_tax_type_has_asset_types_relationship()

@@ -25,7 +25,20 @@ class ChangeRateScenarios extends Page implements HasTable
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) \App\Models\PrognosisChangeRate::query()->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'secondary';
+    }
+
+
     protected string $view = 'filament.pages.change-rate-scenarios';
+
+
 
     public function getTitle(): string|Htmlable
     {
@@ -73,15 +86,13 @@ class ChangeRateScenarios extends Page implements HasTable
 
                 TextColumn::make('asset_count')
                     ->label('Asset Types')
-                    ->badge()
-                    ->color('primary')
-                    ->alignCenter(),
+                    ->numeric()
+                    ->alignEnd(),
 
                 TextColumn::make('total_records')
                     ->label('Total Records')
-                    ->badge()
-                    ->color('gray')
-                    ->alignCenter(),
+                    ->numeric()
+                    ->alignEnd(),
 
                 TextColumn::make('updated_by')
                     ->label('Last updated by')
@@ -90,8 +101,14 @@ class ChangeRateScenarios extends Page implements HasTable
                     ->color('gray'),
 
             ])
+            ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
+            ->filters([])
+            ->toggleColumnsTriggerAction(fn ($action) => $action->modalHeading('Choose columns'))
+            ->paginated([50, 100, 150])
+            ->defaultPaginationPageOption(50)
+            ->paginationPageOptions([50, 100, 150])
             ->recordUrl(function ($record) {
-                return route('filament.admin.pages.prognosis-change-assets', [
+                return route('filament.admin.pages.change-rate-assets', [
                     'scenario' => $record->type,
                 ]);
             })
@@ -102,21 +119,31 @@ class ChangeRateScenarios extends Page implements HasTable
 
     protected function getTableQuery(): Builder
     {
-        return AssetChangeRate::query()
-            ->selectRaw('
-                ROW_NUMBER() OVER (ORDER BY scenario_type) as id,
-                scenario_type as type,
-                scenario_type as description,
-                COUNT(DISTINCT asset_type) as asset_count,
-                COUNT(*) as total_records
-            ')
-            ->groupBy('scenario_type')
-            ->orderBy('scenario_type');
+        // Base on PrognosisType so all types are listed, even with 0 change rate records
+        $query = \App\Models\PrognosisType::query()
+            ->select(['prognoses.id', 'prognoses.code as type', 'prognoses.code as description'])
+            ->orderBy('prognoses.code');
+
+        // Add counts via subselects
+        $query->selectSub(function ($q) {
+            $q->from('prognosis_change_rates as pcr')
+                ->selectRaw('COUNT(DISTINCT asset_type)')
+                ->whereColumn('pcr.scenario_type', 'prognoses.code');
+        }, 'asset_count');
+
+        $query->selectSub(function ($q) {
+            $q->from('prognosis_change_rates as pcr2')
+                ->selectRaw('COUNT(*)')
+                ->whereColumn('pcr2.scenario_type', 'prognoses.code');
+        }, 'total_records');
+
+        return $query;
     }
 
     public function getTableRecordKey($record): string
     {
-        return $record->id ?? $record->type ?? 'unknown';
+        // Ensure stable, unique Livewire keys to avoid row collisions (skip numeric id as it may be 0 for aliased selects)
+        return (string) ($record->type ?? 'unknown');
     }
 
     public function getScenarioTypes(): array

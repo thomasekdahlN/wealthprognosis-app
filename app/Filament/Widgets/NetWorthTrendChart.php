@@ -3,7 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Asset;
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +19,7 @@ class NetWorthTrendChart extends ChartWidget
     protected function getData(): array
     {
         $user = Auth::user();
-        $activeScenario = AssetConfigurationSessionService::getActiveAssetConfiguration();
+        $activeScenario = app(CurrentAssetConfiguration::class)->get();
 
         if (! $activeScenario) {
             return [

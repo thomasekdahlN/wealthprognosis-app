@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\TaxConfigurations\Pages;
 
 use App\Filament\Resources\TaxConfigurations\TaxConfigurationResource;
-use App\Filament\Resources\TaxConfigurations\Widgets\IncomeTaxRateTrend;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -13,14 +12,7 @@ class EditTaxConfiguration extends EditRecord
 
     protected function getHeaderWidgets(): array
     {
-        $record = $this->getRecord();
-
-        return [
-            IncomeTaxRateTrend::make([
-                'country' => (string) $record->country_code,
-                'tax_type' => (string) $record->asset_type,
-            ]),
-        ];
+        return [];
     }
 
     public function getRedirectUrl(): string

@@ -63,14 +63,14 @@ class ImportAssets extends Command
             $this->info("Starting import from: {$configFile}");
 
             $importService = new AssetImportService($user, $teamId);
-            $assetOwner = $importService->importFromFile($configFile);
+            $assetConfiguration = $importService->importFromFile($configFile);
 
             $this->info('✅ Import completed successfully!');
-            $this->info("Created AssetOwner: {$assetOwner->name} (ID: {$assetOwner->id})");
-            $this->info("Assets created: {$assetOwner->assets()->count()}");
+            $this->info("Created Asset Configuration: {$assetConfiguration->name} (ID: {$assetConfiguration->id})");
+            $this->info("Assets created: {$assetConfiguration->assets()->count()}");
 
             // Show summary of created assets
-            $assets = $assetOwner->assets()->get();
+            $assets = $assetConfiguration->assets()->get();
             if ($assets->count() > 0) {
                 $this->info("\nCreated assets:");
                 foreach ($assets as $asset) {

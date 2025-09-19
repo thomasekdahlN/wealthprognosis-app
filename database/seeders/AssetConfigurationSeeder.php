@@ -11,12 +11,12 @@ class AssetConfigurationSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::firstOrCreate(
+        $user = User::updateOrCreate(
             ['email' => 'admin@system.local'],
             ['name' => 'System Admin', 'password' => bcrypt('password')]
         );
 
-        $team = Team::firstOrCreate(
+        $team = Team::updateOrCreate(
             ['name' => 'Default Team'],
             ['description' => 'System default team', 'owner_id' => $user->id, 'is_active' => true]
         );

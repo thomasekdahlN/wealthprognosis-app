@@ -51,26 +51,26 @@ class AssetExportService
 
         // Add meta section from AssetConfiguration
         $data['meta'] = [
-            'name' => $this->assetOwner->name,
-            'birthYear' => (string) $this->assetOwner->birth_year,
-            'prognoseAge' => (string) $this->assetOwner->prognose_age,
-            'pensionOfficialAge' => (string) $this->assetOwner->pension_official_age,
-            'pensionWishAge' => (string) $this->assetOwner->pension_wish_age,
-            'deathAge' => (string) $this->assetOwner->death_age,
-            'exportStartYear' => (string) $this->assetOwner->export_start_age,
+            'name' => $this->assetConfiguration->name,
+            'birthYear' => (string) $this->assetConfiguration->birth_year,
+            'prognoseAge' => (string) $this->assetConfiguration->prognose_age,
+            'pensionOfficialAge' => (string) $this->assetConfiguration->pension_official_age,
+            'pensionWishAge' => (string) $this->assetConfiguration->pension_wish_age,
+            'deathAge' => (string) $this->assetConfiguration->death_age,
+            'exportStartYear' => (string) $this->assetConfiguration->export_start_age,
         ];
 
         // Add timestamps
-        if ($this->assetOwner->created_at) {
-            $data['meta']['createdAt'] = $this->assetOwner->created_at->toISOString();
+        if ($this->assetConfiguration->created_at) {
+            $data['meta']['createdAt'] = $this->assetConfiguration->created_at->toISOString();
         }
-        if ($this->assetOwner->updated_at) {
-            $data['meta']['updatedAt'] = $this->assetOwner->updated_at->toISOString();
+        if ($this->assetConfiguration->updated_at) {
+            $data['meta']['updatedAt'] = $this->assetConfiguration->updated_at->toISOString();
         }
         $data['meta']['exportedAt'] = now()->toISOString();
 
         // Process each asset (ordered by sort_order to maintain JSON sequence)
-        $assets = $this->assetOwner->assets()->with('years')->orderBy('sort_order')->get();
+        $assets = $this->assetConfiguration->assets()->with('years')->orderBy('sort_order')->get();
 
         foreach ($assets as $asset) {
             $assetData = [];
@@ -111,7 +111,7 @@ class AssetExportService
         // Income data
         if ($this->hasIncomeData($assetYear)) {
             $yearData['income'] = array_filter([
-                'name' => $assetYear->income_name,
+
                 'description' => $assetYear->income_description,
                 'amount' => $assetYear->income_amount ?: null,
                 'changerate' => $assetYear->income_changerate,
@@ -125,10 +125,10 @@ class AssetExportService
         // Expense data
         if ($this->hasExpenseData($assetYear)) {
             $yearData['expence'] = array_filter([
-                'name' => $assetYear->expence_name,
+
                 'description' => $assetYear->expence_description,
                 'amount' => $assetYear->expence_amount ?: null,
-                'factor' => $assetYear->expence_factor > 1 ? $assetYear->expence_factor : null,
+                'factor' => $assetYear->expence_factor && $assetYear->expence_factor !== 'yearly' ? 12 : null,
                 'changerate' => $assetYear->expence_changerate,
                 'transfer' => $assetYear->expence_transfer,
                 'source' => $assetYear->expence_source,
@@ -140,7 +140,7 @@ class AssetExportService
         // Asset data
         if ($this->hasAssetData($assetYear)) {
             $yearData['asset'] = array_filter([
-                'name' => $assetYear->asset_name,
+
                 'description' => $assetYear->asset_description,
                 'marketAmount' => $assetYear->asset_market_amount ?: null,
                 'acquisitionAmount' => $assetYear->asset_acquisition_amount ?: null,
@@ -158,7 +158,7 @@ class AssetExportService
         // Mortgage data
         if ($this->hasMortgageData($assetYear)) {
             $yearData['mortgage'] = array_filter([
-                'name' => $assetYear->mortgage_name,
+
                 'description' => $assetYear->mortgage_description,
                 'amount' => $assetYear->mortgage_amount ?: null,
                 'years' => $assetYear->mortgage_years ?: null,
@@ -177,9 +177,9 @@ class AssetExportService
      */
     protected function resolveYearKey(int $year): string
     {
-        $birthYear = $this->assetOwner->birth_year;
-        $pensionWishAge = $this->assetOwner->pension_wish_age;
-        $pensionOfficialAge = $this->assetOwner->pension_official_age;
+        $birthYear = $this->assetConfiguration->birth_year;
+        $pensionWishAge = $this->assetConfiguration->pension_wish_age;
+        $pensionOfficialAge = $this->assetConfiguration->pension_official_age;
 
         // Check if this year matches any special year
         if ($birthYear && $pensionWishAge && $year == ($birthYear + $pensionWishAge)) {
@@ -199,7 +199,7 @@ class AssetExportService
      */
     protected function hasIncomeData($assetYear): bool
     {
-        return ! empty($assetYear->income_name) ||
+        return ! empty($assetYear->income_amount) ||
                ! empty($assetYear->income_amount) ||
                ! empty($assetYear->income_changerate);
     }
@@ -209,7 +209,7 @@ class AssetExportService
      */
     protected function hasExpenseData($assetYear): bool
     {
-        return ! empty($assetYear->expence_name) ||
+        return ! empty($assetYear->expence_amount) ||
                ! empty($assetYear->expence_amount) ||
                ! empty($assetYear->expence_changerate);
     }
@@ -219,7 +219,7 @@ class AssetExportService
      */
     protected function hasAssetData($assetYear): bool
     {
-        return ! empty($assetYear->asset_name) ||
+        return ! empty($assetYear->asset_market_amount) ||
                ! empty($assetYear->asset_market_amount) ||
                ! empty($assetYear->asset_changerate);
     }
@@ -229,7 +229,7 @@ class AssetExportService
      */
     protected function hasMortgageData($assetYear): bool
     {
-        return ! empty($assetYear->mortgage_name) ||
+        return ! empty($assetYear->mortgage_amount) ||
                ! empty($assetYear->mortgage_amount) ||
                ! empty($assetYear->mortgage_interest);
     }

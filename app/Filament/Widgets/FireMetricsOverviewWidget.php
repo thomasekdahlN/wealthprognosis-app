@@ -19,7 +19,7 @@ class FireMetricsOverviewWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $data = FireCalculationService::getFinancialData($this->assetOwnerId);
+        $data = FireCalculationService::getFinancialData($this->assetConfigurationId);
 
         if (! $data['user']) {
             return [

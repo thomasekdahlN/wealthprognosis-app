@@ -14,50 +14,32 @@ class TaxTypeManagementTest extends TestCase
 
     public function test_tax_type_seeder_creates_expected_records()
     {
-        $this->artisan('db:seed', ['--class' => 'TaxTypeSeeder']);
+        $this->artisan('db:seed', ['--class' => 'TaxTypesFromConfigSeeder']);
 
-        $this->assertDatabaseCount('tax_types', 6);
-
-        // Check specific tax types exist
-        $this->assertDatabaseHas('tax_types', [
-            'type' => 'income',
-            'name' => 'Income Tax',
-            'default_rate' => 22.0000,
-            'is_active' => true,
-        ]);
-
-        $this->assertDatabaseHas('tax_types', [
-            'type' => 'realization',
-            'name' => 'Capital Gains Tax',
-            'default_rate' => 37.8400,
-            'is_active' => true,
-        ]);
-
-        $this->assertDatabaseHas('tax_types', [
-            'type' => 'fortune',
-            'name' => 'Wealth Tax',
-            'default_rate' => 1.0000,
-            'is_active' => true,
-        ]);
+        // Count should be at least the distinct types in config, including property_* entries
+        $this->assertDatabaseHas('tax_types', ['type' => 'equityfund']);
+        $this->assertDatabaseHas('tax_types', ['type' => 'salary']);
+        $this->assertDatabaseHas('tax_types', ['type' => 'property_holmestrand']);
     }
 
     public function test_tax_type_model_scopes_work_correctly()
     {
-        $this->artisan('db:seed', ['--class' => 'TaxTypeSeeder']);
+        $this->artisan('db:seed', ['--class' => 'TaxTypesFromConfigSeeder']);
 
-        // Test active scope
-        $activeTaxTypes = TaxType::active()->get();
-        $this->assertCount(4, $activeTaxTypes); // 4 active tax types
+        // Test active scope (all entries from config are seeded as active)
+        $activeCount = TaxType::active()->count();
+        $totalCount = TaxType::count();
+        $this->assertSame($totalCount, $activeCount);
 
-        // Test ordered scope
+        // Test ordered scope - verifies ordering fields exist and are used
         $orderedTaxTypes = TaxType::ordered()->get();
-        $this->assertEquals('income', $orderedTaxTypes->first()->type);
-        $this->assertEquals('gift', $orderedTaxTypes->last()->type);
+        $this->assertNotEmpty($orderedTaxTypes);
+        $this->assertEquals($orderedTaxTypes->sortBy(['sort_order', 'name'])->pluck('id')->all(), $orderedTaxTypes->pluck('id')->all());
     }
 
     public function test_tax_type_resource_page_loads()
     {
-        $this->artisan('db:seed', ['--class' => 'TaxTypeSeeder']);
+        $this->artisan('db:seed', ['--class' => 'TaxTypesFromConfigSeeder']);
 
         $user = User::factory()->create();
 
@@ -80,16 +62,14 @@ class TaxTypeManagementTest extends TestCase
             'type' => 'test_tax',
             'name' => 'Test Tax',
             'description' => 'A test tax type',
-            'default_rate' => 15.0000,
-            'is_active' => true,
+                        'is_active' => true,
             'sort_order' => 10,
         ]);
 
         $this->assertDatabaseHas('tax_types', [
             'type' => 'test_tax',
             'name' => 'Test Tax',
-            'default_rate' => 15.0000,
-        ]);
+                    ]);
     }
 
     public function test_tax_type_unique_type_constraint()

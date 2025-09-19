@@ -6,6 +6,7 @@ use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\TaxType;
 
 class TaxConfiguration extends Model
 {
@@ -15,35 +16,15 @@ class TaxConfiguration extends Model
         'country_code',
         'year',
         'tax_type',
-        'income_tax_rate',
-        'realization_tax_rate',
-        'fortune_tax_rate',
-        'property_tax_rate',
-        'standard_deduction',
-        'fortune_tax_threshold_low',
-        'fortune_tax_threshold_high',
-        'fortune_tax_rate_low',
-        'fortune_tax_rate_high',
-        'tax_shield_rate',
-        'is_active',
-        'configuration_data',
         'description',
+        'is_active',
+        'configuration',
     ];
 
     protected $casts = [
         'year' => 'integer',
-        'income_tax_rate' => 'decimal:4',
-        'realization_tax_rate' => 'decimal:4',
-        'fortune_tax_rate' => 'decimal:4',
-        'property_tax_rate' => 'decimal:4',
-        'standard_deduction' => 'decimal:2',
-        'fortune_tax_threshold_low' => 'decimal:2',
-        'fortune_tax_threshold_high' => 'decimal:2',
-        'fortune_tax_rate_low' => 'decimal:4',
-        'fortune_tax_rate_high' => 'decimal:4',
-        'tax_shield_rate' => 'decimal:4',
         'is_active' => 'boolean',
-        'configuration_data' => 'json',
+        'configuration' => 'json',
     ];
 
     // Asset types that support tax configurations
@@ -95,25 +76,6 @@ class TaxConfiguration extends Model
         return self::COUNTRIES[$this->country_code] ?? $this->country_code;
     }
 
-    public function getIncomeTaxDecimal(): float
-    {
-        return $this->income_tax_rate / 100;
-    }
-
-    public function getRealizationTaxDecimal(): float
-    {
-        return $this->realization_tax_rate / 100;
-    }
-
-    public function getFortuneTaxDecimal(): float
-    {
-        return $this->fortune_tax_rate / 100;
-    }
-
-    public function getPropertyTaxDecimal(): float
-    {
-        return $this->property_tax_rate / 100;
-    }
 
     // Scope methods
     public function scopeForCountry($query, string $countryCode)
@@ -144,5 +106,10 @@ class TaxConfiguration extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function taxType(): BelongsTo
+    {
+        return $this->belongsTo(TaxType::class, 'tax_type', 'type');
     }
 }

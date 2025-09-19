@@ -59,7 +59,7 @@ class AssetYearSeeder extends Seeder
             [
                 'user_id' => $user->id,
                 'team_id' => $asset->team_id,
-                'asset_owner_id' => $asset->asset_owner_id,
+                'asset_configuration_id' => $asset->asset_configuration_id,
                 'income_description' => $this->getIncomeDescription($asset->asset_type),
                 'income_amount' => $baseIncomeAmount ? round($baseIncomeAmount * $yearMultiplier) : null,
                 'income_factor' => $baseIncomeAmount ? 'monthly' : null,
@@ -143,17 +143,6 @@ class AssetYearSeeder extends Seeder
         };
     }
 
-    private function getIncomeName(string $type): ?string
-    {
-        return match ($type) {
-            'salary' => 'Monthly Salary',
-            'rental' => 'Rental Income',
-            'dividend' => 'Dividend Income',
-            'interest' => 'Interest Income',
-            default => null,
-        };
-    }
-
     private function getIncomeDescription(string $type): ?string
     {
         return match ($type) {
@@ -165,32 +154,12 @@ class AssetYearSeeder extends Seeder
         };
     }
 
-    private function getExpenseName(string $type): ?string
-    {
-        return match ($type) {
-            'house', 'rental', 'cabin' => 'Property Expenses',
-            'car' => 'Car Expenses',
-            'boat' => 'Boat Expenses',
-            default => null,
-        };
-    }
-
     private function getExpenseDescription(string $type): ?string
     {
         return match ($type) {
             'house', 'rental', 'cabin' => 'Property taxes, insurance, maintenance',
             'car' => 'Insurance, fuel, maintenance',
             'boat' => 'Insurance, fuel, maintenance, mooring',
-            default => null,
-        };
-    }
-
-    private function getMortgageName(string $type): ?string
-    {
-        return match ($type) {
-            'house' => 'House Mortgage',
-            'rental' => 'Rental Property Mortgage',
-            'cabin' => 'Cabin Mortgage',
             default => null,
         };
     }

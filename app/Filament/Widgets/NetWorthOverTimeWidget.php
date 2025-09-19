@@ -11,21 +11,22 @@ class NetWorthOverTimeWidget extends ChartWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    protected ?int $assetConfigurationId = null;
+    protected ?int $assetConfigId = null;
 
     public function mount(): void
     {
-        $this->assetConfigurationId = request()->get('asset_configuration_id');
+        // Accept both legacy and new param names
+        $this->assetConfigId = (int) (request()->get('asset_configuration_id') ?? request()->get('asset_config_id') ?? 0) ?: null;
     }
 
     public function getHeading(): string
     {
         $heading = 'Net Worth Over Time';
 
-        if ($this->assetConfigurationId) {
-            $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigurationId);
+        if ($this->assetConfigId) {
+            $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigId);
             if ($assetConfiguration) {
-                $heading = 'Net Worth Over Time - '.$assetConfiguration->name;
+                $heading = 'Net Worth Over Time - ' . $assetConfiguration->name;
             }
         }
 
@@ -54,9 +55,9 @@ class NetWorthOverTimeWidget extends ChartWidget
             $totalAssets = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
                 $query->where('user_id', $user->id)->where('is_active', true);
 
-                // Apply asset owner filtering if specified
-                if ($this->assetOwnerId) {
-                    $query->where('asset_owner_id', $this->assetOwnerId);
+                // Apply asset configuration filtering if specified
+                if ($this->assetConfigId) {
+                    $query->where('asset_configuration_id', $this->assetConfigId);
                 }
             })
                 ->where('year', $year)
@@ -77,9 +78,9 @@ class NetWorthOverTimeWidget extends ChartWidget
             $totalLiabilities = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
                 $query->where('user_id', $user->id)->where('is_active', true);
 
-                // Apply asset owner filtering if specified
-                if ($this->assetOwnerId) {
-                    $query->where('asset_owner_id', $this->assetOwnerId);
+                // Apply asset configuration filtering if specified
+                if ($this->assetConfigId) {
+                    $query->where('asset_configuration_id', $this->assetConfigId);
                 }
             })
                 ->where('year', $year)

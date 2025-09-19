@@ -13,11 +13,22 @@ class ChangeRateConfigurationSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing change rate configurations
-        AssetChangeRate::truncate();
+        // Idempotent load: we will upsert per (scenario, asset_type, year)
+        // AssetChangeRate::truncate();
 
         // Load prognosis types from database
         $scenarios = \App\Models\PrognosisType::query()->active()->pluck('code')->all();
+
+        // Fallback: if no active prognosis types in DB, use JSON files in config/prognosis
+        if (empty($scenarios)) {
+            $this->command?->warn('No active PrognosisType records found. Falling back to config/prognosis/*.json files.');
+            $files = glob(config_path('prognosis/*.json')) ?: [];
+            $scenarios = array_values(array_filter(array_map(function ($file) {
+                return basename((string) $file, '.json');
+            }, $files), function ($name) {
+                return ! in_array($name, ['prognosis'], true);
+            }));
+        }
 
         foreach ($scenarios as $scenario) {
             $this->loadChangeRateConfiguration($scenario);
@@ -68,19 +79,23 @@ class ChangeRateConfigurationSeeder extends Seeder
 
         foreach ($changeRateData as $assetType => $yearlyRates) {
             foreach ($yearlyRates as $year => $rate) {
-                AssetChangeRate::create([
-                    'user_id' => $user->id,
-                    'team_id' => $team->id,
-                    'scenario_type' => $scenarioType,
-                    'asset_type' => $assetType,
-                    'year' => (int) $year,
-                    'change_rate' => (float) $rate,
-                    'is_active' => true,
-                    'created_by' => $user->id,
-                    'updated_by' => $user->id,
-                    'created_checksum' => hash('sha256', "{$scenarioType}_{$assetType}_{$year}_created"),
-                    'updated_checksum' => hash('sha256', "{$scenarioType}_{$assetType}_{$year}_updated"),
-                ]);
+                AssetChangeRate::updateOrCreate(
+                    [
+                        'scenario_type' => $scenarioType,
+                        'asset_type' => $assetType,
+                        'year' => (int) $year,
+                    ],
+                    [
+                        'user_id' => $user->id,
+                        'team_id' => $team->id,
+                        'change_rate' => (float) $rate,
+                        'is_active' => true,
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                        'created_checksum' => hash('sha256', "{$scenarioType}_{$assetType}_{$year}_created"),
+                        'updated_checksum' => hash('sha256', "{$scenarioType}_{$assetType}_{$year}_updated"),
+                    ]
+                );
             }
         }
 

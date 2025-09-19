@@ -20,7 +20,9 @@ class ChangeRateAssets extends Page implements HasTable
 
     protected static bool $shouldRegisterNavigation = false;
 
+
     protected string $view = 'filament.pages.change-rate-assets';
+
 
     public string $scenario;
 
@@ -90,19 +92,18 @@ class ChangeRateAssets extends Page implements HasTable
                     ->label('Years Configured')
                     ->badge()
                     ->color('success')
-                    ->alignCenter(),
+                    ->alignEnd(),
 
                 TextColumn::make('year_range')
                     ->label('Year Range')
                     ->badge()
                     ->color('gray')
-                    ->alignCenter(),
+                    ->alignEnd(),
 
                 TextColumn::make('average_rate')
                     ->label('Avg. Rate (%)')
-                    ->formatStateUsing(fn (?float $state): string => $state ? number_format($state, 2).'%' : 'N/A'
-                    )
-                    ->alignCenter(),
+                    ->numeric(decimalPlaces: 2)
+                    ->alignEnd(),
             ])
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('asset_type')
@@ -121,7 +122,7 @@ class ChangeRateAssets extends Page implements HasTable
             ])
             ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
             ->recordUrl(function ($record) {
-                return route('filament.admin.pages.prognosis-change-table', [
+                return route('filament.admin.pages.change-rate-table', [
                     'scenario' => $this->scenario,
                     'asset' => $record->type,
                 ]);

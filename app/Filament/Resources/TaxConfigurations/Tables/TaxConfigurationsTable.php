@@ -13,41 +13,39 @@ class TaxConfigurationsTable
     {
         return $table
             ->columns([
+
                 TextColumn::make('tax_type')
                     ->label('Tax Type')
+                    ->searchable()
                     ->sortable()
                     ->badge(),
                 TextColumn::make('description')
                     ->label('Description')
+                    ->searchable()
                     ->sortable()
                     ->wrap(),
                 TextColumn::make('updated_at')
                     ->label('Last Updated')
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('updated_by')
+                TextColumn::make('updatedBy.name')
                     ->label('Updated By')
                     ->badge()
-                    ->sortable()
-                    ->formatStateUsing(function ($record) {
-                        return optional($record->updatedBy)->name;
-                    }),
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->filters([])
 
+            ->searchable()
+
             ->toggleColumnsTriggerAction(fn ($action) => $action->modalHeading('Choose columns'))
             ->defaultSort('tax_type', 'asc')
-            ->recordUrl(function ($record) {
-                $country = request()->route('country');
-                $year = request()->route('year');
-
-                return TaxConfigurationResource::getUrl('edit', [
-                    'country' => $country,
-                    'year' => $year,
-                    'record' => $record,
-                ]);
-            })
+            ->recordUrl(fn ($record) => TaxConfigurationResource::getUrl('edit', [
+                'country' => $record->country_code,
+                'year' => $record->year,
+                'record' => $record,
+            ]))
             ->emptyStateHeading('Choose country and year to view tax configurations')
             ->toolbarActions([])
             ->paginated([50, 100, 150])

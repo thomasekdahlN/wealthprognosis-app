@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\AssetConfiguration;
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Livewire\Component;
 
 class AssetConfigurationPicker extends Component
@@ -14,14 +14,14 @@ class AssetConfigurationPicker extends Component
 
     public function mount(): void
     {
-        $this->selectedAssetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
+        $this->selectedAssetConfigurationId = app(CurrentAssetConfiguration::class)->id();
 
         // Auto-select first configuration if none is selected
         if (!$this->selectedAssetConfigurationId) {
             $firstConfiguration = AssetConfiguration::query()->orderBy('name')->first();
             if ($firstConfiguration) {
                 $this->selectedAssetConfigurationId = $firstConfiguration->id;
-                AssetConfigurationSessionService::setActiveAssetConfiguration($firstConfiguration);
+                app(CurrentAssetConfiguration::class)->set($firstConfiguration);
             }
         }
     }
@@ -32,9 +32,9 @@ class AssetConfigurationPicker extends Component
 
         if ($assetConfigurationId) {
             $assetConfiguration = AssetConfiguration::find($assetConfigurationId);
-            AssetConfigurationSessionService::setActiveAssetConfiguration($assetConfiguration);
+            app(CurrentAssetConfiguration::class)->set($assetConfiguration);
         } else {
-            AssetConfigurationSessionService::clearActiveAssetConfiguration();
+            app(CurrentAssetConfiguration::class)->set(null);
         }
 
         $this->showDropdown = false;

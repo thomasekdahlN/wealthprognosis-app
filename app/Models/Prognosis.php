@@ -190,6 +190,7 @@ class Prognosis
                 // Expence
                 $expenceAmount = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'expence', 'amount');
                 $expenceFactor = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'expence', 'factor'); // We do not store this in dataH, we only use it to upscale amounts once to yearly amounts
+                $expenceFactor = $this->normalizeFactor($expenceFactor);
                 $expenceRule = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'expence', 'rule');
                 $expenceTransfer = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'expence', 'transfer');
                 $expenceSource = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'expence', 'source');
@@ -208,6 +209,7 @@ class Prognosis
                 // Income
                 $incomeAmount = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'income', 'amount');
                 $incomeFactor = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'income', 'factor'); // We do not store this in dataH, we only use it to upscale amounts once to yearly amounts
+                $incomeFactor = $this->normalizeFactor($incomeFactor);
                 $incomeRule = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'income', 'rule');
                 $incomeTransfer = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'income', 'transfer');
                 $incomeSource = $this->configOrPrevValueRespectRepeat(false, $assetname, $year, 'income', 'source');
@@ -912,6 +914,42 @@ class Prognosis
         }
 
         return Arr::get($this->config, $path, $default);
+
+    }
+
+    /**
+     * Normalize factor input to an integer multiplier.
+     * Accepts values like 1, 12, "monthly", "yearly".
+     * Defaults to 1 on unknown input.
+     */
+    private function normalizeFactor($factor): int
+    {
+        if (is_int($factor)) {
+            return $factor > 0 ? $factor : 1;
+        }
+
+        if (is_numeric($factor)) {
+            $n = (int) $factor;
+            return $n > 0 ? $n : 1;
+        }
+
+        $map = [
+            'monthly' => 12,
+            'month' => 12,
+            'yearly' => 1,
+            'year' => 1,
+            'annually' => 1,
+            'annual' => 1,
+        ];
+
+        if (is_string($factor)) {
+            $key = strtolower(trim($factor));
+            if (isset($map[$key])) {
+                return $map[$key];
+            }
+        }
+
+        return 1;
     }
 
     // Has to be done because a mortgae could potentially have extra downplayments making the fortune colculation wrong

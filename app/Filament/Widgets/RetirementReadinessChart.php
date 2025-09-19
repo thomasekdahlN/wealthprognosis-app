@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +18,7 @@ class RetirementReadinessChart extends ChartWidget
     protected function getData(): array
     {
         $user = Auth::user();
-        $activeScenario = AssetConfigurationSessionService::getActiveAssetOwner();
+        $activeScenario = app(CurrentAssetConfiguration::class)->get();
 
         if (! $activeScenario) {
             return [
@@ -34,7 +34,7 @@ class RetirementReadinessChart extends ChartWidget
             ];
         }
 
-        // Get retirement information from asset_owners table
+        // Get retirement information from asset_configurations table
         $assetOwner = \App\Models\AssetConfiguration::where('user_id', $user->id)->first();
 
         if (! $assetOwner) {

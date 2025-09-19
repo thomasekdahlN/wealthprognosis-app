@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Asset;
 use App\Models\AssetConfiguration;
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Panel;
@@ -25,7 +25,7 @@ class ConfigAssets extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected string $view = 'filament.pages.config-assets';
+
 
     protected static ?string $navigationLabel = 'Assets';
 
@@ -40,9 +40,9 @@ class ConfigAssets extends Page implements HasTable
 
         if ($recordId) {
             $this->record = AssetConfiguration::findOrFail($recordId);
-            AssetConfigurationSessionService::setActiveAssetConfiguration($this->record);
+            app(CurrentAssetConfiguration::class)->set($this->record);
         } else {
-            $this->record = AssetConfigurationSessionService::getActiveAssetConfiguration();
+            $this->record = app(CurrentAssetConfiguration::class)->get();
         }
 
         if (!$this->record) {

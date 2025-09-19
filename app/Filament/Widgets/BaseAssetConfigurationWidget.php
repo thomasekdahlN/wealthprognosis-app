@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ abstract class BaseAssetConfigurationWidget extends Widget
     public function mount(): void
     {
         // Get asset_configuration_id from the session service for consistency
-        $this->assetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
+        $this->assetConfigurationId = app(CurrentAssetConfiguration::class)->id();
 
         // Also check for request parameter (for backwards compatibility)
         if (!$this->assetConfigurationId) {
@@ -25,7 +25,7 @@ abstract class BaseAssetConfigurationWidget extends Widget
     protected function getAssetConfigurationId(): ?int
     {
         // Always get the most current value from session
-        return AssetConfigurationSessionService::getActiveAssetConfigurationId() ?? $this->assetConfigurationId;
+        return app(CurrentAssetConfiguration::class)->id() ?? $this->assetConfigurationId;
     }
 
     protected function getFilteredAssetQuery(): Builder

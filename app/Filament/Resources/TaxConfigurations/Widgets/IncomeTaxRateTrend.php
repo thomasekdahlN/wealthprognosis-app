@@ -51,9 +51,9 @@ class IncomeTaxRateTrend extends ChartWidget
 
         $rows = TaxConfiguration::query()
             ->where('country_code', $country)
-            ->where('asset_type', $taxType)
+            ->where('tax_type', $taxType)
             ->orderBy('year')
-            ->get(['year', 'income_tax_rate']);
+            ->get(['year', 'configuration']);
 
         if ($rows->isEmpty()) {
             return [
@@ -70,7 +70,7 @@ class IncomeTaxRateTrend extends ChartWidget
         }
 
         $labels = $rows->pluck('year')->map(fn ($y) => (string) $y)->values()->all();
-        $data = $rows->pluck('income_tax_rate')->map(fn ($r) => (float) $r)->values()->all();
+        $data = $rows->pluck('configuration')->map(fn ($cfg) => (float) (($cfg['income'] ?? 0))).values()->all();
 
         return [
             'datasets' => [[
@@ -101,7 +101,7 @@ class IncomeTaxRateTrend extends ChartWidget
 
                 if ($record) {
                     $country = (string) $record->country_code;
-                    $taxType = (string) $record->asset_type;
+                    $taxType = (string) $record->tax_type;
                 }
             }
         }

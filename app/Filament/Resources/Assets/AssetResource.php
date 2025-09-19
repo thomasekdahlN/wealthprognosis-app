@@ -8,7 +8,7 @@ use App\Filament\Resources\Assets\Pages\ListAssets;
 use App\Filament\Resources\Assets\Schemas\AssetForm;
 use App\Filament\Resources\Assets\Tables\AssetsTable;
 use App\Models\Asset;
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -42,7 +42,7 @@ class AssetResource extends Resource
         $query = parent::getEloquentQuery()->with(['configuration', 'assetType']);
 
         // Filter by active asset configuration if one is selected
-        $activeAssetConfigurationId = AssetConfigurationSessionService::getActiveAssetConfigurationId();
+        $activeAssetConfigurationId = app(CurrentAssetConfiguration::class)->id();
         if ($activeAssetConfigurationId) {
             $query->where('asset_configuration_id', $activeAssetConfigurationId);
         }

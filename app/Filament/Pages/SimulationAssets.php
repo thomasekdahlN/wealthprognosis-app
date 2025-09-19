@@ -5,22 +5,16 @@ namespace App\Filament\Pages;
 use App\Models\SimulationAsset;
 use App\Models\SimulationConfiguration;
 use Filament\Pages\Page;
-use Filament\Tables\Table;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
+use App\Filament\Concerns\HasWideTable;
 use Filament\Actions\Action;
 use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\Builder;
 
-class SimulationAssets extends Page implements HasTable
+class SimulationAssets extends Page
 {
-    use InteractsWithTable;
+    use HasWideTable;
 
-    protected string $view = 'filament.pages.simulation-assets';
+
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -49,6 +43,9 @@ class SimulationAssets extends Page implements HasTable
         if ($this->simulationConfiguration->user_id !== auth()->id()) {
             throw new Halt(403);
         }
+
+        // Enable page-wide horizontal scrolling for wide tables
+        $this->enableWideTable();
     }
 
     public function getTitle(): string|Htmlable
@@ -68,124 +65,23 @@ class SimulationAssets extends Page implements HasTable
     public function getSubheading(): string|Htmlable|null
     {
         if (!$this->simulationConfiguration) {
-            return null;
+            return 'Read-Only Simulation Data';
         }
 
         $config = $this->simulationConfiguration->assetConfiguration;
         $assetsCount = $this->simulationConfiguration->simulationAssets()->count();
 
-        return "Based on {$config->name} • {$assetsCount} assets • Created " . $this->simulationConfiguration->created_at->diffForHumans();
+        return "Based on {$config->name} • {$assetsCount} assets • Read-Only Simulation Data • Created " . $this->simulationConfiguration->created_at->diffForHumans();
     }
 
-    public function table(Table $table): Table
+    protected function getHeaderWidgets(): array
     {
-        return $table
-            ->query($this->getTableQuery())
-            ->columns([
-                IconColumn::make('assetType.icon')
-                    ->label('')
-                    ->icon(fn (?string $state): string => $state && \App\Helpers\HeroiconValidator::isValid($state) ? $state : 'heroicon-o-cube')
-                    ->size('lg')
-                    ->color(fn ($record): string => $record->assetType?->color ?: 'gray')
-                    ->width('60px')
-                    ->tooltip(fn ($record): ?string => $record->assetType?->name ?? 'Asset Type'),
-
-                TextColumn::make('name')
-                    ->label('Asset Name')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold')
-                    ->description(fn (SimulationAsset $record): string => $record->description ?? ''),
-
-                TextColumn::make('asset_type')
-                    ->label('Type')
-                    ->badge()
-                    ->color('primary')
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->sortable(),
-
-                TextColumn::make('group')
-                    ->label('Group')
-                    ->badge()
-                    ->color('success')
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->sortable(),
-
-                TextColumn::make('tax_type')
-                    ->label('Tax Type')
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->sortable()
-                    ->toggleable(),
-
-
-
-                TextColumn::make('sort_order')
-                    ->label('Order')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                SelectFilter::make('asset_type')
-                    ->label('Asset Type')
-                    ->options(function () {
-                        if (!$this->simulationConfiguration) {
-                            return [];
-                        }
-                        return $this->simulationConfiguration->simulationAssets()
-                            ->distinct()
-                            ->pluck('asset_type', 'asset_type')
-                            ->mapWithKeys(fn ($value, $key) => [$key => ucfirst($value)])
-                            ->toArray();
-                    })
-                    ->multiple(),
-
-                SelectFilter::make('group')
-                    ->label('Group')
-                    ->options([
-                        'private' => 'Private',
-                        'company' => 'Company',
-                    ])
-                    ->multiple(),
-
-                SelectFilter::make('tax_type')
-                    ->label('Tax Type')
-                    ->options(function () {
-                        if (!$this->simulationConfiguration) {
-                            return [];
-                        }
-                        return $this->simulationConfiguration->simulationAssets()
-                            ->distinct()
-                            ->pluck('tax_type', 'tax_type')
-                            ->mapWithKeys(fn ($value, $key) => [$key => ucfirst($value)])
-                            ->toArray();
-                    })
-                    ->multiple(),
-            ])
-
-            ->defaultSort('sort_order')
-            ->paginated([50, 100, 150])
-            ->defaultPaginationPageOption(50)
-            ->paginationPageOptions([50, 100, 150])
-            ->recordUrl(fn (SimulationAsset $record): string =>
-                route('filament.admin.pages.simulation-asset-years', [
-                    'simulation_configuration' => $this->simulationConfiguration->id,
-                    'asset' => $record->id
-                ])
-            );
+        return [
+            \App\Filament\Widgets\SimulationAssetsTable::class,
+        ];
     }
 
-    protected function getTableQuery(): Builder
-    {
-        if (!$this->simulationConfiguration) {
-            return SimulationAsset::query()->whereRaw('1 = 0'); // Empty query
-        }
 
-        return SimulationAsset::query()
-            ->where('asset_configuration_id', $this->simulationConfiguration->id)
-            ->with(['simulationAssetYears', 'assetType'])
-            ->orderBy('sort_order')
-            ->orderBy('name');
-    }
 
     protected function getHeaderActions(): array
     {
@@ -195,7 +91,7 @@ class SimulationAssets extends Page implements HasTable
 
         return [
             Action::make('dashboard')
-                ->label('Dashboard')
+                ->label(__('simulation.dashboard'))
                 ->icon('heroicon-o-chart-bar')
                 ->color('primary')
                 ->url(route('filament.admin.pages.simulation-dashboard', [
@@ -203,16 +99,17 @@ class SimulationAssets extends Page implements HasTable
                 ])),
 
             Action::make('export_excel')
-                ->label('Export Excel')
+                ->label(__('export.export_excel'))
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('success')
                 ->action(function () {
                     $path = \App\Services\SimulationExportService::export($this->simulationConfiguration);
-                    $this->dispatch('download-file', url: route('download.analysis', ['file' => basename($path)]), filename: basename($path));
+                    $url = \URL::signedRoute('download.analysis', ['file' => basename($path)]);
+$this->dispatch('download-file', url: $url, filename: basename($path));
                 }),
 
             Action::make('back_to_simulations')
-                ->label('Back to Simulations')
+                ->label(__('simulation.back_to_simulations'))
                 ->icon('heroicon-o-arrow-left')
                 ->color('gray')
                 ->url(route('filament.admin.resources.simulation-configurations.index')),
@@ -223,7 +120,7 @@ class SimulationAssets extends Page implements HasTable
     {
         $breadcrumbs = [];
 
-        $breadcrumbs[route('filament.admin.resources.simulation-configurations.index')] = 'Simulations';
+        $breadcrumbs[route('filament.admin.resources.simulation-configurations.index')] = __('simulation.simulations');
 
         if ($this->simulationConfiguration) {
             $breadcrumbs[route('filament.admin.pages.simulation-dashboard', [
@@ -236,12 +133,7 @@ class SimulationAssets extends Page implements HasTable
         return $breadcrumbs;
     }
 
-    protected function getViewData(): array
-    {
-        return [
-            'simulationConfiguration' => $this->simulationConfiguration,
-        ];
-    }
+
 
     public static function getRoutes(): array
     {

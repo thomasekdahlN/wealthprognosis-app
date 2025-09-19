@@ -55,4 +55,14 @@ class SimulationConfigurationResource extends Resource
             'edit' => EditSimulationConfiguration::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
 }

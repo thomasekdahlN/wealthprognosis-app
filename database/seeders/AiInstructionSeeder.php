@@ -94,17 +94,22 @@ Provide specific tax optimization recommendations.',
         ];
 
         foreach ($instructions as $instruction) {
-            AiInstruction::create([
-                ...$instruction,
-                'user_id' => $user->id,
-                'team_id' => $user->current_team_id,
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-                'created_checksum' => hash('sha256', $instruction['name'].'_created'),
-                'updated_checksum' => hash('sha256', $instruction['name'].'_updated'),
-            ]);
+            AiInstruction::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'name' => $instruction['name'],
+                ],
+                [
+                    ...$instruction,
+                    'team_id' => $user->current_team_id,
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                    'created_checksum' => hash('sha256', $instruction['name'].'_created'),
+                    'updated_checksum' => hash('sha256', $instruction['name'].'_updated'),
+                ]
+            );
         }
 
-        $this->command->info('Created '.count($instructions).' AI instructions');
+        $this->command->info('Ensured '.count($instructions).' AI instructions');
     }
 }

@@ -33,16 +33,6 @@ class TaxTypeForm
                     ->rows(3)
                     ->placeholder('Detailed description of this tax type'),
 
-                TextInput::make('default_rate')
-                    ->label('Default Rate (%)')
-                    ->numeric()
-                    ->step(0.0001)
-                    ->minValue(0)
-                    ->maxValue(100)
-                    ->suffix('%')
-                    ->placeholder('e.g., 22.0000')
-                    ->helperText('Default tax rate as a percentage'),
-
                 TextInput::make('sort_order')
                     ->label('Sort Order')
                     ->numeric()

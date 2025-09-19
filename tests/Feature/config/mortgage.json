@@ -25,7 +25,7 @@
                 "name": "Income",
                 "description": "Income",
                 "amount": 14500,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },

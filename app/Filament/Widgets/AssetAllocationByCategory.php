@@ -10,21 +10,22 @@ class AssetAllocationByCategory extends ChartWidget
 {
     protected static ?int $sort = 22;
 
-    protected ?int $assetOwnerId = null;
+    protected ?int $assetConfigId = null;
 
     public function mount(): void
     {
-        $this->assetOwnerId = request()->get('asset_owner_id');
+        // Accept both new and legacy param keys
+        $this->assetConfigId = (int) (request()->get('asset_configuration_id') ?? request()->get('asset_owner_id') ?? 0) ?: null;
     }
 
     public function getHeading(): string
     {
         $heading = 'Asset Allocation by Category ('.now()->year.')';
 
-        if ($this->assetOwnerId) {
-            $assetOwner = \App\Models\AssetConfiguration::find($this->assetOwnerId);
-            if ($assetOwner) {
-                $heading = 'Asset Allocation by Category - '.$assetOwner->name.' ('.now()->year.')';
+        if ($this->assetConfigId) {
+            $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigId);
+            if ($assetConfiguration) {
+                $heading = 'Asset Allocation by Category - ' . $assetConfiguration->name . ' (' . now()->year . ')';
             }
         }
 
@@ -48,9 +49,9 @@ class AssetAllocationByCategory extends ChartWidget
         $assetGroups = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            // Apply asset owner filtering if specified
-            if ($this->assetOwnerId) {
-                $query->where('asset_owner_id', $this->assetOwnerId);
+            // Apply asset configuration filtering if specified
+            if ($this->assetConfigId) {
+                $query->where('asset_configuration_id', $this->assetConfigId);
             }
         })
             ->where('year', '<=', $currentYear) // Don't go beyond current year

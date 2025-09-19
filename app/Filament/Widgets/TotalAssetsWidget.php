@@ -46,9 +46,9 @@ class TotalAssetsWidget extends BaseWidget
         $fireSellableAssets = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            // Apply asset owner filtering if specified
-            if ($this->assetOwnerId) {
-                $query->where('asset_owner_id', $this->assetOwnerId);
+            // Apply asset configuration filtering if specified
+            if ($this->assetConfigurationId) {
+                $query->where('asset_configuration_id', $this->assetConfigurationId);
             }
 
             // Only include assets that are FIRE-sellable

@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Events;
 use App\Filament\Resources\Events\Pages\ListEvents;
 use App\Filament\Resources\Events\Tables\EventsTable;
 use App\Models\Asset;
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -26,7 +26,7 @@ class EventResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $currentYear = (int) date('Y');
-        $activeAssetConfigurationId = \App\Services\AssetConfigurationSessionService::getActiveAssetConfigurationId();
+        $activeAssetConfigurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
 
         $query = parent::getEloquentQuery()
             ->with(['configuration', 'assetType'])
@@ -57,5 +57,28 @@ class EventResource extends Resource
         return [
             'index' => ListEvents::route('/'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        // Count distinct assets with future years
+        $currentYear = (int) date('Y');
+        $activeAssetConfigurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
+
+        $query = static::getModel()::query()
+            ->whereHas('years', function ($q) use ($currentYear) {
+                $q->where('year', '>', $currentYear);
+            });
+
+        if ($activeAssetConfigurationId) {
+            $query->where('asset_configuration_id', $activeAssetConfigurationId);
+        }
+
+        return (string) $query->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
     }
 }

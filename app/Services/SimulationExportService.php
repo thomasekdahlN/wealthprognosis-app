@@ -77,12 +77,13 @@ class SimulationExportService
 
             $assetSheet = new PrognosisAssetSheet2($spreadsheet, $config, $assetArray, $meta);
             $spreadsheet->addSheet($assetSheet->worksheet);
-            self::applySheetFormatting($assetSheet->worksheet, $config);
+            \App\Services\ExcelFormatting::applyCommonAssetSheetFormatting($assetSheet->worksheet, $config['meta'] ?? []);
         }
 
         // Add Statistics sheet last (same class as existing export)
         $statsSheet = new AssetSpreadSheet($spreadsheet, $statistics);
         $spreadsheet->addSheet($statsSheet->worksheet);
+        \App\Services\ExcelFormatting::applyStatisticsSheetFormatting($statsSheet->worksheet);
 
         // Save to file
         $exportDir = storage_path('app/exports');
@@ -192,67 +193,6 @@ class SimulationExportService
         ksort($arr);
 
         return $arr;
-    }
-
-    protected static function applySheetFormatting(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet, array $config): void
-    {
-        // Determine row range
-        $startRow = 6;
-        $endRow = max($sheet->getHighestRow(), $startRow);
-
-        // Header row bold and gray fill
-        $sheet->getStyle('A5:AQ5')->getFont()->setBold(true);
-        $sheet->getStyle('A5:AQ5')->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('CCCCCC');
-
-        // Amount formatting (Norwegian): space as thousands separator, red negatives
-        $sheet->getStyle("B{$startRow}:AQ{$endRow}")
-            ->getNumberFormat()->setFormatCode('# ##0;[Red]-# ##0');
-        $sheet->getStyle("B{$startRow}:AQ{$endRow}")
-            ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-
-        // Percent columns formatting
-        $percent0 = '0.0%;[Red]-0.0%';
-        $percent00 = '0.00%;[Red]-0.00%';
-        foreach (['D','F','H','J','O','Q','V','X','AD','AF','AG','AH','AK','AP'] as $col) {
-            $sheet->getStyle("{$col}{$startRow}:{$col}{$endRow}")->getNumberFormat()->setFormatCode($percent0);
-        }
-        // Column Z has two decimals in original
-        $sheet->getStyle("Z{$startRow}:Z{$endRow}")->getNumberFormat()->setFormatCode($percent00);
-
-        // Vertical column colors (as in original)
-        $sheet->getStyle("C{$startRow}:C{$endRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('90EE90'); // income
-        $sheet->getStyle("E{$startRow}:E{$endRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCB'); // expense
-        $sheet->getStyle("P{$startRow}:P{$endRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('ADD8E6'); // cashflow/formue
-        $sheet->getStyle("W{$startRow}:W{$endRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCB'); // formuesskatt
-        $sheet->getStyle("Y{$startRow}:Y{$endRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCB'); // eiendomsskatt
-        $sheet->getStyle("AC{$startRow}:AC{$endRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCB'); // realisering skatt
-        $sheet->getStyle("AI{$startRow}:AI{$endRow}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('ADD8E6'); // cashflow
-
-        // Horizontal highlight rows
-        $meta = $config['meta'] ?? [];
-        $thisYear = (int) ($meta['thisYear'] ?? now()->year);
-        $prevYear = (int) ($meta['prevYear'] ?? ($thisYear - 1));
-        $verticalOffset = 6;
-        $rowsToHighlight = [
-            ['year' => $thisYear, 'color' => '32CD32'], // This year
-            ['year' => (int) ($meta['prognoseYear'] ?? 0), 'color' => '7FFFD4'],
-            ['year' => (int) ($meta['pensionOfficialYear'] ?? 0), 'color' => 'CCCCCC'],
-            ['year' => (int) ($meta['pensionWishYear'] ?? 0), 'color' => 'FFA500'],
-            ['year' => (int) ($meta['deathYear'] ?? 0), 'color' => 'FFCCCB'],
-        ];
-        foreach ($rowsToHighlight as $item) {
-            $year = (int) $item['year'];
-            if ($year > 0) {
-                $row = $year - $prevYear + $verticalOffset;
-                if ($row >= $startRow && $row <= $endRow) {
-                    $sheet->getStyle("A{$row}:AQ{$row}")->getFill()
-                        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB($item['color']);
-                }
-            }
-        }
     }
 
     protected static function buildStatistics($assets): array

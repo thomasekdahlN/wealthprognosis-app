@@ -7,14 +7,21 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationNetWorthChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Net Worth Projection';
+    protected static bool $isLazy = false;
+
+    protected ?string $heading = 'Net Worth Projection Over Time';
     protected static ?int $sort = 4;
 
     public ?SimulationConfiguration $simulationConfiguration = null;
 
-    public function mount(): void
+    public function mount(?SimulationConfiguration $simulationConfiguration = null): void
     {
-        // Get simulation_configuration_id from request
+        if ($simulationConfiguration) {
+            $this->simulationConfiguration = $simulationConfiguration;
+            return;
+        }
+
+        // Fallback: Get simulation_configuration_id from request
         $simulationConfigurationId = request()->get('simulation_configuration_id');
 
         if ($simulationConfigurationId) {

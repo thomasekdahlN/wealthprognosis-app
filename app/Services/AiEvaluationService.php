@@ -87,7 +87,7 @@ class AiEvaluationService
 
             } catch (\Exception $e) {
                 $errorResult = [
-                    'asset_configuration_id' => $assetOwner->id,
+                    'asset_configuration_id' => $assetConfiguration->id,
                     'asset_configuration_name' => $assetConfiguration->name,
                     'instruction_id' => $instruction->id,
                     'instruction_name' => $instruction->name,
@@ -248,20 +248,20 @@ class AiEvaluationService
     /**
      * Static method for easy usage
      */
-    public static function evaluate(AssetConfiguration $assetOwner, AiInstruction $instruction): array
+    public static function evaluate(AssetConfiguration $assetConfiguration, AiInstruction $instruction): array
     {
         $service = new static;
 
-        return $service->evaluateAssetOwner($assetOwner, $instruction);
+        return $service->evaluateAssetConfiguration($assetConfiguration, $instruction);
     }
 
     /**
      * Static method for multiple evaluations
      */
-    public static function evaluateMultiple(AssetConfiguration $assetOwner, array $instructionIds = []): array
+    public static function evaluateMultiple(AssetConfiguration $assetConfiguration, array $instructionIds = []): array
     {
         $service = new static;
 
-        return $service->evaluateWithMultipleInstructions($assetOwner, $instructionIds);
+        return $service->evaluateWithMultipleInstructions($assetConfiguration, $instructionIds);
     }
 }

@@ -9,11 +9,18 @@ use Illuminate\Support\Number;
 
 class SimulationStatsOverviewWidget extends BaseWidget
 {
+    protected static bool $isLazy = false;
+
     public ?SimulationConfiguration $simulationConfiguration = null;
 
-    public function mount(): void
+    public function mount(?SimulationConfiguration $simulationConfiguration = null): void
     {
-        // Get simulation_configuration_id from request
+        if ($simulationConfiguration) {
+            $this->simulationConfiguration = $simulationConfiguration;
+            return;
+        }
+
+        // Fallback: Get simulation_configuration_id from request
         $simulationConfigurationId = request()->get('simulation_configuration_id');
 
         if ($simulationConfigurationId) {

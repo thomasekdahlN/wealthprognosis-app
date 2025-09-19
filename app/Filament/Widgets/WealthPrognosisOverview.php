@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Services\AssetConfigurationSessionService;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ class WealthPrognosisOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         $user = Auth::user();
-        $activeScenario = AssetConfigurationSessionService::getActiveAssetConfiguration();
+        $activeScenario = app(CurrentAssetConfiguration::class)->get();
 
         if (! $activeScenario) {
             return [
@@ -38,11 +38,11 @@ class WealthPrognosisOverview extends StatsOverviewWidget
 
         $netWorth = $totalAssets - $totalMortgages;
 
-        // Get asset owner information for retirement calculations
-        $assetOwner = \App\Models\AssetConfiguration::where('user_id', $user->id)
+        // Get asset configuration information for retirement calculations
+        $assetConfiguration = \App\Models\AssetConfiguration::where('user_id', $user->id)
             ->first();
 
-        if (! $assetOwner) {
+        if (! $assetConfiguration) {
             // If no asset owner, provide default values
             $yearsToRetirement = 0;
             $currentAge = 0;
@@ -50,10 +50,10 @@ class WealthPrognosisOverview extends StatsOverviewWidget
             $pensionWishYear = 65; // Default retirement age
         } else {
             $currentYear = date('Y');
-            $currentAge = $currentYear - $assetOwner->birth_year;
-            $yearsToRetirement = max(0, $assetOwner->pension_wish_year - $currentAge);
-            $birthYear = $assetOwner->birth_year;
-            $pensionWishYear = $assetOwner->pension_wish_year;
+            $currentAge = $currentYear - $assetConfiguration->birth_year;
+            $yearsToRetirement = max(0, $assetConfiguration->pension_wish_year - $currentAge);
+            $birthYear = $assetConfiguration->birth_year;
+            $pensionWishYear = $assetConfiguration->pension_wish_year;
         }
 
         return [
@@ -73,7 +73,7 @@ class WealthPrognosisOverview extends StatsOverviewWidget
                 ->color($yearsToRetirement <= 5 ? 'success' : ($yearsToRetirement <= 15 ? 'warning' : 'primary')),
 
             Stat::make('Current Age', $currentAge > 0 ? $currentAge : 'Not set')
-                ->description($currentAge > 0 ? "Born in {$birthYear}" : 'Create an asset owner to set age')
+                ->description($currentAge > 0 ? "Born in {$birthYear}" : 'Create an asset configuration to set age')
                 ->descriptionIcon('heroicon-m-user')
                 ->color($currentAge > 0 ? 'gray' : 'warning'),
         ];
