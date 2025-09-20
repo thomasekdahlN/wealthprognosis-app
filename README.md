@@ -207,30 +207,50 @@ Overføring av beløp fra den asset regelen er på til den asset som er spesifis
 Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal sende beløpet, hvis ikke blir beløpet lagt til den asset man står på.
 Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det er extraDownPayment på lån, ellers så må transfer alltid skje til en kommende asset.
 
-### Supported assets types for prognosis and tax calculation
-* ask - Aksjesparing med skattefradrag
-* boat - Båt
-* cabin - Hytte
-* car - Bil
-* bank - Bankkonto
-* cash - Kontanter[wealth-te-do-not-share-2024-03.json](..%2F..%2FDocuments%2Fwealthprognosis%2Fwealth-te-do-not-share-2024-03.json)
-* child - Barn. Skattefritt men kjekt å klassifisere.
-* crypto - Krypto
-* bondfund - Rentefond
-* equityfund - Aksjefond eller fond som det kalles på, populært
-* gold - Gull
-* inheritance - Arv.
-* ips - Pensjonssparing med spesielle skatteregler.
-* loantocompany - Når du har gitt et lån til et firma (Skjermingsfadrag
-* income - her samler vi inntekt fra alle assets. Det blir aldri regnet skatt her. income regnes som ferdig skattet fra en transfer/rule/source fra annen asset
-* kpi - Konsumpris indeksen. For å se om investeringene dine gjør det bedre eller dårligere enn denne.
-* otp - Offentlig tjenestepensjon
-* pension - public pension / folketrygd
-* property - Eiendom du ikke leier ut. Sekundærboliger.
-* rental - Utleieeiendom
-* salary - Lønn
-* soleproprietorship - Enkeltpersonforetak
-* stock - Aksjer. Må hensynta fritaksregelen. Ingen skatt på salg av aksjer fra et firma, kun skatt ved salg av aksjer for privatpersoner
+### Supported asset types (canonical)
+
+Legend: 🟢 = Liquid, 🔴 = Non-liquid
+
+| Type | Visningsnavn | Liquid | Beskrivelse |
+|---|---|---|---|
+| equityfund | Aksjefond | 🟢 | Aksjefond (aksjefond/fond). |
+| bondfund | Rentefond | 🟢 | Fond som investerer primært i obligasjoner. |
+| mixedfund | Kombinasjonsfond | 🟢 | Balanserte fond med både aksjer og obligasjoner. |
+| indexfund | Indeksfond | 🟢 | Passivt fond som følger markedsindekser. |
+| hedgefund | Hedgefond | 🟢 | Alternative fond med fleksible strategier. |
+| stock | Aksjer | 🟢 | Hensyntar fritaksregelen; selskap uten skatt ved salg, privatperson beskattes ved salg. |
+| ask | Aksjesparekonto (ASK) | 🟢 | Skattefavorisert aksjesparing. |
+| bonds | Obligasjoner | 🟢 | Stats- og selskapsobligasjoner. |
+| options | Opsjoner | 🟢 | Finansielle derivater (rett, ikke plikt, til å kjøpe/selge). |
+| warrants | Warranter | 🟢 | Langsiktige opsjoner utstedt av selskap. |
+| bank | Bankkonto | 🟢 | Ordinær innskuddskonto. |
+| cash | Kontanter | 🟢 | Fysisk kontanter / umiddelbar likviditet. |
+| savings | Sparekonto | 🟢 | Høyrentekonto. |
+| timedeposit | Tidsinnskudd | 🟢 | Bundet innskudd med garantert rente. |
+| moneymarket | Pengemarkedsfond | 🟢 | Kortsiktige rentefond. |
+| car | Bil | 🔴 | Personlig kjøretøy. |
+| boat | Båt | 🔴 | Fritidsbåt/vannfartøy. |
+| jewelry | Smykker | 🔴 | Smykker og verdigjenstander. |
+| furniture | Møbler | 🔴 | Innbo og løsøre. |
+| crypto | Krypto | 🟢 | Digitale valutaer/kryptoaktiva. |
+| gold | Gull | 🟢 | Fysisk gull og edelmetaller. |
+| ips | Pensjonssparing (IPS) | 🟢 | Pensjonssparing med spesielle skatteregler. |
+| endowment | Kapitalforsikring | 🔴 | Skatteeffektiv sparing i forsikring. |
+| house | Bolig | 🔴 | Primær- eller sekundærbolig. |
+| rental | Utleieeiendom | 🔴 | Eiendom for utleie og inntekt. |
+| cabin | Hytte | 🔴 | Fritidsbolig. |
+| salary | Lønn | 🔴 | Lønnsinntekt fra arbeidsgiver. |
+| income | Annen inntekt | 🔴 | Diverse inntektskilder. |
+| pension | Pensjon | 🔴 | Offentlig pensjon/pensjonsutbetalinger. |
+| otp | Tjenestepensjon (OTP) | 🔴 | Arbeidsgiverpensjon (obligatorisk tjenestepensjon). |
+| child | Barnetrygd | 🔴 | Barnetrygd og andre familieytelser. |
+| inheritance | Arv | 🔴 | Arv og gaver. |
+| company | Selskap | 🔴 | Eierandel i selskap/bedrift. |
+| iphone | iPhone | 🔴 | Teknologiprodukter (eksempel/testkategori). |
+| applestock | Apple-aksjer | 🟢 | Aksjer i Apple Inc. (eksempel på enkeltselskap). |
+| test | Test | 🔴 | Testtype for utvikling/validering. |
+| kpi | KPI | 🔴 | Konsumprisindeks (referanse/indikator). |
+| spouse | Ektefelle | 🔴 | Ektefelles inntekter og utgifter. |
 
 ### Functionality on the priority wishlist:
 - Check calculations for property tax
