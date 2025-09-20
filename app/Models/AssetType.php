@@ -31,7 +31,7 @@ class AssetType extends Model
         'is_private',
         'is_company',
         'is_tax_optimized',
-        'is_fire_sellable',
+        'is_liquid',
         'can_generate_income',
         'can_generate_expenses',
         'can_have_mortgage',
@@ -52,7 +52,7 @@ class AssetType extends Model
         'is_private' => 'boolean',
         'is_company' => 'boolean',
         'is_tax_optimized' => 'boolean',
-        'is_fire_sellable' => 'boolean',
+        'is_liquid' => 'boolean',
         'can_generate_income' => 'boolean',
         'can_generate_expenses' => 'boolean',
         'can_have_mortgage' => 'boolean',
@@ -90,9 +90,9 @@ class AssetType extends Model
         return $query->where('is_tax_optimized', true);
     }
 
-    public function scopeFireSellable($query)
+    public function scopeLiquid($query)
     {
-        return $query->where('is_fire_sellable', true);
+        return $query->where('is_liquid', true);
     }
 
     public function assetCategory(): BelongsTo

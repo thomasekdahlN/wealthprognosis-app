@@ -21,6 +21,7 @@
             "tax": "house"
         },
         "2023": {
+            "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset:  | Mortgage: interest changerates.interest, years 20",
             "asset": {
                 "marketAmount": "3000000",
                 "changerate": "changerates.house",

@@ -22,7 +22,7 @@ beforeEach(function () {
     $this->assetType = AssetType::factory()->create([
         'type' => 'equity',
         'name' => 'Equity',
-        'is_fire_sellable' => true,
+        'is_liquid' => true,
     ]);
 
     $this->taxType = TaxType::factory()->create([
@@ -100,7 +100,7 @@ it('can access simulation dashboard page', function () {
     // Verify dashboard functionality
     expect($dashboard->simulationConfiguration)->not->toBeNull();
     expect($dashboard->simulationConfiguration->id)->toBe($this->simulationConfiguration->id);
-    expect($dashboard->getTitle())->toContain('Simulation Dashboard');
+    expect($dashboard->getTitle())->toContain('Simulation Assets Dashboard');
     expect($dashboard->getHeading())->toContain('Test Simulation');
 
     // Verify widgets are configured
@@ -384,7 +384,7 @@ it('page title and heading are set correctly', function () {
     $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
 
     $response->assertStatus(200);
-    $response->assertSee('Simulation Dashboard - Test Simulation');
+    $response->assertSee('Simulation Assets Dashboard - Test Simulation');
     $response->assertSee('Test Simulation');
 });
 
@@ -419,7 +419,7 @@ it('validates native filament dashboard functionality', function () {
 
     // Test dashboard configuration
     expect($dashboard->getColumns())->toBe(2);
-    expect($dashboard->getTitle())->toContain('Simulation Dashboard');
+    expect($dashboard->getTitle())->toContain('Simulation Assets Dashboard');
     expect($dashboard->getHeading())->toContain('Test Simulation');
 });
 

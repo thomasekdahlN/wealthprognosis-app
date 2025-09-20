@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('is_private')->default(false);
             $table->boolean('is_company')->default(false);
             $table->boolean('is_tax_optimized')->default(false);
-            $table->boolean('is_fire_sellable')->default(false);
+            $table->boolean('is_liquid')->default(false);
 
             // New capabilities flags
             $table->boolean('can_generate_income')->default(false);

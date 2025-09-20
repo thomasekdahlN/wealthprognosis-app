@@ -21,6 +21,7 @@
             "tax": "car"
         },
         "2023": {
+            "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
             "asset": {
                 "marketAmount": 200000,
                 "changerate": "changerates.car",

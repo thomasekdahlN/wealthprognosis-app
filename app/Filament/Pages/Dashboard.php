@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class Dashboard extends BaseDashboard
 {
-    protected static ?string $title = 'Dashboard';
+    protected static ?string $title = 'Actual Assets Dashboard';
 
-    protected static ?string $navigationLabel = 'Dashboard';
+    protected static ?string $navigationLabel = 'Actual Assets Dashboard';
 
     public ?int $assetConfigurationId = null;
 
@@ -34,7 +34,7 @@ class Dashboard extends BaseDashboard
     {
         $assetConfiguration = app(CurrentAssetConfiguration::class)->get();
         if ($assetConfiguration) {
-            return 'Dashboard - '.$assetConfiguration->name;
+            return 'Actual Assets Dashboard - '.$assetConfiguration->name;
         }
 
         return 'Wealthprognosis '.now()->year;

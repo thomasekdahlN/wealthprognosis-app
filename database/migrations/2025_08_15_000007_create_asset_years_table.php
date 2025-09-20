@@ -17,7 +17,10 @@ return new class extends Migration
             $table->foreignId('asset_id')->constrained('assets')->onDelete('cascade');
             $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade');
 
-            $table->text('income_description')->nullable();
+            // Unified description field (replaces income_description, expence_description, asset_description, mortgage_description)
+            $table->text('description')->nullable();
+
+            // Income data
             $table->decimal('income_amount', 15, 2)->nullable();
             $table->enum('income_factor', ['monthly', 'yearly'])->nullable();
             $table->string('income_rule')->nullable();
@@ -26,7 +29,7 @@ return new class extends Migration
             $table->string('income_changerate')->nullable();
             $table->boolean('income_repeat')->default(false);
 
-            $table->text('expence_description')->nullable();
+            // Expense data
             $table->decimal('expence_amount', 15, 2)->nullable();
             $table->enum('expence_factor', ['monthly', 'yearly'])->nullable();
             $table->string('expence_rule')->nullable();
@@ -35,7 +38,7 @@ return new class extends Migration
             $table->string('expence_changerate')->nullable();
             $table->boolean('expence_repeat')->default(false);
 
-            $table->text('asset_description')->nullable();
+            // Asset data
             $table->decimal('asset_market_amount', 15, 2)->nullable();
             $table->decimal('asset_acquisition_amount', 15, 2)->nullable();
             $table->decimal('asset_equity_amount', 15, 2)->nullable();
@@ -47,7 +50,7 @@ return new class extends Migration
             $table->string('asset_source')->nullable();
             $table->boolean('asset_repeat')->default(true);
 
-            $table->text('mortgage_description')->nullable();
+            // Mortgage data
             $table->decimal('mortgage_amount', 15, 2)->nullable();
             $table->smallInteger('mortgage_years')->nullable();
             $table->string('mortgage_interest')->nullable();

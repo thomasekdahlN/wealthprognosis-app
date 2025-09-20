@@ -21,6 +21,7 @@
             "tax": "house"
         },
         "2023": {
+            "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Mortgage: interest changerates.interest, years 20",
             "asset": {
                 "marketAmount": "3000000",
                 "changerate": "changerates.house",
@@ -52,6 +53,7 @@
             "tax": "inheritance"
         },
         "2037": {
+            "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
             "asset": {
                 "name": "inheritance",
                 "description": "",
@@ -77,6 +79,7 @@
             "tax": "equityfund"
         },
         "2024": {
+            "description": "Asset: ",
             "asset": {
                 "marketAmount": 10000,
                 "changerate": "changerates.equityfund",

@@ -21,6 +21,7 @@
             "tax": "crypto"
         },
         "2022": {
+            "description": "Income:  | Expense:  | Asset: ; Uttak fra $pensionWishYear, 1|$pensionWishYears | Mortgage: ",
             "asset": {
                 "marketAmount": 1500000,
                 "changerate": "changerates.crypto",

@@ -60,17 +60,20 @@ class AssetYearSeeder extends Seeder
                 'user_id' => $user->id,
                 'team_id' => $asset->team_id,
                 'asset_configuration_id' => $asset->asset_configuration_id,
-                'income_description' => $this->getIncomeDescription($asset->asset_type),
+                'description' => trim(collect([
+                    $this->getIncomeDescription($asset->asset_type) ? 'Income: '.$this->getIncomeDescription($asset->asset_type) : null,
+                    $this->getExpenseDescription($asset->asset_type) ? 'Expense: '.$this->getExpenseDescription($asset->asset_type) : null,
+                    'Asset: Asset value for '.$year,
+                    $this->getMortgageDescription($asset->asset_type) ? 'Mortgage: '.$this->getMortgageDescription($asset->asset_type) : null,
+                ])->filter()->implode(' | ')),
                 'income_amount' => $baseIncomeAmount ? round($baseIncomeAmount * $yearMultiplier) : null,
                 'income_factor' => $baseIncomeAmount ? 'monthly' : null,
                 'income_changerate' => $baseIncomeAmount ? 'changerates.kpi' : null,
                 'income_repeat' => $baseIncomeAmount ? true : false,
-                'expence_description' => $this->getExpenseDescription($asset->asset_type),
                 'expence_amount' => $baseExpenseAmount ? round($baseExpenseAmount * $yearMultiplier) : null,
                 'expence_factor' => $baseExpenseAmount ? 'monthly' : null,
                 'expence_changerate' => $baseExpenseAmount ? 'changerates.kpi' : null,
                 'expence_repeat' => $baseExpenseAmount ? true : false,
-                'asset_description' => 'Asset value for '.$year,
                 'asset_market_amount' => $baseMarketAmount ? round($baseMarketAmount * $yearMultiplier) : null,
                 'asset_acquisition_amount' => $asset->acquisition_amount,
                 'asset_equity_amount' => $baseMarketAmount ? round(($baseMarketAmount * 0.8) * $yearMultiplier) : null,
@@ -78,8 +81,7 @@ class AssetYearSeeder extends Seeder
                 'asset_taxable_initial_amount' => $asset->taxable_initial_amount,
                 'asset_changerate' => $asset->change_rate_type,
                 // mortgage_name field removed
-                'mortgage_description' => $this->getMortgageDescription($asset->asset_type),
-                'mortgage_amount' => $baseMortgageAmount ? round($baseMortgageAmount * (1 - (($year - 2023) * 0.1))) : null, // Decreasing mortgage
+                                'mortgage_amount' => $baseMortgageAmount ? round($baseMortgageAmount * (1 - (($year - 2023) * 0.1))) : null, // Decreasing mortgage
                 'mortgage_interest' => $baseMortgageAmount ? '5.5' : null,
                 'mortgage_years' => $baseMortgageAmount ? 20 : null,
                 'mortgage_gebyr' => $baseMortgageAmount ? 600 : null,

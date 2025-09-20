@@ -28,9 +28,10 @@ class SimulationAssetYear extends Model
         'year',
         'asset_id',
         'asset_configuration_id',
+        // Unified year description
+        'description',
         // Income fields
         'income_amount',
-        'income_description',
         'income_factor',
         'income_rule',
         'income_transfer',
@@ -39,7 +40,6 @@ class SimulationAssetYear extends Model
         'income_changerate',
         'income_repeat',
         // Expense fields
-        'expence_description',
         'expence_amount',
         'expence_factor',
         'expence_rule',
@@ -63,7 +63,6 @@ class SimulationAssetYear extends Model
         'cashflow_changerate',
         'cashflow_repeat',
         // Asset fields
-        'asset_description',
         'asset_market_amount',
         'asset_market_mortgage_deducted_amount',
         'asset_acquisition_amount',
@@ -91,7 +90,6 @@ class SimulationAssetYear extends Model
         'asset_source',
         'asset_repeat',
         // Mortgage fields
-        'mortgage_description',
         'mortgage_amount',
         'mortgage_term_amount',
         'mortgage_interest_amount',

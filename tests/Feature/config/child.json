@@ -21,6 +21,7 @@
             "tax": "child"
         },
         "2020": {
+            "description": "Income: Barnetrygd | Expense: Utgifter | Asset:  | Mortgage: ",
             "income": {
                 "name": "barnetrygd",
                 "description": "Barnetrygd",
@@ -39,6 +40,7 @@
             }
         },
         "2026": {
+            "description": "Income: Barnetrygd redusert etter 6 år",
             "income": {
                 "name": "barnetrygd",
                 "description": "Barnetrygd redusert etter 6 år",
@@ -49,6 +51,7 @@
             }
         },
         "2038": {
+            "description": "Income: Barnetrygd stopper ved 18 år",
             "income": {
                 "name": "barnetrygd",
                 "description": "Barnetrygd stopper ved 18 år",

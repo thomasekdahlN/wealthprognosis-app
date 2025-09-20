@@ -21,6 +21,7 @@
             "tax": "house"
         },
         "2024": {
+            "description": "Income: Income | Expense: Income | Asset:  | Mortgage: "
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -61,6 +62,7 @@
             "tax": "equityfund"
         },
         "2024": {
+            "description": "Income:  | Expense:  | Asset:  | Mortgage: "
             "asset": {
                 "marketAmount": 1000,
                 "changerate": "changerates.equityfund",

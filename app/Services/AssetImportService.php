@@ -309,9 +309,15 @@ class AssetImportService
             'asset_id' => $asset->id,
             'asset_configuration_id' => $asset->asset_configuration_id,
 
-            // Income data
+            // Unified description: append all existing descriptions into a single field
+            'description' => trim(collect([
+                Arr::get($yearData, 'income.description') ? 'Income: '.Arr::get($yearData, 'income.description') : null,
+                Arr::get($yearData, 'expence.description') ? 'Expense: '.Arr::get($yearData, 'expence.description') : null,
+                Arr::get($yearData, 'asset.description') ? 'Asset: '.Arr::get($yearData, 'asset.description') : null,
+                Arr::get($yearData, 'mortgage.description') ? 'Mortgage: '.Arr::get($yearData, 'mortgage.description') : null,
+            ])->filter()->implode(' | ')),
 
-            'income_description' => Arr::get($yearData, 'income.description'),
+            // Income data
             'income_amount' => (float) Arr::get($yearData, 'income.amount', 0),
             'income_factor' => $this->convertFactorToEnum(Arr::get($yearData, 'income.factor', 1)),
             'income_rule' => Arr::get($yearData, 'income.rule'),
@@ -321,8 +327,6 @@ class AssetImportService
             'income_repeat' => (bool) Arr::get($yearData, 'income.repeat', false),
 
             // Expense data
-
-            'expence_description' => Arr::get($yearData, 'expence.description'),
             'expence_amount' => (float) Arr::get($yearData, 'expence.amount', 0),
             'expence_factor' => $this->convertFactorToEnum(Arr::get($yearData, 'expence.factor', 1)),
             'expence_rule' => Arr::get($yearData, 'expence.rule'),
@@ -332,8 +336,6 @@ class AssetImportService
             'expence_repeat' => (bool) Arr::get($yearData, 'expence.repeat', false),
 
             // Asset data
-
-            'asset_description' => Arr::get($yearData, 'asset.description'),
             'asset_market_amount' => (float) Arr::get($yearData, 'asset.marketAmount', 0),
             'asset_acquisition_amount' => (float) Arr::get($yearData, 'asset.acquisitionAmount', 0),
             'asset_equity_amount' => (float) Arr::get($yearData, 'asset.equityAmount', 0),
@@ -346,8 +348,6 @@ class AssetImportService
             'asset_repeat' => (bool) Arr::get($yearData, 'asset.repeat', false),
 
             // Mortgage data
-
-            'mortgage_description' => Arr::get($yearData, 'mortgage.description'),
             'mortgage_amount' => (float) Arr::get($yearData, 'mortgage.amount', 0),
             'mortgage_years' => (int) Arr::get($yearData, 'mortgage.years', 0),
             'mortgage_interest' => Arr::get($yearData, 'mortgage.interest'),

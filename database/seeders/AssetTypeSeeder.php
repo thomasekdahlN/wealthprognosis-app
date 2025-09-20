@@ -58,7 +58,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 1,
             ],
             [
@@ -76,7 +76,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 2,
             ],
             [
@@ -93,7 +93,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 3,
             ],
             [
@@ -110,7 +110,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 4,
             ],
             [
@@ -127,7 +127,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 5,
             ],
 
@@ -147,7 +147,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 6,
             ],
             [
@@ -165,7 +165,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 7,
             ],
             [
@@ -182,7 +182,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 8,
             ],
             [
@@ -199,7 +199,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 9,
             ],
             [
@@ -216,7 +216,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 10,
             ],
 
@@ -235,7 +235,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 11,
             ],
             [
@@ -252,7 +252,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 12,
             ],
             [
@@ -269,7 +269,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 13,
             ],
             [
@@ -286,7 +286,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 14,
             ],
             [
@@ -303,7 +303,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 15,
             ],
 
@@ -322,7 +322,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 16,
             ],
             [
@@ -339,7 +339,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 17,
             ],
             [
@@ -356,7 +356,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 18,
             ],
             [
@@ -373,7 +373,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 19,
             ],
 
@@ -392,7 +392,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 20,
             ],
             [
@@ -409,7 +409,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 21,
             ],
 
@@ -428,7 +428,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 22,
             ],
             [
@@ -445,7 +445,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 23,
             ],
 
@@ -464,7 +464,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => true,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 24,
             ],
             [
@@ -481,7 +481,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => true,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 25,
             ],
             [
@@ -498,7 +498,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => true,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 26,
             ],
 
@@ -517,7 +517,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 27,
             ],
             [
@@ -534,7 +534,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 28,
             ],
 
@@ -553,7 +553,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 29,
             ],
             [
@@ -570,7 +570,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 30,
             ],
 
@@ -589,7 +589,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 31,
             ],
             [
@@ -606,7 +606,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 32,
             ],
 
@@ -625,7 +625,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 33,
             ],
 
@@ -644,7 +644,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 34,
             ],
             [
@@ -661,7 +661,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
-                'is_fire_sellable' => true,
+                'is_liquid' => true,
                 'sort_order' => 35,
             ],
 
@@ -680,7 +680,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 36,
             ],
             [
@@ -697,7 +697,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => false,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 37,
             ],
 
@@ -716,7 +716,7 @@ class AssetTypeSeeder extends Seeder
                 'can_generate_expenses' => true,
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
-                'is_fire_sellable' => false,
+                'is_liquid' => false,
                 'sort_order' => 38,
             ],
         ];

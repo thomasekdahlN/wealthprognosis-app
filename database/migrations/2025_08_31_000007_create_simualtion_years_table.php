@@ -17,8 +17,11 @@ return new class extends Migration
             $table->foreignId('asset_id')->constrained('simulation_assets')->onDelete('cascade')->index();
             $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade')->index();
 
+
+            // Unified description field (replaces income_description, expence_description, asset_description, mortgage_description)
+            $table->text('description')->nullable();
+
             //Income
-            $table->text('income_description')->nullable();
             $table->decimal('income_amount', 15, 2)->nullable();
             $table->enum('income_factor', ['monthly', 'yearly'])->nullable();
             $table->string('income_rule')->nullable();
@@ -29,7 +32,6 @@ return new class extends Migration
             $table->boolean('income_repeat')->default(false);
 
             //Expence
-            $table->text('expence_description')->nullable();
             $table->decimal('expence_amount', 15, 2)->nullable();
             $table->enum('expence_factor', ['monthly', 'yearly'])->nullable();
             $table->string('expence_rule')->nullable();
@@ -55,7 +57,6 @@ return new class extends Migration
             $table->boolean('cashflow_repeat')->default(false);
 
             //Asset
-            $table->text('asset_description')->nullable();
             $table->decimal('asset_market_amount', 15, 2)->nullable();
             $table->decimal('asset_market_mortgage_deducted_amount', 15, 2)->nullable();
             $table->decimal('asset_acquisition_amount', 15, 2)->nullable();
@@ -84,7 +85,6 @@ return new class extends Migration
             $table->boolean('asset_repeat')->default(true);
 
             //Mortgage
-            $table->text('mortgage_description')->nullable();
             $table->decimal('mortgage_amount', 15, 2)->nullable();
             $table->decimal('mortgage_term_amount', 15, 2)->nullable();
             $table->decimal('mortgage_interest_amount', 15, 2)->nullable();

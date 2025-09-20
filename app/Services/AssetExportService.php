@@ -108,11 +108,14 @@ class AssetExportService
     {
         $yearData = [];
 
+        // Unified year-level description
+        if (! empty($assetYear->description)) {
+            $yearData['description'] = $assetYear->description;
+        }
+
         // Income data
         if ($this->hasIncomeData($assetYear)) {
             $yearData['income'] = array_filter([
-
-                'description' => $assetYear->income_description,
                 'amount' => $assetYear->income_amount ?: null,
                 'changerate' => $assetYear->income_changerate,
                 'transfer' => $assetYear->income_transfer,
@@ -125,8 +128,6 @@ class AssetExportService
         // Expense data
         if ($this->hasExpenseData($assetYear)) {
             $yearData['expence'] = array_filter([
-
-                'description' => $assetYear->expence_description,
                 'amount' => $assetYear->expence_amount ?: null,
                 'factor' => $assetYear->expence_factor && $assetYear->expence_factor !== 'yearly' ? 12 : null,
                 'changerate' => $assetYear->expence_changerate,
@@ -140,8 +141,6 @@ class AssetExportService
         // Asset data
         if ($this->hasAssetData($assetYear)) {
             $yearData['asset'] = array_filter([
-
-                'description' => $assetYear->asset_description,
                 'marketAmount' => $assetYear->asset_market_amount ?: null,
                 'acquisitionAmount' => $assetYear->asset_acquisition_amount ?: null,
                 'equityAmount' => $assetYear->asset_equity_amount ?: null,
@@ -158,8 +157,6 @@ class AssetExportService
         // Mortgage data
         if ($this->hasMortgageData($assetYear)) {
             $yearData['mortgage'] = array_filter([
-
-                'description' => $assetYear->mortgage_description,
                 'amount' => $assetYear->mortgage_amount ?: null,
                 'years' => $assetYear->mortgage_years ?: null,
                 'interest' => $assetYear->mortgage_interest,

@@ -129,6 +129,7 @@ class PrognosisSimulationService
             // Copy asset years
             foreach ($asset->years as $assetYear) {
                 SimulationAssetYear::create([
+                        'description' => $assetYear->description,
                     'user_id' => Auth::id() ?? $assetYear->user_id,
                     'team_id' => Auth::user()?->currentTeam?->id ?? $assetYear->team_id,
                     'year' => $assetYear->year,
@@ -137,50 +138,43 @@ class PrognosisSimulationService
 
                     // Income data
 
-                    'income_description' => 'Generated income from asset',
-                    'income_amount' => $assetYear->income_amount,
+                                        'income_amount' => $assetYear->income_amount,
                     'income_factor' => $assetYear->income_factor,
                     'income_rule' => 'standard',
                     'income_transfer' => 'none',
                     'income_source' => $asset->asset_type,
-                    'income_changerate' => $assetYear->change_rate_type,
+                    'income_changerate' => $assetYear->income_changerate,
                     'income_repeat' => true,
 
                     // Expense data
-                    'expence_name' => 'Expenses for ' . $asset->name,
-                    'expence_description' => 'Operating expenses for asset',
                     'expence_amount' => $assetYear->expence_amount,
                     'expence_factor' => $assetYear->expence_factor,
                     'expence_rule' => 'standard',
                     'expence_transfer' => 'none',
                     'expence_source' => $asset->asset_type,
-                    'expence_changerate' => $assetYear->change_rate_type,
+                    'expence_changerate' => $assetYear->expence_changerate,
                     'expence_repeat' => true,
 
                     // Asset data
-                    'asset_name' => $asset->name,
-                    'asset_description' => $asset->description,
-                    'asset_market_amount' => $assetYear->market_amount,
-                    'asset_acquisition_amount' => $assetYear->acquisition_amount,
-                    'asset_equity_amount' => $assetYear->equity_amount,
-                    'asset_taxable_initial_amount' => $assetYear->taxable_initial_amount,
-                    'asset_paid_amount' => $assetYear->paid_amount,
-                    'asset_changerate' => $assetYear->change_rate_type,
+                    'asset_market_amount' => $assetYear->asset_market_amount,
+                    'asset_acquisition_amount' => $assetYear->asset_acquisition_amount,
+                    'asset_equity_amount' => $assetYear->asset_equity_amount,
+                    'asset_taxable_initial_amount' => $assetYear->asset_taxable_initial_amount,
+                    'asset_paid_amount' => $assetYear->asset_paid_amount,
+                    'asset_changerate' => $assetYear->asset_changerate,
                     'asset_rule' => 'standard',
                     'asset_transfer' => 'none',
                     'asset_source' => $asset->asset_type,
                     'asset_repeat' => true,
 
                     // Mortgage data (if applicable)
-                    'mortgage_name' => null,
-                    'mortgage_description' => null,
                     'mortgage_amount' => 0,
                     'mortgage_years' => null,
-                    'mortgage_interest' => null,
+                    'mortgage_interest_percent' => null,
                     'mortgage_interest_only_years' => null,
                     'mortgage_extra_downpayment_amount' => null,
-                    'mortgage_gebyr' => 0,
-                    'mortgage_tax' => 0,
+                    'mortgage_gebyr_amount' => 0,
+                    'mortgage_tax_deductable_amount' => 0,
 
                     // Audit fields
                     'created_by' => Auth::id() ?? $assetYear->user_id,

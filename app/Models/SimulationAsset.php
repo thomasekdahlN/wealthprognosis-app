@@ -125,11 +125,11 @@ class SimulationAsset extends Model
         return self::TAX_TYPES[$this->tax_type] ?? $this->tax_type;
     }
 
-    public function isFirePartSalePossible(): bool
+    public function isLiquid(): bool
     {
         $assetType = \App\Models\AssetType::where('type', $this->asset_type)->first();
 
-        return $assetType ? $assetType->is_fire_sellable : false;
+        return $assetType ? $assetType->is_liquid : false;
     }
 
     public function isFireSavingType(): bool

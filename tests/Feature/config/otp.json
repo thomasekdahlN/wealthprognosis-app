@@ -21,6 +21,7 @@
             "tax": "income"
         },
         "2023": {
+            "description": "Income: Income | Expense:  | Asset:  | Mortgage: "
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -31,6 +32,7 @@
             }
         },
         "$pensionWishYear": {
+            "description": "Income: Pensioned, no more salary from here | Expense:  | Asset:  | Mortgage: "
             "income": {
                 "name": "Income",
                 "description": "Pensioned, no more salary from here",
@@ -50,6 +52,7 @@
             "tax": "otp"
         },
         "2023": {
+            "description": "Asset: OTP Sparing frem til pensjonsår"
             "asset": {
                 "marketAmount": 2000000,
                 "changerate": "changerates.otp",
@@ -60,6 +63,7 @@
             }
         },
         "$otpStartYear": {
+            "description": "Asset: OTP fra $otpStartYear, 1|$otpYears"
             "asset": {
                 "rule": "1|$otpYears",
                 "transfer": "income.$year.income.amount",

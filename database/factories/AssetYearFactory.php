@@ -24,10 +24,9 @@ class AssetYearFactory extends Factory
             'team_id' => $user->current_team_id,
             'year' => $this->faker->numberBetween(2020, 2030),
             'asset_id' => $asset->id,
-            'asset_owner_id' => $asset->asset_owner_id,
+            'asset_configuration_id' => $asset->asset_configuration_id,
 
             // Income data
-            'income_description' => null,
             'income_amount' => 0,
             'income_factor' => null,
             'income_rule' => null,
@@ -37,7 +36,6 @@ class AssetYearFactory extends Factory
             'income_repeat' => false,
 
             // Expense data
-            'expence_description' => null,
             'expence_amount' => 0,
             'expence_factor' => null,
             'expence_rule' => null,
@@ -46,8 +44,10 @@ class AssetYearFactory extends Factory
             'expence_changerate' => null,
             'expence_repeat' => false,
 
+            // Description
+            'description' => null,
+
             // Asset data
-            'asset_description' => null,
             'asset_market_amount' => 0,
             'asset_acquisition_amount' => 0,
             'asset_equity_amount' => 0,
@@ -60,7 +60,6 @@ class AssetYearFactory extends Factory
             'asset_repeat' => false,
 
             // Mortgage data
-            'mortgage_description' => null,
             'mortgage_amount' => 0,
             'mortgage_years' => 0,
             'mortgage_interest' => null,

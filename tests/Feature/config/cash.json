@@ -21,6 +21,7 @@
             "tax": "cash"
         },
         "2023": {
+            "description": "Income:  | Expense:  | Asset: Kontanter p.t.; Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen | Mortgage: ",
             "asset": {
                 "marketAmount": 100000,
                 "changerate": "changerates.cash",

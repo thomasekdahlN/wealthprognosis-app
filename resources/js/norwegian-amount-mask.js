@@ -105,7 +105,10 @@ document.addEventListener('DOMContentLoaded', function() {
         'input[wire\\:model*="asset_equity_amount"],' +
         'input[wire\\:model*="asset_taxable_initial_amount"],' +
         'input[wire\\:model*="asset_paid_amount"],' +
-        'input[wire\\:model*="mortgage_gebyr"]'
+        'input[wire\\:model*="mortgage_gebyr"],' +
+        'input[wire\\:model*="mortgage_gebyr_amount"],' +
+        'input[wire\\:model*="mortgage_tax_deductable_amount"],' +
+        'input[wire\\:model*="mortgage_extra_downpayment_amount"]'
     );
 
     amountFields.forEach(applyNorwegianAmountMask);
@@ -122,7 +125,10 @@ document.addEventListener('livewire:navigated', function() {
         'input[wire\\:model*="asset_equity_amount"],' +
         'input[wire\\:model*="asset_taxable_initial_amount"],' +
         'input[wire\\:model*="asset_paid_amount"],' +
-        'input[wire\\:model*="mortgage_gebyr"]'
+        'input[wire\\:model*="mortgage_gebyr"],' +
+        'input[wire\\:model*="mortgage_gebyr_amount"],' +
+        'input[wire\\:model*="mortgage_tax_deductable_amount"],' +
+        'input[wire\\:model*="mortgage_extra_downpayment_amount"]'
     );
 
     amountFields.forEach(applyNorwegianAmountMask);

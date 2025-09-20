@@ -122,8 +122,8 @@ class EventsTable
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
-                TextColumn::make('descriptions')
-                    ->label('Descriptions')
+                TextColumn::make('description')
+                    ->label('Description')
                     ->getStateUsing(function ($record) {
                         $currentYear = (int) date('Y');
                         $futureYear = $record->years()
@@ -131,29 +131,11 @@ class EventsTable
                             ->orderBy('year')
                             ->first();
 
-                        if (! $futureYear) {
-                            return '';
-                        }
-
-                        $descriptions = [];
-                        if ($futureYear->income_description) {
-                            $descriptions[] = '**Income:** '.strip_tags($futureYear->income_description);
-                        }
-                        if ($futureYear->expence_description) {
-                            $descriptions[] = '**Expense:** '.strip_tags($futureYear->expence_description);
-                        }
-                        if ($futureYear->asset_description) {
-                            $descriptions[] = '**Asset:** '.strip_tags($futureYear->asset_description);
-                        }
-                        if ($futureYear->mortgage_description) {
-                            $descriptions[] = '**Mortgage:** '.strip_tags($futureYear->mortgage_description);
-                        }
-
-                        return empty($descriptions) ? '' : implode(' • ', $descriptions);
+                        return $futureYear?->description ? strip_tags($futureYear->description) : '';
                     })
                     ->columnSpanFull()
                     ->wrap()
-                    ->html(),
+                    ->html(false),
             ])
             ->filters([
                 SelectFilter::make('asset_type')

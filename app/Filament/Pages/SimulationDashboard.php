@@ -63,8 +63,8 @@ class SimulationDashboard extends Dashboard
     public function getTitle(): string|Htmlable
     {
         return $this->simulationConfiguration
-            ? "Simulation Dashboard - {$this->simulationConfiguration->name}"
-            : 'Simulation Dashboard';
+            ? "Simulation Assets Dashboard - {$this->simulationConfiguration->name}"
+            : 'Simulation Assets Dashboard';
     }
 
     public function getHeading(): string|Htmlable

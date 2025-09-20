@@ -21,6 +21,7 @@
             "tax": "stock"
         },
         "2022": {
+            "description": "Income:  | Expense:  | Asset: Initielt kjøp | Mortgage: ",
             "asset": {
                 "marketAmount": 2500000,
                 "changerate": "changerates.stock",

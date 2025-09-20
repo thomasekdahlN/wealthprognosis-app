@@ -10,7 +10,7 @@ Configure all your assets, mortgage, income and expences.
 The program takes into account all known taxes in Norway, like fortune tax, property tax, income tax, capital tax, pension tax, rental tax, company tax, dividend tax, interest tax, wealth tax, inheritance tax, gift tax, sales tax and tax shield and calculates it for every asset every year
 The program looks at how much your max possibel mortgage can be
 
-The program looks at different F.I.R.E metrics so you can see when you can become financially independent and retire early. But recommends a different approach than the 4% rule - it will take the number of years from you wish to retire until the year you die - and sell the sellable assets until zero (fully configurable). You will still have your house, car, boat and cabin left after these sales.
+The program looks at different F.I.R.E metrics so you can see when you can become financially independent and retire early. But recommends a different approach than the 4% rule - it will take the number of years from you wish to retire until the year you die - and sell the liquid assets until zero (fully configurable). You will still have your house, car, boat and cabin left after these sales.
 Supports correct taxation when transfering an asset from a company to private (first correct taxation on realization in company, then correct taxation when transfering to private)
 
 Supports normal annuitets mortgage and extra downpayments.
@@ -71,6 +71,64 @@ total, company (total company summary), private (total private summary), income 
 * [property-rental](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
 * [rental-vs-fond](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
 * [salary-otp](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
+
+
+### Dashboards og widgets
+
+#### Actual Assets Dashboard (/admin)
+- Asset Overview (GUI) — App\Filament\Widgets\AssetOverviewWidget
+  - Hva: Hurtigstatus for totaler
+  - Matematikk: Henter summer fra FireCalculationService. Viser bl.a. Total Assets (sum markedsverdi), Investment (liquid) Assets, Net Worth = Total Assets − Total Liabilities, Total Mortgage = sum lån.
+- Monthly Cashflow (GUI) — App\Filament\Widgets\MonthlyCashflowWidget
+  - Hva: Månedlig inntekt/utgift, netto cashflow og forbruksgrad
+  - Matematikk: Monthly Cashflow = monthlyIncome − monthlyExpenses. Expense Ratio = annualExpenses / annualIncome × 100. Viser også årsverdier.
+- FIRE Progress & Crossover Point — App\Filament\Widgets\FireProgressAndCrossover
+  - Hva: Linjegraf som viser portefølje vs FIRE‑tall og inntekt/utgift (kun inneværende år)
+  - Matematikk: FIRE‑tall = 25 × årlige utgifter. Potensiell årlig inntekt = porteføljeverdi × 4%.
+- FIRE: Crossover Point — App\Filament\Widgets\FireCrossoverWidget
+  - Hva: Om passiv inntekt overstiger utgifter (oppnådd/ikke)
+  - Matematikk: Basert på FireCalculationService->crossoverAchieved (passiv inntekt > utgifter).
+- FIRE Progress Over Time — App\Filament\Widgets\FireMetricsOverview
+  - Hva: Linjegraf med estimert nettoformue vs FIRE‑tall over 30 år
+  - Matematikk: Nettoformue projiseres med årlig vekst 7%: (forrige + årlig sparing) × 1.07. FIRE‑tall inflasjonsjusteres ~3% p.a. (25 × årlige utgifter × 1.03^n).
+- Net Worth Over Time — App\Filament\Widgets\NetWorthOverTime
+  - Hva: Historisk nettoformue per år (kun til og med inneværende år)
+  - Matematikk: Nettoformue(år) = sum(asset_market_amount) − sum(mortgage_amount) fra AssetYear pr år.
+- Cash Flow Over Time — App\Filament\Widgets\CashFlowOverTime
+  - Hva: Linjegraf for årlig inntekt, utgifter og netto cashflow
+  - Matematikk: Årlig inntekt = sum(income_amount × faktor) der faktor = 12 ved monthly, ellers 1. Årlige utgifter tilsvarende med expence_amount. Net Cashflow = inntekt − utgifter.
+- Asset Allocation by Type — App\Filament\Widgets\AssetAllocationByType
+  - Hva: Fordeling etter asset‑type for inneværende år
+  - Matematikk: Grupperer AssetYear etter asset.asset_type, summerer asset_market_amount (> 0).
+- Asset Allocation by Tax Type — App\Filament\Widgets\AssetAllocationByTaxType
+  - Hva: Fordeling etter skattekategori for inneværende år
+  - Matematikk: Grupperer AssetYear etter asset.tax_type, summerer asset_market_amount (> 0).
+- Asset Allocation by Category — App\Filament\Widgets\AssetAllocationByCategory
+  - Hva: Fordeling etter kategori (fra asset type relasjon) for inneværende år
+  - Matematikk: Grupperer AssetYear etter asset.assetType.category, summerer asset_market_amount (> 0).
+- Actual Tax Rate Over Time — App\Filament\Widgets\ActualTaxRateOverTime
+  - Hva: Faktisk/estimert skattesats over tid
+  - Matematikk: Årsinntekt = sum(income_amount × faktor). Årsskatt = sum(tax_amount) eller estimert norsk modell. Skattesats = skatt/inntekt × 100. Viser også enkel marginalskatt.
+- Retirement Readiness — App\Filament\Widgets\RetirementReadinessChart
+  - Hva: Hvor nær pensjonsmål du er, med kapitalbehov og pensjonsekvivalenter
+  - Matematikk: Nettoformue projiseres med ~6% p.a.; etter pensjon: årlig uttak 4%. Kapitalbehov ≈ 25 × 80% av nåværende utgifter. Pensjonsekvivalent beregnes forenklet (grunnpensjon + OTP 4%‑uttak).
+- Monthly Expense Breakdown — App\Filament\Widgets\ExpenseBreakdownChart
+  - Hva: Doughnut‑diagram av månedlige utgifter pr type
+  - Matematikk: Sum expence_amount per asset‑type for inneværende år, delt på 12.
+
+#### Simulation Assets Dashboard (/admin/simulation-dashboard?simulation_configuration_id=ID)
+- Simulation Overview — App\Filament\Widgets\SimulationStatsOverviewWidget
+  - Hva: Nøkkeltall for porteføljen i simuleringen
+  - Matematikk: Startverdi = sum første års start_value. Sluttverdi = sum siste års end_value. Total vekst = slutt − start. CAGR ≈ (slutt/start)^(1/år) − 1. Viser også totale inntekter, utgifter, netto og skatt.
+- Simulation FIRE Analysis — App\Filament\Widgets\SimulationFireAnalysisWidget
+  - Hva: FIRE‑tall, fremdrift, antatt år til FIRE og dekning av utgifter
+  - Matematikk: Årlige utgifter = gjennomsnitt av expence_amount. FIRE‑tall = 25 × årlige utgifter. Nåverdi = sum start_value. Fremdrift = nåverdi/FIRE‑tall × 100. År til FIRE (forenklet). Passiv inntekt = 4% av portefølje.
+- Simulation Tax Analysis — App\Filament\Widgets\SimulationTaxAnalysisWidget
+  - Hva: Skatteanalyse i simuleringen
+  - Matematikk: Total skatt = sum asset_tax_amount. Effektiv skattesats = total skatt / total inntekt × 100. Skatt på gevinster = skatt / samlede gevinster × 100. Viser også høyeste/laveste skatteår (beløp).
+- Portfolio Allocation Evolution — App\Filament\Widgets\SimulationAssetAllocationChartWidget
+  - Hva: Fordeling av portefølje i siste simulerte år
+  - Matematikk: Finn siste år i datasettet, grupper end_value per asset_type og summer.
 
 ### How to run
 php artisan ReadFile2 yourassetconfig.json realistic|positive|negative|tenpercent|zero|variable all|private|company
@@ -180,7 +238,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 - Support for personfradrag in tax calculations - calculating a bit too high now
 - Support for reading tax configurations pr year and country (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
 - Support for yearly tax on interest on money in the bank.
-- Support for two different types of stock - sellable and non-sellable (greymarket). Sellable stocks will be sold until zero when you retire. Non-sellable stocks will be kept until you die.
+- Support for two different types of stock - liquid and non-liquid (greymarket). Liquid stocks will be sold until zero when you retire. Non-liquid stocks will be kept until you die.
 - Fortune tax is divided into state and municipality tax. Should be calculated separately.
 - Correct the FIRE calulations - the correct is 4% the first year and then KPI adjusted the following years.
 
@@ -200,7 +258,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 - Property tax should use the tax value of year-2 (Holmestrand at least))
 - Company fortune tax for private person should use the tax value of year-2
 - rename group => configuration [private|company]
-- Support for selling parts of partsellable assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
+- Support for selling parts of partly liquid assets every year to get the cashflow to zero. (has top calculate reversed tax - the amount you neet to pay + tax has to be transfered to cashflow)
 - Tax configuration pr year and countries (support for more than norwegian tax regime). Only using the current years tax regime for all calculations now
 - Take into account the number of years you have owned an asset regardign tax calculation on i.e house and cabin.
 - Gjøre beregningene pr år så asset, ikke asset pr år som nå (da vil ikke verdiøkning o.l være med) (BIG REFACTORING - but cod is prepared for it)-
@@ -208,7 +266,7 @@ Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det 
 - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
 - Refactoring and cleanup of code
 - More TDD / tests
-- F.I.R.E - Use up 4% of partly sellable assets from wishPensionYear to DeathYear to see how it handles. Not needed anymore since using up a divisor of your assets (1/10) until you die is a better way to use up sellable assets.
+- F.I.R.E - Use up 4% of partly liquid assets from wishPensionYear to DeathYear to see how it handles. Not needed anymore since using up a divisor of your assets (1/10) until you die is a better way to use up liquid assets.
 - Retrieving asset values from API, like Crypto/Fond/stocks
 
 ## Config
@@ -405,6 +463,7 @@ Før eller etter skatt her?
 "tax": "salary"
 },
 "2023": {
+"description": "Income: Income | Expense: ",
 "income": {
 "name": "Income",
 "description": "Income",
@@ -423,6 +482,7 @@ Før eller etter skatt her?
 }
 },
 "$pensionWishYear": {
+"description": "Income: Pensioned, no more income from here",
 "income": {
 "name": "Income",
 "description": "Pensioned, no more income from here",
@@ -442,6 +502,7 @@ Før eller etter skatt her?
 "tax": "inheritance"
 },
 "2037": {
+"description": "Asset: ",
 "asset": {
 "name": "inheritance",
 "description": "",
@@ -463,6 +524,7 @@ Før eller etter skatt her?
 "tax": "pension"
 },
 "$pensionOfficialYear": {
+"description": "Income: Folketrygden fra $pensionOfficialYear",
 "income": {
 "name": "Folketrygden",
 "description": "Folketrygden fra $pensionOfficialYear",
@@ -483,6 +545,7 @@ Før eller etter skatt her?
 "tax": "equityfund"
 },
 "2023": {
+"description": "Asset: OTP Sparing frem til pensjonsår",
 "asset": {
 "amount": 500000,
 "rule": "5%",

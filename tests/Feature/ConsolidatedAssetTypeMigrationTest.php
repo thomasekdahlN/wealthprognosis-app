@@ -36,7 +36,7 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
             'is_private' => true,
             'is_company' => false,
             'is_tax_optimized' => true,
-            'is_fire_sellable' => true,
+            'is_liquid' => true,
             'sort_order' => 99,
             'created_checksum' => 'test_checksum_created',
             'updated_checksum' => 'test_checksum_updated',
@@ -50,24 +50,24 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
         $this->assertTrue($assetType->is_private);
         $this->assertFalse($assetType->is_company);
         $this->assertTrue($assetType->is_tax_optimized);
-        $this->assertTrue($assetType->is_fire_sellable);
+        $this->assertTrue($assetType->is_liquid);
         $this->assertEquals('test_checksum_created', $assetType->created_checksum);
         $this->assertEquals('test_checksum_updated', $assetType->updated_checksum);
     }
 
-    public function test_fire_sellable_functionality()
+    public function test_liquid_functionality()
     {
         $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
         $this->artisan('db:seed', ['--class' => 'AssetTypeSeeder']);
 
-        // Update some assets to be FIRE sellable
-        AssetType::whereIn('type', ['equityfund', 'stock'])->update(['is_fire_sellable' => true]);
+        // Update some assets to be Liquid
+        AssetType::whereIn('type', ['equityfund', 'stock'])->update(['is_liquid' => true]);
 
-        // Test FIRE sellable scope
-        $fireSellableAssets = AssetType::fireSellable()->get();
-        $this->assertGreaterThanOrEqual(2, $fireSellableAssets->count());
+        // Test Liquid scope
+        $liquidAssets = AssetType::liquid()->get();
+        $this->assertGreaterThanOrEqual(2, $liquidAssets->count());
 
-        $types = $fireSellableAssets->pluck('type')->toArray();
+        $types = $liquidAssets->pluck('type')->toArray();
         $this->assertContains('equityfund', $types);
         $this->assertContains('stock', $types);
     }
@@ -95,7 +95,7 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
             'icon' => 'heroicon-o-chart-bar',
             'color' => 'success',
             'is_active' => true,
-            'is_fire_sellable' => true,
+            'is_liquid' => true,
             'tax_type_id' => $taxType?->id,
             'asset_category_id' => $category?->id,
         ]);
@@ -135,20 +135,20 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
         $this->assertTrue(in_array('updated_checksum', $assetType->getFillable()));
     }
 
-    public function test_fire_sellable_form_and_table_integration()
+    public function test_liquid_form_and_table_integration()
     {
         $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
         $this->artisan('db:seed', ['--class' => 'AssetTypeSeeder']);
 
-        // Test that FIRE sellable field is in fillable array
+        // Test that Liquid field is in fillable array
         $assetType = new AssetType;
-        $this->assertTrue(in_array('is_fire_sellable', $assetType->getFillable()));
+        $this->assertTrue(in_array('is_liquid', $assetType->getFillable()));
 
-        // Test that FIRE sellable field is cast as boolean
+        // Test that Liquid field is cast as boolean
         $casts = $assetType->getCasts();
-        $this->assertEquals('boolean', $casts['is_fire_sellable']);
+        $this->assertEquals('boolean', $casts['is_liquid']);
 
-        // Test creating asset with FIRE sellable flag
+        // Test creating asset with Liquid flag
         $user = User::factory()->create();
         $team = Team::factory()->create();
 
@@ -158,10 +158,10 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
             'type' => 'fire_test',
             'name' => 'FIRE Test Asset',
             'category' => 'Investment',
-            'is_fire_sellable' => true,
+            'is_liquid' => true,
         ]);
 
-        $this->assertTrue($fireSellableAsset->is_fire_sellable);
+        $this->assertTrue($fireSellableAsset->is_liquid);
     }
 
     public function test_consolidated_migration_no_duplicate_columns()
@@ -175,7 +175,7 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
 
         $expectedColumns = [
             'id', 'user_id', 'team_id', 'type', 'name', 'description', 'category', 'icon', 'color',
-            'is_active', 'is_private', 'is_company', 'is_tax_optimized', 'is_fire_sellable',
+            'is_active', 'is_private', 'is_company', 'is_tax_optimized', 'is_liquid',
             'sort_order', 'asset_category_id', 'tax_type_id', 'created_by', 'updated_by',
             'created_checksum', 'updated_checksum', 'created_at', 'updated_at',
         ];

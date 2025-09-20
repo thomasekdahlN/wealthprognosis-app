@@ -101,8 +101,9 @@ class AssetImportServiceTest extends TestCase
         $assetYear = $asset->years()->first();
         $this->assertEquals(2023, $assetYear->year);
         $this->assertEquals(3000000, $assetYear->asset_market_amount);
-        // expence_name field has been removed, checking description instead
-        $this->assertNotNull($assetYear->expence_description);
+        // unified description field contains expense text
+        $this->assertNotNull($assetYear->description);
+        $this->assertStringContainsString('Monthly expenses', $assetYear->description);
         $this->assertEquals(7300, $assetYear->expence_amount);
         $this->assertEquals('monthly', $assetYear->expence_factor);
     }

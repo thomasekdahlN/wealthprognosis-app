@@ -80,10 +80,19 @@ class AssetYearForm
                 ->columns(12)
                 ->columnSpanFull(),
 
+            Section::make('Description')
+                ->schema([
+                    RichEditor::make('description')
+                        ->columnSpanFull()
+                        ->extraAttributes(['style' => 'min-height: calc(1.5rem * 8);'])
+                        ->helperText('Describe this year across income, expenses, asset and mortgage in one place.'),
+                ])
+                ->columnSpanFull(),
+
             Grid::make(2)->schema([
                 Section::make('Income')
                     ->schema([
-                        RichEditor::make('income_description')->columnSpanFull()->extraAttributes(['style' => 'min-height: calc(1.5rem * 8);'])->helperText('Describe the expected income for this year (e.g., salary, rent).'),
+                        // Removed income_description; use unified description section above
                         TextInput::make('income_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Gross income amount for the year (masked, NOK).'),
                         Select::make('income_factor')
                             ->label('Income Factor')
@@ -199,7 +208,7 @@ class AssetYearForm
 
                 Section::make('Expense')
                     ->schema([
-                        RichEditor::make('expence_description')->columnSpanFull()->extraAttributes(['style' => 'min-height: calc(1.5rem * 8);'])->helperText('Describe the expected expenses for this year.'),
+                        // Removed expence_description; use unified description section above
                         TextInput::make('expence_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Total expenses for the year (NOK).'),
                         Select::make('expence_factor')
                             ->label('Expense Factor')
@@ -318,7 +327,7 @@ class AssetYearForm
                 Section::make('Asset')
                     ->schema([
                         TextInput::make('asset_name')->helperText('Optional label for this asset snapshot.'),
-                        RichEditor::make('asset_description')->columnSpanFull()->extraAttributes(['style' => 'min-height: calc(1.5rem * 8);'])->helperText('Describe the asset state this year.'),
+                        // Removed asset_description; use unified description section above
                         TextInput::make('asset_market_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Market value (NOK).'),
                         TextInput::make('asset_acquisition_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Acquisition price (NOK).'),
                         TextInput::make('asset_equity_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Equity value (NOK).'),
@@ -433,14 +442,14 @@ class AssetYearForm
                 Section::make('Mortgage')
                     ->schema([
                         TextInput::make('mortgage_name')->helperText('Optional label for this mortgage event.'),
-                        RichEditor::make('mortgage_description')->columnSpanFull()->extraAttributes(['style' => 'min-height: calc(1.5rem * 8);'])->helperText('Describe mortgage changes this year (e.g., refinance, extra payment).'),
-                        TextInput::make('mortgage_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Outstanding principal (NOK).'),
-                        TextInput::make('mortgage_years')->numeric()->helperText('Remaining years of the loan.'),
-                        TextInput::make('mortgage_interest')->suffix('%')->helperText('Annual interest rate (e.g., 4.5).'),
-                        TextInput::make('mortgage_interest_only_years')->numeric()->helperText('Number of interest-only years remaining.'),
-                        TextInput::make('mortgage_extra_downpayment_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Extra principal payment this year (NOK).'),
-                        TextInput::make('mortgage_gebyr')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Fees (NOK).'),
-                        TextInput::make('mortgage_tax')->numeric()->helperText('Tax deduction rate for interest (if applicable).'),
+                        // Removed mortgage_description; use unified description section above
+                        TextInput::make('mortgage_amount')->label('Mortgage Principal Amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Outstanding principal amount (simulation: mortgage_amount).'),
+                        TextInput::make('mortgage_years')->label('Loan Term (Years)')->numeric()->helperText('Remaining years of the loan (simulation: mortgage_years).'),
+                        TextInput::make('mortgage_interest')->label('Interest Percent')->suffix('%')->helperText('Annual interest rate in percent (e.g., 4.5). Simulation field: mortgage_interest_percent.'),
+                        TextInput::make('mortgage_interest_only_years')->label('Interest-only Years')->numeric()->helperText('Number of interest-only years remaining (simulation: interest-only period).'),
+                        TextInput::make('mortgage_extra_downpayment_amount')->label('Extra Downpayment Amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Extra principal payment this year (simulation: mortgage_extra_downpayment_amount).'),
+                        TextInput::make('mortgage_gebyr')->label('Fee Amount (Gebyr)')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Yearly fees in NOK (simulation: mortgage_gebyr_amount).'),
+                        TextInput::make('mortgage_tax')->label('Tax Deductible Percent')->numeric()->suffix('%')->helperText('Tax deduction rate for interest in percent (simulation: mortgage_tax_deductable_percent).'),
                     ])
                     ->visible(function ($get): bool {
                         $assetId = $get('asset_id') ?: optional(\App\Models\AssetYear::find(request()->route('record')))->asset_id ?: request()->get('asset');

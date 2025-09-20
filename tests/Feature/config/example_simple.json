@@ -21,6 +21,7 @@
             "tax": "salary"
         },
         "2023": {
+            "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -39,6 +40,7 @@
             }
         },
         "$pensionWishYear": {
+            "description": "Income: Pensioned, no more salary from here | Expense:  | Asset:  | Mortgage: ",
             "income": {
                 "name": "Pension",
                 "description": "Pensioned, no more salary from here",
@@ -58,6 +60,7 @@
             "tax": "inheritance"
         },
         "2040": {
+            "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
             "asset": {
                 "name": "inheritance",
                 "description": "",
@@ -83,6 +86,7 @@
             "tax": "salary"
         },
         "$pensionOfficialYear": {
+            "description": "Income: Pension from $pensionOfficialYear",
             "income": {
                 "name": "Pension",
                 "description": "Pension from $pensionOfficialYear",
@@ -132,6 +136,7 @@
             "tax": "house"
         },
         "2023": {
+            "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
             "asset": {
                 "marketAmount": "3000000",
                 "changerate": "changerates.house",
@@ -163,6 +168,7 @@
             "tax": "equityfund"
         },
         "2023": {
+            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
             "asset": {
                 "marketAmount": 10000,
                 "changerate": "changerates.equityfund",
@@ -181,6 +187,7 @@
             "tax": "cash"
         },
         "2023": {
+            "description": "Income:  | Expense:  | Asset: Kontanter p.t. | Mortgage: ",
             "asset": {
                 "marketAmount": 100000,
                 "changerate": "changerates.cash",
@@ -206,6 +213,7 @@
             "tax": "car"
         },
         "2023": {
+            "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
             "asset": {
                 "marketAmount": 200000,
                 "changerate": "changerates.car",

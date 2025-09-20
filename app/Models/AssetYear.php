@@ -26,7 +26,11 @@ class AssetYear extends Model
         'year',
         'asset_id',
         'asset_configuration_id',
-        'income_description',
+
+        // Unified description for the year (consolidated from income/expense/asset/mortgage)
+        'description',
+
+        // Income data
         'income_amount',
         'income_factor',
         'income_rule',
@@ -34,7 +38,8 @@ class AssetYear extends Model
         'income_source',
         'income_changerate',
         'income_repeat',
-        'expence_description',
+
+        // Expense data
         'expence_amount',
         'expence_factor',
         'expence_rule',
@@ -42,7 +47,8 @@ class AssetYear extends Model
         'expence_source',
         'expence_changerate',
         'expence_repeat',
-        'asset_description',
+
+        // Asset data
         'asset_market_amount',
         'asset_acquisition_amount',
         'asset_equity_amount',
@@ -53,7 +59,8 @@ class AssetYear extends Model
         'asset_transfer',
         'asset_source',
         'asset_repeat',
-        'mortgage_description',
+
+        // Mortgage data
         'mortgage_amount',
         'mortgage_years',
         'mortgage_interest',

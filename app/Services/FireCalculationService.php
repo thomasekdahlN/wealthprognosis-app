@@ -29,7 +29,7 @@ class FireCalculationService
                 ?? session('dashboard_asset_owner_id');
         }
 
-        // Calculate FIRE-sellable assets (Investment Assets)
+        // Calculate Liquid assets (Investment Assets)
         $totalAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
@@ -38,7 +38,7 @@ class FireCalculationService
             }
 
             $query->whereHas('assetType', function ($assetTypeQuery) {
-                $assetTypeQuery->where('is_fire_sellable', true);
+                $assetTypeQuery->where('is_liquid', true);
             });
         })
             ->where('year', $currentYear)
@@ -125,7 +125,7 @@ class FireCalculationService
             'currentYear' => $currentYear,
             'assetConfigurationId' => $assetConfigId,
             'assetOwnerId' => $assetConfigId,
-            'totalAssets' => $totalAssets, // FIRE-sellable assets
+            'totalAssets' => $totalAssets, // Liquid assets
             'allAssets' => $allAssets, // All assets
             'totalLiabilities' => $totalLiabilities,
             'monthlyIncome' => $monthlyIncome,

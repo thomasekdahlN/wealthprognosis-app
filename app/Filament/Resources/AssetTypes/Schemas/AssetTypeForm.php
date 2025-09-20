@@ -121,10 +121,10 @@ class AssetTypeForm
                     ->default(false)
                     ->helperText('Has special tax advantages or considerations'),
 
-                Toggle::make('is_fire_sellable')
-                    ->label('FIRE Sellable')
+                Toggle::make('is_liquid')
+                    ->label('Liquid')
                     ->default(false)
-                    ->helperText('Can be partially sold to fund Financial Independence/Retire Early lifestyle'),
+                    ->helperText('Can be sold in parts to generate cash flow when needed'),
 
                 Toggle::make('can_generate_income')
                     ->label('Can Generate Income')

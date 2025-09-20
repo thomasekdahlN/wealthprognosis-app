@@ -16,7 +16,7 @@ class AssetYearsTable
             ->columns([
                 TextColumn::make('year')
                     ->sortable()
-                    ->description(fn ($record) => $record->asset_description ? strip_tags($record->asset_description) : null)
+                    ->description(fn ($record) => $record->description ? strip_tags($record->description) : null)
                     ->wrap(),
                 TextInputColumn::make('income_amount')
                     ->type('number')

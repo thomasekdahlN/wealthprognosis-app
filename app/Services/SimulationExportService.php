@@ -124,12 +124,12 @@ class SimulationExportService
                 'income' => [
                     'amount' => self::toNum($year->income_amount),
                     'changeratePercent' => 0,
-                    'description' => $year->income_description,
+                    'description' => $year->description,
                 ],
                 'expence' => [
                     'amount' => self::toNum($year->expence_amount),
                     'changeratePercent' => 0,
-                    'description' => $year->expence_description,
+                    'description' => $year->description,
                 ],
                 'cashflow' => [
                     'amount' => self::toNum($year->cashflow_before_taxamount),
@@ -148,7 +148,7 @@ class SimulationExportService
                     'balanceAmount' => self::toNum($year->mortgage_balance_amount),
                     'taxDeductableAmount' => self::toNum($year->mortgage_tax_deductable_amount),
                     'taxDeductableDecimal' => self::percentToDecimal($year->mortgage_tax_deductable_percent),
-                    'description' => $year->mortgage_description,
+                    'description' => $year->description,
                 ],
                 'asset' => [
                     'marketAmount' => self::toNum($year->asset_market_amount),
@@ -163,7 +163,7 @@ class SimulationExportService
                     'taxPropertyAmount' => self::toNum($year->asset_taxable_property_amount),
                     'taxPropertyDecimal' => self::percentToDecimal($year->asset_taxable_property_percent),
                     'mortageRateDecimal' => self::percentToDecimal($year->asset_mortgage_rate_percent ?? 0),
-                    'description' => $year->asset_description,
+                    'description' => $year->description,
                 ],
                 'realization' => [
                     'amount' => self::toNum($year->realization_amount),

@@ -21,6 +21,7 @@
             "tax": "cabin"
         },
         "2023": {
+            "description": "Income: Rental AirBNB | Expense: Expences | Asset: Fortune sets the value from the tax authorities | Mortgage: interest changerates.interest, years 20",
             "asset": {
                 "marketAmount": 10000000,
                 "acquisitionAmount": 6000000,
