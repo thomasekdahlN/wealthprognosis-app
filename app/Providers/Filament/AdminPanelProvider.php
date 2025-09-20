@@ -43,7 +43,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 // ROW 1: Asset Overview (sort = 0) - 4 stats in 1 widget = 4 per row
                 \App\Filament\Widgets\AssetOverviewWidget::class,
@@ -51,20 +50,27 @@ class AdminPanelProvider extends PanelProvider
                 // ROW 2: Monthly Cash Flow (sort = 1) - 4 stats in 1 widget = 4 per row
                 \App\Filament\Widgets\MonthlyCashflowWidget::class,
 
-                // ROW 3: FIRE Metrics (sort = 2) - 4 stats in 1 widget = 4 per row
-                \App\Filament\Widgets\FireMetricsOverviewWidget::class,
-
-                // Chart Widgets
-                \App\Filament\Widgets\NetWorthOverTimeWidget::class,
-                \App\Filament\Widgets\SavingsRateOverTimeWidget::class,
+                // Chart Widgets (FIRE grouped together; removed projections)
+                // Removed NetWorthOverTimeWidget per request
+                // Removed YearlyCashflowWidget per request
+                // Keep FIRE widgets grouped together
                 \App\Filament\Widgets\FireProgressAndCrossover::class,
+                \App\Filament\Widgets\SavingsRateOverTimeWidget::class,
+
+                // FIRE chart + single-value widgets in one row
+                \App\Filament\Widgets\FireMetricsOverview::class,
+                \App\Filament\Widgets\FireCrossoverWidget::class,
+
+                // Net Worth & Cash Flow over time (respect active asset configuration)
+                \App\Filament\Widgets\NetWorthOverTime::class,
+                \App\Filament\Widgets\CashFlowOverTime::class,
 
                 // Asset Allocation Charts (3 different groupings)
                 \App\Filament\Widgets\AssetAllocationByType::class,
                 \App\Filament\Widgets\AssetAllocationByTaxType::class,
                 \App\Filament\Widgets\AssetAllocationByCategory::class,
 
-                \App\Filament\Widgets\YearlyCashflowWidget::class,
+                // Additional charts
                 \App\Filament\Widgets\ActualTaxRateOverTime::class,
                 \App\Filament\Widgets\RetirementReadinessChart::class,
                 \App\Filament\Widgets\ExpenseBreakdownChart::class,

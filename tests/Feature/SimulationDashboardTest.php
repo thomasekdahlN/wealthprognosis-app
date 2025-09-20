@@ -105,7 +105,7 @@ it('can access simulation dashboard page', function () {
 
     // Verify widgets are configured
     $widgets = $dashboard->getWidgets();
-    expect($widgets)->toHaveCount(6);
+    expect($widgets)->toHaveCount(4);
     expect($widgets)->toContain(\App\Filament\Widgets\SimulationStatsOverviewWidget::class);
 
     // Note: HTTP route testing may require additional Filament dashboard routing configuration
@@ -287,9 +287,7 @@ it('displays chart widgets', function () {
     $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
 
     $response->assertStatus(200);
-    // Check for chart sections
-    $response->assertSee('Net Worth Projection Over Time');
-    $response->assertSee('Cash Flow Analysis');
+    // Check for chart sections that remain
     $response->assertSee('Portfolio Allocation Evolution');
 });
 
@@ -326,8 +324,6 @@ it('can instantiate all dashboard widgets without errors', function () {
         \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
         \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
         \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
-        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
-        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
@@ -356,8 +352,6 @@ it('widgets calculate correct financial metrics', function () {
 
 it('chart widgets generate valid chart data', function () {
     $chartWidgets = [
-        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
-        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
@@ -409,15 +403,13 @@ it('validates native filament dashboard functionality', function () {
     // Test that widgets are properly configured
     $widgets = $dashboard->getWidgets();
     expect($widgets)->toBeArray();
-    expect($widgets)->toHaveCount(6);
+    expect($widgets)->toHaveCount(4);
 
     // Verify all expected widgets are present
     $expectedWidgets = [
         \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
         \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
         \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
-        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
-        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
@@ -468,8 +460,6 @@ it('catches widget instantiation syntax errors', function () {
         \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
         \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
         \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
-        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
-        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
@@ -517,8 +507,6 @@ it('validates all dashboard components can be instantiated', function () {
         \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
         \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
         \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
-        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
-        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
@@ -541,12 +529,10 @@ it('validates all dashboard components can be instantiated', function () {
 it('catches BadMethodCallException and missing method errors in widgets', function () {
     // Test that all widgets can be rendered without BadMethodCallException
     $widgetClasses = [
-        \App\Filament\Widgets\SimulationOverviewWidget::class,
-        \App\Filament\Widgets\FireAnalysisWidget::class,
-        \App\Filament\Widgets\TaxAnalysisWidget::class,
-        \App\Filament\Widgets\NetWorthProjectionChart::class,
-        \App\Filament\Widgets\CashFlowProjectionChart::class,
-        \App\Filament\Widgets\AssetAllocationOverTimeChart::class,
+        \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
+        \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
+        \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
     foreach ($widgetClasses as $widgetClass) {
@@ -573,8 +559,6 @@ it('validates native filament widgets render correctly', function () {
         \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
         \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
         \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
-        \App\Filament\Widgets\SimulationNetWorthChartWidget::class,
-        \App\Filament\Widgets\SimulationCashFlowChartWidget::class,
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
     ];
 
@@ -633,16 +617,6 @@ it('validates widget base classes and methods to prevent getColumns errors', fun
         \App\Filament\Widgets\SimulationTaxAnalysisWidget::class => [
             'base_class' => \Filament\Widgets\StatsOverviewWidget::class,
             'required_methods' => ['getStats'],
-            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
-        ],
-        \App\Filament\Widgets\SimulationNetWorthChartWidget::class => [
-            'base_class' => \Filament\Widgets\ChartWidget::class,
-            'required_methods' => ['getData', 'getType'],
-            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
-        ],
-        \App\Filament\Widgets\SimulationCashFlowChartWidget::class => [
-            'base_class' => \Filament\Widgets\ChartWidget::class,
-            'required_methods' => ['getData', 'getType'],
             'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
         ],
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class => [

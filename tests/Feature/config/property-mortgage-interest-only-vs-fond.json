@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "70",
         "icon": "heroicon-o-calculator",
-        "color": "#8b5cf6",
-        "tags": ["interest-only", "mortgage", "strategy", "comparison"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "house": {
         "meta" : {

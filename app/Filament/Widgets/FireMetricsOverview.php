@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Auth;
 
 class FireMetricsOverview extends ChartWidget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 2; // Same row as FireCrossoverWidget
+
+    protected int|string|array $columnSpan = ['default' => 6, 'md' => 6, 'lg' => 6, 'xl' => 6]; // Share row with FIRE: Crossover Point
 
     public function getHeading(): string
     {
@@ -40,12 +42,16 @@ class FireMetricsOverview extends ChartWidget
         $fireNumbers = [];
         $netWorthData = [];
 
-        // Get current financial data
-        $totalAssets = \App\Models\Asset::where('user_id', $user->id)
-            ->where('is_active', true)
-            ->sum('market_amount');
-        $annualIncome = $this->calculateAnnualIncome($user);
-        $annualExpenses = $this->calculateAnnualExpenses($user);
+        // Get current financial data (respect active asset configuration)
+        $assetConfigId = $activeScenario->id;
+        $totalAssets = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+                $query->where('user_id', $user->id)->where('is_active', true);
+                $query->where('asset_configuration_id', $assetConfigId);
+            })
+            ->where('year', now()->year)
+            ->sum('asset_market_amount');
+        $annualIncome = $this->calculateAnnualIncome($user, $assetConfigId);
+        $annualExpenses = $this->calculateAnnualExpenses($user, $assetConfigId);
         $annualSavings = $annualIncome - $annualExpenses;
 
         // FIRE number (25x annual expenses)
@@ -119,26 +125,32 @@ class FireMetricsOverview extends ChartWidget
         ];
     }
 
-    private function calculateAnnualIncome(\App\Models\User $user): float
+    private function calculateAnnualIncome(\App\Models\User $user, ?int $assetConfigId = null): float
     {
         // Get income from asset_years for the current year
         $currentYear = now()->year;
 
-        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
+            }
         })
             ->where('year', $currentYear)
             ->whereNotNull('income_amount')
             ->sum('income_amount') ?? 0;
     }
 
-    private function calculateAnnualExpenses(\App\Models\User $user): float
+    private function calculateAnnualExpenses(\App\Models\User $user, ?int $assetConfigId = null): float
     {
         // Get expenses from asset_years for the current year
         $currentYear = now()->year;
 
-        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
+            }
         })
             ->where('year', $currentYear)
             ->whereNotNull('expence_amount')

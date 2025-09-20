@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-users",
-        "color": "#7c3aed",
-        "tags": ["family", "children", "benefits", "education"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "child": {
         "meta": {

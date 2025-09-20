@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "70",
         "icon": "heroicon-o-briefcase",
-        "color": "#0891b2",
-        "tags": ["otp", "pension", "employer", "retirement"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "income": {
         "meta": {

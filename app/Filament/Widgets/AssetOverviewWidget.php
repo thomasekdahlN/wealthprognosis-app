@@ -15,7 +15,10 @@ class AssetOverviewWidget extends BaseWidget
 
     public function mount(?int $assetConfigurationId = null): void
     {
-        $this->assetConfigurationId = $assetConfigurationId ?? request()->get('asset_configuration_id') ?? session('dashboard_asset_configuration_id');
+        $this->assetConfigurationId = $assetConfigurationId
+            ?? app(\App\Services\CurrentAssetConfiguration::class)->id()
+            ?? request()->get('asset_configuration_id')
+            ?? request()->get('asset_owner_id');
     }
 
     protected function getStats(): array

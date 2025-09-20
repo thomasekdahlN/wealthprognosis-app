@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "70",
         "icon": "heroicon-o-chart-bar-square",
-        "color": "#3b82f6",
-        "tags": ["young", "professional", "funds", "compound", "growth"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "income": {
         "meta": {

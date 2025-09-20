@@ -202,9 +202,8 @@ class ChangeRateTable extends Page implements HasForms, HasTable
 
     public function getWidgets(): array
     {
-        return [
-            \App\Filament\Widgets\ChangeRateTrendWidget::class,
-        ];
+        // Removed ChangeRateTrendWidget per request
+        return [];
     }
 
     public function getColumns(): int|string|array

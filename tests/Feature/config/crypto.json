@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-currency-dollar",
-        "color": "#f59e0b",
-        "tags": ["crypto", "bitcoin", "ethereum", "defi", "blockchain"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "crypto": {
         "meta": {

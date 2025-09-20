@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-chart-bar",
-        "color": "#f97316",
-        "tags": ["kpi", "inflation", "tracking", "economics"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "kpi": {
         "meta" : {

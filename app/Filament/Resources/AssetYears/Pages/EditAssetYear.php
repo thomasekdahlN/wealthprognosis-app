@@ -6,6 +6,7 @@ use App\Filament\Resources\AssetYears\AssetYearResource;
 use App\Models\Asset;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 
 class EditAssetYear extends EditRecord
@@ -46,7 +47,46 @@ class EditAssetYear extends EditRecord
 
     protected function getHeaderActions(): array
     {
+        $record = $this->getRecord();
         return [
+            Action::make('add_event')
+                ->label('Add Event')
+                ->icon('heroicon-o-plus')
+                ->color('primary')
+                ->form([
+                    \Filament\Forms\Components\Select::make('asset_id')
+                        ->label('Asset')
+                        ->options(function () use ($record) {
+                            if ($record?->asset_configuration_id) {
+                                return \App\Models\Asset::query()
+                                    ->where('asset_configuration_id', $record->asset_configuration_id)
+                                    ->pluck('name', 'id');
+                            }
+                            return [];
+                        })
+                        ->required()
+                        ->searchable()
+                        ->preload(),
+                    \Filament\Forms\Components\TextInput::make('year')
+                        ->label('Year')
+                        ->numeric()
+                        ->required(),
+                ])
+                ->action(function (array $data): void {
+                    // Create or fetch AssetYear for the chosen asset/year then redirect to its edit page
+                    $assetId = (int) $data['asset_id'];
+                    $year = (int) $data['year'];
+                    $asset = \App\Models\Asset::query()->findOrFail($assetId);
+                    $assetYear = \App\Models\AssetYear::query()->firstOrCreate([
+                        'asset_id' => $assetId,
+                        'asset_configuration_id' => $asset->asset_configuration_id,
+                        'year' => $year,
+                    ]);
+                    $this->redirect(\App\Filament\Resources\AssetYears\AssetYearResource::getUrl('edit', ['record' => $assetYear->id]));
+                })
+                ->modalHeading('Add Event')
+                ->modalSubmitActionLabel('Continue')
+                ->modalWidth('md'),
             DeleteAction::make(),
         ];
     }

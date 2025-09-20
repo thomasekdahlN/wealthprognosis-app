@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-arrows-right-left",
-        "color": "#06b6d4",
-        "tags": ["cashflow", "transfer", "optimization", "advanced"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "salary": {
         "meta": {

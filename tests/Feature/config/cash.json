@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-banknotes",
-        "color": "#059669",
-        "tags": ["cash", "emergency", "liquidity", "savings"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "cash": {
         "meta": {

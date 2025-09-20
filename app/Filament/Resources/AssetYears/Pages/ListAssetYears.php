@@ -17,9 +17,8 @@ class ListAssetYears extends ListRecords
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            \App\Filament\Resources\AssetYears\Widgets\AssetYearAmountsChart::class,
-        ];
+        // Removed amounts-over-years chart widget per request
+        return [];
     }
 
     public function getTitle(): string|Htmlable

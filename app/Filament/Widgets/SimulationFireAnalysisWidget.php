@@ -13,6 +13,12 @@ class SimulationFireAnalysisWidget extends BaseWidget
 
     public ?SimulationConfiguration $simulationConfiguration = null;
 
+    public static function canView(): bool
+    {
+        // Only render on the Simulation Dashboard, not on the main dashboard
+        return request()->routeIs('filament.admin.pages.simulation-dashboard');
+    }
+
     public function mount(?SimulationConfiguration $simulationConfiguration = null): void
     {
         if ($simulationConfiguration) {

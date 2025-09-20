@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-gift",
-        "color": "#8b5cf6",
-        "tags": ["inheritance", "wealth-transfer", "family", "estate"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "house": {
         "meta": {

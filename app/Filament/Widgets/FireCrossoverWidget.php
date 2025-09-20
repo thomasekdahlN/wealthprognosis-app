@@ -8,11 +8,13 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class FireCrossoverWidget extends BaseWidget
 {
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 2;
+
+    protected int|string|array $columnSpan = ['default' => 6, 'md' => 6, 'lg' => 6, 'xl' => 6]; // Place side-by-side on md+ in one row
 
     protected function getStats(): array
     {
-        $data = FireCalculationService::getFinancialData();
+        $data = FireCalculationService::getFinancialData(app(\App\Services\CurrentAssetConfiguration::class)->id());
 
         if (! $data['user']) {
             return [

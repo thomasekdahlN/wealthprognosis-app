@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "80",
         "icon": "heroicon-o-academic-cap",
-        "color": "#8b5cf6",
-        "tags": ["advanced", "complex", "wealth", "sophisticated"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "salary": {
         "meta": {

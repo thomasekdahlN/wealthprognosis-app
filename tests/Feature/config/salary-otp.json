@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-banknotes",
-        "color": "#059669",
-        "tags": ["salary", "employment", "otp", "worker"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "salary": {
         "meta": {

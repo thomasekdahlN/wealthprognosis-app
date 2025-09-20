@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "70",
         "icon": "heroicon-o-scale",
-        "color": "#f59e0b",
-        "tags": ["comparison", "property", "funds", "mortgage", "analysis"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "house": {
         "meta" : {

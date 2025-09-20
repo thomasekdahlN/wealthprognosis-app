@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-home",
-        "color": "#059669",
-        "tags": ["house", "mortgage", "property", "homeowner"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "house": {
         "meta": {

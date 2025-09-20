@@ -76,9 +76,8 @@ class SimulationAssets extends Page
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            \App\Filament\Widgets\SimulationAssetsTable::class,
-        ];
+        // Removed SimulationAssetsTable widget per request
+        return [];
     }
 
 

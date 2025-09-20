@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "63",
         "icon": "heroicon-o-map",
-        "color": "#0ea5e9",
-        "tags": ["charter", "sailing", "business", "seasonal"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "company": {
         "meta": {

@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-building-office",
-        "color": "#dc2626",
-        "tags": ["company", "stocks", "business", "corporate"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "company": {
         "meta": {

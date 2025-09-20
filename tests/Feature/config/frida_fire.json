@@ -4,11 +4,8 @@
         "description": "FIRE enthusiast who achieved financial independence in 2023 through systematic investing and frugal living",
         "birthYear": "1990",
         "icon": "heroicon-o-fire",
-        "tags": [
-            "analysis",
-            "example"
-        ],
-        "color": "orange",
+        "tags": ["advanced"],
+        "color": "#f97316",
         "prognoseAge": "50",
         "pensionOfficialAge": "67",
         "pensionWishAge": "33",

@@ -32,6 +32,6 @@ class ListEvents extends ListRecords
 
     public function getSubheading(): ?string
     {
-        return 'Manage anticipated financial events that will impact your wealth projection. These events represent significant changes in income, expenses, or asset values that are expected to occur in future years and will be incorporated into your financial prognosis calculations.';
+        return 'Manage anticipated financial events that impact your prognosis (e.g. kid(s) moving out, pension start, inheritance, debt free milestone, career change, sabbatical, major purchase, sale of property, or other life changes).';
     }
 }

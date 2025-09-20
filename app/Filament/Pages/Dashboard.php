@@ -67,4 +67,11 @@ class Dashboard extends BaseDashboard
     {
         return $this->assetConfigurationId;
     }
+
+    public function getColumns(): int
+    {
+        // Use a 12-column grid so allocation charts (columnSpan=4) sit on the same row
+        return 12;
+    }
 }
+

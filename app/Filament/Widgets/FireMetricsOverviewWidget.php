@@ -10,6 +10,8 @@ class FireMetricsOverviewWidget extends BaseWidget
 {
     protected static ?int $sort = 2; // Row 3: FIRE Metrics
 
+    protected int|string|array $columnSpan = 6; // Place side-by-side in one row
+
     public ?int $assetConfigurationId = null;
 
     public function mount(?int $assetConfigurationId = null): void

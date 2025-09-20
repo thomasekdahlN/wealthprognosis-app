@@ -84,9 +84,8 @@ class SimulationAssetYears extends Page
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            \App\Filament\Widgets\SimulationAssetYearsTable::class,
-        ];
+        // Removed SimulationAssetYearsTable widget per request
+        return [];
     }
 
 

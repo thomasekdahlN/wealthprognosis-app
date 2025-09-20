@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-arrows-right-left",
-        "color": "#06b6d4",
-        "tags": ["rental", "funds", "comparison", "investment", "analysis"]
+        "color": "#f97316",
+        "tags": ["advanced"]
     },
     "house": {
         "meta" : {

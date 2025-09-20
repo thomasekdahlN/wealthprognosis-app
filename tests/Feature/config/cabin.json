@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-home-modern",
-        "color": "#059669",
-        "tags": ["cabin", "rental", "investment", "mountain"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "cabin": {
         "meta": {

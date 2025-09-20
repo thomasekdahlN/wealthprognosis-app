@@ -10,12 +10,15 @@ class AssetAllocationByType extends ChartWidget
 {
     protected static ?int $sort = 20;
 
+    protected int|string|array $columnSpan = 4; // Show 3 charts per row (12-column grid)
+
     protected ?int $assetConfigId = null;
 
     public function mount(): void
     {
-        // Accept both new and legacy param keys
-        $this->assetConfigId = (int) (request()->get('asset_configuration_id') ?? request()->get('asset_owner_id') ?? 0) ?: null;
+        // Prefer session via CurrentAssetConfiguration, fallback to request
+        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id()
+            ?? (int) (request()->get('asset_configuration_id') ?? request()->get('asset_owner_id') ?? 0) ?: null;
     }
 
     public function getHeading(): string
@@ -134,7 +137,7 @@ class AssetAllocationByType extends ChartWidget
 
     protected function getType(): string
     {
-        return 'doughnut';
+        return 'bar';
     }
 
     protected function getOptions(): array

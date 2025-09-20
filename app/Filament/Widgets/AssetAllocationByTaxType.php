@@ -10,11 +10,15 @@ class AssetAllocationByTaxType extends ChartWidget
 {
     protected static ?int $sort = 21;
 
+    protected int|string|array $columnSpan = 4; // Show 3 charts per row (12-column grid)
+
     protected ?int $assetConfigId = null;
 
     public function mount(): void
     {
-        $this->assetConfigId = request()->get('asset_configuration_id') ?? request()->get('asset_config_id');
+        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id()
+            ?? request()->get('asset_configuration_id')
+            ?? request()->get('asset_owner_id');
     }
 
     public function getHeading(): string
@@ -126,7 +130,7 @@ class AssetAllocationByTaxType extends ChartWidget
 
     protected function getType(): string
     {
-        return 'doughnut';
+        return 'bar';
     }
 
     protected function getOptions(): array

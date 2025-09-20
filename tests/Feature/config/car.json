@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-bolt",
-        "color": "#10b981",
-        "tags": ["electric", "vehicle", "sustainability", "transport"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "car": {
         "meta": {

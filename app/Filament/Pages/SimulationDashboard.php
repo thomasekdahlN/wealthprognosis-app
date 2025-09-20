@@ -5,8 +5,6 @@ namespace App\Filament\Pages;
 use App\Models\SimulationConfiguration;
 use App\Filament\Widgets\SimulationStatsOverviewWidget;
 use App\Filament\Widgets\SimulationFireAnalysisWidget;
-use App\Filament\Widgets\SimulationNetWorthChartWidget;
-use App\Filament\Widgets\SimulationCashFlowChartWidget;
 use App\Filament\Widgets\SimulationAssetAllocationChartWidget;
 use App\Filament\Widgets\SimulationTaxAnalysisWidget;
 use Filament\Pages\Dashboard;
@@ -98,12 +96,13 @@ class SimulationDashboard extends Dashboard
             return [];
         }
 
+        // Group FIRE widgets together; remove projections per request
         return [
             SimulationStatsOverviewWidget::class,
             SimulationFireAnalysisWidget::class,
             SimulationTaxAnalysisWidget::class,
-            SimulationNetWorthChartWidget::class,
-            SimulationCashFlowChartWidget::class,
+            // Removed SimulationNetWorthChartWidget::class,
+            // Removed SimulationCashFlowChartWidget::class,
             SimulationAssetAllocationChartWidget::class,
         ];
     }

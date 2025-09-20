@@ -8,8 +8,8 @@
         "pensionWishYear": "63",
         "deathYear": "82",
         "icon": "heroicon-o-key",
-        "color": "#7c3aed",
-        "tags": ["rental", "multi-property", "income", "landlord"]
+        "color": "#22c55e",
+        "tags": ["simple"]
     },
     "house": {
         "meta" : {
