@@ -12,13 +12,13 @@ use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->brandName(fn () => $this->getBrandName())
             ->brandLogo(fn () => $this->getBrandLogo())
+            ->brandLogoHeight('2rem')
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('4.5rem')
@@ -88,14 +89,51 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->routes(function (): void {
+                // Pretty URLs including configuration ID for Assets
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/assets', \App\Filament\Resources\Assets\Pages\ListAssets::class)
+                    ->name('resources.assets.index.pretty');
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/assets/create', \App\Filament\Resources\Assets\Pages\CreateAsset::class)
+                    ->name('resources.assets.create.pretty');
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/assets/{record}/edit', \App\Filament\Resources\Assets\Pages\EditAsset::class)
+                    ->name('resources.assets.edit.pretty');
+
+                // Override Filament auto-registered slug routes with pretty, canonical names
+                // Config Assets index (clicking a configuration row)
+                \Illuminate\Support\Facades\Route::get('config/{record}/assets', \App\Filament\Pages\ConfigAssets::class)
+                    ->middleware([\Filament\Http\Middleware\Authenticate::class])
+                    ->name('pages.config-assets.pretty');
+
+                // Config-scoped Pages (Events & Simulations) with canonical names
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/events', \App\Filament\Pages\ConfigEvents::class)
+                    ->middleware([\Filament\Http\Middleware\Authenticate::class])
+                    ->name('pages.config-events.pretty');
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/simulations', \App\Filament\Pages\ConfigSimulations::class)
+                    ->middleware([\Filament\Http\Middleware\Authenticate::class])
+                    ->name('pages.config-simulations.pretty');
+
+                // Simulation Pages - pretty route for Simulation Assets
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/sim/{simulation}/assets', \App\Filament\Pages\SimulationAssets::class)
+                    ->middleware([\Filament\Http\Middleware\Authenticate::class])
+                    ->name('pages.simulation-assets.pretty');
+
+                // Pretty URL for Config Asset Years list (one asset)
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/assets/{asset}/years', \App\Filament\Pages\ConfigAssetYears::class)
+                    ->middleware([\Filament\Http\Middleware\Authenticate::class])
+                    ->name('pages.config-asset-years.pretty');
+
+                // Pretty URL for Asset Years edit
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/asset-years/{record}/edit', \App\Filament\Resources\AssetYears\Pages\EditAssetYear::class)
+                    ->name('resources.asset-years.edit.pretty');
+            });
     }
 
     public function boot(): void
     {
         FilamentView::registerRenderHook(
-            PanelsRenderHook::TOPBAR_END,
-            fn (): string => Blade::render('<div class="px-2"><livewire:asset-configuration-picker /></div>')
+            PanelsRenderHook::TOPBAR_LOGO_AFTER,
+            fn (): string => Blade::render('<span aria-hidden="true" class="inline-block" style="width: 2ch;"></span><div class="inline-flex items-center align-middle"><livewire:asset-configuration-picker /></div>')
         );
 
         // Global download handler for pages
@@ -111,34 +149,28 @@ class AdminPanelProvider extends PanelProvider
         );
     }
 
-
     protected function getBrandName(): string
     {
         $appName = config('app.name', 'Laravel');
         $activeAssetConfiguration = app(\App\Services\CurrentAssetConfiguration::class)->get();
 
         if ($activeAssetConfiguration) {
-            return $appName . ' - ' . $activeAssetConfiguration->name;
+            return $appName.' - '.$activeAssetConfiguration->name;
         }
 
         return $appName;
     }
 
-
     protected function getBrandLogo(): ?string
     {
-        $activeAssetConfiguration = app(\App\Services\CurrentAssetConfiguration::class)->get();
-
-        if ($activeAssetConfiguration && $activeAssetConfiguration->icon) {
-            $iconName = $activeAssetConfiguration->icon;
-            $iconColor = $activeAssetConfiguration->color ?? 'inherit';
-
-            return view('components.asset-configuration-brand-logo', [
-                'iconName' => $iconName,
-                'iconColor' => $iconColor
-            ])->render();
+        // Filament expects an image URL here; returning HTML will break the <img src> tag.
+        // Use public/logo.png per project preference, if it exists.
+        $logoPath = public_path('logo.png');
+        if (is_file($logoPath)) {
+            return asset('logo.png');
         }
 
+        // Fallback to Filament default if no logo is present.
         return null;
     }
 }

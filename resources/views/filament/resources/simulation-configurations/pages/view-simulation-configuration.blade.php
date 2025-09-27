@@ -176,7 +176,7 @@
                                             $currentValue = $currentYearData ? $currentYearData->asset_market_amount : 0;
                                         @endphp
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-                                            onclick="window.location.href='{{ route('filament.admin.pages.simulation-asset-years', ['simulation_configuration_id' => $simulationConfiguration->id, 'asset' => $asset->id]) }}'">
+                                            onclick="window.location.href='{{ route('filament.admin.pages.simulation-asset-years', ['configuration' => $simulationConfiguration->asset_configuration_id, 'simulation' => $simulationConfiguration->id, 'asset' => $asset->id]) }}'">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $asset->name }}</div>
                                                 @if($asset->description)
@@ -203,7 +203,7 @@
                                                 {{ $asset->simulationAssetYears->count() }} years
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <a href="{{ route('filament.admin.pages.simulation-asset-years', ['simulation_configuration_id' => $simulationConfiguration->id, 'asset' => $asset->id]) }}"
+                                                <a href="{{ route('filament.admin.pages.simulation-asset-years', ['configuration' => $simulationConfiguration->asset_configuration_id, 'simulation' => $simulationConfiguration->id, 'asset' => $asset->id]) }}"
                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
                                                     View Details
                                                 </a>

@@ -18,7 +18,7 @@
             "name": "Arne Arving",
             "description": "Established family home in Stavanger with remaining mortgage to be paid off",
             "active": true,
-            "tax": "house"
+
         },
         "2023": {
             "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Mortgage: interest changerates.interest, years 20",
@@ -32,7 +32,7 @@
                 "name": "Utgifter",
                 "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
                 "amount": 7300,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -49,8 +49,7 @@
             "group": "private",
             "name": "Parents' Estate Inheritance",
             "description": "Expected inheritance from parents' estate including property and investments",
-            "active": true,
-            "tax": "inheritance"
+            "active": true
         },
         "2037": {
             "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
@@ -76,7 +75,7 @@
             "name": "Diversified Investment Portfolio",
             "description": "Long-term investment portfolio enhanced by inheritance allocation",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2024": {
             "description": "Asset: ",

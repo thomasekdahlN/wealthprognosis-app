@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('asset_type');
             $table->string('group')->default('private');
-            $table->string('tax_type');
+
             $table->string('tax_property', 50)->nullable();
             $table->string('tax_country', 5)->default('no');
             $table->boolean('is_active')->default(true);

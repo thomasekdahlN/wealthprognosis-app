@@ -22,4 +22,3 @@ use App\Http\Controllers\AnalysisDownloadController;
 Route::get('/download/analysis/{file}', [AnalysisDownloadController::class, 'download'])
     ->middleware(['auth', 'signed'])
     ->name('download.analysis');
-

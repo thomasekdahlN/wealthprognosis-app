@@ -45,6 +45,9 @@ class ConfigurationAssets extends ListRecords implements HasTable
             ? $param
             : AssetConfiguration::query()->findOrFail((int) $param);
 
+        // Keep the active configuration in session so other pages (e.g., /admin/assets) scope consistently
+        app(\App\Services\CurrentAssetConfiguration::class)->set($this->record);
+
         // Clear any existing AI results when mounting
         $this->aiEvaluationResults = null;
     }
@@ -74,7 +77,7 @@ class ConfigurationAssets extends ListRecords implements HasTable
             TextColumn::make('name')->label('Name')->searchable()->sortable(),
             TextColumn::make('asset_type')->label('Type')->searchable()->sortable()->badge()->color('primary'),
             TextColumn::make('assetType.name')->label('Asset Type')->sortable(),
-            TextColumn::make('tax_type')->label('Tax Type')->searchable()->sortable(),
+            TextColumn::make('assetType.taxType.name')->label('Tax Type')->badge()->color('info')->placeholder('No tax type')->sortable()->searchable(),
             TextColumn::make('tax_property')->label('Tax Property')->searchable()->sortable(),
             TextColumn::make('description')->label('Description')->limit(60)->wrap(),
             IconColumn::make('is_active')->label('Active')->boolean(),
@@ -130,9 +133,8 @@ class ConfigurationAssets extends ListRecords implements HasTable
             ->paginated([50, 100, 150])
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([50, 100, 150])
-            ->recordUrl(fn (\App\Models\Asset $asset) => route('filament.admin.resources.asset-years.index', [
-                'owner' => $this->record->id,
-                'asset' => $asset->id,
+            ->recordUrl(fn (\App\Models\Asset $asset) => \App\Filament\Resources\Assets\AssetResource::getUrl('edit', [
+                'record' => $asset,
             ]));
     }
 

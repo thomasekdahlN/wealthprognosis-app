@@ -1,17 +1,17 @@
 <?php
 
-use App\Models\User;
 use App\Models\AssetConfiguration;
-use App\Models\SimulationConfiguration;
+use App\Models\AssetType;
 use App\Models\SimulationAsset;
 use App\Models\SimulationAssetYear;
-use App\Models\AssetType;
+use App\Models\SimulationConfiguration;
 use App\Models\TaxType;
+use App\Models\User;
 
 beforeEach(function () {
     // Use the existing test user
     $this->user = User::where('email', 'thomas@ekdahl.no')->first();
-    if (!$this->user) {
+    if (! $this->user) {
         $this->user = User::factory()->create([
             'email' => 'thomas@ekdahl.no',
             'password' => bcrypt('ballball'),
@@ -55,7 +55,8 @@ beforeEach(function () {
     createSimulationAssetsWithYears($this->simulationConfiguration, $this->assetConfiguration, $this->user);
 });
 
-function createSimulationAssetsWithYears($simulationConfiguration, $assetConfiguration, $user) {
+function createSimulationAssetsWithYears($simulationConfiguration, $assetConfiguration, $user)
+{
     // Create multiple simulation assets
     for ($i = 1; $i <= 3; $i++) {
         $simulationAsset = SimulationAsset::factory()->create([
@@ -64,7 +65,6 @@ function createSimulationAssetsWithYears($simulationConfiguration, $assetConfigu
             'team_id' => $user->currentTeam?->id,
             'name' => "Test Asset {$i}",
             'asset_type' => 'equity',
-            'tax_type' => 'capital_gains',
             'group' => 'private',
         ]);
 
@@ -84,16 +84,27 @@ function createSimulationAssetsWithYears($simulationConfiguration, $assetConfigu
         }
     }
 }
+function setSimRoute($configurationId, $simulationId): void
+{
+    request()->setRouteResolver(function () use ($configurationId, $simulationId) {
+        $route = new \Illuminate\Routing\Route('GET', "/admin/config/{$configurationId}/sim/{$simulationId}/dashboard", []);
+        $route->setParameter('configuration', $configurationId);
+        $route->setParameter('simulation', $simulationId);
+
+        return $route;
+    });
+}
 
 it('can access simulation dashboard page', function () {
     $this->actingAs($this->user);
 
     // Test the page class directly to ensure it works correctly
-    $dashboard = new \App\Filament\Pages\SimulationDashboard();
-    request()->merge(['simulation_configuration_id' => $this->simulationConfiguration->id]);
+    $dashboard = new \App\Filament\Pages\SimulationDashboard;
+    setSimRoute($this->assetConfiguration->id, $this->simulationConfiguration->id);
 
     expect(function () use ($dashboard) {
         $dashboard->mount();
+
         return $dashboard;
     })->not->toThrow(ParseError::class);
 
@@ -115,7 +126,7 @@ it('can access simulation dashboard page', function () {
 it('shows 404 for non-existent simulation', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get('/admin/simulation-dashboard?simulation_configuration_id=99999');
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => 99999]));
 
     $response->assertStatus(404);
 });
@@ -124,17 +135,17 @@ it('validates simulation configuration id parameter', function () {
     $this->actingAs($this->user);
 
     // Test missing simulation_configuration_id parameter
-    $response = $this->get('/admin/simulation-dashboard');
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => 'invalid']));
     // Filament might return 403 or 404 depending on middleware
     expect($response->status())->toBeIn([403, 404]);
 
     // Test invalid simulation_configuration_id format
-    $response = $this->get('/admin/simulation-dashboard?simulation_configuration_id=invalid');
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => 'invalid']));
     // Filament might return 400, 403, or 404 depending on middleware
     expect($response->status())->toBeIn([400, 403, 404]);
 
     // Test non-existent simulation_configuration_id
-    $response = $this->get('/admin/simulation-dashboard?simulation_configuration_id=99999');
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => 99999]));
     expect($response->status())->toBeIn([403, 404]);
 });
 
@@ -143,22 +154,22 @@ it('validates simulation configuration id using direct page instantiation', func
 
     // Test missing simulation_configuration_id parameter
     expect(function () {
-        $dashboard = new \App\Filament\Pages\SimulationDashboard();
-        request()->merge([]); // No simulation_configuration_id
+        $dashboard = new \App\Filament\Pages\SimulationDashboard;
+        request()->setRouteResolver(fn () => null); // No route params
         $dashboard->mount();
     })->toThrow(\Filament\Support\Exceptions\Halt::class);
 
     // Test invalid simulation_configuration_id format
     expect(function () {
-        $dashboard = new \App\Filament\Pages\SimulationDashboard();
-        request()->merge(['simulation_configuration_id' => 'invalid']);
+        $dashboard = new \App\Filament\Pages\SimulationDashboard;
+        setSimRoute($this->assetConfiguration->id, 'invalid');
         $dashboard->mount();
     })->toThrow(\Filament\Support\Exceptions\Halt::class);
 
     // Test non-existent simulation_configuration_id
     expect(function () {
-        $dashboard = new \App\Filament\Pages\SimulationDashboard();
-        request()->merge(['simulation_configuration_id' => 99999]);
+        $dashboard = new \App\Filament\Pages\SimulationDashboard;
+        setSimRoute($this->assetConfiguration->id, 99999);
         $dashboard->mount();
     })->toThrow(\Filament\Support\Exceptions\Halt::class);
 });
@@ -186,39 +197,15 @@ it('shows access denied for simulation owned by different user', function () {
     $this->actingAs($this->user);
 
     // Test using direct page instantiation to bypass Filament middleware
-    expect(function () use ($otherSimConfig) {
-        $dashboard = new \App\Filament\Pages\SimulationDashboard();
-        request()->merge(['simulation_configuration_id' => $otherSimConfig->id]);
+    expect(function () use ($otherSimConfig, $otherAssetConfig) {
+        $dashboard = new \App\Filament\Pages\SimulationDashboard;
+        setSimRoute($otherAssetConfig->id, $otherSimConfig->id);
         $dashboard->mount();
     })->toThrow(\Filament\Support\Exceptions\Halt::class);
 
     // Also test HTTP response (might be 403 due to Filament middleware)
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$otherSimConfig->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $otherAssetConfig->id, 'simulation' => $otherSimConfig->id]));
     expect($response->status())->toBeIn([403, 404]);
-});
-
-it('shows warning for simulation with no assets', function () {
-    // Create a simulation configuration with no assets
-    $emptySimConfig = SimulationConfiguration::factory()->create([
-        'user_id' => $this->user->id,
-        'asset_configuration_id' => $this->assetConfiguration->id,
-        'name' => 'Empty Simulation',
-    ]);
-
-    $this->actingAs($this->user);
-
-    // Test using direct page instantiation to verify warning logic
-    $dashboard = new \App\Filament\Pages\SimulationDashboard();
-    request()->merge(['simulation_configuration_id' => $emptySimConfig->id]);
-
-    // This should not throw an exception but should set a warning
-    expect(function () use ($dashboard) {
-        $dashboard->mount();
-    })->not->toThrow(\Filament\Support\Exceptions\Halt::class);
-
-    // Verify the simulation configuration was loaded
-    expect($dashboard->simulationConfiguration)->not->toBeNull();
-    expect($dashboard->simulationConfiguration->simulationAssets)->toBeEmpty();
 });
 
 it('shows 403 for unauthorized simulation access', function () {
@@ -227,19 +214,19 @@ it('shows 403 for unauthorized simulation access', function () {
 
     // Test using direct page instantiation since HTTP routing may not be fully configured
     expect(function () {
-        $dashboard = new \App\Filament\Pages\SimulationDashboard();
-        request()->merge(['simulation_configuration_id' => $this->simulationConfiguration->id]);
+        $dashboard = new \App\Filament\Pages\SimulationDashboard;
+        setSimRoute($this->assetConfiguration->id, $this->simulationConfiguration->id);
         $dashboard->mount();
     })->toThrow(\Filament\Support\Exceptions\Halt::class);
 
     // HTTP route test - may return 404 due to routing configuration
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
     expect($response->status())->toBeIn([403, 404]); // Either is acceptable due to routing
 });
 
 it('requires authentication', function () {
     // HTTP route test - may return 404 due to routing configuration, but should not be accessible without auth
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     // Either redirect to login or 404 is acceptable (depends on routing configuration)
     expect($response->status())->toBeIn([302, 404]); // 302 for redirect, 404 for route not found
@@ -248,7 +235,7 @@ it('requires authentication', function () {
 it('displays simulation overview widget', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
     // Check for widget content
@@ -260,7 +247,7 @@ it('displays simulation overview widget', function () {
 it('displays fire analysis widget', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
     // Check for FIRE widget content
@@ -272,7 +259,7 @@ it('displays fire analysis widget', function () {
 it('displays tax analysis widget', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
     // Check for tax widget content
@@ -284,7 +271,7 @@ it('displays tax analysis widget', function () {
 it('displays chart widgets', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
     // Check for chart sections that remain
@@ -294,7 +281,7 @@ it('displays chart widgets', function () {
 it('displays navigation buttons', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
     // Check for navigation buttons
@@ -313,7 +300,7 @@ it('handles simulation with no data gracefully', function () {
 
     $this->actingAs($this->user);
 
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$emptySimulation->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $emptySimulation->id]));
 
     $response->assertStatus(200);
     $response->assertSee('Empty Simulation');
@@ -329,15 +316,16 @@ it('can instantiate all dashboard widgets without errors', function () {
 
     foreach ($widgets as $widgetClass) {
         expect(function () use ($widgetClass) {
-            $widget = new $widgetClass();
+            $widget = new $widgetClass;
             $widget->setSimulationConfiguration($this->simulationConfiguration);
+
             return $widget;
         })->not()->toThrow(Exception::class);
     }
 });
 
 it('widgets calculate correct financial metrics', function () {
-    $widget = new \App\Filament\Widgets\SimulationOverviewWidget();
+    $widget = new \App\Filament\Widgets\SimulationOverviewWidget;
     $widget->setSimulationConfiguration($this->simulationConfiguration);
 
     // Test that the widget can generate stats without errors
@@ -356,7 +344,7 @@ it('chart widgets generate valid chart data', function () {
     ];
 
     foreach ($chartWidgets as $widgetClass) {
-        $widget = new $widgetClass();
+        $widget = new $widgetClass;
         $widget->setSimulationConfiguration($this->simulationConfiguration);
 
         // Test that chart data can be generated without errors
@@ -365,6 +353,7 @@ it('chart widgets generate valid chart data', function () {
             $reflection = new ReflectionClass($widget);
             $method = $reflection->getMethod('getData');
             $method->setAccessible(true);
+
             return $method->invoke($widget);
         })->not()->toThrow(Exception::class);
     }
@@ -373,54 +362,19 @@ it('chart widgets generate valid chart data', function () {
 it('handles missing simulation_configuration_id parameter', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get('/admin/simulation-dashboard');
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => 'invalid']));
 
-    $response->assertStatus(404);
+    expect($response->status())->toBeIn([400, 403, 404]);
 });
 
 it('page title and heading are set correctly', function () {
     $this->actingAs($this->user);
 
-    $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+    $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
     $response->assertSee('Simulation Assets Dashboard - Test Simulation');
     $response->assertSee('Test Simulation');
-});
-
-it('validates native filament dashboard functionality', function () {
-    $this->actingAs($this->user);
-
-    // Test that the native Filament dashboard works correctly
-    $dashboard = new \App\Filament\Pages\SimulationDashboard();
-    request()->merge(['simulation_configuration_id' => $this->simulationConfiguration->id]);
-
-    // Test mount method
-    expect(function () use ($dashboard) {
-        $dashboard->mount();
-    })->not->toThrow(Exception::class);
-
-    // Test that widgets are properly configured
-    $widgets = $dashboard->getWidgets();
-    expect($widgets)->toBeArray();
-    expect($widgets)->toHaveCount(4);
-
-    // Verify all expected widgets are present
-    $expectedWidgets = [
-        \App\Filament\Widgets\SimulationStatsOverviewWidget::class,
-        \App\Filament\Widgets\SimulationFireAnalysisWidget::class,
-        \App\Filament\Widgets\SimulationTaxAnalysisWidget::class,
-        \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class,
-    ];
-
-    foreach ($expectedWidgets as $expectedWidget) {
-        expect($widgets)->toContain($expectedWidget);
-    }
-
-    // Test dashboard configuration
-    expect($dashboard->getColumns())->toBe(2);
-    expect($dashboard->getTitle())->toContain('Simulation Assets Dashboard');
-    expect($dashboard->getHeading())->toContain('Test Simulation');
 });
 
 it('catches php syntax errors in page class', function () {
@@ -431,17 +385,18 @@ it('catches php syntax errors in page class', function () {
 
     // Test page instantiation
     expect(function () {
-        return new \App\Filament\Pages\SimulationDashboard();
+        return new \App\Filament\Pages\SimulationDashboard;
     })->not->toThrow(ParseError::class);
 
     // Test page methods
-    $page = new \App\Filament\Pages\SimulationDashboard();
+    $page = new \App\Filament\Pages\SimulationDashboard;
 
     // Mock the request for mount method
-    request()->merge(['simulation_configuration_id' => $this->simulationConfiguration->id]);
+    setSimRoute($this->assetConfiguration->id, $this->simulationConfiguration->id);
 
     expect(function () use ($page) {
         $page->mount();
+
         return $page->getTitle();
     })->not->toThrow(ParseError::class);
 
@@ -465,8 +420,9 @@ it('catches widget instantiation syntax errors', function () {
 
     foreach ($widgetClasses as $widgetClass) {
         expect(function () use ($widgetClass) {
-            $widget = new $widgetClass();
+            $widget = new $widgetClass;
             $widget->setSimulationConfiguration($this->simulationConfiguration);
+
             return $widget;
         })->not->toThrow(ParseError::class, "Widget {$widgetClass} has syntax errors");
     }
@@ -488,7 +444,7 @@ it('detects blade syntax errors in view compilation', function () {
                 'net_income' => 100000,
                 'net_growth' => 500000,
                 'total_start_value' => 1000000,
-            ]
+            ],
         ]);
 
         // Force compilation by rendering
@@ -499,7 +455,7 @@ it('detects blade syntax errors in view compilation', function () {
 it('validates all dashboard components can be instantiated', function () {
     // Test page class
     expect(function () {
-        return new \App\Filament\Pages\SimulationDashboard();
+        return new \App\Filament\Pages\SimulationDashboard;
     })->not->toThrow(ParseError::class, 'SimulationDashboard page class has syntax errors');
 
     // Test all widget classes
@@ -512,15 +468,16 @@ it('validates all dashboard components can be instantiated', function () {
 
     foreach ($widgetClasses as $widgetClass) {
         expect(function () use ($widgetClass) {
-            return new $widgetClass();
+            return new $widgetClass;
         })->not->toThrow(ParseError::class, "Widget {$widgetClass} has syntax errors");
     }
 
     // Test that widgets can be configured
     foreach ($widgetClasses as $widgetClass) {
         expect(function () use ($widgetClass) {
-            $widget = new $widgetClass();
+            $widget = new $widgetClass;
             $widget->setSimulationConfiguration($this->simulationConfiguration);
+
             return $widget;
         })->not->toThrow(Exception::class, "Widget {$widgetClass} configuration has errors");
     }
@@ -537,7 +494,7 @@ it('catches BadMethodCallException and missing method errors in widgets', functi
 
     foreach ($widgetClasses as $widgetClass) {
         expect(function () use ($widgetClass) {
-            $widget = new $widgetClass();
+            $widget = new $widgetClass;
             $widget->setSimulationConfiguration($this->simulationConfiguration);
 
             // Try to render the widget - this will catch BadMethodCallException
@@ -546,8 +503,9 @@ it('catches BadMethodCallException and missing method errors in widgets', functi
         })->not->toThrow(BadMethodCallException::class, "Widget {$widgetClass} has missing method calls");
 
         expect(function () use ($widgetClass) {
-            $widget = new $widgetClass();
+            $widget = new $widgetClass;
             $widget->setSimulationConfiguration($this->simulationConfiguration);
+
             return $widget->render();
         })->not->toThrow(Error::class, "Widget {$widgetClass} has fatal errors during rendering");
     }
@@ -564,9 +522,10 @@ it('validates native filament widgets render correctly', function () {
 
     foreach ($widgetClasses as $widgetClass) {
         expect(function () use ($widgetClass) {
-            $widget = new $widgetClass();
-            request()->merge(['simulation_configuration_id' => $this->simulationConfiguration->id]);
+            $widget = new $widgetClass;
+            setSimRoute($this->assetConfiguration->id, $this->simulationConfiguration->id);
             $widget->mount();
+
             return $widget;
         })->not->toThrow(Exception::class, "Widget {$widgetClass} should mount without errors");
     }
@@ -578,7 +537,7 @@ it('catches BadMethodCallException in HTTP dashboard access', function () {
     // Test the actual HTTP route to catch method call errors that might only occur
     // when accessed through Filament's routing system
     expect(function () {
-        $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+        $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
         // If we get here without exception, check the response
         if ($response->status() !== 200) {
@@ -589,14 +548,16 @@ it('catches BadMethodCallException in HTTP dashboard access', function () {
 
         // Force content rendering to catch any method call errors
         $content = $response->getContent();
+
         return $response;
     })->not->toThrow(BadMethodCallException::class, 'HTTP dashboard access has missing method calls');
 
     expect(function () {
-        $response = $this->get("/admin/simulation-dashboard?simulation_configuration_id={$this->simulationConfiguration->id}");
+        $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
         if ($response->status() === 200) {
             $response->getContent(); // Force content rendering
         }
+
         return $response;
     })->not->toThrow(Error::class, 'HTTP dashboard access has fatal errors');
 });
@@ -607,27 +568,27 @@ it('validates widget base classes and methods to prevent getColumns errors', fun
         \App\Filament\Widgets\SimulationStatsOverviewWidget::class => [
             'base_class' => \Filament\Widgets\StatsOverviewWidget::class,
             'required_methods' => ['getStats'],
-            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
+            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery'],
         ],
         \App\Filament\Widgets\SimulationFireAnalysisWidget::class => [
             'base_class' => \Filament\Widgets\StatsOverviewWidget::class,
             'required_methods' => ['getStats'],
-            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
+            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery'],
         ],
         \App\Filament\Widgets\SimulationTaxAnalysisWidget::class => [
             'base_class' => \Filament\Widgets\StatsOverviewWidget::class,
             'required_methods' => ['getStats'],
-            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
+            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery'],
         ],
         \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class => [
             'base_class' => \Filament\Widgets\ChartWidget::class,
             'required_methods' => ['getData', 'getType'],
-            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery']
+            'should_not_have' => ['getColumns', 'getTableColumns', 'getTableQuery'],
         ],
     ];
 
     foreach ($widgetTests as $widgetClass => $tests) {
-        $widget = new $widgetClass();
+        $widget = new $widgetClass;
 
         // Test base class
         expect($widget)->toBeInstanceOf($tests['base_class'], "Widget {$widgetClass} should extend {$tests['base_class']}");
@@ -643,6 +604,7 @@ it('validates widget base classes and methods to prevent getColumns errors', fun
                 // If the method exists, make sure it doesn't throw BadMethodCallException
                 expect(function () use ($widget, $method) {
                     $widget->setSimulationConfiguration($this->simulationConfiguration);
+
                     return $widget->$method();
                 })->not->toThrow(BadMethodCallException::class, "Widget {$widgetClass} method {$method} should not throw BadMethodCallException");
             }

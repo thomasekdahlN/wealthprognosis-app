@@ -37,13 +37,61 @@ class AssetResource extends Resource
         return static::getUrl('edit', $parameters);
     }
 
+    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false): string
+    {
+        $name ??= 'index';
+
+        // Prefer pretty routes that include configuration
+        if (in_array($name, ['index', 'create', 'edit'], true)) {
+            // Resolve configuration ID
+            $configurationId = $parameters['configuration'] ?? null;
+            if (! $configurationId && isset($parameters['record']) && $parameters['record'] instanceof \App\Models\Asset) {
+                $configurationId = $parameters['record']->asset_configuration_id;
+            }
+
+            if (! $configurationId) {
+                $configurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
+            }
+
+            if ($configurationId) {
+                // Map to our pretty route names
+                return match ($name) {
+                    'index' => route('filament.admin.resources.assets.index.pretty', [
+                        'configuration' => $configurationId,
+                    ], $isAbsolute),
+                    'create' => route('filament.admin.resources.assets.create.pretty', [
+                        'configuration' => $configurationId,
+                    ], $isAbsolute),
+                    'edit' => (function () use ($configurationId, $parameters, $isAbsolute) {
+                        $recordParam = $parameters['record'] ?? $parameters['asset'] ?? null;
+                        if (! $recordParam) {
+                            // Defensive: if no record provided, fall back to index to avoid URL gen errors
+                            return route('filament.admin.resources.assets.index.pretty', [
+                                'configuration' => $configurationId,
+                            ], $isAbsolute);
+                        }
+
+                        return route('filament.admin.resources.assets.edit.pretty', [
+                            'configuration' => $configurationId,
+                            'record' => $recordParam,
+                        ], $isAbsolute);
+                    })(),
+                    default => parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters),
+                };
+            }
+        }
+
+        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters);
+    }
+
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $query = parent::getEloquentQuery()->with(['configuration', 'assetType']);
 
-        // Filter by active asset configuration if one is selected
-        $activeAssetConfigurationId = app(CurrentAssetConfiguration::class)->id();
-        if ($activeAssetConfigurationId) {
+        // Scope by the active configuration stored in session/service only (no querystring fallback)
+        $activeAssetConfigurationId = (int) (app(CurrentAssetConfiguration::class)->id() ?? 0);
+
+        if ($activeAssetConfigurationId > 0) {
             $query->where('asset_configuration_id', $activeAssetConfigurationId);
         }
 
@@ -78,12 +126,17 @@ class AssetResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::count();
+        $query = static::getModel()::query();
+        $activeAssetConfigurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
+        if ($activeAssetConfigurationId) {
+            $query->where('asset_configuration_id', $activeAssetConfigurationId);
+        }
+
+        return (string) $query->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
         return 'info';
     }
-
 }

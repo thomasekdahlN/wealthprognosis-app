@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\Auditable;
 use App\Models\Scopes\TeamScope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -108,6 +109,7 @@ class AssetYear extends Model
 
     // Factor enum constants
     public const FACTOR_MONTHLY = 'monthly';
+
     public const FACTOR_YEARLY = 'yearly';
 
     /**
@@ -209,5 +211,30 @@ class AssetYear extends Model
                 },
             ],
         ];
+    }
+
+    protected function description(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value): ?string {
+                if ($value === null) {
+                    return null;
+                }
+
+                // Ensure numeric-only values render safely in RichEditor (TipTap) by wrapping in HTML
+                if (is_int($value) || (is_string($value) && ctype_digit($value))) {
+                    return '<p>'.(string) $value.'</p>';
+                }
+
+                return (string) $value;
+            },
+            set: function ($value): ?string {
+                if ($value === null) {
+                    return null;
+                }
+
+                return (string) $value;
+            }
+        );
     }
 }

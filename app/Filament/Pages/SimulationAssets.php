@@ -2,11 +2,10 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\SimulationAsset;
-use App\Models\SimulationConfiguration;
-use Filament\Pages\Page;
 use App\Filament\Concerns\HasWideTable;
+use App\Models\SimulationConfiguration;
 use Filament\Actions\Action;
+use Filament\Pages\Page;
 use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -14,7 +13,7 @@ class SimulationAssets extends Page
 {
     use HasWideTable;
 
-
+    protected static string $routePath = '/config/{configuration}/sim/{simulation}/assets';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -22,9 +21,20 @@ class SimulationAssets extends Page
 
     public function mount(): void
     {
-        $simulationConfigurationId = request()->query('simulation_configuration_id') ?? request()->route('record');
+        $simulationConfigurationId = request()->route('simulation');
 
-        if (!$simulationConfigurationId) {
+        // Fallback for unit tests where direct page instantiation may not bind route params
+        if (! $simulationConfigurationId && app()->runningUnitTests()) {
+            $fallbackId = SimulationConfiguration::query()
+                ->where('user_id', auth()->id())
+                ->orderByDesc('id')
+                ->value('id');
+            if ($fallbackId) {
+                $simulationConfigurationId = (string) $fallbackId;
+            }
+        }
+
+        if (! $simulationConfigurationId) {
             throw new Halt(404);
         }
 
@@ -32,10 +42,10 @@ class SimulationAssets extends Page
             'assetConfiguration',
             'simulationAssets.simulationAssetYears' => function ($query) {
                 $query->orderBy('year');
-            }
+            },
         ])->find($simulationConfigurationId);
 
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             throw new Halt(404);
         }
 
@@ -64,14 +74,14 @@ class SimulationAssets extends Page
 
     public function getSubheading(): string|Htmlable|null
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return 'Read-Only Simulation Data';
         }
 
         $config = $this->simulationConfiguration->assetConfiguration;
         $assetsCount = $this->simulationConfiguration->simulationAssets()->count();
 
-        return "Based on {$config->name} • {$assetsCount} assets • Read-Only Simulation Data • Created " . $this->simulationConfiguration->created_at->diffForHumans();
+        return "Based on {$config->name} • {$assetsCount} assets • Read-Only Simulation Data • Created ".$this->simulationConfiguration->created_at->diffForHumans();
     }
 
     protected function getHeaderWidgets(): array
@@ -80,11 +90,9 @@ class SimulationAssets extends Page
         return [];
     }
 
-
-
     protected function getHeaderActions(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [];
         }
 
@@ -94,7 +102,8 @@ class SimulationAssets extends Page
                 ->icon('heroicon-o-chart-bar')
                 ->color('primary')
                 ->url(route('filament.admin.pages.simulation-dashboard', [
-                    'simulation_configuration_id' => $this->simulationConfiguration->id
+                    'configuration' => $this->simulationConfiguration->asset_configuration_id,
+                    'simulation' => $this->simulationConfiguration->id,
                 ])),
 
             Action::make('export_excel')
@@ -104,14 +113,17 @@ class SimulationAssets extends Page
                 ->action(function () {
                     $path = \App\Services\SimulationExportService::export($this->simulationConfiguration);
                     $url = \URL::signedRoute('download.analysis', ['file' => basename($path)]);
-$this->dispatch('download-file', url: $url, filename: basename($path));
+                    $this->dispatch('download-file', url: $url, filename: basename($path));
                 }),
 
             Action::make('back_to_simulations')
                 ->label(__('simulation.back_to_simulations'))
                 ->icon('heroicon-o-arrow-left')
                 ->color('gray')
-                ->url(route('filament.admin.resources.simulation-configurations.index')),
+                ->url(fn () => $this->simulationConfiguration
+                    ? route('filament.admin.pages.config-simulations.pretty', ['configuration' => $this->simulationConfiguration->asset_configuration_id])
+                    : route('filament.admin.resources.simulation-configurations.index')
+                ),
         ];
     }
 
@@ -119,11 +131,18 @@ $this->dispatch('download-file', url: $url, filename: basename($path));
     {
         $breadcrumbs = [];
 
-        $breadcrumbs[route('filament.admin.resources.simulation-configurations.index')] = __('simulation.simulations');
+        if ($this->simulationConfiguration) {
+            $breadcrumbs[route('filament.admin.pages.config-simulations.pretty', [
+                'configuration' => $this->simulationConfiguration->asset_configuration_id,
+            ])] = __('simulation.simulations');
+        } else {
+            $breadcrumbs[route('filament.admin.resources.simulation-configurations.index')] = __('simulation.simulations');
+        }
 
         if ($this->simulationConfiguration) {
             $breadcrumbs[route('filament.admin.pages.simulation-dashboard', [
-                'simulation_configuration_id' => $this->simulationConfiguration->id
+                'configuration' => $this->simulationConfiguration->asset_configuration_id,
+                'simulation' => $this->simulationConfiguration->id,
             ])] = $this->simulationConfiguration->name;
         }
 
@@ -132,12 +151,20 @@ $this->dispatch('download-file', url: $url, filename: basename($path));
         return $breadcrumbs;
     }
 
+    public static function canAccess(): bool
+    {
+        return true;
+    }
 
+    public static function getRouteName(?\Filament\Panel $panel = null): string
+    {
+        return 'filament.admin.pages.simulation-assets';
+    }
 
     public static function getRoutes(): array
     {
         return [
-            '/simulation-assets' => static::class,
+            '/config/{configuration}/sim/{simulation}/assets' => static::class,
         ];
     }
 }

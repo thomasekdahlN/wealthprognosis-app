@@ -3,16 +3,15 @@
 namespace App\Filament\Resources\AssetConfigurations\Actions;
 
 use App\Models\AssetConfiguration;
-use App\Models\SimulationConfiguration;
 use App\Services\PrognosisSimulationService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
-use Filament\Schemas\Components\Section;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class RunSimulationAction extends Action
 {
@@ -36,7 +35,7 @@ class RunSimulationAction extends Action
                 $countryCode = basename($directory);
 
                 // Map country codes to readable names
-                $countryName = match($countryCode) {
+                $countryName = match ($countryCode) {
                     'no' => 'Norway',
                     'se' => 'Sweden',
                     'ch' => 'Switzerland',
@@ -121,7 +120,7 @@ class RunSimulationAction extends Action
                             ->required()
                             ->inline(false)
                             ->columnSpanFull(),
-                    ])
+                    ]),
             ])
             ->action(function (array $data, AssetConfiguration $record) {
                 try {
@@ -146,7 +145,7 @@ class RunSimulationAction extends Action
                     ];
 
                     // Run the simulation using the new Prognosis engine
-                    $simulationService = new PrognosisSimulationService();
+                    $simulationService = new PrognosisSimulationService;
                     $results = $simulationService->runSimulation($simulationData);
 
                     $simulationConfigurationId = $results['simulation_configuration_id'];
@@ -161,8 +160,11 @@ class RunSimulationAction extends Action
                         ->duration(5000)
                         ->send();
 
-                    // For now, just show success - in future we can redirect to simulation results page
-                    return null;
+                    // Redirect to the pretty Simulation Dashboard for the new simulation
+                    return redirect()->to(route('filament.admin.pages.simulation-dashboard', [
+                        'configuration' => $record->getKey(),
+                        'simulation' => $simulationConfigurationId,
+                    ]));
 
                 } catch (\Exception $e) {
                     DB::rollBack();

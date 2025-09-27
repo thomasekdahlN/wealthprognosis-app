@@ -34,7 +34,6 @@ class SimulationAsset extends Model
         'description',
         'asset_type',
         'group',
-        'tax_type',
         'tax_property',
         'tax_country',
         'is_active',
@@ -54,22 +53,6 @@ class SimulationAsset extends Model
     public const GROUPS = [
         'private' => 'Private',
         'company' => 'Company',
-    ];
-
-    // Tax types
-    public const TAX_TYPES = [
-        'none' => 'No Tax',
-        'income' => 'Income Tax',
-        'salary' => 'Salary Tax',
-        'house' => 'House Tax',
-        'rental' => 'Rental Tax',
-        'equityfund' => 'Equity Fund Tax',
-        'bondfund' => 'Bond Fund Tax',
-        'stock' => 'Stock Tax',
-        'crypto' => 'Crypto Tax',
-        'cash' => 'Cash Tax',
-        'pension' => 'Pension Tax',
-        'inheritance' => 'Inheritance Tax',
     ];
 
     public function user(): BelongsTo
@@ -122,7 +105,9 @@ class SimulationAsset extends Model
 
     public function getTaxTypeLabel(): string
     {
-        return self::TAX_TYPES[$this->tax_type] ?? $this->tax_type;
+        $taxTypeName = optional($this->assetType?->taxType)->name;
+
+        return $taxTypeName ?? '';
     }
 
     public function isLiquid(): bool

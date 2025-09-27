@@ -18,7 +18,6 @@
             "name": "My property",
             "description": "Here I rent out the house",
             "active" : true,
-            "tax": "rental",
             "taxProperty": "ringerike"
         },
         "2023": {

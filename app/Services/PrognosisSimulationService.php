@@ -8,7 +8,6 @@ use App\Models\SimulationAsset;
 use App\Models\SimulationAssetYear;
 use App\Models\SimulationConfiguration;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PrognosisSimulationService
@@ -84,8 +83,8 @@ class PrognosisSimulationService
             'team_id' => Auth::user()?->currentTeam?->id ?? $assetConfig->team_id,
             'created_by' => Auth::id() ?? $assetConfig->user_id,
             'updated_by' => Auth::id() ?? $assetConfig->user_id,
-            'created_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope', 'taxCountry')) . '_created'),
-            'updated_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope', 'taxCountry')) . '_updated'),
+            'created_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope', 'taxCountry')).'_created'),
+            'updated_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope', 'taxCountry')).'_updated'),
         ]);
     }
 
@@ -113,7 +112,7 @@ class PrognosisSimulationService
                 'description' => $asset->description,
                 'asset_type' => $asset->asset_type,
                 'group' => $asset->group,
-                'tax_type' => $asset->tax_type,
+                'tax_type' => optional($asset->assetType?->taxType)->type ?? 'none',
                 'tax_property' => $asset->tax_property,
                 'tax_country' => $asset->tax_country,
                 'is_active' => $asset->is_active,
@@ -122,14 +121,14 @@ class PrognosisSimulationService
                 'team_id' => Auth::user()?->currentTeam?->id ?? $asset->team_id,
                 'created_by' => Auth::id() ?? $asset->user_id,
                 'updated_by' => Auth::id() ?? $asset->user_id,
-                'created_checksum' => hash('sha256', json_encode($asset->toArray()) . '_created'),
-                'updated_checksum' => hash('sha256', json_encode($asset->toArray()) . '_updated'),
+                'created_checksum' => hash('sha256', json_encode($asset->toArray()).'_created'),
+                'updated_checksum' => hash('sha256', json_encode($asset->toArray()).'_updated'),
             ]);
 
             // Copy asset years
             foreach ($asset->years as $assetYear) {
                 SimulationAssetYear::create([
-                        'description' => $assetYear->description,
+                    'description' => $assetYear->description,
                     'user_id' => Auth::id() ?? $assetYear->user_id,
                     'team_id' => Auth::user()?->currentTeam?->id ?? $assetYear->team_id,
                     'year' => $assetYear->year,
@@ -138,7 +137,7 @@ class PrognosisSimulationService
 
                     // Income data
 
-                                        'income_amount' => $assetYear->income_amount,
+                    'income_amount' => $assetYear->income_amount,
                     'income_factor' => $assetYear->income_factor,
                     'income_rule' => 'standard',
                     'income_transfer' => 'none',
@@ -179,8 +178,8 @@ class PrognosisSimulationService
                     // Audit fields
                     'created_by' => Auth::id() ?? $assetYear->user_id,
                     'updated_by' => Auth::id() ?? $assetYear->user_id,
-                    'created_checksum' => hash('sha256', json_encode($assetYear->toArray()) . '_created'),
-                    'updated_checksum' => hash('sha256', json_encode($assetYear->toArray()) . '_updated'),
+                    'created_checksum' => hash('sha256', json_encode($assetYear->toArray()).'_created'),
+                    'updated_checksum' => hash('sha256', json_encode($assetYear->toArray()).'_updated'),
                 ]);
             }
         }
@@ -198,11 +197,11 @@ class PrognosisSimulationService
         $simulationConfig->update([
             'tags' => array_merge($simulationConfig->tags ?? [], [
                 'simulation_completed',
-                'total_years_' . count($results['yearly_data']),
-                'fire_' . ($results['summary']['fire_achieved'] ? 'achieved' : 'not_achieved'),
+                'total_years_'.count($results['yearly_data']),
+                'fire_'.($results['summary']['fire_achieved'] ? 'achieved' : 'not_achieved'),
             ]),
             'updated_by' => Auth::id(),
-            'updated_checksum' => hash('sha256', json_encode($results['summary']) . '_results'),
+            'updated_checksum' => hash('sha256', json_encode($results['summary']).'_results'),
         ]);
 
         Log::info('Simulation results stored', [
@@ -217,7 +216,7 @@ class PrognosisSimulationService
      */
     protected function mapPrognosisTypeToRiskTolerance(string $prognosisType): string
     {
-        return match($prognosisType) {
+        return match ($prognosisType) {
             'negative' => 'conservative',
             'zero' => 'moderate_conservative',
             'realistic' => 'moderate',
@@ -234,7 +233,7 @@ class PrognosisSimulationService
     public function getSimulationResults(int $simulationConfigurationId): array
     {
         $simulationConfig = SimulationConfiguration::with([
-            'simulationAssets.simulationAssetYears'
+            'simulationAssets.simulationAssetYears',
         ])->findOrFail($simulationConfigurationId);
 
         // Reconstruct results from stored data

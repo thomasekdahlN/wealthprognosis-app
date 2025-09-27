@@ -76,57 +76,57 @@ total, company (total company summary), private (total private summary), income 
 ### Dashboards og widgets
 
 #### Actual Assets Dashboard (/admin)
-- Asset Overview (GUI) — App\Filament\Widgets\AssetOverviewWidget
+- **Asset Overview (GUI)** — App\Filament\Widgets\AssetOverviewWidget
   - Hva: Hurtigstatus for totaler
   - Matematikk: Henter summer fra FireCalculationService. Viser bl.a. Total Assets (sum markedsverdi), Investment (liquid) Assets, Net Worth = Total Assets − Total Liabilities, Total Mortgage = sum lån.
-- Monthly Cashflow (GUI) — App\Filament\Widgets\MonthlyCashflowWidget
+- **Monthly Cashflow (GUI)** — App\Filament\Widgets\MonthlyCashflowWidget
   - Hva: Månedlig inntekt/utgift, netto cashflow og forbruksgrad
   - Matematikk: Monthly Cashflow = monthlyIncome − monthlyExpenses. Expense Ratio = annualExpenses / annualIncome × 100. Viser også årsverdier.
-- FIRE Progress & Crossover Point — App\Filament\Widgets\FireProgressAndCrossover
+- **FIRE Progress & Crossover Point** — App\Filament\Widgets\FireProgressAndCrossover
   - Hva: Linjegraf som viser portefølje vs FIRE‑tall og inntekt/utgift (kun inneværende år)
   - Matematikk: FIRE‑tall = 25 × årlige utgifter. Potensiell årlig inntekt = porteføljeverdi × 4%.
-- FIRE: Crossover Point — App\Filament\Widgets\FireCrossoverWidget
+- **FIRE: Crossover Point** — App\Filament\Widgets\FireCrossoverWidget
   - Hva: Om passiv inntekt overstiger utgifter (oppnådd/ikke)
   - Matematikk: Basert på FireCalculationService->crossoverAchieved (passiv inntekt > utgifter).
-- FIRE Progress Over Time — App\Filament\Widgets\FireMetricsOverview
+- **FIRE Progress Over Time** — App\Filament\Widgets\FireMetricsOverview
   - Hva: Linjegraf med estimert nettoformue vs FIRE‑tall over 30 år
   - Matematikk: Nettoformue projiseres med årlig vekst 7%: (forrige + årlig sparing) × 1.07. FIRE‑tall inflasjonsjusteres ~3% p.a. (25 × årlige utgifter × 1.03^n).
-- Net Worth Over Time — App\Filament\Widgets\NetWorthOverTime
+- **Net Worth Over Time** — App\Filament\Widgets\NetWorthOverTime
   - Hva: Historisk nettoformue per år (kun til og med inneværende år)
   - Matematikk: Nettoformue(år) = sum(asset_market_amount) − sum(mortgage_amount) fra AssetYear pr år.
-- Cash Flow Over Time — App\Filament\Widgets\CashFlowOverTime
+- **Cash Flow Over Time** — App\Filament\Widgets\CashFlowOverTime
   - Hva: Linjegraf for årlig inntekt, utgifter og netto cashflow
   - Matematikk: Årlig inntekt = sum(income_amount × faktor) der faktor = 12 ved monthly, ellers 1. Årlige utgifter tilsvarende med expence_amount. Net Cashflow = inntekt − utgifter.
-- Asset Allocation by Type — App\Filament\Widgets\AssetAllocationByType
+- **Asset Allocation by Type** — App\Filament\Widgets\AssetAllocationByType
   - Hva: Fordeling etter asset‑type for inneværende år
   - Matematikk: Grupperer AssetYear etter asset.asset_type, summerer asset_market_amount (> 0).
-- Asset Allocation by Tax Type — App\Filament\Widgets\AssetAllocationByTaxType
+- **Asset Allocation by Tax Type** — App\Filament\Widgets\AssetAllocationByTaxType
   - Hva: Fordeling etter skattekategori for inneværende år
   - Matematikk: Grupperer AssetYear etter asset.tax_type, summerer asset_market_amount (> 0).
-- Asset Allocation by Category — App\Filament\Widgets\AssetAllocationByCategory
+- **Asset Allocation by Category** — App\Filament\Widgets\AssetAllocationByCategory
   - Hva: Fordeling etter kategori (fra asset type relasjon) for inneværende år
   - Matematikk: Grupperer AssetYear etter asset.assetType.category, summerer asset_market_amount (> 0).
-- Actual Tax Rate Over Time — App\Filament\Widgets\ActualTaxRateOverTime
+- **Actual Tax Rate Over Time** — App\Filament\Widgets\ActualTaxRateOverTime
   - Hva: Faktisk/estimert skattesats over tid
   - Matematikk: Årsinntekt = sum(income_amount × faktor). Årsskatt = sum(tax_amount) eller estimert norsk modell. Skattesats = skatt/inntekt × 100. Viser også enkel marginalskatt.
-- Retirement Readiness — App\Filament\Widgets\RetirementReadinessChart
+- **Retirement Readiness** — App\Filament\Widgets\RetirementReadinessChart
   - Hva: Hvor nær pensjonsmål du er, med kapitalbehov og pensjonsekvivalenter
   - Matematikk: Nettoformue projiseres med ~6% p.a.; etter pensjon: årlig uttak 4%. Kapitalbehov ≈ 25 × 80% av nåværende utgifter. Pensjonsekvivalent beregnes forenklet (grunnpensjon + OTP 4%‑uttak).
-- Monthly Expense Breakdown — App\Filament\Widgets\ExpenseBreakdownChart
+- **Monthly Expense Breakdown** — App\Filament\Widgets\ExpenseBreakdownChart
   - Hva: Doughnut‑diagram av månedlige utgifter pr type
   - Matematikk: Sum expence_amount per asset‑type for inneværende år, delt på 12.
 
-#### Simulation Assets Dashboard (/admin/simulation-dashboard?simulation_configuration_id=ID)
-- Simulation Overview — App\Filament\Widgets\SimulationStatsOverviewWidget
+#### Simulation Assets Dashboard (/admin/config/{configuration}/sim/{simulation}/dashboard)
+- **Simulation Overview** — App\Filament\Widgets\SimulationStatsOverviewWidget
   - Hva: Nøkkeltall for porteføljen i simuleringen
   - Matematikk: Startverdi = sum første års start_value. Sluttverdi = sum siste års end_value. Total vekst = slutt − start. CAGR ≈ (slutt/start)^(1/år) − 1. Viser også totale inntekter, utgifter, netto og skatt.
-- Simulation FIRE Analysis — App\Filament\Widgets\SimulationFireAnalysisWidget
+- **Simulation FIRE Analysis** — App\Filament\Widgets\SimulationFireAnalysisWidget
   - Hva: FIRE‑tall, fremdrift, antatt år til FIRE og dekning av utgifter
   - Matematikk: Årlige utgifter = gjennomsnitt av expence_amount. FIRE‑tall = 25 × årlige utgifter. Nåverdi = sum start_value. Fremdrift = nåverdi/FIRE‑tall × 100. År til FIRE (forenklet). Passiv inntekt = 4% av portefølje.
-- Simulation Tax Analysis — App\Filament\Widgets\SimulationTaxAnalysisWidget
+- **Simulation Tax Analysis** — App\Filament\Widgets\SimulationTaxAnalysisWidget
   - Hva: Skatteanalyse i simuleringen
   - Matematikk: Total skatt = sum asset_tax_amount. Effektiv skattesats = total skatt / total inntekt × 100. Skatt på gevinster = skatt / samlede gevinster × 100. Viser også høyeste/laveste skatteår (beløp).
-- Portfolio Allocation Evolution — App\Filament\Widgets\SimulationAssetAllocationChartWidget
+- **Portfolio Allocation Evolution** — App\Filament\Widgets\SimulationAssetAllocationChartWidget
   - Hva: Fordeling av portefølje i siste simulerte år
   - Matematikk: Finn siste år i datasettet, grupper end_value per asset_type og summer.
 
@@ -293,14 +293,18 @@ Legend: 🟢 = Liquid, 🔴 = Non-liquid
 
 ### meta - top level - reserved keyword
 - meta.name - Required. Your name or an alias for you
-- meta.birthYear - Required. When you are born
-- meta.prognoseYear - Just visualizes this year extra with a colored line in excel
-- meta.pensionOfficialYear - Official pension year in your country (67 in noprway)
-- meta.pensionWishYear - When you wish to retire. Maybe you want to retire earlier because of F.I.R.E
-- meta.deathYear - Required. When do you think you die?
-- meta.exportStartYear - Optional. Defaults to last year. The excel sheet created will start at this year.
+- meta.description - Optional. Longer description for the configuration
+- meta.birthYear - Required. Year you were born
+- meta.prognoseAge - Optional. Age used for highlighting/projection focus in charts/exports
+- meta.pensionOfficialAge - Official retirement age in your country (e.g., 67 in Norway)
+- meta.pensionWishAge - Desired retirement age (FIRE target or similar)
+- meta.deathAge - Required. Expected age of death
+- meta.exportStartYear - Optional. Calendar year to start Excel export from (defaults to last year)
+- meta.icon - Optional. Heroicon name (e.g., heroicon-o-user). Invalid values are ignored and set to null.
+- meta.color - Optional. Color hint for UI (string)
+- meta.tags - Optional. Array of tags for labeling/grouping
 
-Your pensionOfficialYear/pensionWishYear will be used to calculate equal payments (like 1/14 of your assets) from your assets until deathYear. So if you live longer, you get less pr year.
+Your pensionOfficialAge/pensionWishAge will be used to calculate equal payments (like 1/14 of your assets) from your assets until deathAge. If you live longer, you get less per year.
 
 ### Assets configurations
 
@@ -308,12 +312,13 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 
 #### meta - asset level - reserved keyword
 
-- meta.type - Required. What kind of asset this is. Valid values income|expence|mortgage|asset|pension|otp|fond|cash|house|car|inheritance|boat|cabin|crypto|pension|property|rental|salary
-- meta.group - Required. Valid values private|company asset
-- meta.name - Required. Shor description of the asset, used in excel tabs
-- meta.description - Optional. Longer description of your asset.
-- meta.active - Required. Valid values true|false. If false, the asset will not be calculated.
-- meta.tax - Required. How this asset is taxed. Valid values income|fond|cash|house|car|inheritance|boat|cabin|crypto|pension|property|rental|salary|none. What kind of tax is this asset subject to.
+- meta.type — Required. Asset type code. See “Supported asset types (canonical)” above.
+- meta.group — Required. Owner group for the asset. Valid values: private | company. Defaults to private.
+- meta.name — Required. Short name shown in UI/exports.
+- meta.description — Optional. Longer description of the asset.
+- meta.active — Optional. Boolean (true|false). If false, the asset will not be calculated. Defaults to true.
+- meta.tax — Removed. Tax type is implied via the selected asset_type which maps to a TaxType through Asset Types.
+- meta.taxProperty — Optional. Property-tax specific code/flag used when applicable.
 
 #### Income
 - income.amount - beløp før skatt

@@ -18,7 +18,7 @@ class NetWorthOverTime extends ChartWidget
 
         $assetConfig = app(CurrentAssetConfiguration::class)->get();
         if ($assetConfig) {
-            $heading .= ' - ' . $assetConfig->name;
+            $heading .= ' - '.$assetConfig->name;
         }
 
         return $heading;
@@ -34,17 +34,15 @@ class NetWorthOverTime extends ChartWidget
             ];
         }
 
-        $assetConfigId = app(CurrentAssetConfiguration::class)->id()
-            ?? request()->get('asset_configuration_id')
-            ?? request()->get('asset_owner_id');
+        $assetConfigId = app(CurrentAssetConfiguration::class)->id();
 
         // Collect years with data for this user & configuration up to current year
         $years = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
-                $query->where('user_id', $user->id)->where('is_active', true);
-                if ($assetConfigId) {
-                    $query->where('asset_configuration_id', $assetConfigId);
-                }
-            })
+            $query->where('user_id', $user->id)->where('is_active', true);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
+            }
+        })
             ->where('year', '<=', now()->year)
             ->distinct()
             ->orderBy('year')
@@ -59,11 +57,11 @@ class NetWorthOverTime extends ChartWidget
 
         foreach ($years as $year) {
             $totals = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
-                    $query->where('user_id', $user->id)->where('is_active', true);
-                    if ($assetConfigId) {
-                        $query->where('asset_configuration_id', $assetConfigId);
-                    }
-                })
+                $query->where('user_id', $user->id)->where('is_active', true);
+                if ($assetConfigId) {
+                    $query->where('asset_configuration_id', $assetConfigId);
+                }
+            })
                 ->where('year', $year)
                 ->selectRaw('COALESCE(SUM(asset_market_amount), 0) as assets, COALESCE(SUM(mortgage_amount), 0) as liabilities')
                 ->first();
@@ -129,4 +127,3 @@ class NetWorthOverTime extends ChartWidget
         ];
     }
 }
-

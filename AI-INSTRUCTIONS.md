@@ -78,3 +78,6 @@ Always generate feature tests for new models
 Always generate page tests that check for HTTP 200 for all new pages
 Always run feature and page tests after making new functionality
 Always run the tests for all pages, models, controllers and resources that have been involved in a change.
+
+Pretty routes, avoid using query parameters to identify resources. Always use /admin/config/{configuration}/
+Remove html tags from varchar fields that are listed in tables.

@@ -1,0 +1,15 @@
+{
+  "zurich": {
+    "name": "Zurich",
+    "income": 0.3,
+    "fortune": 0.3,
+    "standardDeduction": 0
+  },
+  "geneva": {
+    "name": "Geneva",
+    "income": 0.25,
+    "fortune": 0.38,
+    "standardDeduction": 0
+  }
+}
+

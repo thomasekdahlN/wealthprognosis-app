@@ -82,7 +82,6 @@ class AssetExportService
                 'name' => $asset->name,
                 'description' => $asset->description ?? '',
                 'active' => $asset->is_active,
-                'tax' => $asset->tax_type,
                 'taxProperty' => $asset->tax_property,
             ];
 

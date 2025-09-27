@@ -17,8 +17,7 @@
             "group": "private",
             "name": "Emma - First Child (Born 2020)",
             "description": "Financial planning for first child including benefits, education, and living expenses",
-            "active": true,
-            "tax": "child"
+            "active": true
         },
         "2020": {
             "description": "Income: Barnetrygd | Expense: Utgifter | Asset:  | Mortgage: ",

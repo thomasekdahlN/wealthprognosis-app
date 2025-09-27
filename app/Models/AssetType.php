@@ -37,6 +37,9 @@ class AssetType extends Model
         'can_have_mortgage',
         'can_have_market_value',
         'sort_order',
+        'income_changerate',
+        'expence_changerate',
+        'asset_changerate',
         'asset_category_id',
         'tax_type_id',
         'user_id',
@@ -58,6 +61,9 @@ class AssetType extends Model
         'can_have_mortgage' => 'boolean',
         'can_have_market_value' => 'boolean',
         'sort_order' => 'integer',
+        'income_changerate' => 'string',
+        'expence_changerate' => 'string',
+        'asset_changerate' => 'string',
     ];
 
     public function scopeActive($query)

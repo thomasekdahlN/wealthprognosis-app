@@ -18,7 +18,7 @@
             "name": "Company AS",
             "description": "I own stocks here",
             "active": true,
-            "tax": "stock"
+
         },
         "2022": {
             "description": "Income:  | Expense:  | Asset: Initielt kjøp | Mortgage: ",

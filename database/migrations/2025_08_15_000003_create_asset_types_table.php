@@ -33,6 +33,11 @@ return new class extends Migration
             $table->boolean('can_have_mortgage')->default(false);
             $table->boolean('can_have_market_value')->default(false);
 
+            // Default change rate suggestions (used to prefill Asset / AssetYear forms)
+            $table->string('income_changerate')->nullable();
+            $table->string('expence_changerate')->nullable();
+            $table->string('asset_changerate')->nullable();
+
             $table->integer('sort_order')->default(0);
             $table->foreignId('asset_category_id')->nullable()->constrained('asset_categories');
             $table->foreignId('tax_type_id')->nullable()->constrained('tax_types');

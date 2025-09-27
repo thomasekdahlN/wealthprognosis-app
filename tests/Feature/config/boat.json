@@ -17,8 +17,7 @@
             "group": "private",
             "name": "Jeanneau Sun Odyssey 349 - Sailing Yacht",
             "description": "35-foot sailing yacht for coastal cruising and potential charter opportunities",
-            "active": true,
-            "tax": "boat"
+            "active": true
         },
         "2023": {
             "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
@@ -32,7 +31,7 @@
                 "name": "Utgifter",
                 "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
                 "amount": 2000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }

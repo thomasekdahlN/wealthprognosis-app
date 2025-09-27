@@ -3,13 +3,11 @@
 namespace App\Filament\Resources\SimulationConfigurations\Pages;
 
 use App\Filament\Resources\SimulationConfigurations\SimulationConfigurationResource;
-use App\Models\SimulationConfiguration;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
 class ViewSimulationConfiguration extends ViewRecord
 {
-
     protected static string $resource = SimulationConfigurationResource::class;
 
     protected string $view = 'filament.resources.simulation-configurations.pages.view-simulation-configuration';
@@ -35,14 +33,17 @@ class ViewSimulationConfiguration extends ViewRecord
 
         if ($activeTab === 'assets') {
             $this->redirect(route('filament.admin.pages.simulation-assets', [
-                'simulation_configuration_id' => $this->getRecord()->id
+                'configuration' => $this->getRecord()->asset_configuration_id,
+                'simulation' => $this->getRecord()->id,
             ]));
+
             return;
         }
 
         // Default to dashboard
         $this->redirect(route('filament.admin.pages.simulation-dashboard', [
-            'simulation_configuration_id' => $this->getRecord()->id
+            'configuration' => $this->getRecord()->asset_configuration_id,
+            'simulation' => $this->getRecord()->id,
         ]));
     }
 

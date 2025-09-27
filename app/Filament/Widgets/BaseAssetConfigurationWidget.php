@@ -16,10 +16,6 @@ abstract class BaseAssetConfigurationWidget extends Widget
         // Get asset_configuration_id from the session service for consistency
         $this->assetConfigurationId = app(CurrentAssetConfiguration::class)->id();
 
-        // Also check for request parameter (for backwards compatibility)
-        if (!$this->assetConfigurationId) {
-            $this->assetConfigurationId = request()->get('asset_configuration_id') ?? request()->get('asset_configuration_id');
-        }
     }
 
     protected function getAssetConfigurationId(): ?int

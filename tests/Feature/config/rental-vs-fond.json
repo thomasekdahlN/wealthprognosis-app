@@ -18,7 +18,7 @@
             "name": "Rental",
             "description": "Rental",
             "active" : true,
-            "tax": "rental"
+
         },
         "2023": {
             "asset": {
@@ -58,7 +58,7 @@
             "name": "fond",
             "description": "",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2024": {
             "asset": {

@@ -25,30 +25,31 @@ class ConfigAssets extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-
-
     protected static ?string $navigationLabel = 'Assets';
 
     protected static ?string $title = 'Assets';
 
+    protected static string $routePath = '/config/{record}/assets';
+
     #[Locked]
     public ?AssetConfiguration $record = null;
 
-    public function mount(): void
+    public function mount(AssetConfiguration|int|string|null $record = null): void
     {
-        $recordId = request()->route('record');
-
-        if ($recordId) {
-            $this->record = AssetConfiguration::findOrFail($recordId);
-            app(CurrentAssetConfiguration::class)->set($this->record);
+        if ($record instanceof AssetConfiguration) {
+            $this->record = $record;
+        } elseif (is_numeric($record)) {
+            $this->record = AssetConfiguration::query()->findOrFail((int) $record);
         } else {
-            $this->record = app(CurrentAssetConfiguration::class)->get();
+            // No query fallback; only pretty path is supported
+            abort(404);
         }
 
-        if (!$this->record) {
-            // Redirect to configurations if no asset configuration is found
-            redirect()->route('filament.admin.resources.asset-configurations.index');
+        if (! $this->record) {
+            abort(404);
         }
+
+        app(CurrentAssetConfiguration::class)->set($this->record);
     }
 
     public static function getRouteName(?Panel $panel = null): string
@@ -73,7 +74,7 @@ class ConfigAssets extends Page implements HasTable
 
     protected function getTableQuery(): Builder
     {
-        if (!$this->record) {
+        if (! $this->record) {
             return Asset::query()->whereRaw('1 = 0'); // Empty result
         }
 
@@ -148,13 +149,17 @@ class ConfigAssets extends Page implements HasTable
             ->defaultSort('sort_order')
             ->paginated([50, 100, 150])
             ->defaultPaginationPageOption(50)
-            ->paginationPageOptions([50, 100, 150]);
+            ->paginationPageOptions([50, 100, 150])
+            ->recordUrl(fn (\App\Models\Asset $asset) => route('filament.admin.pages.config-asset-years.pretty', [
+                'configuration' => $this->record?->getKey() ?? ($this->record->id ?? null),
+                'asset' => $asset->getKey(),
+            ]));
     }
 
     public function getTitle(): string
     {
         if ($this->record) {
-            return 'Assets - ' . $this->record->name;
+            return 'Assets - '.$this->record->name;
         }
 
         return 'Assets';
@@ -163,5 +168,12 @@ class ConfigAssets extends Page implements HasTable
     public function getHeading(): string
     {
         return $this->getTitle();
+    }
+
+    public static function getRoutes(): array
+    {
+        return [
+            '/config/{record}/assets' => static::class,
+        ];
     }
 }

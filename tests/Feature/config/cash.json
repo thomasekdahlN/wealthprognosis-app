@@ -17,8 +17,7 @@
             "group": "private",
             "name": "Emergency Fund - High-Yield Savings",
             "description": "6-month emergency fund in high-yield savings account for financial security",
-            "active": true,
-            "tax": "cash"
+            "active": true
         },
         "2023": {
             "description": "Income:  | Expense:  | Asset: Kontanter p.t.; Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen | Mortgage: ",

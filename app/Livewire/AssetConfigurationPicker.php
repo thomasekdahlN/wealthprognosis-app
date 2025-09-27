@@ -9,7 +9,9 @@ use Livewire\Component;
 class AssetConfigurationPicker extends Component
 {
     public ?int $selectedAssetConfigurationId = null;
+
     public bool $showDropdown = false;
+
     public string $search = '';
 
     public function mount(): void
@@ -17,7 +19,7 @@ class AssetConfigurationPicker extends Component
         $this->selectedAssetConfigurationId = app(CurrentAssetConfiguration::class)->id();
 
         // Auto-select first configuration if none is selected
-        if (!$this->selectedAssetConfigurationId) {
+        if (! $this->selectedAssetConfigurationId) {
             $firstConfiguration = AssetConfiguration::query()->orderBy('name')->first();
             if ($firstConfiguration) {
                 $this->selectedAssetConfigurationId = $firstConfiguration->id;
@@ -40,13 +42,29 @@ class AssetConfigurationPicker extends Component
         $this->showDropdown = false;
         $this->search = '';
 
-        // Refresh the page to update all components
-        $this->redirect(request()->header('Referer') ?: '/admin');
+        // Redirect using pretty URLs. If coming from assets index, go to config-scoped assets.
+        $referer = request()->headers->get('referer');
+
+        if (! $referer) {
+            $this->redirect(route('filament.admin.pages.config-assets', ['record' => $assetConfigurationId]));
+
+            return;
+        }
+
+        if (str_contains($referer, '/admin/assets')) {
+            $this->redirect(route('filament.admin.pages.config-assets', ['record' => $assetConfigurationId]));
+
+            return;
+        }
+
+        // Default: just refresh the page without leaking query parameters
+        [$base] = explode('?', $referer, 2);
+        $this->redirect($base);
     }
 
     public function toggleDropdown(): void
     {
-        $this->showDropdown = !$this->showDropdown;
+        $this->showDropdown = ! $this->showDropdown;
         if ($this->showDropdown) {
             $this->search = '';
         }
@@ -65,7 +83,7 @@ class AssetConfigurationPicker extends Component
             $searchTerm = trim($this->search);
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('description', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('description', 'LIKE', "%{$searchTerm}%");
             });
         }
 

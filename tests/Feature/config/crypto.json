@@ -17,8 +17,7 @@
             "group": "private",
             "name": "Bitcoin & Ethereum Portfolio",
             "description": "Long-term cryptocurrency holdings as digital store of value and inflation hedge",
-            "active": true,
-            "tax": "crypto"
+            "active": true
         },
         "2022": {
             "description": "Income:  | Expense:  | Asset: ; Uttak fra $pensionWishYear, 1|$pensionWishYears | Mortgage: ",

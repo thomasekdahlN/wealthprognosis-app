@@ -48,6 +48,9 @@ class AssetImportService
             throw new \RuntimeException("Failed to read configuration file: {$filePath}");
         }
 
+        // Sanitize JSON (remove BOM and trailing commas) before decoding
+        $content = $this->sanitizeJson($content);
+
         // Get file timestamps
         $fileCreatedAt = Carbon::createFromTimestamp(filectime($filePath));
         $fileUpdatedAt = Carbon::createFromTimestamp(filemtime($filePath));
@@ -242,7 +245,7 @@ class AssetImportService
             'description' => Arr::get($meta, 'description', ''),
             'asset_type' => $validatedAssetType,
             'group' => Arr::get($meta, 'group', 'private'),
-            'tax_type' => Arr::get($meta, 'tax'),
+
             'tax_property' => Arr::get($meta, 'taxProperty'),
             'tax_country' => 'no',
             'is_active' => Arr::get($meta, 'active', true),
@@ -318,6 +321,7 @@ class AssetImportService
             ])->filter()->implode(' | ')),
 
             // Income data
+
             'income_amount' => (float) Arr::get($yearData, 'income.amount', 0),
             'income_factor' => $this->convertFactorToEnum(Arr::get($yearData, 'income.factor', 1)),
             'income_rule' => Arr::get($yearData, 'income.rule'),
@@ -360,6 +364,20 @@ class AssetImportService
             'created_checksum' => hash('sha256', $asset->id.'_'.$year.'_created'),
             'updated_checksum' => hash('sha256', $asset->id.'_'.$year.'_updated'),
         ];
+
+        // Inherit default changerates from asset type if missing
+        $assetType = \App\Models\AssetType::where('type', $asset->asset_type)->first();
+        if ($assetType) {
+            if (! isset($data['income_changerate']) || $data['income_changerate'] === null) {
+                $data['income_changerate'] = $assetType->income_changerate;
+            }
+            if (! isset($data['expence_changerate']) || $data['expence_changerate'] === null) {
+                $data['expence_changerate'] = $assetType->expence_changerate;
+            }
+            if (! isset($data['asset_changerate']) || $data['asset_changerate'] === null) {
+                $data['asset_changerate'] = $assetType->asset_changerate;
+            }
+        }
 
         // Create the asset year
         $assetYear = AssetYear::create($data);
@@ -432,6 +450,7 @@ class AssetImportService
 
         // Convert numeric factor to enum
         $numericFactor = (int) $factor;
+
         return $numericFactor === 12 ? 'monthly' : 'yearly';
     }
 
@@ -451,6 +470,7 @@ class AssetImportService
     public static function importJson(string $jsonContent, ?string $sourceName = null, ?User $user = null, ?int $teamId = null): AssetConfiguration
     {
         $service = new static($user, $teamId);
+        $jsonContent = $service->sanitizeJson($jsonContent);
 
         return $service->importFromJson($jsonContent, $sourceName);
     }
@@ -485,5 +505,20 @@ class AssetImportService
         $files = glob($testDir.'/*.json');
 
         return array_map(fn ($file) => basename($file), $files);
+    }
+
+    /**
+     * Basic JSON sanitization: remove BOM and trailing commas before } or ]
+     */
+    protected function sanitizeJson(string $json): string
+    {
+        // Remove UTF-8 BOM
+        if (substr($json, 0, 3) === "\xEF\xBB\xBF") {
+            $json = substr($json, 3);
+        }
+        // Remove trailing commas before } or ] (simple heuristic)
+        $json = preg_replace('/,\s*([}\]])/', '$1', $json);
+
+        return $json;
     }
 }

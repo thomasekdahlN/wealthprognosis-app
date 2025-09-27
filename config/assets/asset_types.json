@@ -1,0 +1,50 @@
+[
+  {"type":"equityfund","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+  {"type":"bondfund","income_changerate":"changerates.bondfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.bondfund"},
+  {"type":"mixedfund","income_changerate":"changerates.bondfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+  {"type":"indexfund","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+  {"type":"hedgefund","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+  {"type":"stock","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+  {"type":"ask","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+  {"type":"bonds","income_changerate":"changerates.bondfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.bondfund"},
+  {"type":"options","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+  {"type":"warrants","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+
+  {"type":"bank","income_changerate":"changerates.cash","expence_changerate":"changerates.kpi","asset_changerate":"changerates.cash"},
+  {"type":"cash","income_changerate":"changerates.cash","expence_changerate":"changerates.kpi","asset_changerate":"changerates.cash"},
+  {"type":"savings","income_changerate":"changerates.cash","expence_changerate":"changerates.kpi","asset_changerate":"changerates.cash"},
+  {"type":"timedeposit","income_changerate":"changerates.cash","expence_changerate":"changerates.kpi","asset_changerate":"changerates.cash"},
+  {"type":"moneymarket","income_changerate":"changerates.cash","expence_changerate":"changerates.kpi","asset_changerate":"changerates.cash"},
+
+  {"type":"car","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.car"},
+  {"type":"boat","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.car"},
+  {"type":"jewelry","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"furniture","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+
+  {"type":"crypto","income_changerate":"changerates.crypto","expence_changerate":"changerates.kpi","asset_changerate":"changerates.crypto"},
+  {"type":"gold","income_changerate":"changerates.gold","expence_changerate":"changerates.kpi","asset_changerate":"changerates.gold"},
+
+  {"type":"ips","income_changerate":"changerates.bondfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.bondfund"},
+  {"type":"endowment","income_changerate":"changerates.bondfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.bondfund"},
+
+  {"type":"house","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.house"},
+  {"type":"rental","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.house"},
+  {"type":"cabin","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.house"},
+
+  {"type":"salary","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"income","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+
+  {"type":"pension","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"otp","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"child","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"inheritance","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+
+  {"type":"company","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"iphone","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"applestock","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
+
+  {"type":"test","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"kpi","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.kpi"},
+  {"type":"spouse","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"}
+]
+

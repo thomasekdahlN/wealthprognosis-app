@@ -18,14 +18,14 @@
             "name": "Salary",
             "description": "Lønn",
             "active": true,
-            "tax": "salary"
+
         },
         "2024": {
             "income": {
                 "name": "Lønn",
                 "description": "Lønn 600000",
                 "amount": 50000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -33,7 +33,7 @@
                 "name": "Utgifter",
                 "description": "",
                 "amount": 10000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -54,14 +54,14 @@
             "name": "Folketrygden",
             "description": "Folketrygden",
             "active": true,
-            "tax": "salary"
+
         },
         "$pensionOfficialYear": {
             "income": {
                 "name": "Folketrygden",
                 "description": "Folketrygden fra $pensionOfficialYear",
                 "amount": 15000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -74,7 +74,7 @@
             "name": "OTP",
             "description": "OTP",
             "active": true,
-            "tax": "otp"
+
         },
         "2024": {
             "asset": {
@@ -103,7 +103,7 @@
             "name": "Income",
             "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
             "active": true,
-            "tax": "income"
+
         },
         "2024": {
             "income": {

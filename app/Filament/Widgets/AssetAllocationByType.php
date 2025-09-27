@@ -16,9 +16,8 @@ class AssetAllocationByType extends ChartWidget
 
     public function mount(): void
     {
-        // Prefer session via CurrentAssetConfiguration, fallback to request
-        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id()
-            ?? (int) (request()->get('asset_configuration_id') ?? request()->get('asset_owner_id') ?? 0) ?: null;
+        // Use session via CurrentAssetConfiguration only (no querystring fallback)
+        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id();
     }
 
     public function getHeading(): string
@@ -28,7 +27,7 @@ class AssetAllocationByType extends ChartWidget
         if ($this->assetConfigId) {
             $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigId);
             if ($assetConfiguration) {
-                $heading = 'Asset Allocation by Type - ' . $assetConfiguration->name . ' (' . now()->year . ')';
+                $heading = 'Asset Allocation by Type - '.$assetConfiguration->name.' ('.now()->year.')';
             }
         }
 

@@ -4,20 +4,21 @@ namespace App\Services;
 
 use App\Models\AssetType;
 use App\Models\TaxType;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 
 class AiConfigurationAnalysisService
 {
     protected ?string $openaiApiKey;
+
     protected string $model = 'gpt-4';
 
     public function __construct()
     {
         $this->openaiApiKey = config('services.openai.api_key');
 
-        if (!$this->openaiApiKey) {
+        if (! $this->openaiApiKey) {
             throw new \Exception('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment.');
         }
     }
@@ -28,7 +29,7 @@ class AiConfigurationAnalysisService
     public function analyzeEconomicSituation(string $description): array
     {
         // Cache the analysis for 1 hour to avoid duplicate API calls for same input
-        $cacheKey = 'ai_analysis_' . hash('sha256', $description);
+        $cacheKey = 'ai_analysis_'.hash('sha256', $description);
 
         return Cache::remember($cacheKey, 3600, function () use ($description) {
             return $this->performAiAnalysis($description);
@@ -45,7 +46,7 @@ class AiConfigurationAnalysisService
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
+                'Authorization' => 'Bearer '.$this->openaiApiKey,
                 'Content-Type' => 'application/json',
             ])->timeout(20)->post('https://api.openai.com/v1/chat/completions', [
                 'model' => $this->model,
@@ -57,8 +58,8 @@ class AiConfigurationAnalysisService
                 'max_tokens' => 4000,
             ]);
 
-            if (!$response->successful()) {
-                throw new \Exception('OpenAI API request failed: ' . $response->body());
+            if (! $response->successful()) {
+                throw new \Exception('OpenAI API request failed: '.$response->body());
             }
 
             $responseData = $response->json();
@@ -68,7 +69,7 @@ class AiConfigurationAnalysisService
             $analysisResult = json_decode($content, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception('Failed to parse AI response as JSON: ' . json_last_error_msg());
+                throw new \Exception('Failed to parse AI response as JSON: '.json_last_error_msg());
             }
 
             // Validate and sanitize the result
@@ -93,10 +94,10 @@ class AiConfigurationAnalysisService
         $assetTypes = AssetType::pluck('type')->toArray();
         $taxTypes = TaxType::pluck('type')->toArray();
 
-        return "You are a financial analysis AI that converts natural language descriptions of economic situations into structured asset configurations.
+        return 'You are a financial analysis AI that converts natural language descriptions of economic situations into structured asset configurations.
 
-AVAILABLE ASSET TYPES: " . implode(', ', $assetTypes) . "
-AVAILABLE TAX TYPES: " . implode(', ', $taxTypes) . "
+AVAILABLE ASSET TYPES: '.implode(', ', $assetTypes).'
+AVAILABLE TAX TYPES: '.implode(', ', $taxTypes)."
 
 Your task is to analyze the user's economic description and create a JSON structure with:
 1. A main configuration object with personal details and timeline
@@ -120,7 +121,7 @@ RESPONSE FORMAT (JSON only, no other text):
       \"description\": \"Asset description\",
       \"code\": \"unique_code\",
       \"asset_type\": \"one of the available asset types\",
-      \"tax_type\": \"one of the available tax types\",
+
       \"group\": \"private or business\",
       \"tax_country\": \"no\",
       \"sort_order\": 1,
@@ -162,7 +163,7 @@ GUIDELINES:
      */
     protected function buildUserPrompt(string $description): string
     {
-        return "Analyze this economic situation and create a structured asset configuration:\n\n" . $description;
+        return "Analyze this economic situation and create a structured asset configuration:\n\n".$description;
     }
 
     /**
@@ -171,7 +172,7 @@ GUIDELINES:
     protected function validateAndSanitizeResult(array $result): array
     {
         // Ensure required structure exists
-        if (!isset($result['configuration']) || !isset($result['assets'])) {
+        if (! isset($result['configuration']) || ! isset($result['assets'])) {
             throw new \Exception('AI response missing required configuration or assets structure');
         }
 
@@ -188,7 +189,6 @@ GUIDELINES:
 
         // Validate assets
         $validAssetTypes = AssetType::pluck('type')->toArray();
-        $validTaxTypes = TaxType::pluck('type')->toArray();
 
         foreach ($result['assets'] as &$asset) {
             $asset['name'] = $asset['name'] ?? 'Unnamed Asset';
@@ -196,13 +196,8 @@ GUIDELINES:
             $asset['code'] = $asset['code'] ?? \Illuminate\Support\Str::slug($asset['name']);
 
             // Validate asset type
-            if (!in_array($asset['asset_type'] ?? '', $validAssetTypes)) {
+            if (! in_array($asset['asset_type'] ?? '', $validAssetTypes)) {
                 $asset['asset_type'] = 'other';
-            }
-
-            // Validate tax type
-            if (!in_array($asset['tax_type'] ?? '', $validTaxTypes)) {
-                $asset['tax_type'] = 'none';
             }
 
             $asset['group'] = in_array($asset['group'] ?? '', ['private', 'business']) ? $asset['group'] : 'private';
@@ -210,7 +205,7 @@ GUIDELINES:
             $asset['sort_order'] = (int) ($asset['sort_order'] ?? 1);
 
             // Validate years data
-            if (!isset($asset['years']) || !is_array($asset['years'])) {
+            if (! isset($asset['years']) || ! is_array($asset['years'])) {
                 $asset['years'] = [];
             }
 
@@ -234,7 +229,7 @@ GUIDELINES:
 
         return [
             'configuration' => $config,
-            'assets' => $result['assets']
+            'assets' => $result['assets'],
         ];
     }
 
@@ -260,7 +255,6 @@ GUIDELINES:
                     'description' => 'Basic savings account',
                     'code' => 'basic_savings',
                     'asset_type' => 'cash',
-                    'tax_type' => 'none',
                     'group' => 'private',
                     'tax_country' => 'no',
                     'sort_order' => 1,
@@ -280,10 +274,10 @@ GUIDELINES:
                             'start_year' => (int) date('Y'),
                             'end_year' => null,
                             'sort_order' => 1,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

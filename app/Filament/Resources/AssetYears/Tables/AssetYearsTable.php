@@ -56,6 +56,9 @@ class AssetYearsTable
             ->paginated([50, 100, 150])
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([50, 100, 150])
-            ->recordUrl(fn (\App\Models\AssetYear $record) => \App\Filament\Resources\AssetYears\AssetYearResource::getUrl('edit', ['record' => $record->getKey()]));
+            ->recordUrl(fn (\App\Models\AssetYear $record) => \App\Filament\Resources\AssetYears\AssetYearResource::getUrl('edit', [
+                'record' => $record->getKey(),
+                'configuration' => $record->asset_configuration_id,
+            ]));
     }
 }

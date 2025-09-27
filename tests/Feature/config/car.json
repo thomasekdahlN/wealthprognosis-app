@@ -18,7 +18,7 @@
             "name": "Tesla Model Y - Electric Vehicle",
             "description": "Premium electric SUV with lower operating costs and environmental benefits",
             "active": true,
-            "tax": "car"
+
         },
         "2023": {
             "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
@@ -32,7 +32,7 @@
                 "name": "Utgifter",
                 "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
                 "amount": 2000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }

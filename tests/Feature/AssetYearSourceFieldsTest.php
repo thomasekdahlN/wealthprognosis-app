@@ -29,7 +29,7 @@ beforeEach(function () {
         'description' => 'Asset for source fields testing',
         'asset_type' => 'cash',
         'group' => 'private',
-        'tax_type' => 'none',
+
         'tax_country' => 'no',
         'is_active' => true,
         'sort_order' => 1,

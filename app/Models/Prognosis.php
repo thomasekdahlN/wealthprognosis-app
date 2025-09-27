@@ -139,9 +139,17 @@ class Prognosis
                 continue;
             } // Jump past inactive assets
 
-            $taxType = $this->ArrGetConfig("$assetname.meta.tax"); // How tax is to be calculated for this asset
+            $assetTypeCode = $this->ArrGetConfig("$assetname.meta.type");
             $taxGroup = $this->ArrGetConfig("$assetname.meta.group"); // How tax is to be calculated for this asset
             $taxProperty = $this->ArrGetConfig("$assetname.meta.taxProperty"); // How tax is to be calculated for this asset
+            // Derive tax type via asset type relation and default to 'none' when missing
+            $taxType = 'none';
+            try {
+                $assetType = \App\Models\AssetType::where('type', $assetTypeCode)->with('taxType')->first();
+                $taxType = $assetType?->taxType?->type ?? 'none';
+            } catch (\Throwable $e) {
+                $taxType = 'none';
+            }
 
             $firsttime = false; // Only set to true on the first time we see a configuration on this asset.
             $assetMarketAmount = 0;
@@ -626,10 +634,17 @@ class Prognosis
         $transferedOriginPathDescription = "$originAssetname.$originYear.$originType.description";
 
         // Realisation tax calculations here, because we have to realize a transfered asset.
-        [$taxAssetname, $taxYear, $taxOriginType] = $this->getAssetMetaFromPath($transferOrigin, 'tax');
+        // Derive origin tax type via asset_type instead of meta.tax
         [$taxAssetname, $taxYear, $taxOriginGroup] = $this->getAssetMetaFromPath($transferOrigin, 'group');
+        [$originAssetnameMeta, $originYearMeta, $originAssetTypeCode] = $this->getAssetMetaFromPath($transferOrigin, 'type');
+        $taxOriginType = 'none';
+        try {
+            $assetType = \App\Models\AssetType::where('type', $originAssetTypeCode)->with('taxType')->first();
+            $taxOriginType = $assetType?->taxType?->type ?? 'none';
+        } catch (\Throwable $e) {
+            $taxOriginType = 'none';
+        }
 
-        [$taxToAssetname, $taxToYear, $taxToType] = $this->getAssetMetaFromPath($transferTo, 'tax');
         [$taxToAssetname, $taxToYear, $taxToGroup] = $this->getAssetMetaFromPath($transferTo, 'group');
 
         // print "    Tax asset: $taxAssetname, year: $taxYear, type: $taxType\n";
@@ -930,6 +945,7 @@ class Prognosis
 
         if (is_numeric($factor)) {
             $n = (int) $factor;
+
             return $n > 0 ? $n : 1;
         }
 
@@ -958,7 +974,15 @@ class Prognosis
 
         [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
         [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($path, 'group');
-        [$assetname, $year, $taxType] = $this->getAssetMetaFromPath($path, 'tax');
+        // derive tax type via asset_type
+        [$assetname, $year, $assetTypeCode] = $this->getAssetMetaFromPath($path, 'type');
+        $taxType = 'none';
+        try {
+            $assetType = \App\Models\AssetType::where('type', $assetTypeCode)->with('taxType')->first();
+            $taxType = $assetType?->taxType?->type ?? 'none';
+        } catch (\Throwable $e) {
+            $taxType = 'none';
+        }
         [$assetname, $year, $taxProperty] = $this->getAssetMetaFromPath($path, 'taxProperty');
 
         $assetMarketAmount = $this->ArrGet("$path.asset.marketAmount");
@@ -1174,7 +1198,15 @@ class Prognosis
     public function postProcessPotentialYearly(string $path)
     {
         // Retrieve the year and tax type from the asset metadata.
-        [$assetname, $year, $taxType] = $this->getAssetMetaFromPath($path, 'tax');
+        // derive tax type via asset_type
+        [$assetname, $year, $assetTypeCode] = $this->getAssetMetaFromPath($path, 'type');
+        $taxType = 'none';
+        try {
+            $assetType = \App\Models\AssetType::where('type', $assetTypeCode)->with('taxType')->first();
+            $taxType = $assetType?->taxType?->type ?? 'none';
+        } catch (\Throwable $e) {
+            $taxType = 'none';
+        }
 
         // Retrieve the income amount for the asset.
         $potentialIncomeAmount = $this->ArrGet("$path.income.amount");

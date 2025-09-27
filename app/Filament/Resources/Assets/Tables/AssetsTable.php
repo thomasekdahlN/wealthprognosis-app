@@ -11,7 +11,15 @@ class AssetsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->persistFiltersInSession(false)
+            ->persistSearchInSession(false)
+            ->persistSortInSession(false)
+            ->persistColumnSearchesInSession(false)
+            ->defaultSort('id')
+            ->paginationPageOptions([50, 100, 150])
+            ->defaultPaginationPageOption(50)
             ->columns([
+                TextColumn::make('id')->label('ID')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('name')->label('Name')->searchable(),
                 TextColumn::make('assetType.name')->label('Asset Type')->sortable()->searchable()->badge()->color('primary'),
                 TextColumn::make('group')->label('Group')->searchable()->badge()->color(fn (string $state): string => match ($state) {
@@ -19,7 +27,7 @@ class AssetsTable
                     'company' => 'warning',
                     default => 'gray',
                 }),
-                TextColumn::make('tax_type')->label('Tax Type')->searchable(),
+                TextColumn::make('assetType.taxType.name')->label('Tax Type')->badge()->color('info')->placeholder('No tax type')->sortable()->searchable(),
                 TextColumn::make('tax_property')->label('Tax Property')->searchable(),
                 TextColumn::make('description')->label('Description')->limit(60)->wrap(),
                 IconColumn::make('is_active')->label('Active')->boolean(),
@@ -33,73 +41,110 @@ class AssetsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filtersLayout(\Filament\Tables\Enums\FiltersLayout::AboveContent)
-            ->recordUrl(fn (\App\Models\Asset $record) => route('filament.admin.resources.asset-years.index', ['configuration' => $record->asset_configuration_id, 'asset' => $record->id]))
-
             ->filters([
-                \Filament\Tables\Filters\SelectFilter::make('asset_type')
-                    ->label('Asset Type')
-                    ->options(fn () => \App\Models\AssetType::query()->active()->ordered()->pluck('name', 'type')->all())
-                    ->multiple()
-                    ->preload(),
-
                 \Filament\Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Status')
                     ->placeholder('All')
                     ->trueLabel('Active only')
                     ->falseLabel('Inactive only'),
 
-                // Advanced filters (group, tax type, capabilities)
-                \Filament\Tables\Filters\Filter::make('advanced')
-                    ->label('More filters')
+                \Filament\Tables\Filters\SelectFilter::make('asset_type')
+                    ->label('Asset Type')
+                    ->options(fn () => \App\Models\AssetType::query()->active()->ordered()->pluck('name', 'type')->all())
+                    ->multiple()
+                    ->preload(),
+                \Filament\Tables\Filters\SelectFilter::make('group')
+                    ->label('Group')
+                    ->options(\App\Models\Asset::GROUPS),
+
+                \Filament\Tables\Filters\Filter::make('tax_type')
+                    ->label('Tax Type')
                     ->form([
-                        \Filament\Forms\Components\Select::make('group')
-                            ->label('Group')
-                            ->options(\App\Models\Asset::GROUPS),
-                        \Filament\Forms\Components\Select::make('tax_type')
+                        \Filament\Forms\Components\Select::make('tax_type_id')
                             ->label('Tax Type')
-                            ->options(\App\Models\Asset::TAX_TYPES),
-                        \Filament\Forms\Components\Checkbox::make('cap_income')->label('Gen. Income'),
-                        \Filament\Forms\Components\Checkbox::make('cap_expenses')->label('Gen. Expenses'),
-                        \Filament\Forms\Components\Checkbox::make('cap_mortgage')->label('Mortgage'),
-                        \Filament\Forms\Components\Checkbox::make('cap_market_value')->label('Market Value'),
+                            ->options(fn () => \App\Models\TaxType::query()->active()->ordered()->pluck('name', 'id')->all())
+                            ->searchable()
+                            ->preload(),
                     ])
                     ->query(function ($query, array $data) {
-                        if (! empty($data['group'])) {
-                            $query->where('group', $data['group']);
-                        }
-                        if (! empty($data['tax_type'])) {
-                            $query->where('tax_type', $data['tax_type']);
-                        }
-                        if ($data['cap_income'] !== null && $data['cap_income'] !== '') {
-                            $codes = \App\Models\AssetType::query()
-                                ->where('can_generate_income', (bool) $data['cap_income'])
-                                ->pluck('type');
-                            $query->whereIn('asset_type', $codes);
-                        }
-                        if ($data['cap_expenses'] !== null && $data['cap_expenses'] !== '') {
-                            $codes = \App\Models\AssetType::query()
-                                ->where('can_generate_expenses', (bool) $data['cap_expenses'])
-                                ->pluck('type');
-                            $query->whereIn('asset_type', $codes);
-                        }
-                        if ($data['cap_mortgage'] !== null && $data['cap_mortgage'] !== '') {
-                            $codes = \App\Models\AssetType::query()
-                                ->where('can_have_mortgage', (bool) $data['cap_mortgage'])
-                                ->pluck('type');
-                            $query->whereIn('asset_type', $codes);
-                        }
-                        if ($data['cap_market_value'] !== null && $data['cap_market_value'] !== '') {
-                            $codes = \App\Models\AssetType::query()
-                                ->where('can_have_market_value', (bool) $data['cap_market_value'])
-                                ->pluck('type');
-                            $query->whereIn('asset_type', $codes);
+                        if (! empty($data['tax_type_id'])) {
+                            $query->whereHas('assetType', fn ($q) => $q->where('tax_type_id', $data['tax_type_id']));
                         }
 
                         return $query;
                     }),
 
+                \Filament\Tables\Filters\TernaryFilter::make('liquid')
+                    ->label('Liquidity')
+                    ->placeholder('All')
+                    ->trueLabel('Liquid')
+                    ->falseLabel('Illiquid')
+                    ->queries(
+                        true: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('is_liquid', true)),
+                        false: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('is_liquid', false)),
+                        blank: fn ($query) => $query,
+                    ),
+
+                \Filament\Tables\Filters\TernaryFilter::make('cap_income')
+                    ->label('Can Generate Income')
+                    ->placeholder('All')
+                    ->trueLabel('Yes')
+                    ->falseLabel('No')
+                    ->queries(
+                        true: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_generate_income', true)),
+                        false: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_generate_income', false)),
+                        blank: fn ($query) => $query,
+                    ),
+
+                \Filament\Tables\Filters\TernaryFilter::make('cap_expenses')
+                    ->label('Can Generate Expenses')
+                    ->placeholder('All')
+                    ->trueLabel('Yes')
+                    ->falseLabel('No')
+                    ->queries(
+                        true: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_generate_expenses', true)),
+                        false: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_generate_expenses', false)),
+                        blank: fn ($query) => $query,
+                    ),
+
+                \Filament\Tables\Filters\TernaryFilter::make('cap_mortgage')
+                    ->label('Can Have Mortgage')
+                    ->placeholder('All')
+                    ->trueLabel('Yes')
+                    ->falseLabel('No')
+                    ->queries(
+                        true: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_have_mortgage', true)),
+                        false: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_have_mortgage', false)),
+                        blank: fn ($query) => $query,
+                    ),
+
+                \Filament\Tables\Filters\TernaryFilter::make('cap_market_value')
+                    ->label('Can Have Market Value')
+                    ->placeholder('All')
+                    ->trueLabel('Yes')
+                    ->falseLabel('No')
+                    ->queries(
+                        true: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_have_market_value', true)),
+                        false: fn ($query) => $query->whereHas('assetType', fn ($q) => $q->where('can_have_market_value', false)),
+                        blank: fn ($query) => $query,
+                    ),
+
             ])
 
+            ->recordUrl(function (\App\Models\Asset $record): string {
+                $configurationId = (int) (request()->route('configuration') ?? 0);
+
+                if ($configurationId > 0) {
+                    return route('filament.admin.pages.config-asset-years.pretty', [
+                        'configuration' => $configurationId,
+                        'asset' => $record->getKey(),
+                    ]);
+                }
+
+                return \App\Filament\Resources\Assets\AssetResource::getUrl('edit', [
+                    'record' => $record,
+                ]);
+            })
             ->toolbarActions([]);
     }
 }

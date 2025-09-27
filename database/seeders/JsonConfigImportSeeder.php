@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\AssetConfiguration;
+use App\Models\User;
 use App\Services\AssetImportService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 
 class JsonConfigImportSeeder extends Seeder
 {
@@ -75,11 +75,13 @@ class JsonConfigImportSeeder extends Seeder
 
                 // First, read the JSON to get the name
                 $jsonContent = File::get($filePath);
-                $data = json_decode($jsonContent, true);
+                $sanitized = $this->sanitizeJson($jsonContent);
+                $data = json_decode($sanitized, true);
 
                 if (! $data || ! isset($data['meta']['name'])) {
                     $this->command->warn("  ⚠️  Skipping {$filename}: Invalid JSON or missing meta.name");
                     $skippedCount++;
+
                     continue;
                 }
 
@@ -93,6 +95,7 @@ class JsonConfigImportSeeder extends Seeder
                 if ($existingConfig && ! $forceReimport) {
                     $this->command->warn("  ⚠️  Skipping {$filename}: Configuration '{$configName}' already exists (ID: {$existingConfig->id})");
                     $skippedCount++;
+
                     continue;
                 } elseif ($existingConfig && $forceReimport) {
                     // Safe force re-import: delete dependents then delete the existing configuration
@@ -171,5 +174,20 @@ class JsonConfigImportSeeder extends Seeder
         $this->command->info("     - Asset Configurations: {$totalAssetConfigurations}");
         $this->command->info("     - Assets: {$totalAssets}");
         $this->command->info("     - Asset Years: {$totalYears}");
+    }
+
+    /**
+     * Basic JSON sanitization: remove BOM and trailing commas before } or ]
+     */
+    protected function sanitizeJson(string $json): string
+    {
+        // Remove UTF-8 BOM
+        if (substr($json, 0, 3) === "\xEF\xBB\xBF") {
+            $json = substr($json, 3);
+        }
+        // Remove trailing commas before } or ] (simple heuristic)
+        $json = preg_replace('/,\s*([}\]])/', '$1', $json);
+
+        return $json;
     }
 }

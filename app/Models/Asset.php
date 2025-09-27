@@ -21,6 +21,16 @@ class Asset extends Model
 
         // Apply team-based filtering
         static::addGlobalScope(new TeamScope);
+
+        // Always inherit current active asset configuration on create when not explicitly set
+        static::creating(function (self $asset): void {
+            if (empty($asset->asset_configuration_id)) {
+                $id = (int) (app(\App\Services\CurrentAssetConfiguration::class)->id() ?? 0);
+                if ($id > 0) {
+                    $asset->asset_configuration_id = $id;
+                }
+            }
+        });
     }
 
     protected $fillable = [
@@ -31,7 +41,7 @@ class Asset extends Model
         'description',
         'asset_type',
         'group',
-        'tax_type',
+
         'tax_property',
         'tax_country',
         'is_active',
@@ -54,22 +64,6 @@ class Asset extends Model
     public const GROUPS = [
         'private' => 'Private',
         'company' => 'Company',
-    ];
-
-    // Tax types
-    public const TAX_TYPES = [
-        'none' => 'No Tax',
-        'income' => 'Income Tax',
-        'salary' => 'Salary Tax',
-        'house' => 'House Tax',
-        'rental' => 'Rental Tax',
-        'equityfund' => 'Equity Fund Tax',
-        'bondfund' => 'Bond Fund Tax',
-        'stock' => 'Stock Tax',
-        'crypto' => 'Crypto Tax',
-        'cash' => 'Cash Tax',
-        'pension' => 'Pension Tax',
-        'inheritance' => 'Inheritance Tax',
     ];
 
     // removed prognosis relation; assets are not tied to prognoses
@@ -150,7 +144,9 @@ class Asset extends Model
 
     public function getTaxTypeLabel(): string
     {
-        return self::TAX_TYPES[$this->tax_type] ?? $this->tax_type;
+        $taxTypeName = optional($this->assetType?->taxType)->name;
+
+        return $taxTypeName ?? '';
     }
 
     public function isLiquid(): bool

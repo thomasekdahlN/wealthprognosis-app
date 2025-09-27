@@ -146,6 +146,33 @@ class AssetTypeForm
                     ->default(false)
                     ->helperText('This asset type has a market value to track.'),
 
+                Select::make('income_changerate')
+                    ->label('Default Income Change Rate')
+                    ->searchable()
+                    ->preload()
+                    ->options(\App\Filament\Resources\AssetYears\Schemas\AssetYearForm::getChangeRateOptions())
+                    ->nullable()
+                    ->placeholder('None')
+                    ->helperText('Pick one predefined rate, or leave empty. Numbers are not allowed'),
+
+                Select::make('expence_changerate')
+                    ->label('Default Expense Change Rate')
+                    ->searchable()
+                    ->preload()
+                    ->options(\App\Filament\Resources\AssetYears\Schemas\AssetYearForm::getChangeRateOptions())
+                    ->nullable()
+                    ->placeholder('None')
+                    ->helperText('Pick one predefined rate, or leave empty. Numbers are not allowed'),
+
+                Select::make('asset_changerate')
+                    ->label('Default Asset Change Rate')
+                    ->searchable()
+                    ->preload()
+                    ->options(\App\Filament\Resources\AssetYears\Schemas\AssetYearForm::getChangeRateOptions())
+                    ->nullable()
+                    ->placeholder('None')
+                    ->helperText('Pick one predefined rate, or leave empty. Numbers are not allowed'),
+
                 Toggle::make('is_active')
                     ->label('Active')
                     ->default(true)

@@ -17,8 +17,7 @@
             "group": "company",
             "name": "Company AS",
             "description": "I own stocks here",
-            "active": true,
-            "tax": "stock"
+            "active": true
         },
         "2024": {
             "asset": {

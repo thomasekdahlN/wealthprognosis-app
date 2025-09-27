@@ -29,7 +29,7 @@ beforeEach(function () {
         'description' => 'Asset for transfer fields testing',
         'asset_type' => 'cash',
         'group' => 'private',
-        'tax_type' => 'none',
+
         'tax_country' => 'no',
         'is_active' => true,
         'sort_order' => 1,
@@ -205,7 +205,7 @@ it('validates transfer field logic', function () {
         'name' => 'Real Estate Transfer Asset',
         'asset_type' => 'real_estate',
         'group' => 'private',
-        'tax_type' => 'capital_gains',
+
         'is_active' => true,
         'sort_order' => 2,
         'created_by' => $this->user->id,

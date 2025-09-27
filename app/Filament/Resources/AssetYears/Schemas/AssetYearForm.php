@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\AssetYears\Schemas;
 
-use App\Filament\Resources\AssetYears\Pages\CreateAssetYear as CreateAssetYearPage;
 use App\Helpers\AmountHelper;
 use App\Models\PrognosisChangeRate;
 use App\Rules\AssetRuleValidation;
@@ -22,7 +21,7 @@ class AssetYearForm
     /**
      * Get changerate options for dropdowns
      */
-    private static function getChangeRateOptions(): array
+    public static function getChangeRateOptions(): array
     {
         // Get distinct asset types from prognosis_change_rates table
         $distinctAssetTypes = PrognosisChangeRate::query()
@@ -60,21 +59,42 @@ class AssetYearForm
         return $schema->components([
             Section::make('Year & Assignment')
                 ->schema([
-                    TextInput::make('year')->numeric()->required()->minValue(1925)->maxValue(2125)->helperText('Calendar year this record applies to.')->columnSpanFull(),
+                    TextInput::make('year')
+                        ->numeric()
+                        ->required()
+                        ->minValue(1925)
+                        ->maxValue(2125)
+                        ->default(function (): int {
+                            $assetId = (int) (request()->get('asset') ?? 0);
+                            if ($assetId > 0) {
+                                $maxYear = \App\Models\AssetYear::query()->where('asset_id', $assetId)->max('year');
+
+                                return $maxYear ? ((int) $maxYear + 1) : (int) date('Y');
+                            }
+
+                            return (int) date('Y');
+                        })
+                        ->helperText('Calendar year this record applies to.')
+                        ->columnSpanFull(),
+
                     Select::make('asset_id')
                         ->relationship('asset', 'name')
                         ->searchable()
                         ->preload()
                         ->required()
                         ->helperText('Asset this year belongs to (shown on create).')
-                        ->visible(fn ($livewire) => $livewire instanceof CreateAssetYearPage)
+                        ->visible(false)
+                        ->dehydrated(true)
+                        ->default(fn () => (int) (request()->get('asset') ?? 0))
                         ->columnSpan(3),
                     Select::make('asset_configuration_id')
                         ->relationship('assetConfiguration', 'name')
                         ->searchable()
                         ->preload()
                         ->helperText('Configuration/owner (shown on create).')
-                        ->visible(fn ($livewire) => $livewire instanceof CreateAssetYearPage)
+                        ->visible(false)
+                        ->dehydrated(true)
+                        ->default(fn () => (int) (request()->get('configuration') ?? request()->get('owner') ?? 0))
                         ->columnSpan(3),
                 ])
                 ->columns(12)
@@ -191,8 +211,16 @@ class AssetYearForm
                             ->suffix('%')
                             ->datalist(array_keys(self::getChangeRateOptions()))
                             ->nullable()
-                            ->default(null)
-                            ->rule('nullable|regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i')
+                            ->default(function (\Filament\Schemas\Components\Utilities\Get $get) {
+                                $assetId = $get('asset_id') ?: optional(\App\Models\AssetYear::find(request()->route('record')))->asset_id ?: request()->get('asset');
+                                if (! $assetId) {
+                                    return null;
+                                }
+                                $asset = \App\Models\Asset::with('assetType')->find($assetId);
+
+                                return $asset?->assetType?->income_changerate;
+                            })
+                            ->rules(['nullable', 'regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
                             ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         Toggle::make('income_repeat')->label('Repeat Income')->helperText('If on, this income setup repeats into future years.'),
                     ])
@@ -307,8 +335,16 @@ class AssetYearForm
                             ->suffix('%')
                             ->datalist(array_keys(self::getChangeRateOptions()))
                             ->nullable()
-                            ->default(null)
-                            ->rule('nullable|regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i')
+                            ->default(function (\Filament\Schemas\Components\Utilities\Get $get) {
+                                $assetId = $get('asset_id') ?: optional(\App\Models\AssetYear::find(request()->route('record')))->asset_id ?: request()->get('asset');
+                                if (! $assetId) {
+                                    return null;
+                                }
+                                $asset = \App\Models\Asset::with('assetType')->find($assetId);
+
+                                return $asset?->assetType?->expence_changerate;
+                            })
+                            ->rules(['nullable', 'regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
                             ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         Toggle::make('expence_repeat')->label('Repeat Expense')->helperText('If on, this expense setup repeats into future years.'),
                     ])
@@ -326,7 +362,7 @@ class AssetYearForm
             Grid::make(2)->schema([
                 Section::make('Asset')
                     ->schema([
-                        TextInput::make('asset_name')->helperText('Optional label for this asset snapshot.'),
+
                         // Removed asset_description; use unified description section above
                         TextInput::make('asset_market_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Market value (NOK).'),
                         TextInput::make('asset_acquisition_amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Acquisition price (NOK).'),
@@ -339,8 +375,16 @@ class AssetYearForm
                             ->suffix('%')
                             ->datalist(array_keys(self::getChangeRateOptions()))
                             ->nullable()
-                            ->default(null)
-                            ->rule('nullable|regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i')
+                            ->default(function (\Filament\Schemas\Components\Utilities\Get $get) {
+                                $assetId = $get('asset_id') ?: optional(\App\Models\AssetYear::find(request()->route('record')))->asset_id ?: request()->get('asset');
+                                if (! $assetId) {
+                                    return null;
+                                }
+                                $asset = \App\Models\Asset::with('assetType')->find($assetId);
+
+                                return $asset?->assetType?->asset_changerate;
+                            })
+                            ->rules(['nullable', 'regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
                             ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         TextInput::make('asset_rule')
                             ->label('Asset Rule')
@@ -441,7 +485,7 @@ class AssetYearForm
 
                 Section::make('Mortgage')
                     ->schema([
-                        TextInput::make('mortgage_name')->helperText('Optional label for this mortgage event.'),
+
                         // Removed mortgage_description; use unified description section above
                         TextInput::make('mortgage_amount')->label('Mortgage Principal Amount')->numeric()->extraAttributes(AmountHelper::getNorwegianAmountMask())->mask(AmountHelper::getAlpineAmountMask())->stripCharacters([' '])->suffix('NOK')->helperText('Outstanding principal amount (simulation: mortgage_amount).'),
                         TextInput::make('mortgage_years')->label('Loan Term (Years)')->numeric()->helperText('Remaining years of the loan (simulation: mortgage_years).'),

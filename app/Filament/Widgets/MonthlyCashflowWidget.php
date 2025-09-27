@@ -15,9 +15,7 @@ class MonthlyCashflowWidget extends BaseWidget
     public function mount(?int $assetConfigurationId = null): void
     {
         $this->assetConfigurationId = $assetConfigurationId
-            ?? app(\App\Services\CurrentAssetConfiguration::class)->id()
-            ?? request()->get('asset_configuration_id')
-            ?? request()->get('asset_owner_id');
+            ?? app(\App\Services\CurrentAssetConfiguration::class)->id();
     }
 
     protected function getStats(): array

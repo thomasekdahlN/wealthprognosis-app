@@ -17,8 +17,8 @@
             "group": "private",
             "name": "Senior Software Engineer Salary",
             "description": "Full-time software engineering position with annual increases",
-            "active": true,
-            "tax": "salary"
+            "active": true
+
         },
         "2023": {
             "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
@@ -56,8 +56,7 @@
             "group": "private",
             "name": "Family Inheritance",
             "description": "Expected inheritance from parents' estate",
-            "active": true,
-            "tax": "inheritance"
+            "active": true
         },
         "2040": {
             "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
@@ -82,8 +81,7 @@
             "group": "private",
             "name": "Norwegian State Pension (Folketrygd)",
             "description": "Government pension starting at official retirement age",
-            "active": true,
-            "tax": "salary"
+            "active": true
         },
         "$pensionOfficialYear": {
             "description": "Income: Pension from $pensionOfficialYear",
@@ -103,8 +101,7 @@
             "group": "private",
             "name": "Occupational Pension (OTP)",
             "description": "Employer-sponsored pension with 5% annual contributions",
-            "active": true,
-            "tax": "otp"
+            "active": true
         },
         "2023": {
             "asset": {
@@ -132,8 +129,7 @@
             "group": "private",
             "name": "Oslo Apartment - Primary Residence",
             "description": "Modern 3-bedroom apartment in central Oslo with mortgage",
-            "active": true,
-            "tax": "house"
+            "active": true
         },
         "2023": {
             "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
@@ -164,8 +160,7 @@
             "group": "private",
             "name": "Global Equity Fund Portfolio",
             "description": "Diversified equity fund investments for long-term growth",
-            "active": true,
-            "tax": "equityfund"
+            "active": true
         },
         "2023": {
             "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
@@ -183,8 +178,7 @@
             "group": "private",
             "name": "Emergency Fund & Cash Reserves",
             "description": "High-yield savings account for emergencies and opportunities",
-            "active": true,
-            "tax": "cash"
+            "active": true
         },
         "2023": {
             "description": "Income:  | Expense:  | Asset: Kontanter p.t. | Mortgage: ",
@@ -209,8 +203,7 @@
             "group": "private",
             "name": "Tesla Model Y - Electric Vehicle",
             "description": "Electric vehicle with lower operating costs and depreciation",
-            "active": true,
-            "tax": "car"
+            "active": true
         },
         "2023": {
             "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",

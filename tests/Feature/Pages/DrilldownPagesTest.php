@@ -77,7 +77,7 @@ class DrilldownPagesTest extends TestCase
 
     public function test_asset_row_links_to_asset_years_list(): void
     {
-        $url = route('filament.admin.resources.asset-years.index', ['owner' => $this->owner->getKey(), 'asset' => $this->asset->getKey()]);
+        $url = route('filament.admin.pages.config-asset-years', ['configuration' => $this->owner->getKey(), 'asset' => $this->asset->getKey()]);
         $response = $this->withoutMiddleware()->get($url);
         $response->assertStatus(200);
     }

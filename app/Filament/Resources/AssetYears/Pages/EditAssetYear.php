@@ -4,9 +4,9 @@ namespace App\Filament\Resources\AssetYears\Pages;
 
 use App\Filament\Resources\AssetYears\AssetYearResource;
 use App\Models\Asset;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Actions\Action;
 use Illuminate\Contracts\Support\Htmlable;
 
 class EditAssetYear extends EditRecord
@@ -25,6 +25,13 @@ class EditAssetYear extends EditRecord
         $assetType = $asset->getTypeLabel();
 
         return 'Edit: '.$assetName.' ('.$assetType.')';
+    }
+
+    public static function getRoutes(): array
+    {
+        return [
+            '/config/{configuration}/asset-years/{record}/edit' => static::class,
+        ];
     }
 
     public function getBreadcrumbs(): array
@@ -48,6 +55,7 @@ class EditAssetYear extends EditRecord
     protected function getHeaderActions(): array
     {
         $record = $this->getRecord();
+
         return [
             Action::make('add_event')
                 ->label('Add Event')
@@ -62,6 +70,7 @@ class EditAssetYear extends EditRecord
                                     ->where('asset_configuration_id', $record->asset_configuration_id)
                                     ->pluck('name', 'id');
                             }
+
                             return [];
                         })
                         ->required()

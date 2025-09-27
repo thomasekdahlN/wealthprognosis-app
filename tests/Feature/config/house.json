@@ -18,7 +18,7 @@
             "name": "Bergen Family Home",
             "description": "4-bedroom family home in desirable Bergen neighborhood with mountain views",
             "active": true,
-            "tax": "house"
+
         },
         "2023": {
             "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset:  | Mortgage: interest changerates.interest, years 20",
@@ -32,7 +32,7 @@
                 "name": "Utgifter",
                 "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
                 "amount": 7300,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },

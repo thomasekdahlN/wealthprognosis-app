@@ -16,6 +16,13 @@ class AssetTypeSeeder extends Seeder
         // Ensure Tax Types are available as dependency
         $this->call(TaxTypesFromConfigSeeder::class);
 
+        // Optional overlay defaults for changerates per asset type from JSON
+        $jsonOverlay = [];
+        $jsonPath = config_path('assets/asset_types.json');
+        if (file_exists($jsonPath)) {
+            $jsonOverlay = json_decode(file_get_contents($jsonPath), true) ?? [];
+        }
+
         // Get or create a default user for seeding
         $user = \App\Models\User::first();
         if (! $user) {
@@ -714,6 +721,7 @@ class AssetTypeSeeder extends Seeder
                 'is_tax_optimized' => false,
                 'can_generate_income' => true,
                 'can_generate_expenses' => true,
+
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
                 'is_liquid' => false,
@@ -733,6 +741,18 @@ class AssetTypeSeeder extends Seeder
             $assetType['created_by'] = $user->id;
             $assetType['updated_by'] = $user->id;
             $assetType['created_checksum'] = $assetType['created_checksum'] ?? hash('sha256', 'asset_type_created_'.$code);
+
+            // Merge changerate defaults from JSON overlay if available
+            if (! empty($jsonOverlay)) {
+                $overlayByType = collect($jsonOverlay)->keyBy('type');
+                $overlay = $overlayByType->get($assetType['type']);
+                if ($overlay) {
+                    $assetType['income_changerate'] = $overlay['income_changerate'] ?? ($assetType['income_changerate'] ?? null);
+                    $assetType['expence_changerate'] = $overlay['expence_changerate'] ?? ($assetType['expence_changerate'] ?? null);
+                    $assetType['asset_changerate'] = $overlay['asset_changerate'] ?? ($assetType['asset_changerate'] ?? null);
+                }
+            }
+
             $assetType['updated_checksum'] = $assetType['updated_checksum'] ?? hash('sha256', 'asset_type_updated_'.$code);
 
             // Determine most probable tax type by category/code

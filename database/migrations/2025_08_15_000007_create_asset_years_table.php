@@ -22,7 +22,7 @@ return new class extends Migration
 
             // Income data
             $table->decimal('income_amount', 15, 2)->nullable();
-            $table->enum('income_factor', ['monthly', 'yearly'])->nullable();
+            $table->enum('income_factor', ['monthly', 'yearly'])->default('monthly');
             $table->string('income_rule')->nullable();
             $table->string('income_transfer')->nullable();
             $table->string('income_source')->nullable();
@@ -31,7 +31,7 @@ return new class extends Migration
 
             // Expense data
             $table->decimal('expence_amount', 15, 2)->nullable();
-            $table->enum('expence_factor', ['monthly', 'yearly'])->nullable();
+            $table->enum('expence_factor', ['monthly', 'yearly'])->default('monthly');
             $table->string('expence_rule')->nullable();
             $table->string('expence_transfer')->nullable();
             $table->string('expence_source')->nullable();

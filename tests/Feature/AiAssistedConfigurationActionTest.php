@@ -45,7 +45,7 @@ class AiAssistedConfigurationActionTest extends TestCase
     {
         // Mock HTTP to simulate AI service failure
         Http::fake([
-            'api.openai.com/*' => Http::response([], 500)
+            'api.openai.com/*' => Http::response([], 500),
         ]);
 
         // Set fake API key to avoid the "no API key" exception in constructor
@@ -57,7 +57,7 @@ class AiAssistedConfigurationActionTest extends TestCase
         $this->assertEquals(0, AssetConfiguration::count());
 
         // Simulate the action execution with fallback
-        $service = new \App\Services\AiConfigurationAnalysisService();
+        $service = new \App\Services\AiConfigurationAnalysisService;
         $result = $service->analyzeEconomicSituation('I have $50,000 in savings and want to retire at 65.');
 
         // Verify fallback configuration is returned
@@ -81,8 +81,8 @@ class AiAssistedConfigurationActionTest extends TestCase
             'export_start_age' => $configData['export_start_age'],
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
-            'created_checksum' => hash('sha256', json_encode($configData) . '_created'),
-            'updated_checksum' => hash('sha256', json_encode($configData) . '_updated'),
+            'created_checksum' => hash('sha256', json_encode($configData).'_created'),
+            'updated_checksum' => hash('sha256', json_encode($configData).'_updated'),
         ]);
 
         // Verify the configuration was created
@@ -102,7 +102,7 @@ class AiAssistedConfigurationActionTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('OpenAI API key not configured');
 
-        new \App\Services\AiConfigurationAnalysisService();
+        new \App\Services\AiConfigurationAnalysisService;
     }
 
     public function test_action_has_correct_properties(): void
@@ -138,7 +138,6 @@ class AiAssistedConfigurationActionTest extends TestCase
             'description' => 'Test asset description',
             'asset_type' => $assetType->type,
             'group' => 'private',
-            'tax_type' => $taxType->type,
             'tax_country' => 'no',
             'is_active' => true,
             'sort_order' => 1,

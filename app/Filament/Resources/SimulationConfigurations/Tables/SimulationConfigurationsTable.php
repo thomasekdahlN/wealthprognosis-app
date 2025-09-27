@@ -67,8 +67,7 @@ class SimulationConfigurationsTable
                         'aggressive' => 'gray',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string =>
-                        \App\Models\SimulationConfiguration::RISK_TOLERANCE_LEVELS[$state] ?? $state
+                    ->formatStateUsing(fn (string $state): string => \App\Models\SimulationConfiguration::RISK_TOLERANCE_LEVELS[$state] ?? $state
                     )
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -76,8 +75,7 @@ class SimulationConfigurationsTable
                     ->label('Tax Country')
                     ->badge()
                     ->color('info')
-                    ->formatStateUsing(fn (string $state): string =>
-                        \App\Models\SimulationConfiguration::getTaxCountries()[$state] ?? strtoupper($state)
+                    ->formatStateUsing(fn (string $state): string => \App\Models\SimulationConfiguration::getTaxCountries()[$state] ?? strtoupper($state)
                     )
                     ->toggleable(),
 
@@ -93,8 +91,7 @@ class SimulationConfigurationsTable
                         'variable' => 'primary',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string =>
-                        \App\Models\SimulationConfiguration::PROGNOSIS_TYPES[$state] ?? $state
+                    ->formatStateUsing(fn (string $state): string => \App\Models\SimulationConfiguration::PROGNOSIS_TYPES[$state] ?? $state
                     )
                     ->toggleable(),
 
@@ -107,8 +104,7 @@ class SimulationConfigurationsTable
                         'both' => 'info',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string =>
-                        \App\Models\SimulationConfiguration::GROUP_TYPES[$state] ?? $state
+                    ->formatStateUsing(fn (string $state): string => \App\Models\SimulationConfiguration::GROUP_TYPES[$state] ?? $state
                     )
                     ->toggleable(),
 
@@ -131,6 +127,7 @@ class SimulationConfigurationsTable
                         if (is_array($state) && count($state) > 3) {
                             return 'All tags: '.implode(', ', $state);
                         }
+
                         return null;
                     }),
 
@@ -180,8 +177,7 @@ class SimulationConfigurationsTable
                     ->label('Dashboard')
                     ->icon('heroicon-o-chart-bar')
                     ->color('primary')
-                    ->url(fn (\App\Models\SimulationConfiguration $record) =>
-                        route('filament.admin.pages.simulation-dashboard', ['simulation_configuration_id' => $record->id])
+                    ->url(fn (\App\Models\SimulationConfiguration $record) => route('filament.admin.pages.simulation-dashboard', ['configuration' => $record->asset_configuration_id, 'simulation' => $record->id])
                     )
                     ->openUrlInNewTab(false),
 
@@ -189,8 +185,7 @@ class SimulationConfigurationsTable
                     ->label('Simulate')
                     ->icon('heroicon-o-play')
                     ->color('success')
-                    ->url(fn (\App\Models\SimulationConfiguration $record) =>
-                        route('filament.admin.pages.simulation-assets', ['record' => $record->id])
+                    ->url(fn (\App\Models\SimulationConfiguration $record) => route('filament.admin.pages.simulation-assets', ['configuration' => $record->asset_configuration_id, 'simulation' => $record->id])
                     )
                     ->openUrlInNewTab(false),
             ])
@@ -198,8 +193,7 @@ class SimulationConfigurationsTable
             ->paginated([50, 100, 150])
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([50, 100, 150])
-            ->recordUrl(fn (\App\Models\SimulationConfiguration $record) =>
-                \App\Filament\Resources\SimulationConfigurations\SimulationConfigurationResource::getUrl('view', ['record' => $record->getKey()])
+            ->recordUrl(fn (\App\Models\SimulationConfiguration $record) => \App\Filament\Resources\SimulationConfigurations\SimulationConfigurationResource::getUrl('view', ['record' => $record->getKey()])
             );
     }
 }

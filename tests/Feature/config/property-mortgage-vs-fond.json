@@ -18,16 +18,15 @@
             "name": "House",
             "description": "House with normal mortgage, the rest is put into fund",
             "active" : true,
-            "tax": "rental",
-            "taxProperty": "ringerike"
+
         },
         "2024": {
-            "description": "Income: Income | Expense: Income | Asset:  | Mortgage: "
+            "description": "Income: Income | Expense: Income | Asset:  | Mortgage: ",
             "income": {
                 "name": "Income",
                 "description": "Income",
                 "amount": 13250,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -35,7 +34,7 @@
                 "name": "Income",
                 "description": "Income",
                 "amount": 3300,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -67,10 +66,10 @@
             "name": "fond",
             "description": "",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2024": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: "
+            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
             "asset": {
                 "marketAmount": 1500000,
                 "changerate": "changerates.equityfund",

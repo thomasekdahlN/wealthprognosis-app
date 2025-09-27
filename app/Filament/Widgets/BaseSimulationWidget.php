@@ -9,20 +9,21 @@ use Illuminate\Support\Facades\Auth;
 abstract class BaseSimulationWidget extends Widget
 {
     protected ?int $simulationConfigurationId = null;
+
     protected ?SimulationConfiguration $simulationConfiguration = null;
 
     public function mount(): void
     {
-        // Get simulation_configuration_id from request
-        $this->simulationConfigurationId = request()->get('simulation_configuration_id');
-        
+        // Prefer route param, fallback to legacy query param for compatibility
+        $this->simulationConfigurationId = request()->route('simulation');
+
         if ($this->simulationConfigurationId) {
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
-                'simulationAssets.simulationAssetYears'
+                'simulationAssets.simulationAssetYears',
             ])
-            ->where('user_id', Auth::id())
-            ->find($this->simulationConfigurationId);
+                ->where('user_id', Auth::id())
+                ->find($this->simulationConfigurationId);
         }
     }
 

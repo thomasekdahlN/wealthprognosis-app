@@ -72,13 +72,13 @@ class AssetConfigurationsTable
                     ->label('Dashboard')
                     ->icon('heroicon-o-chart-bar')
                     ->color('primary')
-                    ->url(fn (\App\Models\AssetConfiguration $record) => route('filament.admin.pages.dashboard', ['asset_configuration_id' => $record->id]))
+                    ->url(fn (\App\Models\AssetConfiguration $record) => route('filament.admin.pages.dashboard', ['configuration' => $record->getKey()]))
                     ->openUrlInNewTab(false),
             ])
             ->defaultSort('name')
             ->paginated([50, 100, 150])
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([50, 100, 150])
-            ->recordUrl(fn (\App\Models\AssetConfiguration $record) => \App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $record->getKey()]));
+            ->recordUrl(fn (\App\Models\AssetConfiguration $record) => route('filament.admin.pages.config-assets.pretty', ['record' => $record->getKey()]));
     }
 }

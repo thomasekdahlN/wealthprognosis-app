@@ -18,10 +18,10 @@
             "name": "House",
             "description": "House with 10 interestOnlyYears, the rest of the money put into fond",
             "active" : true,
-            "tax": "house"
+
         },
         "2024": {
-            "description": "Income: Income | Expense: Income | Asset:  | Mortgage: "
+            "description": "Income: Income | Expense: Income | Asset:  | Mortgage: ",
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -59,10 +59,10 @@
             "name": "fond",
             "description": "",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2024": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: "
+            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
             "asset": {
                 "marketAmount": 1000,
                 "changerate": "changerates.equityfund",

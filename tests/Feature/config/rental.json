@@ -18,7 +18,6 @@
             "name": "My house",
             "description": "Here I live",
             "active" : true,
-            "tax": "rental",
             "taxProperty": "ringerike"
         },
         "2023": {

@@ -17,8 +17,7 @@
             "group": "private",
             "name": "Lillehammer Mountain Cabin",
             "description": "Premium mountain cabin with rental potential in Lillehammer ski resort area",
-            "active": true,
-            "tax": "cabin"
+            "active": true
         },
         "2023": {
             "description": "Income: Rental AirBNB | Expense: Expences | Asset: Fortune sets the value from the tax authorities | Mortgage: interest changerates.interest, years 20",
@@ -35,7 +34,7 @@
                 "name": "rental",
                 "description": "Rental AirBNB",
                 "amount": 0,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -43,7 +42,7 @@
                 "name": "Expences",
                 "description": "Expences",
                 "amount": 2000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },

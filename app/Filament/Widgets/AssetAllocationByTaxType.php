@@ -16,9 +16,7 @@ class AssetAllocationByTaxType extends ChartWidget
 
     public function mount(): void
     {
-        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id()
-            ?? request()->get('asset_configuration_id')
-            ?? request()->get('asset_owner_id');
+        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id();
     }
 
     public function getHeading(): string
@@ -60,9 +58,11 @@ class AssetAllocationByTaxType extends ChartWidget
             ->where('year', '<=', $currentYear) // Don't go beyond current year
             ->where('year', $currentYear) // Use current year data
             ->where('asset_market_amount', '>', 0)
-            ->with('asset')
+            ->with(['asset.assetType.taxType'])
             ->get()
-            ->groupBy('asset.tax_type')
+            ->groupBy(function ($assetYear) {
+                return optional($assetYear->asset?->assetType?->taxType)->type ?? 'none';
+            })
             ->map(function ($assetYears) {
                 return $assetYears->sum('asset_market_amount');
             })

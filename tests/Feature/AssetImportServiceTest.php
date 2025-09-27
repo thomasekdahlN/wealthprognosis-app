@@ -53,7 +53,7 @@ class AssetImportServiceTest extends TestCase
                     'name' => 'Test House',
                     'description' => 'A test house',
                     'active' => true,
-                    'tax' => 'house',
+
                 ],
                 '2023' => [
                     'asset' => [
@@ -93,7 +93,7 @@ class AssetImportServiceTest extends TestCase
         $this->assertEquals('Test House', $asset->name);
         $this->assertEquals('house', $asset->asset_type);
         $this->assertEquals('private', $asset->group);
-        $this->assertEquals('house', $asset->tax_type);
+        // tax_type removed; derived from asset type relation
         $this->assertTrue($asset->is_active);
 
         // Assert AssetYear was created

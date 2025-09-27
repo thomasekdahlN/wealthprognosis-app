@@ -17,15 +17,14 @@
             "group": "private",
             "name": "Lønn",
             "description": "Lønn",
-            "active": true,
-            "tax": "salary"
+            "active": true
         },
         "2024": {
             "income": {
                 "name": "Income",
                 "description": "Income",
                 "amount": 40000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -33,7 +32,7 @@
                 "name": "Expences",
                 "description": "",
                 "amount": 15000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -54,14 +53,13 @@
             "group": "private",
             "name": "Wife",
             "description": "Kone - å dele utgifter med",
-            "active": true,
-            "tax": "salary"
+            "active": true
         },
         "2024": {
             "income": {
                 "description": "Dele reelle utgifter på hus (4000) og mat (3000) - ikke lån - dvs 7000 spart pr mnd",
                 "amount": 7000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -73,20 +71,19 @@
             "group": "private",
             "name": "Child1",
             "description": "Barnetrygd som inntekter på barn frem til 18 år, utgifter helt til de flytter ut",
-            "active": true,
-            "tax": "none"
+            "active": true
         },
         "2024": {
             "income": {
                 "amount": 1000,
-                "factor": 12,
+                "factor": "monthly",
                 "name": "Barnetrygd",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
             "expence": {
                 "amount": 2800,
-                "factor": 12,
+                "factor": "monthly",
                 "name": "Utgifter",
                 "changerate": "changerates.kpi",
                 "repeat": true
@@ -95,7 +92,7 @@
         "2042": {
             "income": {
                 "amount": 0,
-                "factor": 12,
+                "factor": "monthly",
                 "name": "Slutt på barnetrygd",
                 "changerate": "changerates.kpi",
                 "repeat": false
@@ -116,8 +113,7 @@
             "group": "private",
             "name": "inheritance",
             "description": "Arv som kan prognostiseres om de har gjenlevende foreldre eller andre du kan arve av i fremtiden",
-            "active": true,
-            "tax": "inheritance"
+            "active": true
         },
         "2037": {
             "asset": {
@@ -137,15 +133,14 @@
             "group": "private",
             "name": "Folketrygden",
             "description": "Folketrygden",
-            "active": true,
-            "tax": "pension"
+            "active": true
         },
         "$pensionOfficialYear": {
             "income": {
                 "name": "Folketrygden",
                 "description": "Folketrygden fra $pensionOfficialYear",
                 "amount": 15000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -157,8 +152,7 @@
             "group": "private",
             "name": "OTP",
             "description": "OTP",
-            "active": true,
-            "tax": "equityfund"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -188,8 +182,7 @@
             "name": "My house",
             "description": "Your house, with a apartment that you rent out",
             "active" : true,
-            "tax": "house",
-            "taxProperty": "holmestrand"
+
         },
         "2024": {
             "asset": {
@@ -210,7 +203,7 @@
                 "name": "Rental",
                 "description": "Rental 10000 pr month",
                 "amount": 10000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -218,7 +211,7 @@
                 "name": "Utgifter",
                 "description": "Kommunale/Forsikring/Strøm 7300 mnd",
                 "amount": 7300,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -230,8 +223,7 @@
             "group": "private",
             "name": "Cabin",
             "description": "Hytte med litt AirBnb inntekt",
-            "active": true,
-            "tax": "cabin"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -247,7 +239,7 @@
                 "name": "AirBnB inntekt",
                 "description": "",
                 "amount": 3000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -255,7 +247,7 @@
                 "name": "Utgifter",
                 "description": "",
                 "amount": 2000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -268,8 +260,7 @@
             "name": "Rental",
             "description": "Rental",
             "active": true,
-            "tax": "rental",
-            "taxProperty": "ringerike"
+
         },
         "2024": {
             "asset": {
@@ -282,7 +273,7 @@
                 "name": "Utleie",
                 "description": "Utleie av leilighet",
                 "amount": 12500,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -290,7 +281,7 @@
                 "name": "Utgifter",
                 "description": "Kommunale/Forsikring/Strøm,- pr mnd",
                 "amount": 3000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -309,8 +300,7 @@
             "group": "private",
             "name": "Crypto",
             "description": "Crypto",
-            "active": true,
-            "tax": "crypto"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -336,8 +326,7 @@
             "group": "private",
             "name": "Gold",
             "description": "Gold",
-            "active": true,
-            "tax": "gold"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -363,8 +352,7 @@
             "group": "private",
             "name": "Cash",
             "description": "",
-            "active": true,
-            "tax": "cash"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -390,8 +378,7 @@
             "group": "private",
             "name": "Avensis",
             "description": "",
-            "active": true,
-            "tax": "car"
+            "active": true
         },
         "2020": {
             "asset": {
@@ -404,7 +391,7 @@
                 "name": "Utgifter",
                 "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
                 "amount": 3000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -416,8 +403,7 @@
             "group": "private",
             "name": "Boat",
             "description": "",
-            "active": true,
-            "tax": "boat"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -430,7 +416,7 @@
                 "name": "Utgifter",
                 "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
                 "amount": 2000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -442,8 +428,7 @@
             "group": "company",
             "name": "Company AS",
             "description": "I own stocks here",
-            "active": true,
-            "tax": "stock"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -460,8 +445,7 @@
             "group": "private",
             "name": "fond privat",
             "description": "Has to be the second last asset since we often trasfer from other assets when sold, to this asset",
-            "active": true,
-            "tax": "equityfund"
+            "active": true
         },
         "2024": {
             "asset": {
@@ -488,8 +472,7 @@
             "group": "private",
             "name": "Income",
             "description": "Amount in this asset is not taxed. Everything transfered here is taxed when transfered from fond/otp. Has to be the last asset in the config.",
-            "active": true,
-            "tax": "income"
+            "active": true
         }
     }
 }

@@ -17,13 +17,12 @@ return new class extends Migration
             $table->foreignId('asset_id')->constrained('simulation_assets')->onDelete('cascade')->index();
             $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade')->index();
 
-
             // Unified description field (replaces income_description, expence_description, asset_description, mortgage_description)
             $table->text('description')->nullable();
 
-            //Income
+            // Income
             $table->decimal('income_amount', 15, 2)->nullable();
-            $table->enum('income_factor', ['monthly', 'yearly'])->nullable();
+            $table->enum('income_factor', ['monthly', 'yearly'])->default('monthly');
             $table->string('income_rule')->nullable();
             $table->string('income_transfer')->nullable();
             $table->decimal('income_transfer_amount', 15, 2)->nullable();
@@ -31,9 +30,9 @@ return new class extends Migration
             $table->string('income_changerate')->nullable();
             $table->boolean('income_repeat')->default(false);
 
-            //Expence
+            // Expence
             $table->decimal('expence_amount', 15, 2)->nullable();
-            $table->enum('expence_factor', ['monthly', 'yearly'])->nullable();
+            $table->enum('expence_factor', ['monthly', 'yearly'])->default('monthly');
             $table->string('expence_rule')->nullable();
             $table->string('expence_transfer')->nullable();
             $table->decimal('expence_transfer_amount', 15, 2)->nullable();
@@ -41,7 +40,7 @@ return new class extends Migration
             $table->string('expence_changerate')->nullable();
             $table->boolean('expence_repeat')->default(false);
 
-            //Cashflow
+            // Cashflow
             $table->text('cashflow_description')->nullable();
             $table->decimal('cashflow_after_taxamount', 15, 2)->nullable();
             $table->decimal('cashflow_before_taxamount', 15, 2)->nullable();
@@ -56,7 +55,7 @@ return new class extends Migration
             $table->string('cashflow_changerate')->nullable();
             $table->boolean('cashflow_repeat')->default(false);
 
-            //Asset
+            // Asset
             $table->decimal('asset_market_amount', 15, 2)->nullable();
             $table->decimal('asset_market_mortgage_deducted_amount', 15, 2)->nullable();
             $table->decimal('asset_acquisition_amount', 15, 2)->nullable();
@@ -84,7 +83,7 @@ return new class extends Migration
             $table->string('asset_source')->nullable();
             $table->boolean('asset_repeat')->default(true);
 
-            //Mortgage
+            // Mortgage
             $table->decimal('mortgage_amount', 15, 2)->nullable();
             $table->decimal('mortgage_term_amount', 15, 2)->nullable();
             $table->decimal('mortgage_interest_amount', 15, 2)->nullable();
@@ -98,7 +97,7 @@ return new class extends Migration
             $table->decimal('mortgage_tax_deductable_amount', 15, 2)->nullable();
             $table->decimal('mortgage_tax_deductable_percent', 3, 2)->nullable();
 
-            //Realization
+            // Realization
             $table->text('realization_description')->nullable();
             $table->decimal('realization_amount', 15, 2)->nullable();
             $table->decimal('realization_taxable_amount', 15, 2)->nullable();
@@ -107,15 +106,15 @@ return new class extends Migration
             $table->decimal('realization_tax_shield_amount', 15, 2)->nullable();
             $table->decimal('realization_tax_shield_percent', 3, 2)->nullable();
 
-            //Yield
+            // Yield
             $table->decimal('yield_brutto_percent', 3, 2)->nullable();
             $table->decimal('yield_netto_percent', 3, 2)->nullable();
 
-            //Potential
+            // Potential
             $table->decimal('potential_income_amount', 15, 2)->nullable();
             $table->decimal('potential_mortgage_amount', 15, 2)->nullable();
 
-            //F.I.R.E.
+            // F.I.R.E.
             $table->decimal('fire_percent', 3, 2)->nullable();
             $table->decimal('fire_income_amount', 15, 2)->nullable();
             $table->decimal('fire_expence_amount', 15, 2)->nullable();
@@ -124,7 +123,7 @@ return new class extends Migration
             $table->decimal('fire_savings_amount', 15, 2)->nullable();
             $table->decimal('fire_savings_rate_percent', 3, 2)->nullable();
 
-            //div
+            // div
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->string('created_checksum')->nullable();

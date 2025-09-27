@@ -23,12 +23,13 @@ class SimulationConfigurationViewTest extends TestCase
         $response = $this->actingAs($user)
             ->withoutMiddleware()
             ->get(route('filament.admin.resources.simulation-configurations.view', [
-                'record' => $simulationConfiguration->id
+                'record' => $simulationConfiguration->id,
             ]));
 
         // Should redirect to the simulation dashboard
         $response->assertRedirect(route('filament.admin.pages.simulation-dashboard', [
-            'simulation_configuration_id' => $simulationConfiguration->id
+            'configuration' => $simulationConfiguration->asset_configuration_id,
+            'simulation' => $simulationConfiguration->id,
         ]));
     }
 
@@ -43,7 +44,8 @@ class SimulationConfigurationViewTest extends TestCase
         $response = $this->actingAs($user)
             ->withoutMiddleware()
             ->get(route('filament.admin.pages.simulation-dashboard', [
-                'simulation_configuration_id' => $simulationConfiguration->id
+                'configuration' => $simulationConfiguration->asset_configuration_id,
+                'simulation' => $simulationConfiguration->id,
             ]));
 
         $response->assertStatus(200);
@@ -63,7 +65,8 @@ class SimulationConfigurationViewTest extends TestCase
         $response = $this->actingAs($user)
             ->withoutMiddleware()
             ->get(route('filament.admin.pages.simulation-assets', [
-                'simulation_configuration_id' => $simulationConfiguration->id
+                'configuration' => $simulationConfiguration->asset_configuration_id,
+                'simulation' => $simulationConfiguration->id,
             ]));
 
         $response->assertStatus(200);
@@ -86,7 +89,9 @@ class SimulationConfigurationViewTest extends TestCase
         $response = $this->actingAs($user)
             ->withoutMiddleware()
             ->get(route('filament.admin.pages.simulation-asset-years', [
-                'simulation_configuration' => $simulationConfiguration->id
+                'configuration' => $simulationConfiguration->asset_configuration_id,
+                'simulation' => $simulationConfiguration->id,
+                'asset' => 1,
             ]));
 
         $response->assertStatus(200);
@@ -107,7 +112,7 @@ class SimulationConfigurationViewTest extends TestCase
         // Test without withoutMiddleware to ensure authorization works
         $response = $this->actingAs($user2)
             ->get(route('filament.admin.resources.simulation-configurations.view', [
-                'record' => $simulationConfiguration->id
+                'record' => $simulationConfiguration->id,
             ]));
 
         // Since we're using withoutMiddleware in other tests, let's just check that

@@ -17,8 +17,7 @@
             "group": "private",
             "name": "InterestOnly5years",
             "description": "Paying only interest for the first 5 years, then paying interest and principal for the remaining years",
-            "active": true,
-            "tax": "house"
+            "active": true
         },
         "2024": {
             "income": {
@@ -57,7 +56,7 @@
             "name": "ExtraDownpayment",
             "description": "Paying interest and principal + 60 000 ekstra downpayment for all the years",
             "active": false,
-            "tax": "house"
+
         },
         "2024": {
             "asset": {
@@ -81,7 +80,7 @@
             "name": "Normal",
             "description": "Paying interest and principal for all the years",
             "active": true,
-            "tax": "house"
+
         },
         "2023": {
             "asset": {

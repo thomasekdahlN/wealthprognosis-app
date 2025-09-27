@@ -18,10 +18,10 @@
             "name": "Fond - Firma",
             "description": "Fond - Firma",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2020": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: "
+            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
             "asset": {
                 "marketAmount": 1000000,
                 "changerate": "changerates.equityfund",
@@ -30,7 +30,7 @@
             }
         },
         "2025": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: "
+            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
             "asset": {
                 "rule": "100%",
                 "transfer": "fondprivate.$year.asset.marketAmount",
@@ -45,7 +45,7 @@
             "name": "Fond - Privat",
             "description": "Fond - Privat",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2020": {
             "asset": {

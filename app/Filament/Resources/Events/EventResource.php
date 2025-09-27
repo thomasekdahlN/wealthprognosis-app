@@ -4,8 +4,7 @@ namespace App\Filament\Resources\Events;
 
 use App\Filament\Resources\Events\Pages\ListEvents;
 use App\Filament\Resources\Events\Tables\EventsTable;
-use App\Models\Asset;
-use App\Services\CurrentAssetConfiguration;
+use App\Models\AssetYear;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -13,7 +12,7 @@ use Filament\Tables\Table;
 
 class EventResource extends Resource
 {
-    protected static ?string $model = Asset::class;
+    protected static ?string $model = AssetYear::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
@@ -29,15 +28,10 @@ class EventResource extends Resource
         $activeAssetConfigurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
 
         $query = parent::getEloquentQuery()
-            ->with(['configuration', 'assetType'])
-            ->whereHas('years', function ($query) use ($currentYear) {
-                $query->where('year', '>', $currentYear);
-            });
+            ->with(['asset', 'asset.assetType'])
+            ->where('year', '>', $currentYear);
 
-        // Filter by active asset configuration if one is selected
-        if ($activeAssetConfigurationId) {
-            $query->where('assets.asset_configuration_id', $activeAssetConfigurationId);
-        }
+        $query->where('asset_configuration_id', $activeAssetConfigurationId ?? -1);
 
         return $query;
     }
@@ -65,14 +59,13 @@ class EventResource extends Resource
         $currentYear = (int) date('Y');
         $activeAssetConfigurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
 
-        $query = static::getModel()::query()
-            ->whereHas('years', function ($q) use ($currentYear) {
-                $q->where('year', '>', $currentYear);
-            });
-
-        if ($activeAssetConfigurationId) {
-            $query->where('asset_configuration_id', $activeAssetConfigurationId);
+        if (! $activeAssetConfigurationId) {
+            return '0';
         }
+
+        $query = static::getModel()::query()
+            ->where('year', '>', $currentYear)
+            ->where('asset_configuration_id', $activeAssetConfigurationId);
 
         return (string) $query->count();
     }

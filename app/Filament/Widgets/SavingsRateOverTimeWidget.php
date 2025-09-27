@@ -15,9 +15,7 @@ class SavingsRateOverTimeWidget extends ChartWidget
 
     public function mount(): void
     {
-        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id()
-            ?? request()->get('asset_configuration_id')
-            ?? request()->get('asset_owner_id');
+        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id();
     }
 
     public function getHeading(): string

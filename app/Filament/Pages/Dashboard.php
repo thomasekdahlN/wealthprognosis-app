@@ -19,9 +19,18 @@ class Dashboard extends BaseDashboard
         // Use session service for consistency
         $this->assetConfigurationId = app(CurrentAssetConfiguration::class)->id();
 
+        // Allow pretty route param to set current configuration
+        $routeConfigId = (int) ($request->route('configuration') ?? 0);
+        if ($routeConfigId > 0) {
+            if ($assetConfiguration = \App\Models\AssetConfiguration::find($routeConfigId)) {
+                app(CurrentAssetConfiguration::class)->set($assetConfiguration);
+                $this->assetConfigurationId = $routeConfigId;
+            }
+        }
+
         // Also check for URL parameter (for backwards compatibility)
-        if (!$this->assetConfigurationId && $request->get('asset_configuration_id')) {
-            $urlAssetConfigurationId = $request->get('asset_configuration_id');
+        if (! $this->assetConfigurationId && $request->get('asset_configuration_id')) {
+            $urlAssetConfigurationId = (int) $request->get('asset_configuration_id');
             $assetConfiguration = \App\Models\AssetConfiguration::find($urlAssetConfigurationId);
             if ($assetConfiguration) {
                 app(CurrentAssetConfiguration::class)->set($assetConfiguration);
@@ -68,10 +77,16 @@ class Dashboard extends BaseDashboard
         return $this->assetConfigurationId;
     }
 
+    public static function getRoutes(): array
+    {
+        return [
+            '/config/{configuration}/dashboard' => static::class,
+        ];
+    }
+
     public function getColumns(): int
     {
         // Use a 12-column grid so allocation charts (columnSpan=4) sit on the same row
         return 12;
     }
 }
-

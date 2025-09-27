@@ -27,7 +27,6 @@ class AssetFactory extends Factory
             'description' => $this->faker->sentence(),
             'asset_type' => $this->faker->randomElement(['house', 'car', 'boat', 'fund', 'stock']),
             'group' => $this->faker->randomElement(['private', 'company']),
-            'tax_type' => $this->faker->randomElement(['house', 'fund', 'stock']),
             'tax_property' => null,
             'tax_country' => 'no',
             'is_active' => true,

@@ -36,7 +36,7 @@ it('can display assets table for configuration', function () {
         'description' => 'Cash asset for table testing',
         'asset_type' => 'cash',
         'group' => 'private',
-        'tax_type' => 'none',
+
         'tax_country' => 'no',
         'is_active' => true,
         'sort_order' => 1,
@@ -54,7 +54,7 @@ it('can display assets table for configuration', function () {
         'description' => 'Equity asset for table testing',
         'asset_type' => 'equity',
         'group' => 'private',
-        'tax_type' => 'capital_gains',
+
         'tax_country' => 'no',
         'is_active' => true,
         'sort_order' => 2,
@@ -80,7 +80,7 @@ it('can filter assets by type', function () {
         'name' => 'Filter Cash Asset',
         'asset_type' => 'cash',
         'group' => 'private',
-        'tax_type' => 'none',
+
         'is_active' => true,
         'sort_order' => 1,
         'created_by' => $this->user->id,
@@ -96,7 +96,7 @@ it('can filter assets by type', function () {
         'name' => 'Filter Equity Asset',
         'asset_type' => 'equity',
         'group' => 'private',
-        'tax_type' => 'capital_gains',
+
         'is_active' => true,
         'sort_order' => 2,
         'created_by' => $this->user->id,
@@ -112,7 +112,7 @@ it('can filter assets by type', function () {
         'name' => 'Filter Real Estate Asset',
         'asset_type' => 'real_estate',
         'group' => 'private',
-        'tax_type' => 'capital_gains',
+
         'is_active' => true,
         'sort_order' => 3,
         'created_by' => $this->user->id,
@@ -146,7 +146,7 @@ it('can filter assets by group', function () {
         'name' => 'Private Asset',
         'asset_type' => 'cash',
         'group' => 'private',
-        'tax_type' => 'none',
+
         'is_active' => true,
         'sort_order' => 1,
         'created_by' => $this->user->id,
@@ -162,7 +162,7 @@ it('can filter assets by group', function () {
         'name' => 'Business Asset',
         'asset_type' => 'equity',
         'group' => 'business',
-        'tax_type' => 'capital_gains',
+
         'is_active' => true,
         'sort_order' => 2,
         'created_by' => $this->user->id,
@@ -193,7 +193,7 @@ it('can sort assets by different criteria', function () {
         'name' => 'Sort Asset C',
         'asset_type' => 'cash',
         'group' => 'private',
-        'tax_type' => 'none',
+
         'is_active' => true,
         'sort_order' => 3,
         'created_by' => $this->user->id,
@@ -209,7 +209,7 @@ it('can sort assets by different criteria', function () {
         'name' => 'Sort Asset A',
         'asset_type' => 'equity',
         'group' => 'private',
-        'tax_type' => 'capital_gains',
+
         'is_active' => true,
         'sort_order' => 1,
         'created_by' => $this->user->id,
@@ -225,7 +225,7 @@ it('can sort assets by different criteria', function () {
         'name' => 'Sort Asset B',
         'asset_type' => 'bond',
         'group' => 'private',
-        'tax_type' => 'income_tax',
+
         'is_active' => true,
         'sort_order' => 2,
         'created_by' => $this->user->id,
@@ -256,7 +256,7 @@ it('can handle active and inactive assets', function () {
         'name' => 'Active Asset',
         'asset_type' => 'cash',
         'group' => 'private',
-        'tax_type' => 'none',
+
         'is_active' => true,
         'sort_order' => 1,
         'created_by' => $this->user->id,
@@ -272,7 +272,7 @@ it('can handle active and inactive assets', function () {
         'name' => 'Inactive Asset',
         'asset_type' => 'equity',
         'group' => 'private',
-        'tax_type' => 'capital_gains',
+
         'is_active' => false,
         'sort_order' => 2,
         'created_by' => $this->user->id,
@@ -303,7 +303,7 @@ it('displays asset details correctly', function () {
         'description' => 'Detailed asset for testing display',
         'asset_type' => 'real_estate',
         'group' => 'private',
-        'tax_type' => 'capital_gains',
+
         'tax_country' => 'no',
         'tax_property' => 'residential',
         'is_active' => true,
@@ -319,7 +319,7 @@ it('displays asset details correctly', function () {
     expect($asset->description)->toBe('Detailed asset for testing display');
     expect($asset->asset_type)->toBe('real_estate');
     expect($asset->group)->toBe('private');
-    expect($asset->tax_type)->toBe('capital_gains');
+    // tax_type removed; verify relation is available via $asset->assetType->taxType when needed
     expect($asset->tax_country)->toBe('no');
     expect($asset->tax_property)->toBe('residential');
     expect($asset->is_active)->toBe(true);

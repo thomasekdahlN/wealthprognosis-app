@@ -18,15 +18,14 @@
             "name": "House",
             "description": "House with normal mortgage, the rest is put into fund",
             "active" : true,
-            "tax": "rental",
-            "taxProperty": "ringerike"
+
         },
         "2024": {
             "income": {
                 "name": "Income",
                 "description": "0.4% av boligverdi. 13333 i 11 mnd hver år = 12221 pr mnd hele året",
                 "amount": 12221,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -34,7 +33,7 @@
                 "name": "Utfgifter",
                 "description": "Offentlige 0.6% av boligverdi: 8765, Forsikring 0.07% pr mnd 7000,- pr mnd, Vedlikehold: 1% av boligverdi pr år: 2777",
                 "amount": 8765,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.zero",
                 "repeat": true
             },
@@ -66,7 +65,7 @@
             "name": "fond",
             "description": "Fra cash flow: 9388 x 12 hvert år",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2024": {
             "asset": {

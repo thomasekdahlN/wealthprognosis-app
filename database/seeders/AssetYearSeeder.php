@@ -67,11 +67,11 @@ class AssetYearSeeder extends Seeder
                     $this->getMortgageDescription($asset->asset_type) ? 'Mortgage: '.$this->getMortgageDescription($asset->asset_type) : null,
                 ])->filter()->implode(' | ')),
                 'income_amount' => $baseIncomeAmount ? round($baseIncomeAmount * $yearMultiplier) : null,
-                'income_factor' => $baseIncomeAmount ? 'monthly' : null,
+                'income_factor' => 'monthly',
                 'income_changerate' => $baseIncomeAmount ? 'changerates.kpi' : null,
                 'income_repeat' => $baseIncomeAmount ? true : false,
                 'expence_amount' => $baseExpenseAmount ? round($baseExpenseAmount * $yearMultiplier) : null,
-                'expence_factor' => $baseExpenseAmount ? 'monthly' : null,
+                'expence_factor' => 'monthly',
                 'expence_changerate' => $baseExpenseAmount ? 'changerates.kpi' : null,
                 'expence_repeat' => $baseExpenseAmount ? true : false,
                 'asset_market_amount' => $baseMarketAmount ? round($baseMarketAmount * $yearMultiplier) : null,
@@ -81,7 +81,7 @@ class AssetYearSeeder extends Seeder
                 'asset_taxable_initial_amount' => $asset->taxable_initial_amount,
                 'asset_changerate' => $asset->change_rate_type,
                 // mortgage_name field removed
-                                'mortgage_amount' => $baseMortgageAmount ? round($baseMortgageAmount * (1 - (($year - 2023) * 0.1))) : null, // Decreasing mortgage
+                'mortgage_amount' => $baseMortgageAmount ? round($baseMortgageAmount * (1 - (($year - 2023) * 0.1))) : null, // Decreasing mortgage
                 'mortgage_interest' => $baseMortgageAmount ? '5.5' : null,
                 'mortgage_years' => $baseMortgageAmount ? 20 : null,
                 'mortgage_gebyr' => $baseMortgageAmount ? 600 : null,

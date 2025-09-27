@@ -20,7 +20,7 @@ class TaxTypeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Setup';
+    protected static \UnitEnum|string|null $navigationGroup = 'Taxes';
 
     protected static ?string $navigationLabel = 'Tax Types';
 
@@ -68,5 +68,4 @@ class TaxTypeResource extends Resource
     {
         return 'danger';
     }
-
 }

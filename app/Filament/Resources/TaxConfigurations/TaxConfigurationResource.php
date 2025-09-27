@@ -20,7 +20,7 @@ class TaxConfigurationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3BottomRight;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Setup';
+    protected static \UnitEnum|string|null $navigationGroup = 'Taxes';
 
     protected static ?string $navigationLabel = 'Tax Configurations';
 
@@ -100,5 +100,4 @@ class TaxConfigurationResource extends Resource
     {
         return 'secondary';
     }
-
 }

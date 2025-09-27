@@ -18,115 +18,114 @@
             "group": "private",
             "name": "Iphone",
             "description": "https://www.androidauthority.com/iphone-price-history-3221497/",
-            "active": true,
-            "tax": "none"
+            "active": true
         },
         "2007": {
             "asset": {
                 "marketAmount": 4990,
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2008": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2009": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2010": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2011": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2012": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2013": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2014": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2015": {
             "asset": {
                 "rule": "+1990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2016": {
             "asset": {
                 "rule": "+6490",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2017": {
             "asset": {
                 "rule": "+6990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2018": {
             "asset": {
                 "rule": "+7490",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2019": {
             "asset": {
                 "rule": "+6990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2020": {
             "asset": {
                 "rule": "+7990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2021": {
             "asset": {
                 "rule": "+7990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2022": {
             "asset": {
                 "rule": "+7990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2023": {
             "asset": {
                 "rule": "+7990",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2024": {
             "asset": {
                 "rule": "+7990",
-                "factor": 1,
+                "factor": "yearly",
                 "repeat": false
             }
         },
@@ -142,35 +141,34 @@
             "group": "private",
             "name": "Apple stock",
             "description": "",
-            "active": true,
-            "tax": "none"
+            "active": true
         },
         "2007": {
             "asset": {
                 "marketAmount": 4990,
                 "changerate": "changerates.applestock",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2008": {
             "asset": {
                 "rule": "+1990",
                 "changerate": "changerates.applestock",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2009": {
             "asset": {
                 "rule": "+1990",
                 "changerate": "changerates.applestock",
-                "factor": 1
+                "factor": "yearly"
             }
         },
         "2010": {
             "asset": {
                 "rule": "+1990",
                 "changerate": "changerates.applestock",
-                "factor": 1
+                "factor": "yearly"
             }
         }
     }

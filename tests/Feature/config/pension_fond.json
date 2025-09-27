@@ -18,14 +18,14 @@
             "name": "Salary",
             "description": "Salary",
             "active": true,
-            "tax": "salary"
+
         },
         "2022": {
             "income": {
                 "name": "Income",
                 "description": "Income",
                 "amount": 40000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             },
@@ -33,7 +33,7 @@
                 "name": "Expences",
                 "description": "",
                 "amount": 15000,
-                "factor": 12,
+                "factor": "monthly",
                 "changerate": "changerates.kpi",
                 "repeat": true
             }
@@ -55,7 +55,7 @@
             "name": "equityfund",
             "description": "equityfund",
             "active": true,
-            "tax": "equityfund"
+
         },
         "2022": {
             "asset": {
@@ -84,7 +84,7 @@
             "name": "Income",
             "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
             "active": true,
-            "tax": "income"
+
         },
         "2024": {
             "income": {

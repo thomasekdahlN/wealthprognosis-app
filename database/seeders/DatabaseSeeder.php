@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AssetConfigurationSeeder::class,
             AiInstructionSeeder::class,
             TaxConfigurationSeeder::class,
+            TaxPropertySeeder::class,
             PrognosisSeeder::class,
             ChangeRateConfigurationSeeder::class,
             // SampleScenarioSeeder::class, // Skip - Scenario model doesn't exist

@@ -16,4 +16,16 @@ class EditAsset extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    public static function getRoutes(): array
+    {
+        return [
+            '/config/{configuration}/assets/{record}/edit' => static::class,
+        ];
+    }
+
+    public static function getRouteKeyName(): ?string
+    {
+        return 'record';
+    }
 }

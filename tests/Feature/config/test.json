@@ -18,7 +18,7 @@
             "name": "Prozeed AS",
             "description": "Oppkjøps analyse",
             "active": true,
-            "tax": "stock"
+
         },
         "2022": {
             "asset": {

@@ -17,8 +17,7 @@
             "group": "private",
             "name": "Salary",
             "description": "Salary",
-            "active": true,
-            "tax": "salary"
+            "active": true
         },
         "2022": {
             "income": {
@@ -53,8 +52,7 @@
             "group": "private",
             "name": "OTP",
             "description": "OTP",
-            "active": true,
-            "tax": "otp"
+            "active": true
         },
         "2022": {
             "asset": {
@@ -83,8 +81,7 @@
             "group": "private",
             "name": "Income",
             "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
-            "active": true,
-            "tax": "income"
+            "active": true
         },
         "2024": {
             "income": {

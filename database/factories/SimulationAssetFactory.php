@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\SimulationAsset;
-use App\Models\SimulationConfiguration;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,7 +26,6 @@ class SimulationAssetFactory extends Factory
     public function definition(): array
     {
         $assetTypes = ['cash', 'equity', 'bond', 'real_estate', 'crypto', 'commodity'];
-        $taxTypes = ['none', 'capital_gains', 'income', 'tax_deferred'];
         $groups = ['private', 'business'];
 
         return [
@@ -37,7 +35,6 @@ class SimulationAssetFactory extends Factory
             'description' => $this->faker->sentence(),
             'asset_type' => $this->faker->randomElement($assetTypes),
             'group' => $this->faker->randomElement($groups),
-            'tax_type' => $this->faker->randomElement($taxTypes),
             'tax_country' => 'no',
             'is_active' => true,
             'sort_order' => $this->faker->numberBetween(1, 100),
