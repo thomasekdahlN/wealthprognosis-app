@@ -5,7 +5,7 @@
 
 
         type="button"
-        class="relative inline-flex flex-row flex-nowrap items-center whitespace-nowrap rounded-lg px-3 pr-9 py-2 text-start outline-none overflow-hidden transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 max-w-[24rem]" style="display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:center;white-space:nowrap;line-height:1;"
+        class="relative inline-flex flex-row flex-nowrap items-center whitespace-nowrap rounded-lg bg-white dark:bg-gray-900 px-3 pr-9 py-2 text-start outline-none overflow-hidden transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800 max-w-[24rem]" style="display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:center;white-space:nowrap;line-height:1;"
 
 
     >
@@ -45,7 +45,7 @@
 
 
         </x-slot>
-        <x-filament::dropdown.list class="min-w-[56rem] w-[56rem] max-w-[95vw]" style="min-width:56rem;width:56rem;max-width:95vw;">
+        <x-filament::dropdown.list class="min-w-[64rem] w-[64rem] max-w-[95vw] text-left bg-white dark:bg-gray-900 bg-opacity-100 dark:bg-opacity-100 border border-gray-200 dark:border-white/10 rounded-xl shadow-xl ring-1 ring-gray-950/5 dark:ring-white/10" style="background-color:#fff;">
             <div class="p-2 border-b border-gray-200 dark:border-white/10 sticky top-0 z-10 bg-white dark:bg-gray-900">
                 <div class="relative">
                     <input
@@ -65,7 +65,7 @@
                 <button
                     type="button"
                     wire:click="selectAssetConfiguration({{ $assetConfiguration->id }})"
-                    class="fi-dropdown-list-item flex w-full items-center gap-x-3 px-3 py-2 text-start text-sm outline-none transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5"
+                    class="fi-dropdown-list-item flex w-full items-center justify-start gap-x-3 px-3 py-2 text-start text-sm outline-none transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800"
                 >
                     <div class="flex h-7 w-7 items-center justify-center">
                         @if($assetConfiguration->icon)
@@ -75,25 +75,25 @@
                         @endif
                     </div>
                     <div class="flex-1">
-                        <div class="font-bold text-left text-gray-950 dark:text-white">
+                        <div class="text-left text-gray-950 dark:text-white font-bold" style="font-weight: 700 !important;">
                             {{ $assetConfiguration->name }}
                         </div>
                         @if($assetConfiguration->description)
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ Str::limit($assetConfiguration->description, 50) }}
+                            <div class="text-left text-xs text-gray-500 dark:text-gray-400">
+                                {{ \Illuminate\Support\Str::limit(strip_tags((string) $assetConfiguration->description), 50) }}
                             </div>
                         @endif
                     </div>
                 </button>
             @empty
-                <div class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                <div class="px-3 py-2 text-sm text-left text-gray-500 dark:text-gray-400">
                     No asset configurations available
                 </div>
             @endforelse
 
             <div class="my-1 border-t border-gray-200 dark:border-white/10"></div>
 
-            <button type="button" wire:click="selectAssetConfiguration(null)" class="fi-dropdown-list-item flex w-full items-center gap-x-3 px-3 py-2 text-start text-sm outline-none transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-white/5 dark:focus-visible:bg-white/5 text-gray-600 dark:text-gray-400">
+            <button type="button" wire:click="selectAssetConfiguration(null)" class="fi-dropdown-list-item flex w-full items-center gap-x-3 px-3 py-2 text-start text-sm outline-none transition duration-75 hover:bg-gray-50 focus-visible:bg-gray-50 dark:hover:bg-gray-800 dark:focus-visible:bg-gray-800 text-gray-600 dark:text-gray-400">
                 <x-filament::icon icon="heroicon-o-x-mark" class="h-5 w-5" />
                 Clear Selection
             </button>

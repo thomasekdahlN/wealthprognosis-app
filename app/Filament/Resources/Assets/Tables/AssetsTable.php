@@ -29,7 +29,7 @@ class AssetsTable
                 }),
                 TextColumn::make('assetType.taxType.name')->label('Tax Type')->badge()->color('info')->placeholder('No tax type')->sortable()->searchable(),
                 TextColumn::make('tax_property')->label('Tax Property')->searchable(),
-                TextColumn::make('description')->label('Description')->limit(60)->wrap(),
+                TextColumn::make('description')->label('Description')->formatStateUsing(fn (?string $state): string => strip_tags((string) $state))->limit(60)->wrap(),
                 IconColumn::make('is_active')->label('Active')->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()

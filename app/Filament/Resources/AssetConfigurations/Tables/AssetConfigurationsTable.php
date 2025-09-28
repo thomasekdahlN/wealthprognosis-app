@@ -26,7 +26,7 @@ class AssetConfigurationsTable
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn ($record) => $record->description)
+                    ->description(fn ($record) => strip_tags((string) $record->description))
                     ->wrap(),
                 TextColumn::make('birth_year')
                     ->label('Birth Year')

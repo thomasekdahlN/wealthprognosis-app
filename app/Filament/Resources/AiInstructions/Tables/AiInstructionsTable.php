@@ -26,6 +26,7 @@ class AiInstructionsTable
                 TextColumn::make('description')
                     ->label('Description')
                     ->searchable()
+                    ->formatStateUsing(fn (?string $state): string => strip_tags((string) $state))
                     ->limit(50)
                     ->wrap(),
 

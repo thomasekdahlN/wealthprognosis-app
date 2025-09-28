@@ -48,6 +48,7 @@ class AssetType extends Model
         'updated_by',
         'created_checksum',
         'updated_checksum',
+        'debug',
     ];
 
     protected $casts = [
@@ -64,6 +65,7 @@ class AssetType extends Model
         'income_changerate' => 'string',
         'expence_changerate' => 'string',
         'asset_changerate' => 'string',
+        'debug' => 'boolean',
     ];
 
     public function scopeActive($query)

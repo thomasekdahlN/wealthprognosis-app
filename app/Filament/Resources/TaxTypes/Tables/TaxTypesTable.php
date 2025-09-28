@@ -30,9 +30,10 @@ class TaxTypesTable
 
                 TextColumn::make('description')
                     ->label('Description')
+                    ->formatStateUsing(fn (?string $state): string => strip_tags((string) $state))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
-                        $state = $column->getState();
+                        $state = strip_tags((string) $column->getState());
                         if (strlen($state) <= 50) {
                             return null;
                         }

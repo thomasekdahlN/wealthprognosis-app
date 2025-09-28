@@ -45,6 +45,7 @@ class Asset extends Model
         'tax_property',
         'tax_country',
         'is_active',
+        'debug',
         'sort_order',
         'created_by',
         'updated_by',
@@ -54,6 +55,7 @@ class Asset extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'debug' => 'boolean',
         'sort_order' => 'integer',
     ];
 

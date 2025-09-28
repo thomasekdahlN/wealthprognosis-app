@@ -297,6 +297,7 @@ class AssetForm
                     ->dehydrated(false)
                     ->hidden(fn (\Filament\Schemas\Components\Utilities\Get $get): bool => (string) ($get('tax_property') ?? '') === '')
                     ->columnSpanFull(),
+                Toggle::make('debug')->label('Debug')->default(false)->helperText('Mark this asset for debugging'),
                 Toggle::make('is_active')->default(true)->required(),
             ]);
     }

@@ -173,6 +173,8 @@ class AssetTypeForm
                     ->placeholder('None')
                     ->helperText('Pick one predefined rate, or leave empty. Numbers are not allowed'),
 
+                Toggle::make('debug')->label('Debug')->default(false)->helperText('Mark this asset type for debugging'),
+
                 Toggle::make('is_active')
                     ->label('Active')
                     ->default(true)

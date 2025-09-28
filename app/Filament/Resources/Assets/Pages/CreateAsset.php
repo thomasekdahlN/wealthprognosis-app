@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Assets\Pages;
 
 use App\Filament\Resources\Assets\AssetResource;
+use App\Models\AssetYear;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateAsset extends CreateRecord
@@ -17,5 +18,21 @@ class CreateAsset extends CreateRecord
         }
 
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        $asset = $this->record; // The newly created asset
+        $year = (int) date('Y');
+
+        AssetYear::firstOrCreate(
+            [
+                'asset_id' => $asset->id,
+                'year' => $year,
+            ],
+            [
+                'asset_configuration_id' => $asset->asset_configuration_id,
+            ]
+        );
     }
 }

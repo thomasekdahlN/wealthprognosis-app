@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('tax_property', 50)->nullable();
             $table->string('tax_country', 5)->default('no');
             $table->boolean('is_active')->default(true);
+            $table->boolean('debug')->default(false);
             $table->integer('sort_order')->default(0);
             $table->timestamps();
             $table->foreignId('created_by')->nullable()->constrained('users');
