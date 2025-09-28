@@ -96,8 +96,8 @@ class ListAssetConfigurations extends ListRecords
                             ->send();
                     }
                 })
-                ->modalHeading('Upload Asset Configuration')
-                ->modalDescription('Upload a JSON configuration file to create a new asset owner with all associated assets and yearly data.')
+                ->modalHeading('Upload configuration')
+                ->modalDescription('Upload a JSON configuration file to create a new configuration with all associated assets and yearly data.')
                 ->modalSubmitActionLabel('Import Assets')
                 ->modalWidth('lg'),
         ];

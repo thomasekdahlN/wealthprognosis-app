@@ -33,7 +33,7 @@
 
         <span aria-hidden="true" class="inline-block" style="width: 1ch;"></span>
             <span class="flex-auto min-w-0 truncate text-xl font-bold text-left text-gray-700 dark:text-gray-200" style="font-weight: 700 !important; text-align: left !important;">
-            {{ $this->selectedAssetConfiguration ? $this->selectedAssetConfiguration->name : 'Select Asset Configuration' }}
+            {{ $this->selectedAssetConfiguration ? $this->selectedAssetConfiguration->name : 'Select configuration' }}
         </span>
 
         <x-filament::icon

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\SimulationConfigurations\Schemas;
 
-use App\Models\AssetConfiguration;
 use App\Models\SimulationConfiguration;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -14,7 +13,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\File;
-
 
 class SimulationConfigurationForm
 {
@@ -33,7 +31,7 @@ class SimulationConfigurationForm
                 $countryCode = basename($directory);
 
                 // Map country codes to readable names
-                $countryName = match($countryCode) {
+                $countryName = match ($countryCode) {
                     'no' => 'Norway',
                     'se' => 'Sweden',
                     'ch' => 'Switzerland',
@@ -120,10 +118,8 @@ class SimulationConfigurationForm
                 ->default(false)
                 ->helperText('Make this simulation visible to other users'),
 
-            TextInput::make('icon')
+            \App\Filament\Components\IconPicker::make('icon')
                 ->label('Icon')
-                ->placeholder('heroicon-o-chart-bar')
-                ->helperText('Enter a Heroicon name (e.g., heroicon-o-chart-bar)')
                 ->nullable(),
 
             FileUpload::make('image')

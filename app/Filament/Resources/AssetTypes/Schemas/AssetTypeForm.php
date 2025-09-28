@@ -62,10 +62,8 @@ class AssetTypeForm
                     ->placeholder('Select applicable tax type')
                     ->helperText('Choose the tax type that applies to this asset type'),
 
-                TextInput::make('icon')
-                    ->label('Icon')
-                    ->placeholder('heroicon-o-chart-bar')
-                    ->helperText('Heroicon class name for display'),
+                \App\Filament\Components\IconPicker::make('icon')
+                    ->label('Icon'),
 
                 Select::make('color')
                     ->label('Color Theme')

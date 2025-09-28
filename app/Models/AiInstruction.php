@@ -13,6 +13,7 @@ class AiInstruction extends Model
     protected $fillable = [
         'name',
         'description',
+        'type',
         'system_prompt',
         'user_prompt_template',
         'model',

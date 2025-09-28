@@ -23,6 +23,14 @@ class AiInstructionsTable
                     ->sortable()
                     ->weight('bold'),
 
+                TextColumn::make('type')
+                    ->label('Type')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('primary')
+                    ->placeholder('No type'),
+
                 TextColumn::make('description')
                     ->label('Description')
                     ->searchable()

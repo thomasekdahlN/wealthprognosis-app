@@ -22,6 +22,7 @@ class AiInstructionFactory extends Factory
         return [
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->sentence(),
+            'type' => $this->faker->randomElement(['portfolio_analysis', 'risk_assessment', 'tax_optimization', 'market_analysis', 'performance_review']),
             'system_prompt' => $this->faker->paragraph(),
             'user_prompt_template' => 'Analyze this data: {json_data}',
             'model' => $this->faker->randomElement(['gpt-4', 'gpt-3.5-turbo']),

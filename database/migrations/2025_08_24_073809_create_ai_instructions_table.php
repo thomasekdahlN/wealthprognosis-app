@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('description')->nullable();
+            $table->string('type')->nullable();
             $table->text('system_prompt');
             $table->text('user_prompt_template');
             $table->string('model')->default('gpt-4');

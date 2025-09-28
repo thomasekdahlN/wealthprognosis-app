@@ -2,7 +2,7 @@
     {{-- Owner Information Section --}}
     <x-filament::section>
         <x-slot name="heading">
-            Asset Configuration Information
+            Configuration information
         </x-slot>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

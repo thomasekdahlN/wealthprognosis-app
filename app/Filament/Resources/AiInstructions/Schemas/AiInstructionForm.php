@@ -20,20 +20,28 @@ class AiInstructionForm
                 Section::make('Basic Information')
                     ->schema([
                         TextInput::make('name')
-                            ->label('Instruction Name')
+                            ->label('Instruction name')
                             ->required()
                             ->maxLength(255)
                             ->placeholder('e.g., Asset Portfolio Analysis')
                             ->helperText('A descriptive name for this AI instruction set')
                             ->columnSpanFull(),
 
-                        Textarea::make('description')
-                            ->label('Description')
-                            ->maxLength(500)
-                            ->rows(3)
-                            ->placeholder('Brief description of what this instruction does and its purpose')
-                            ->helperText('Optional description for reference')
-                            ->columnSpanFull(),
+                        Grid::make(2)
+                            ->schema([
+                                Textarea::make('description')
+                                    ->label('Description')
+                                    ->maxLength(500)
+                                    ->rows(3)
+                                    ->placeholder('Brief description of what this instruction does and its purpose')
+                                    ->helperText('Optional description for reference'),
+
+                                TextInput::make('type')
+                                    ->label('Type')
+                                    ->maxLength(100)
+                                    ->placeholder('e.g., portfolio_analysis, risk_assessment')
+                                    ->helperText('Category or type identifier for this instruction'),
+                            ]),
 
                         Grid::make(3)
                             ->schema([

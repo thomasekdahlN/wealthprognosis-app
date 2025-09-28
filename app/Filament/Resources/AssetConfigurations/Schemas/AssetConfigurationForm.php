@@ -24,7 +24,7 @@ class AssetConfigurationForm
             TextInput::make('death_age')->numeric()->label('Death Age')->minValue(0)->maxValue(125),
             TextInput::make('export_start_year')->numeric()->label('Export Start Year')->minValue(1925)->maxValue(2125),
             Toggle::make('public')->label('Public')->default(false),
-            TextInput::make('icon')->label('Icon'),
+            \App\Filament\Components\IconPicker::make('icon')->label('Icon'),
             FileUpload::make('image')->label('Image')->image(),
             TextInput::make('color')->label('Color'),
             TextInput::make('tags')->label('Tags (comma-separated)'),

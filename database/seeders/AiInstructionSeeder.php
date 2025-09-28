@@ -25,6 +25,7 @@ class AiInstructionSeeder extends Seeder
             [
                 'name' => 'Asset Portfolio Analysis',
                 'description' => 'Comprehensive analysis of asset portfolio with recommendations',
+                'type' => 'portfolio_analysis',
                 'system_prompt' => 'You are an expert financial advisor with deep knowledge of asset allocation, risk management, and wealth building strategies. You analyze asset portfolios and provide actionable insights and recommendations. Focus on diversification, risk assessment, tax efficiency, and long-term wealth building strategies.',
                 'user_prompt_template' => 'Please analyze the following asset portfolio data and provide a comprehensive evaluation:
 
@@ -48,6 +49,7 @@ Format your response in clear sections with actionable insights.',
             [
                 'name' => 'Risk Assessment',
                 'description' => 'Focus on risk analysis and mitigation strategies',
+                'type' => 'risk_assessment',
                 'system_prompt' => 'You are a risk management specialist focused on identifying and mitigating financial risks in investment portfolios. You excel at analyzing asset correlations, concentration risks, and market vulnerabilities.',
                 'user_prompt_template' => 'Analyze the risk profile of this asset portfolio:
 
@@ -71,6 +73,7 @@ Provide specific, actionable risk management strategies.',
             [
                 'name' => 'Tax Optimization Review',
                 'description' => 'Analysis focused on tax efficiency and optimization',
+                'type' => 'tax_optimization',
                 'system_prompt' => 'You are a tax-focused financial advisor specializing in tax-efficient investing and wealth preservation strategies. You understand various tax-advantaged accounts, tax-loss harvesting, and asset location strategies.',
                 'user_prompt_template' => 'Review this portfolio for tax optimization opportunities:
 

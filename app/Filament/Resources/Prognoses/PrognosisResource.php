@@ -35,10 +35,8 @@ class PrognosisResource extends Resource
         return $schema->components([
             \Filament\Forms\Components\TextInput::make('code')->required()->unique(ignoreRecord: true),
             \Filament\Forms\Components\TextInput::make('label')->required(),
-            \Filament\Forms\Components\TextInput::make('icon')
-                ->label('Icon (Heroicon name)')
-                ->helperText('e.g. heroicon-o-check-badge, heroicon-o-arrow-trending-up')
-                ->prefixIcon(fn ($get) => $get('icon') ?: 'heroicon-o-sparkles')
+            \App\Filament\Components\IconPicker::make('icon')
+                ->label('Icon')
                 ->maxLength(100),
             \Filament\Forms\Components\Select::make('color')->options([
                 'primary' => 'Primary',

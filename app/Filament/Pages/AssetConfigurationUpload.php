@@ -22,18 +22,13 @@ class AssetConfigurationUpload extends Page implements HasForms
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrow-up-tray';
 
+    protected static ?string $title = 'Configuration upload';
 
-
-    protected static ?string $title = 'Asset Configuration Upload';
-
-    protected static ?string $navigationLabel = 'Upload Asset Config';
+    protected static ?string $navigationLabel = 'Upload configuration';
 
     protected static ?int $navigationSort = 20;
 
-
     // protected static ?string $navigationGroup = 'Analysis';
-
-
 
     public function mount(): void
     {
@@ -47,10 +42,8 @@ class AssetConfigurationUpload extends Page implements HasForms
 
     public function getHeading(): string
     {
-        return 'Asset Configuration Upload & Analysis';
+        return 'Configuration upload & analysis';
     }
-
-
 
     public function getSubheading(): ?string
     {
@@ -83,7 +76,7 @@ class AssetConfigurationUpload extends Page implements HasForms
                         ->required()
                         ->default('all'),
                     FileUpload::make('config_file')
-                        ->label('Asset Configuration File')
+                        ->label('Configuration file')
                         ->acceptedFileTypes(['application/json', 'text/json'])
                         ->maxSize(10240)
                         ->required()
@@ -92,7 +85,7 @@ class AssetConfigurationUpload extends Page implements HasForms
                         ->visibility('private')
                         ->multiple(false)
                         ->storeFileNamesIn('config_file_names')
-                        ->helperText('Upload your JSON asset configuration file (max 10MB, .json)'),
+                        ->helperText('Upload your JSON configuration file (max 10MB, .json)'),
                 ])
                 ->action(function (array $data) {
                     try {
@@ -179,8 +172,6 @@ class AssetConfigurationUpload extends Page implements HasForms
                 }),
         ];
     }
-
-
 
     public static function getNavigationBadge(): ?string
     {

@@ -35,7 +35,7 @@ class ExportAssets extends Command
 
             $assetConfigurationId = $this->argument('asset-configuration-id');
             if (! $assetConfigurationId) {
-                $this->error('Please provide an asset-configuration-id or use --all to export all asset configurations');
+                $this->error('Please provide an asset-configuration-id or use --all to export all configurations');
 
                 return Command::FAILURE;
             }
@@ -46,7 +46,7 @@ class ExportAssets extends Command
             $assetConfiguration = AssetConfiguration::with(['assets.years'])->find($assetConfigurationId);
 
             if (! $assetConfiguration) {
-                $this->error("Asset configuration not found with ID: {$assetConfigurationId}");
+                $this->error("Configuration not found with ID: {$assetConfigurationId}");
 
                 return Command::FAILURE;
             }

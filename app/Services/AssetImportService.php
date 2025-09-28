@@ -160,7 +160,7 @@ class AssetImportService
     {
         $meta = Arr::get($this->config, 'meta', []);
 
-        $name = Arr::get($meta, 'name', $sourceName ?? 'Imported Asset Configuration');
+        $name = Arr::get($meta, 'name', $sourceName ?? 'Imported configuration');
         $birthYear = (int) Arr::get($meta, 'birthYear');
         $prognoseAge = (int) Arr::get($meta, 'prognoseAge');
         $pensionOfficialAge = (int) Arr::get($meta, 'pensionOfficialAge');

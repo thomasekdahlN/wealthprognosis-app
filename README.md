@@ -143,9 +143,9 @@ Output:
 The command will automatically generate [excel](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
 
 
-### CLI: Export Asset Configurations
+### CLI: Export configurations
 
-Use the assets:export command to export one or more asset configurations to JSON files.
+Use the assets:export command to export one or more configurations to JSON files.
 
 Examples:
 
