@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Livewire\AiAssistantWidget;
+use App\Services\AiAssistantService;
+use App\Services\FinancialPlanningService;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +17,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(AiAssistantService::class);
+        $this->app->singleton(FinancialPlanningService::class);
     }
 
     /**
@@ -23,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        // Manually register AI Assistant Widget as Livewire component
+        Livewire::component('ai-assistant-widget', AiAssistantWidget::class);
     }
 }

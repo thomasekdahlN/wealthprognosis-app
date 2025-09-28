@@ -32,7 +32,7 @@ class IconPicker extends Select
 
                 $label = $this->getHeroiconOptions()[$value] ?? $value;
 
-                return $label;
+                return (string) $label;
             })
             ->placeholder('Select an icon...')
             ->helperText('Search for Heroicons by name');

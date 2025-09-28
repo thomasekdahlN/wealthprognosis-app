@@ -136,6 +136,12 @@ class AdminPanelProvider extends PanelProvider
             fn (): string => Blade::render('<span aria-hidden="true" class="inline-block" style="width: 2ch;"></span><div class="inline-flex items-center align-middle"><livewire:asset-configuration-picker /></div>')
         );
 
+        // Add AI Assistant Widget to all pages
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_END,
+            fn (): string => Blade::render('<livewire:ai-assistant-widget />')
+        );
+
         // Global download handler for pages
         FilamentView::registerRenderHook(
             PanelsRenderHook::BODY_END,
