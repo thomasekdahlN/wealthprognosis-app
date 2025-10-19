@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\TaxFortune;
+use App\Models\Core\TaxFortune;
 use Tests\TestCase;
 
 class TaxFortuneTest extends TestCase

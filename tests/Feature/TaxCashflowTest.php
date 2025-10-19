@@ -80,4 +80,27 @@ class TaxCashflowTest extends TestCase
         $this->assertEquals(0.2, $cashflowTaxPercent);
         $this->assertEquals(0, $cashflowTaxAmount);
     }
+
+    public function test_it_falls_back_to_income_rate_when_cashflow_not_found()
+    {
+        // Use a Norwegian tax config which has income rates but no cashflow rates
+        $taxCashflow = new TaxCashflow('no/no-tax-2025', 2025, 2025);
+
+        // Test with 'bank' type which has income: 22 but no cashflow field
+        $cashflowTaxPercent = $taxCashflow->getCashflowTax('private', 'bank', 2025);
+        $this->assertEquals(0.22, $cashflowTaxPercent);
+
+        // Test with 'rental' type which has income: 22 but no cashflow field
+        $cashflowTaxPercent = $taxCashflow->getCashflowTax('private', 'rental', 2025);
+        $this->assertEquals(0.22, $cashflowTaxPercent);
+    }
+
+    public function test_it_defaults_to_20_percent_when_neither_cashflow_nor_income_found()
+    {
+        $taxCashflow = new TaxCashflow('no/no-tax-2025', 2025, 2025);
+
+        // Test with a type that doesn't exist in the config
+        $cashflowTaxPercent = $taxCashflow->getCashflowTax('private', 'nonexistent', 2025);
+        $this->assertEquals(0.2, $cashflowTaxPercent);
+    }
 }

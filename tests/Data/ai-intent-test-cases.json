@@ -1,0 +1,478 @@
+{
+  "create_assets": {
+    "description": "Test cases for creating new assets",
+    "test_cases": [
+      {
+        "message": "Add a Tesla car worth 500K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Basic asset creation with brand and value"
+      },
+      {
+        "message": "Legg til en Tesla bil verdi 500K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian asset creation with brand and value"
+      },
+      {
+        "message": "I have a house worth 3 million",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Asset creation with 'have' verb"
+      },
+      {
+        "message": "Jeg har et hus verdt 3 millioner",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian asset creation with 'har' verb"
+      },
+      {
+        "message": "Create a new BMW X5 valued at 800K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Asset creation with 'create' verb and specific model"
+      },
+      {
+        "message": "Opprett en ny BMW X5 til verdi 800K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian asset creation with 'opprett' verb"
+      },
+      {
+        "message": "Add a Princess 55 boat",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Asset creation with boat brand"
+      },
+      {
+        "message": "Legg til en Princess 55 båt",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian boat asset creation"
+      },
+      {
+        "message": "I own a cabin worth 2M",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Asset creation with 'own' verb"
+      },
+      {
+        "message": "Jeg eier en hytte verdt 2M",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian cabin asset creation with 'eier' verb"
+      },
+      {
+        "message": "Add cryptocurrency Bitcoin worth 100K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Cryptocurrency asset creation"
+      },
+      {
+        "message": "Legg til kryptovaluta Bitcoin verdi 100K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian cryptocurrency asset creation"
+      }
+    ]
+  },
+  "update_assets": {
+    "description": "Test cases for updating existing asset values",
+    "test_cases": [
+      {
+        "message": "Set the value of my toyota to 40K",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Basic asset value update with English preposition 'of'"
+      },
+      {
+        "message": "Sett verdien av min toyota til 40K",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian asset value update with 'av' preposition"
+      },
+      {
+        "message": "Sett verdien på min toyota til 40K",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian asset value update with 'på' preposition"
+      },
+      {
+        "message": "Update my house value to 2M",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Asset value update with different word order"
+      },
+      {
+        "message": "Oppdater verdien på mitt hus til 2M",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian house value update with 'oppdater'"
+      },
+      {
+        "message": "Change my BMW worth to 60K",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Asset value update with 'change' and 'worth'"
+      },
+      {
+        "message": "Endre verdien av min BMW til 60K",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian BMW value update with 'endre'"
+      },
+      {
+        "message": "Set the price of my boat to 500K",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Asset value update using 'price' instead of 'value'"
+      },
+      {
+        "message": "Sett prisen på min båt til 500K",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian boat price update"
+      },
+      {
+        "message": "Update the worth of my cabin to 1.5M",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Cabin value update with decimal value"
+      },
+      {
+        "message": "Oppdater verdien av min hytte til 1,5M",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian cabin value update with comma decimal"
+      }
+    ]
+  },
+  "create_configurations": {
+    "description": "Test cases for creating new financial configurations",
+    "test_cases": [
+      {
+        "message": "Create a new financial configuration",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Basic configuration creation"
+      },
+      {
+        "message": "Opprett en ny finansiell konfigurasjon",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian configuration creation"
+      },
+      {
+        "message": "Start a new financial plan",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Configuration creation with 'plan' terminology"
+      },
+      {
+        "message": "Start en ny finansiell plan",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian financial plan creation"
+      },
+      {
+        "message": "Setup a new configuration profile",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Configuration creation with 'setup' and 'profile'"
+      },
+      {
+        "message": "Sett opp en ny konfigurasjonsprofil",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Norwegian configuration profile setup"
+      },
+      {
+        "message": "New configuration",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Minimal configuration creation request"
+      },
+      {
+        "message": "Ny konfigurasjon",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Minimal Norwegian configuration creation"
+      }
+    ]
+  },
+  "edge_cases": {
+    "description": "Edge cases and potential misclassifications",
+    "test_cases": [
+      {
+        "message": "What is the value of my toyota?",
+        "expected_intent": "general_question",
+        "expected_confidence": 0.8,
+        "language": "english",
+        "description": "Question about asset value should not be update intent"
+      },
+      {
+        "message": "Hva er verdien av min toyota?",
+        "expected_intent": "general_question",
+        "expected_confidence": 0.8,
+        "language": "norwegian",
+        "description": "Norwegian question about asset value"
+      },
+      {
+        "message": "Show me my assets",
+        "expected_intent": "view_data",
+        "expected_confidence": 0.8,
+        "language": "english",
+        "description": "Request to view data, not create assets"
+      },
+      {
+        "message": "Vis meg mine eiendeler",
+        "expected_intent": "view_data",
+        "expected_confidence": 0.8,
+        "language": "norwegian",
+        "description": "Norwegian request to view assets"
+      },
+      {
+        "message": "I need help",
+        "expected_intent": "general_help",
+        "expected_confidence": 0.8,
+        "language": "english",
+        "description": "General help request"
+      },
+      {
+        "message": "Jeg trenger hjelp",
+        "expected_intent": "general_help",
+        "expected_confidence": 0.8,
+        "language": "norwegian",
+        "description": "Norwegian help request"
+      },
+      {
+        "message": "Add income from salary 50K monthly",
+        "expected_intent": "add_income",
+        "expected_confidence": 0.8,
+        "language": "english",
+        "description": "Income addition should not be asset creation"
+      },
+      {
+        "message": "Legg til inntekt fra lønn 50K månedlig",
+        "expected_intent": "add_income",
+        "expected_confidence": 0.8,
+        "language": "norwegian",
+        "description": "Norwegian income addition"
+      }
+    ]
+  },
+  "complex_cases": {
+    "description": "Complex phrases that might be challenging to parse",
+    "test_cases": [
+      {
+        "message": "I want to add a Tesla Model S Performance worth approximately 1.2 million NOK",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Complex asset creation with specific model and currency"
+      },
+      {
+        "message": "Jeg ønsker å legge til en Tesla Model S Performance verdt omtrent 1,2 millioner NOK",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Complex Norwegian asset creation"
+      },
+      {
+        "message": "Please update the current market value of my BMW X5 to exactly 650,000 NOK",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Formal asset value update with specific amount"
+      },
+      {
+        "message": "Vennligst oppdater den nåværende markedsverdien av min BMW X5 til nøyaktig 650 000 NOK",
+        "expected_intent": "update_asset_value",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Formal Norwegian asset value update"
+      },
+      {
+        "message": "Could you help me create a new financial configuration for retirement planning?",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "english",
+        "description": "Polite configuration creation request with context"
+      },
+      {
+        "message": "Kan du hjelpe meg å opprette en ny finansiell konfigurasjon for pensjonsplanlegging?",
+        "expected_intent": "create_configuration",
+        "expected_confidence": 0.9,
+        "language": "norwegian",
+        "description": "Polite Norwegian configuration creation with context"
+      }
+    ]
+  },
+  "update_mortgage": {
+    "description": "Test cases for updating mortgage information on assets",
+    "test_cases": [
+      {
+        "message": "Set mortgage on my house to 2500000 NOK",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Basic mortgage amount update"
+      },
+      {
+        "message": "Sett lånet på mitt hus til 2500000 kroner",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian mortgage amount update"
+      },
+      {
+        "message": "Update mortgage on my cabin to 1500000 NOK with 4.5% interest",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Mortgage update with amount and interest rate"
+      },
+      {
+        "message": "Oppdater lånet på min hytte til 1500000 kroner med 4,5% rente",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian mortgage update with amount and interest"
+      },
+      {
+        "message": "Set mortgage interest on my house to 5.2%",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Mortgage interest rate only update"
+      },
+      {
+        "message": "Sett boliglån rente på mitt hus til 5,2%",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian mortgage interest rate update"
+      },
+      {
+        "message": "Update my house mortgage to 3000000 NOK for 25 years",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Mortgage update with amount and term"
+      },
+      {
+        "message": "Oppdater boliglånet mitt til 3000000 kroner i 25 år",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian mortgage update with amount and term"
+      },
+      {
+        "message": "Change mortgage amount on my cabin to 1800000",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Mortgage amount change with 'change' verb"
+      },
+      {
+        "message": "Endre lånebeløpet på min hytte til 1800000",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian mortgage amount change"
+      },
+      {
+        "message": "Add mortgage to my house 2000000 NOK",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Adding mortgage with 'add' verb"
+      },
+      {
+        "message": "Legg til lån på mitt hus 2000000 kroner",
+        "expected_intent": "update_mortgage",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian adding mortgage"
+      }
+    ]
+  },
+  "add_asset_with_loan": {
+    "description": "Test cases for adding new assets with loan information",
+    "test_cases": [
+      {
+        "message": "Add a Tesla worth 500K with a loan of 300K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Asset creation with loan amount"
+      },
+      {
+        "message": "Legg til en tesla til en verdi av 200K med et lån på 100K",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian asset creation with loan"
+      },
+      {
+        "message": "Create a house worth 3M with a mortgage of 2.5M for 25 years",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "House creation with mortgage and term"
+      },
+      {
+        "message": "Opprett et hus verdt 3M med et boliglån på 2,5M i 25 år",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian house creation with mortgage and term"
+      },
+      {
+        "message": "Add a BMW X5 valued at 800K with loan 500K over 6 years",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.95,
+        "language": "english",
+        "description": "Car creation with loan and term"
+      },
+      {
+        "message": "Legg til en BMW X5 til verdi 800K med lån 500K over 6 år",
+        "expected_intent": "add_asset",
+        "expected_confidence": 0.95,
+        "language": "norwegian",
+        "description": "Norwegian car creation with loan and term"
+      }
+    ]
+  }
+}

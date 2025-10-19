@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Utleie-vs-Fond-Ulrik - Investeringsanalytikeren",
+        "name": "Utleie vs Fond",
         "description": "Direct comparison between rental property investment and equity fund investment returns",
         "birthYear": "1985",
         "prognoseYear": "50",
@@ -20,7 +20,7 @@
             "active" : true,
 
         },
-        "2023": {
+        "2025": {
             "asset": {
                 "marketAmount": 3200000,
                 "changerate": "changerates.rental",
@@ -60,7 +60,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 2100000,
                 "changerate": "changerates.equityfund",

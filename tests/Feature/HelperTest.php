@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Helper;
+use App\Models\Core\Helper;
 use Tests\TestCase;
 
 class HelperTest extends TestCase

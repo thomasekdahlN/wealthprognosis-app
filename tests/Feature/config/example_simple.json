@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Even Enklel Eksempel - fra Groruddalen",
+        "name": "Even Enklel",
         "description": "Comprehensive financial independence portfolio with diversified investments and strategic planning",
         "birthYear": "1975",
         "prognoseYear": "50",
@@ -20,7 +20,7 @@
             "active": true
 
         },
-        "2023": {
+        "2025": {
             "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
             "income": {
                 "name": "Income",
@@ -103,7 +103,7 @@
             "description": "Employer-sponsored pension with 5% annual contributions",
             "active": true
         },
-        "2023": {
+        "2025": {
             "asset": {
                 "marketAmount": 2000000,
                 "rule": "5%",
@@ -131,7 +131,7 @@
             "description": "Modern 3-bedroom apartment in central Oslo with mortgage",
             "active": true
         },
-        "2023": {
+        "2025": {
             "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
             "asset": {
                 "marketAmount": "3000000",
@@ -162,7 +162,7 @@
             "description": "Diversified equity fund investments for long-term growth",
             "active": true
         },
-        "2023": {
+        "2025": {
             "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
             "asset": {
                 "marketAmount": 10000,
@@ -180,7 +180,7 @@
             "description": "High-yield savings account for emergencies and opportunities",
             "active": true
         },
-        "2023": {
+        "2025": {
             "description": "Income:  | Expense:  | Asset: Kontanter p.t. | Mortgage: ",
             "asset": {
                 "marketAmount": 100000,
@@ -205,7 +205,7 @@
             "description": "Electric vehicle with lower operating costs and depreciation",
             "active": true
         },
-        "2023": {
+        "2025": {
             "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
             "asset": {
                 "marketAmount": 200000,

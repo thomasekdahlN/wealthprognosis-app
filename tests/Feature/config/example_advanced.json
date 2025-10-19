@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Avansert-Astrid - Formuesguruen fra Fredrikstad",
+        "name": "Avansert-Astrid",
         "description": "Advanced wealth management with complex asset structures and sophisticated financial planning",
         "birthYear": "1985",
         "prognoseYear": "50",
@@ -19,7 +19,7 @@
             "description": "Lønn",
             "active": true
         },
-        "2024": {
+        "2025": {
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -55,7 +55,7 @@
             "description": "Kone - å dele utgifter med",
             "active": true
         },
-        "2024": {
+        "2025": {
             "income": {
                 "description": "Dele reelle utgifter på hus (4000) og mat (3000) - ikke lån - dvs 7000 spart pr mnd",
                 "amount": 7000,
@@ -73,7 +73,7 @@
             "description": "Barnetrygd som inntekter på barn frem til 18 år, utgifter helt til de flytter ut",
             "active": true
         },
-        "2024": {
+        "2025": {
             "income": {
                 "amount": 1000,
                 "factor": "monthly",
@@ -184,7 +184,7 @@
             "active" : true,
 
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 4000000,
                 "changerate": "changerates.house",
@@ -225,7 +225,7 @@
             "description": "Hytte med litt AirBnb inntekt",
             "active": true
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 5000000,
                 "acquisitionAmount": 1,
@@ -262,7 +262,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 4000000,
                 "changerate": "changerates.house",
@@ -302,7 +302,7 @@
             "description": "Crypto",
             "active": true
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 5000,
                 "changerate": "changerates.crypto",
@@ -328,7 +328,7 @@
             "description": "Gold",
             "active": true
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 5000,
                 "changerate": "changerates.gold",
@@ -380,7 +380,7 @@
             "description": "",
             "active": true
         },
-        "2020": {
+        "2025": {
             "asset": {
                 "marketAmount": 50000,
                 "changerate": "changerates.car",
@@ -405,7 +405,7 @@
             "description": "",
             "active": true
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 200000,
                 "changerate": "changerates.boat",

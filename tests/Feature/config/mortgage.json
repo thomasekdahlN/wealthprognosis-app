@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Låne-Lasse - Boliglånseksperten fra Hamar",
+        "name": "Låne-Lasse",
         "description": "Advanced mortgage strategies including interest-only periods and payment optimization",
         "birthYear": "1995",
         "prognoseYear": "50",
@@ -19,7 +19,7 @@
             "description": "Paying only interest for the first 5 years, then paying interest and principal for the remaining years",
             "active": true
         },
-        "2024": {
+        "2025": {
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -58,7 +58,7 @@
             "active": false,
 
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": "3000000",
                 "changerate": "changerates.house",
@@ -82,7 +82,7 @@
             "active": true,
 
         },
-        "2023": {
+        "2025": {
             "asset": {
                 "marketAmount": "3000000",
                 "changerate": "changerates.house",

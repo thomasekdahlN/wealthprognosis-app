@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Changerate;
+use App\Models\Core\Changerate;
 use Tests\TestCase;
 
 class ChangerateTest extends TestCase

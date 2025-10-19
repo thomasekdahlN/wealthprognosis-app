@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Pensjon-Petter - Pensjonsplanleggeren fra Porsgrunn",
+        "name": "Pensjon-OTP",
         "description": "Comprehensive pension planning combining state pension and occupational pension strategies",
         "birthYear": "1985",
         "prognoseYear": "50",
@@ -20,7 +20,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "income": {
                 "name": "Lønn",
                 "description": "Lønn 600000",
@@ -76,7 +76,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "asset": {
                 "marketAmount": 2000000,
                 "rule": "5%",
@@ -105,7 +105,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "income": {
                 "amount": 0,
                 "changerate": "changerates.kpi",

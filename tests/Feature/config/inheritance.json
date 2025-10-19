@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Arving-Arne - Millionæren som Venter på Mormor",
+        "name": "Arving-Arne",
         "description": "Strategic financial planning incorporating expected inheritance and optimal wealth transfer strategies",
         "birthYear": "1975",
         "prognoseYear": "50",
@@ -20,7 +20,7 @@
             "active": true,
 
         },
-        "2023": {
+        "2025": {
             "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Mortgage: interest changerates.interest, years 20",
             "asset": {
                 "marketAmount": "3000000",
@@ -77,7 +77,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "description": "Asset: ",
             "asset": {
                 "marketAmount": 10000,

@@ -18,7 +18,7 @@ class AssetTypeManagementTest extends TestCase
         // Run basic seeders first to create users and teams
         $this->artisan('db:seed', ['--class' => 'DatabaseSeeder']);
 
-        $this->assertDatabaseCount('asset_types', 38);
+        $this->assertDatabaseCount('asset_types', 40);
 
         // Check specific Norwegian asset types exist
         $this->assertDatabaseHas('asset_types', [
@@ -63,7 +63,7 @@ class AssetTypeManagementTest extends TestCase
 
         // Test active scope
         $activeAssetTypes = AssetType::active()->get();
-        $this->assertCount(38, $activeAssetTypes); // All 38 are active
+        $this->assertCount(40, $activeAssetTypes); // All 40 are active
 
         // Test ordered scope
         $orderedAssetTypes = AssetType::ordered()->get();
@@ -155,6 +155,7 @@ class AssetTypeManagementTest extends TestCase
             'Business',
             'Cash Equivalents',
             'Consumer Goods',
+            'Debt & Liabilities',
             'Development',
             'Family',
             'Income',

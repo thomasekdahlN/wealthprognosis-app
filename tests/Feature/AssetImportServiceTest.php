@@ -84,7 +84,7 @@ class AssetImportServiceTest extends TestCase
         $this->assertEquals(50, $assetConfiguration->prognose_age);
         $this->assertEquals(67, $assetConfiguration->pension_official_age);
         $this->assertEquals(63, $assetConfiguration->pension_wish_age);
-        $this->assertEquals(82, $assetConfiguration->death_age);
+        $this->assertEquals(82, $assetConfiguration->expected_death_age);
         $this->assertEquals($this->user->id, $assetConfiguration->user_id);
 
         // Assert Asset was created

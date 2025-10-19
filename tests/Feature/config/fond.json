@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Fonda Fondsen - Den Unge Sparegris",
+        "name": "Alex Aksjefond",
         "description": "Early career professional building wealth through systematic fund investments and compound growth",
         "birthYear": "2005",
         "prognoseYear": "50",
@@ -19,7 +19,7 @@
             "description": "Entry-level to senior software developer career progression",
             "active": true
         },
-        "2024": {
+        "2025": {
             "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
             "income": {
                 "name": "Income",
@@ -58,7 +58,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
             "asset": {
                 "marketAmount": 1000000,

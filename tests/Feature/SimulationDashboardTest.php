@@ -36,7 +36,7 @@ beforeEach(function () {
         'team_id' => $this->user->currentTeam?->id,
         'name' => 'Test Portfolio',
         'birth_year' => 1980,
-        'death_age' => 85,
+        'expected_death_age' => 85,
     ]);
 
     // Create a simulation configuration with assets and years
@@ -46,7 +46,7 @@ beforeEach(function () {
         'asset_configuration_id' => $this->assetConfiguration->id,
         'name' => 'Test Simulation',
         'birth_year' => 1980,
-        'death_age' => 85,
+        'expected_death_age' => 85,
         'created_by' => $this->user->id,
         'updated_by' => $this->user->id,
     ]);

@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\ChangeRateTable;
-use App\Filament\Widgets\ChangeRateChart;
 use App\Models\ChangeRateConfiguration;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

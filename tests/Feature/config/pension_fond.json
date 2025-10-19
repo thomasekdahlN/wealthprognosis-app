@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Pensjonsfond-Petra - Fondsguruen fra Porsgrunn",
+        "name": "Pensjonsfond-Petra",
         "description": "Pension fund investment strategy combining state pension with private fund investments",
         "birthYear": "1975",
         "prognoseYear": "50",
@@ -20,7 +20,7 @@
             "active": true,
 
         },
-        "2022": {
+        "2025": {
             "income": {
                 "name": "Income",
                 "description": "Income",
@@ -57,7 +57,7 @@
             "active": true,
 
         },
-        "2022": {
+        "2025": {
             "asset": {
                 "rule": "+12000",
                 "marketAmount": 1080000,
@@ -86,7 +86,7 @@
             "active": true,
 
         },
-        "2024": {
+        "2025": {
             "income": {
                 "amount": 0,
                 "changerate": "changerates.kpi",

@@ -2,9 +2,9 @@
 
 use App\Models\AssetConfiguration;
 use App\Models\AssetType;
+use App\Models\PrognosisNew;
 use App\Models\TaxType;
 use App\Models\User;
-use App\Models\PrognosisNew;
 use App\Services\PrognosisSimulationService;
 
 beforeEach(function () {
@@ -23,7 +23,7 @@ beforeEach(function () {
         'user_id' => $this->user->id,
         'name' => 'Test Portfolio',
         'birth_year' => 1985,
-        'death_age' => 85,
+        'expected_death_age' => 85,
         'prognose_age' => 65,
         'pension_official_age' => 67,
         'pension_wish_age' => 65,
@@ -118,10 +118,9 @@ beforeEach(function () {
     ]);
 });
 
-
 it('can run simulation with realistic data', function () {
-        $prognosis = new PrognosisNew($this->assetConfiguration, 'realistic', 'both');
-        $results = $prognosis->runSimulation();
+    $prognosis = new PrognosisNew($this->assetConfiguration, 'realistic', 'both');
+    $results = $prognosis->runSimulation();
 
     expect($results)->toBeArray();
     expect($results)->toHaveKey('configuration');
@@ -158,18 +157,18 @@ it('can run simulation with realistic data', function () {
 });
 
 it('can integrate with simulation service', function () {
-        $this->actingAs($this->user);
+    $this->actingAs($this->user);
 
-        $simulationData = [
-            'asset_configuration_id' => $this->assetConfiguration->id,
-            'prognosis_type' => 'positive',
-            'asset_scope' => 'private',
-            'start_year' => date('Y'),
-            'end_year' => $this->assetConfiguration->birth_year + $this->assetConfiguration->death_age,
-        ];
+    $simulationData = [
+        'asset_configuration_id' => $this->assetConfiguration->id,
+        'prognosis_type' => 'positive',
+        'asset_scope' => 'private',
+        'start_year' => date('Y'),
+        'end_year' => $this->assetConfiguration->birth_year + $this->assetConfiguration->expected_death_age,
+    ];
 
-        $service = new PrognosisSimulationService();
-        $results = $service->runSimulation($simulationData);
+    $service = new PrognosisSimulationService;
+    $results = $service->runSimulation($simulationData);
 
     expect($results)->toBeArray();
     expect($results)->toHaveKey('simulation_configuration_id');
@@ -196,14 +195,14 @@ it('can integrate with simulation service', function () {
 });
 
 it('produces different results for different prognosis types', function () {
-        $prognosisRealistic = new PrognosisNew($this->assetConfiguration, 'realistic', 'both');
-        $resultsRealistic = $prognosisRealistic->runSimulation();
+    $prognosisRealistic = new PrognosisNew($this->assetConfiguration, 'realistic', 'both');
+    $resultsRealistic = $prognosisRealistic->runSimulation();
 
-        $prognosisPositive = new PrognosisNew($this->assetConfiguration, 'positive', 'both');
-        $resultsPositive = $prognosisPositive->runSimulation();
+    $prognosisPositive = new PrognosisNew($this->assetConfiguration, 'positive', 'both');
+    $resultsPositive = $prognosisPositive->runSimulation();
 
-        $prognosisNegative = new PrognosisNew($this->assetConfiguration, 'negative', 'both');
-        $resultsNegative = $prognosisNegative->runSimulation();
+    $prognosisNegative = new PrognosisNew($this->assetConfiguration, 'negative', 'both');
+    $resultsNegative = $prognosisNegative->runSimulation();
 
     // Positive scenario should result in higher end values than realistic
     expect($resultsPositive['summary']['total_assets_end'])
@@ -221,61 +220,61 @@ it('produces different results for different prognosis types', function () {
 });
 
 it('calculates FIRE metrics correctly', function () {
-        // Create a configuration that should achieve FIRE
-        $richConfig = AssetConfiguration::factory()->create([
-            'user_id' => $this->user->id,
-            'name' => 'Rich Portfolio',
-            'birth_year' => 1990,
-            'death_age' => 85,
-        ]);
+    // Create a configuration that should achieve FIRE
+    $richConfig = AssetConfiguration::factory()->create([
+        'user_id' => $this->user->id,
+        'name' => 'Rich Portfolio',
+        'birth_year' => 1990,
+        'expected_death_age' => 85,
+    ]);
 
-        // Create high-value asset
-        $richAsset = $richConfig->assets()->create([
-            'user_id' => $this->user->id,
-            'team_id' => $this->user->currentTeam?->id,
-            'code' => 'rich_portfolio',
-            'name' => 'Rich Portfolio',
-            'description' => 'High value investment portfolio',
-            'asset_type' => 'equity',
-            'group' => 'private',
-            'tax_type' => 'capital_gains',
-            'tax_country' => 'no',
-            'is_active' => true,
-            'sort_order' => 1,
-            'created_by' => $this->user->id,
-            'updated_by' => $this->user->id,
-            'created_checksum' => hash('sha256', 'rich_created'),
-            'updated_checksum' => hash('sha256', 'rich_updated'),
-        ]);
+    // Create high-value asset
+    $richAsset = $richConfig->assets()->create([
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'code' => 'rich_portfolio',
+        'name' => 'Rich Portfolio',
+        'description' => 'High value investment portfolio',
+        'asset_type' => 'equity',
+        'group' => 'private',
+        'tax_type' => 'capital_gains',
+        'tax_country' => 'no',
+        'is_active' => true,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'rich_created'),
+        'updated_checksum' => hash('sha256', 'rich_updated'),
+    ]);
 
-        $richAsset->years()->create([
-            'asset_configuration_id' => $richConfig->id,
-            'user_id' => $this->user->id,
-            'team_id' => $this->user->currentTeam?->id,
-            'year' => date('Y'),
-            'asset_market_amount' => 2000000, // 2M starting value
-            'asset_acquisition_amount' => 1500000,
-            'asset_equity_amount' => 2000000,
-            'asset_paid_amount' => 0,
-            'asset_taxable_initial_amount' => 0,
-            'income_amount' => 50000,
-            'income_factor' => 'yearly',
-            'expence_amount' => 80000, // 80k yearly expenses
-            'expence_factor' => 'yearly',
-            'change_rate_type' => 'equity',
-            'start_year' => date('Y'),
-            'end_year' => null,
-            'sort_order' => 1,
-            'created_by' => $this->user->id,
-            'updated_by' => $this->user->id,
-            'created_checksum' => hash('sha256', 'rich_year_created'),
-            'updated_checksum' => hash('sha256', 'rich_year_updated'),
-        ]);
+    $richAsset->years()->create([
+        'asset_configuration_id' => $richConfig->id,
+        'user_id' => $this->user->id,
+        'team_id' => $this->user->currentTeam?->id,
+        'year' => date('Y'),
+        'asset_market_amount' => 2000000, // 2M starting value
+        'asset_acquisition_amount' => 1500000,
+        'asset_equity_amount' => 2000000,
+        'asset_paid_amount' => 0,
+        'asset_taxable_initial_amount' => 0,
+        'income_amount' => 50000,
+        'income_factor' => 'yearly',
+        'expence_amount' => 80000, // 80k yearly expenses
+        'expence_factor' => 'yearly',
+        'change_rate_type' => 'equity',
+        'start_year' => date('Y'),
+        'end_year' => null,
+        'sort_order' => 1,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => hash('sha256', 'rich_year_created'),
+        'updated_checksum' => hash('sha256', 'rich_year_updated'),
+    ]);
 
-        $prognosis = new PrognosisNew($richConfig, 'realistic', 'both');
-        $results = $prognosis->runSimulation();
+    $prognosis = new PrognosisNew($richConfig, 'realistic', 'both');
+    $results = $prognosis->runSimulation();
 
-        $summary = $results['summary'];
+    $summary = $results['summary'];
 
     // Should achieve FIRE (25x expenses = 25 * 80k = 2M, which we already have)
     expect($summary['fire_achieved'])->toBe(true);

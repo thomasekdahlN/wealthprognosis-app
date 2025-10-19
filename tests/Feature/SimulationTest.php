@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\AssetConfiguration;
 use App\Models\AssetType;
+use App\Models\PrognosisNew;
 use App\Models\TaxType;
 use App\Models\User;
-use App\Models\PrognosisNew;
 use App\Services\PrognosisSimulationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,6 +16,7 @@ class SimulationTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected AssetConfiguration $assetConfiguration;
 
     protected function setUp(): void
@@ -37,7 +38,7 @@ class SimulationTest extends TestCase
             'user_id' => $this->user->id,
             'name' => 'Test Configuration',
             'birth_year' => 1985,
-            'death_age' => 85,
+            'expected_death_age' => 85,
             'prognose_age' => 65,
         ]);
 
@@ -133,7 +134,7 @@ class SimulationTest extends TestCase
             'end_year' => $this->assetConfiguration->birth_year + $this->assetConfiguration->death_age,
         ];
 
-        $service = new PrognosisSimulationService();
+        $service = new PrognosisSimulationService;
         $results = $service->runSimulation($simulationData);
 
         $this->assertIsArray($results);

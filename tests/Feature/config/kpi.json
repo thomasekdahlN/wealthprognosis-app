@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "KPI-Knut - Inflasjonseksperten fra Kongsberg",
+        "name": "KPI-Knut",
         "description": "Consumer Price Index tracking and inflation-adjusted financial planning",
         "birthYear": "1975",
         "prognoseYear": "50",
@@ -19,7 +19,7 @@
             "description": "",
             "active": true
         },
-        "2023": {
+        "2025": {
             "asset": {
                 "marketAmount": 100000,
                 "changerate": "changerates.kpi",

@@ -62,14 +62,14 @@ class TaxTypeManagementTest extends TestCase
             'type' => 'test_tax',
             'name' => 'Test Tax',
             'description' => 'A test tax type',
-                        'is_active' => true,
+            'is_active' => true,
             'sort_order' => 10,
         ]);
 
         $this->assertDatabaseHas('tax_types', [
             'type' => 'test_tax',
             'name' => 'Test Tax',
-                    ]);
+        ]);
     }
 
     public function test_tax_type_unique_type_constraint()

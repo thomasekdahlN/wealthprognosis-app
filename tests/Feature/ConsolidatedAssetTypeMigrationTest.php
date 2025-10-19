@@ -5,8 +5,8 @@ namespace Tests\Feature;
 use App\Models\AssetCategory;
 use App\Models\AssetType;
 use App\Models\TaxType;
-use App\Models\User;
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

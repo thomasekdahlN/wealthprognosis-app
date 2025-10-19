@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "FIRE-Frida - Spareguruen fra Sandnes",
+        "name": "FIRE-Frida",
         "description": "FIRE enthusiast who achieved financial independence in 2023 through systematic investing and frugal living",
         "birthYear": "1990",
         "icon": "heroicon-o-fire",
@@ -38,7 +38,7 @@
                     "repeat": true
                 }
             },
-            "2023": {
+            "2025": {
                 "income": {
                     "name": "FIRE Achieved - Optional Work",
                     "description": "Financial independence reached - work becomes optional",

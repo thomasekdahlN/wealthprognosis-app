@@ -21,4 +21,3 @@ class AssetTypeTaxLinkTest extends TestCase
         $this->assertSame($total, $withTax, 'All asset types should be linked to a tax type');
     }
 }
-

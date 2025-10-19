@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Amortization;
-use App\Models\Changerate;
+use App\Models\Core\Amortization;
+use App\Models\Core\Changerate;
 use Tests\TestCase;
 
 class AmortizationTest extends TestCase
@@ -51,8 +51,10 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_positive_balance()
     {
-        $changerate = new class {
-            public function getChangerate() {
+        $changerate = new class
+        {
+            public function getChangerate()
+            {
                 return [5, 0.05, null, ''];
             }
         };
@@ -65,8 +67,10 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_zero_balance()
     {
-        $changerate = new class {
-            public function getChangerate() {
+        $changerate = new class
+        {
+            public function getChangerate()
+            {
                 return [5, 0.05, null, ''];
             }
         };
@@ -78,8 +82,10 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_interest_only_years()
     {
-        $changerate = new class {
-            public function getChangerate() {
+        $changerate = new class
+        {
+            public function getChangerate()
+            {
                 return [5, 0.05, null, ''];
             }
         };
@@ -91,8 +97,10 @@ class AmortizationTest extends TestCase
 
     public function test_it_calculates_amortization_schedule_with_extra_downpayment()
     {
-        $changerate = new class {
-            public function getChangerate() {
+        $changerate = new class
+        {
+            public function getChangerate()
+            {
                 return [5, 0.05, null, ''];
             }
         };
@@ -104,8 +112,10 @@ class AmortizationTest extends TestCase
 
     public function test_it_handles_negative_interest_without_exception()
     {
-        $changerate = new class {
-            public function getChangerate() {
+        $changerate = new class
+        {
+            public function getChangerate()
+            {
                 return [-1, -0.01, null, ''];
             }
         };

@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Bosse Boligeier - Huslånshelten fra Bergen",
+        "name": "Bosse Boligeier",
         "description": "Primary residence ownership with mortgage optimization and property appreciation analysis",
         "birthYear": "1975",
         "prognoseYear": "50",
@@ -20,7 +20,7 @@
             "active": true,
 
         },
-        "2023": {
+        "2025": {
             "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset:  | Mortgage: interest changerates.interest, years 20",
             "asset": {
                 "marketAmount": "3000000",

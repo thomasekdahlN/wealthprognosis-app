@@ -2,11 +2,23 @@
 
 namespace Tests\Feature;
 
-use App\Models\TaxRealization;
+use App\Models\Core\TaxRealization;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class TaxRealizationTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Seed asset types for tax shield functionality
+        $this->seed(\Database\Seeders\TaxTypesFromConfigSeeder::class);
+        $this->seed(\Database\Seeders\AssetTypeSeeder::class);
+    }
+
     public function test_it_calculates_tax_realization_for_company_group()
     {
         $taxRealization = new TaxRealization('config', 2022, 2023);

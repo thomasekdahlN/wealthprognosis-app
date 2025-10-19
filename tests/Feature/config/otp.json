@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Oddgeir OTP - Tjenestepensjonisten fra Tromsø",
+        "name": "Oddgeir OTP",
         "description": "Occupational pension planning with employer contributions and withdrawal strategies",
         "birthYear": "1985",
         "prognoseYear": "50",
@@ -20,7 +20,7 @@
             "active": true,
 
         },
-        "2023": {
+        "2025": {
             "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
             "income": {
                 "name": "Income",
@@ -50,7 +50,7 @@
             "description": "OTP",
             "active": true
         },
-        "2023": {
+        "2025": {
             "description": "Asset: OTP Sparing frem til pensjonsår",
             "asset": {
                 "marketAmount": 2000000,
