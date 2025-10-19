@@ -22,6 +22,10 @@ class AiAssistantWidget extends Component
 
     public string $currentStatus = '';
 
+    public int $elapsedSeconds = 0;
+
+    public ?float $startTime = null;
+
     public ?int $currentConfigurationId = null;
 
     protected AiAssistantService $aiService;
@@ -33,6 +37,13 @@ class AiAssistantWidget extends Component
 
     public function mount(): void
     {
+        // Ensure user is authenticated and has a team
+        if (! Auth::check() || ! Auth::user()->current_team_id) {
+            \Log::warning('AiAssistantWidget: Attempted to mount without authentication or team');
+
+            return;
+        }
+
         // Get current configuration from session
         $this->detectCurrentConfiguration();
 
@@ -47,6 +58,13 @@ class AiAssistantWidget extends Component
 
     protected function detectCurrentConfiguration(): void
     {
+        // Ensure user is authenticated
+        if (! Auth::check() || ! Auth::user()) {
+            $this->currentConfigurationId = null;
+
+            return;
+        }
+
         // Get current configuration from session using the service
         $currentConfigService = app(CurrentAssetConfiguration::class);
         $config = $currentConfigService->get();
@@ -86,6 +104,10 @@ class AiAssistantWidget extends Component
         // Refresh configuration detection when widget is opened
         if ($this->isOpen) {
             $this->detectCurrentConfiguration();
+            // Set a test status to verify the display works
+            $this->currentStatus = '👋 Welcome! Ready to help with your finances.';
+        } else {
+            $this->currentStatus = '';
         }
     }
 
@@ -99,19 +121,7 @@ class AiAssistantWidget extends Component
             return;
         }
 
-        // Start the loading process with status updates
-        $this->isLoading = true;
-        $this->updateStatus('🔍 Interpreting your question...');
-
-        // Always refresh configuration detection before processing
-        $this->detectCurrentConfiguration();
-
-        \Log::info('AiAssistantWidget: Processing message', [
-            'message' => $this->message,
-            'current_config_id' => $this->currentConfigurationId,
-        ]);
-
-        // Add user message to conversation
+        // Add user message to conversation first
         $this->conversation[] = [
             'type' => 'user',
             'message' => trim($this->message),
@@ -121,17 +131,56 @@ class AiAssistantWidget extends Component
         $userMessage = $this->message;
         $this->message = '';
 
-        \Log::info('AiAssistantWidget: Added user message, starting AI processing');
+        // Start the loading process
+        $this->isLoading = true;
+        $this->currentStatus = '🔍 Analyzing your question...';
+        $this->startTime = microtime(true);
+        $this->elapsedSeconds = 0;
+
+        // Always refresh configuration detection before processing
+        $this->detectCurrentConfiguration();
+
+        \Log::info('AiAssistantWidget: Processing message', [
+            'message' => $userMessage,
+            'current_config_id' => $this->currentConfigurationId,
+            'isLoading' => $this->isLoading,
+        ]);
 
         try {
-            // Process message with AI service
+            // Process message with AI service with real-time status updates
             $response = $this->aiService->processMessage(
                 $userMessage,
                 $this->conversation,
                 Auth::user(),
                 $this->currentConfigurationId,
                 function ($status) {
-                    $this->updateStatus($status);
+                    // Update the status property
+                    $this->currentStatus = $status;
+
+                    // Update elapsed time
+                    if ($this->startTime !== null) {
+                        $this->elapsedSeconds = (int) floor(microtime(true) - $this->startTime);
+                    }
+
+                    \Log::info('AiAssistantWidget: Status updated', [
+                        'status' => $status,
+                        'elapsed' => $this->elapsedSeconds,
+                    ]);
+
+                    // Use JavaScript to update UI immediately during processing
+                    $this->js(sprintf(
+                        "
+                        const statusElements = document.querySelectorAll('[data-ai-status]');
+                        const elapsedElements = document.querySelectorAll('[data-ai-elapsed]');
+                        statusElements.forEach(el => el.textContent = %s);
+                        elapsedElements.forEach(el => el.textContent = %s + 's');
+                        console.log('AI Status updated:', %s, 'Elapsed:', %s);
+                        ",
+                        json_encode($status),
+                        $this->elapsedSeconds,
+                        json_encode($status),
+                        $this->elapsedSeconds
+                    ));
                 }
             );
 
@@ -152,7 +201,6 @@ class AiAssistantWidget extends Component
 
         } catch (\Exception $e) {
             \Log::error('AiAssistantWidget: Error processing message', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            $this->updateStatus('❌ Processing error...');
 
             $this->conversation[] = [
                 'type' => 'assistant',
@@ -164,7 +212,17 @@ class AiAssistantWidget extends Component
 
         $this->isLoading = false;
         $this->currentStatus = '';
+        $this->startTime = null;
+        $this->elapsedSeconds = 0;
+
         \Log::info('AiAssistantWidget: Finished processing, conversation count: '.count($this->conversation));
+    }
+
+    public function updateElapsedTime(): void
+    {
+        if ($this->startTime !== null && $this->isLoading) {
+            $this->elapsedSeconds = (int) floor(microtime(true) - $this->startTime);
+        }
     }
 
     public function refreshConfiguration(): void
@@ -201,18 +259,6 @@ class AiAssistantWidget extends Component
     }
 
     /**
-     * Update the current status and refresh the UI
-     */
-    protected function updateStatus(string $status): void
-    {
-        $this->currentStatus = $status;
-        // Force Livewire to update the UI immediately
-        $this->dispatch('status-updated', status: $status);
-        // Add a small delay to make status visible
-        usleep(200000); // 0.2 seconds for better visibility
-    }
-
-    /**
      * Format a message with markdown support for AI assistant display
      */
     public function formatMessage(string $message): string
@@ -236,6 +282,11 @@ class AiAssistantWidget extends Component
 
     public function render()
     {
+        // Don't render if user is not authenticated or doesn't have a team
+        if (! Auth::check() || ! Auth::user()?->current_team_id) {
+            return view('livewire.empty');
+        }
+
         return view('livewire.ai-assistant-widget');
     }
 }

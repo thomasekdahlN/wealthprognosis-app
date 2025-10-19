@@ -112,7 +112,7 @@ RESPONSE FORMAT (JSON only, no other text):
     \"prognose_age\": 65,
     \"pension_official_age\": 67,
     \"pension_wish_age\": 65,
-    \"death_age\": 85,
+    \"expected_death_age\": 85,
     \"export_start_age\": 25
   },
   \"assets\": [

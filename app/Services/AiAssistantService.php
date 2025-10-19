@@ -70,7 +70,7 @@ class AiAssistantService
                     $statusCallback('🤖 Sending request to AI...');
                 }
                 // Use real AI service for contextual responses
-                $aiResponse = $this->callAiService($originalMessage, $contextData, $user);
+                $aiResponse = $this->callAiService($originalMessage, $contextData, $user, $conversation);
 
                 if ($statusCallback) {
                     $statusCallback('✨ Formatting response...');
@@ -93,6 +93,8 @@ class AiAssistantService
         return match ($intent['type']) {
             'switch_configuration' => $this->handleSwitchConfiguration($message, $intent, $user),
             'create_configuration' => $this->handleCreateConfiguration($message, $intent, $user),
+            'update_mortgage' => $this->handleUpdateMortgage($message, $intent, $user, $currentConfigurationId, $statusCallback),
+            'update_asset_value' => $this->handleUpdateAssetValue($message, $intent, $user, $currentConfigurationId, $statusCallback),
             'add_asset' => $this->handleAddAsset($message, $intent, $user, $currentConfigurationId),
             'add_income' => $this->handleAddIncome($message, $intent, $user, $currentConfigurationId),
             'add_life_event' => $this->handleAddLifeEvent($message, $intent, $user, $currentConfigurationId),
@@ -105,57 +107,100 @@ class AiAssistantService
 
     protected function analyzeIntent(string $message, array $conversation): array
     {
-        // Check for configuration switching keywords
-        if (preg_match('/switch|change|select|use.*configuration|config.*(\d+)/i', $message)) {
+        // Check for configuration switching keywords - Enhanced Norwegian support
+        if (preg_match('/(?:switch|change|select|use|bytt|endre|velg|bruk).*(?:configuration|config|konfigurasjon).*(\d+)/i', $message)) {
             return ['type' => 'switch_configuration', 'confidence' => 0.9];
         }
 
-        // Check for configuration creation keywords
-        if (preg_match('/create|new|start|setup.*configuration|profile|plan/i', $message)) {
+        // Check for configuration creation keywords - Enhanced Norwegian support
+        if (preg_match('/(?:create|new|start|setup|opprett|ny|start|sett\s+opp).*(?:configuration|profile|plan|konfigurasjon|profil|finansiell)/i', $message)) {
             return ['type' => 'create_configuration', 'confidence' => 0.9];
         }
 
-        // Check for asset-related keywords first (higher priority than general questions)
-        if (preg_match('/(?:add|create|have|own).*(?:asset|house|car|boat|cabin|fund|crypto|property|investment|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum)/i', $message)) {
-            return ['type' => 'add_asset', 'confidence' => 0.9];
-        }
-
-        // Check for explicit asset addition with value patterns
-        if (preg_match('/(?:house|car|boat|cabin|fund|crypto|property|investment|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum).*(?:worth|value|cost|price).*\d+/i', $message)) {
+        // Check for asset creation with loan (higher priority than mortgage updates)
+        // Patterns for "add/create asset with loan"
+        if (preg_match('/(?:add|create|legg.*til|opprett).*(?:en|et|a)?.*(?:asset|house|car|boat|båt|cabin|hytte|hus|bil|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess).*(?:with|med).*(?:loan|mortgage|lån|boliglån)/i', $message) ||
+            preg_match('/(?:add|create|legg.*til|opprett).*(?:en|et|a)?.*(?:asset|house|car|boat|båt|cabin|hytte|hus|bil|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess).*(?:worth|value|verdi|verdt).*(?:with|med).*(?:loan|mortgage|lån|boliglån)/i', $message) ||
+            preg_match('/(?:legg.*til|add|opprett).*(?:en|et|a).*(?:house|car|boat|båt|cabin|hytte|hus|bil|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess).*(?:til|to).*(?:en|a).*(?:verdi|value).*(?:med|with).*(?:et|a).*(?:lån|loan|boliglån)/i', $message)) {
             return ['type' => 'add_asset', 'confidence' => 0.95];
         }
 
-        // Check for income-related keywords
-        if (preg_match('/income|salary|wage|pension|benefit|barnetrygd|earn/i', $message)) {
+        // Check for mortgage updates on existing assets (lower priority than asset creation)
+        // Patterns for both English and Norwegian
+        if (preg_match('/(?:set|update|change|add|sett|oppdater|endre|legg.*til).*(?:mortgage|loan|lån|boliglån).*(?:on|på|to|til).*(?:my|min|mitt)/i', $message) ||
+            preg_match('/(?:sett|set).*(?:lån|lånet|mortgage|loan).*(?:på|av|of).*(?:my|min|mitt)/i', $message) ||
+            preg_match('/(?:mortgage|loan|lån|boliglån).*(?:interest|rente).*(?:on|på).*(?:my|min|mitt)/i', $message) ||
+            preg_match('/(?:update|oppdater).*(?:my|min|mitt).*(?:house|hus|cabin|hytte|car|bil).*(?:mortgage|loan|lån|boliglån)/i', $message) ||
+            preg_match('/(?:add|legg.*til).*(?:mortgage|loan|lån|boliglån).*(?:to|til).*(?:my|min|mitt)/i', $message) ||
+            preg_match('/(?:oppdater|update).*(?:boliglån|boliglånet|mortgage|loan|lån|lånet).*(?:mitt|my)/i', $message)) {
+            return ['type' => 'update_mortgage', 'confidence' => 0.95];
+        }
+
+        // Check for asset value updates (higher priority than adding new assets, but exclude mortgage-related)
+        // Simplified patterns for both English and Norwegian
+        if ((preg_match('/(?:set|update|change|sett|oppdater|endre).*(?:value|worth|price|verdi|pris|verdien).*(?:to|til).*\d+/i', $message) ||
+            preg_match('/(?:sett|set).*(?:verdien|value).*(?:på|av|of).*(?:til|to).*\d+/i', $message) ||
+            preg_match('/(?:update|oppdater).*(?:my|min|mine|mitt).*(?:to|til).*\d+/i', $message)) &&
+            ! preg_match('/(?:mortgage|loan|lån|boliglån)/i', $message)) {
+            return ['type' => 'update_asset_value', 'confidence' => 0.95];
+        }
+
+        // Check for asset-related keywords first (higher priority than general questions)
+        // Enhanced Norwegian support with more patterns
+        if (preg_match('/(?:add|create|have|own|legg.*til|har|eier|jeg\s+har|jeg\s+eier).*(?:asset|house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess)/i', $message)) {
+            return ['type' => 'add_asset', 'confidence' => 0.9];
+        }
+
+        // Check for explicit asset addition with value patterns - Enhanced Norwegian support with "verdt"
+        if (preg_match('/(?:house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess).*(?:worth|value|cost|price|verdi|verdt|koster|pris).*\d+/i', $message)) {
+            return ['type' => 'add_asset', 'confidence' => 0.95];
+        }
+
+        // Additional pattern for Norwegian "har/eier + asset + verdt + amount"
+        if (preg_match('/(?:har|eier|jeg\s+har|jeg\s+eier).*(?:et|en|ett).*(?:house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|hus|bil|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess).*(?:verdt|worth).*\d+/i', $message)) {
+            return ['type' => 'add_asset', 'confidence' => 0.95];
+        }
+
+        // Check for income-related keywords - Enhanced Norwegian support
+        if (preg_match('/(?:income|salary|wage|pension|benefit|barnetrygd|earn|inntekt|lønn|pensjon|trygd|tjener)/i', $message)) {
             return ['type' => 'add_income', 'confidence' => 0.8];
         }
 
-        // Check for life events
-        if (preg_match('/retirement|retire|kids|children|inheritance|move|house.*change|plan.*for/i', $message)) {
+        // Check for life events - Enhanced Norwegian support
+        if (preg_match('/(?:retirement|retire|kids|children|inheritance|move|house.*change|plan.*for|pensjon|pensjonering|barn|arv|flytte|planlegge)/i', $message)) {
             return ['type' => 'add_life_event', 'confidence' => 0.7];
         }
 
-        // Check for viewing data (higher priority than general questions)
-        if (preg_match('/show.*complete|show.*financial.*data|show.*analysis|view.*complete|view.*financial.*data|show|view|list|what.*have|current.*assets|my.*configuration|current.*configuration|configuration.*summary/i', $message)) {
+        // Check for general questions about finances FIRST (needs AI context) - Enhanced Norwegian support
+        // These should use AI for intelligent analysis, not just return static summaries
+        if (preg_match('/(?:how.*much|what.*value|when.*retire|can.*afford|should.*invest|recommend|advice|analyze|analysis|compare|best|worst|risk|return|yield|profit|loss|tax|expense|income|cash.*flow|net.*worth|fire|financial.*independence|hvor.*mye|hva.*verdi|når.*pensjon|kan.*råd|bør.*investere|anbefal|råd|analyser|sammenlign|best|verst|risiko|avkastning|profitt|tap|skatt|utgift|inntekt|kontantstrøm|nettoformue)/i', $message)) {
+            return ['type' => 'general_question', 'confidence' => 0.9];
+        }
+
+        // Check for questions about quantity/count of assets (needs AI analysis)
+        if (preg_match('/(?:hvor.*mange|how.*many|count|antall).*(?:asset|eiendel|eiendom)/i', $message)) {
+            return ['type' => 'general_question', 'confidence' => 0.9];
+        }
+
+        // Check for viewing CONFIGURATION data (static summary only) - Enhanced Norwegian support
+        // Only match explicit requests for configuration summary, not general asset questions
+        if (preg_match('/(?:show|view|display|vis|se).*(?:my.*configuration|current.*configuration|configuration.*summary|min.*konfigurasjon|nåværende.*konfigurasjon|konfigurasjon.*sammendrag)/i', $message)) {
             return ['type' => 'view_data', 'confidence' => 0.9];
         }
 
-        // Check for simulation
-        if (preg_match('/simulation|simulate|forecast|predict|future|scenario/i', $message)) {
+        // Check for simulation - Enhanced Norwegian support
+        if (preg_match('/(?:simulation|simulate|forecast|predict|future|scenario|simulering|simulere|prognose|fremtid|scenario)/i', $message)) {
             return ['type' => 'create_simulation', 'confidence' => 0.8];
         }
 
-        // Check for general questions about finances (needs context) - lower priority
-        if (preg_match('/how.*much|what.*value|when.*retire|can.*afford|should.*invest|recommend|advice|analyze|analysis|compare|best|worst|risk|return|yield|profit|loss|tax|expense|income|cash.*flow|net.*worth|fire|financial.*independence|total|summary|balance|overview/i', $message)) {
-            return ['type' => 'general_question', 'confidence' => 0.8];
-        }
-
-        // Check for help
-        if (preg_match('/help|what.*can.*do|how.*work|guide/i', $message)) {
+        // Check for help - Enhanced Norwegian support
+        if (preg_match('/(?:help|what.*can.*do|how.*work|guide|hjelp|hva.*kan.*gjøre|hvordan.*fungerer|veiledning|jeg\s+trenger\s+hjelp)/i', $message)) {
             return ['type' => 'general_help', 'confidence' => 0.9];
         }
 
-        return ['type' => 'unknown', 'confidence' => 0.0];
+        // Default to general_question for anything else that might need AI analysis
+        // This ensures questions get intelligent responses instead of "unknown" fallback
+        return ['type' => 'general_question', 'confidence' => 0.5];
     }
 
     protected function getFinancialContextForAI(int $configurationId, User $user): ?string
@@ -244,9 +289,7 @@ class AiAssistantService
             $configuration = $this->createAssetConfiguration($extractedData, $user);
 
             return [
-                'message' => "🎉 **Great! I've created your configuration '{$configuration->name}'.**\n\n".
-                           "Now let's add your income sources. What sources of income do you have and how much do you earn from each?\n\n".
-                           "For example: *'I earn 500,000 NOK per year from my job as a software developer'*",
+                'message' => "✅ **Configuration '{$configuration->name}' created**",
                 'configuration_id' => $configuration->id,
             ];
         } catch (\Exception $e) {
@@ -272,8 +315,7 @@ class AiAssistantService
 
             if ($configuration) {
                 return [
-                    'message' => "✅ **Switched to configuration '{$configuration->name}'.**\n\n".
-                               'You can now add assets, income sources, or ask me about this configuration. What would you like to do?',
+                    'message' => "✅ **Switched to configuration '{$configuration->name}'**",
                     'configuration_id' => $configuration->id,
                 ];
             }
@@ -283,6 +325,163 @@ class AiAssistantService
             'message' => "❌ **Configuration not found or invalid ID.**\n\n".
                        'Please provide a valid configuration ID. You can only switch to configurations that belong to you.',
         ];
+    }
+
+    protected function handleUpdateAssetValue(string $message, array $intent, User $user, ?int $configurationId, ?callable $statusCallback = null): array
+    {
+        if (! $configurationId) {
+            return [
+                'message' => '⚠️ **Please create or select a configuration first before updating asset values.**\n\n'.
+                           "You can create a new configuration by saying: *'Create a new financial configuration'*",
+            ];
+        }
+
+        if ($statusCallback) {
+            $statusCallback('🔍 Extracting asset information...');
+        }
+
+        // Extract asset identifier and new value from message
+        $updateData = $this->extractAssetUpdateData($message);
+
+        if (empty($updateData['asset_identifier']) || empty($updateData['value'])) {
+            return [
+                'message' => '📝 **I need more information to update the asset value.**\n\n'.
+                           'Please specify:\n'.
+                           '• **Which asset** to update (e.g., "my Toyota", "my house")\n'.
+                           '• **New value** in NOK\n\n'.
+                           "For example: *'Set the value of my Toyota to 400,000 NOK'*",
+            ];
+        }
+
+        try {
+            if ($statusCallback) {
+                $statusCallback('🔎 Finding your asset...');
+            }
+
+            // Find the asset to update
+            $asset = $this->findAssetByIdentifier($updateData['asset_identifier'], $configurationId, $user);
+
+            if (! $asset) {
+                return [
+                    'message' => "❌ **Asset not found.**\n\n".
+                               "I couldn't find an asset matching '{$updateData['asset_identifier']}' in your configuration.\n\n".
+                               'Please check the asset name or add it first if it doesn\'t exist.',
+                ];
+            }
+
+            if ($statusCallback) {
+                $statusCallback('💾 Updating asset value...');
+            }
+
+            // Update or create asset year record
+            $this->updateAssetYearValue($asset, $updateData['value'], $user);
+
+            if ($statusCallback) {
+                $statusCallback('✨ Formatting response...');
+            }
+
+            // Generate brief confirmation response
+            $formattedValue = number_format($updateData['value'], 0, ',', ' ');
+            $response = "✅ **{$asset->name}** value updated to **{$formattedValue} NOK**";
+
+            return ['message' => $response];
+        } catch (\Exception $e) {
+            Log::error('Error updating asset value', [
+                'message' => $message,
+                'user_id' => $user->id,
+                'configuration_id' => $configurationId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'message' => '❌ **Error updating asset value.**\n\n'.
+                           'There was an error updating the asset value. Please try again or contact support if the problem persists.',
+            ];
+        }
+    }
+
+    protected function handleUpdateMortgage(string $message, array $intent, User $user, ?int $configurationId, ?callable $statusCallback = null): array
+    {
+        if (! $configurationId) {
+            return [
+                'message' => '⚠️ **Please create or select a configuration first before updating mortgage information.**\n\n'.
+                           "You can create a new configuration by saying: *'Create a new financial configuration'*",
+            ];
+        }
+
+        if ($statusCallback) {
+            $statusCallback('🔍 Extracting mortgage information...');
+        }
+
+        // Extract asset identifier and mortgage data from message
+        $mortgageData = $this->extractMortgageUpdateData($message);
+
+        if (empty($mortgageData['asset_identifier'])) {
+            return [
+                'message' => '📝 **I need more information to update the mortgage.**\n\n'.
+                           'Please specify:\n'.
+                           '• **Which asset** has the mortgage (e.g., "my house", "my cabin")\n'.
+                           '• **Mortgage amount** in NOK\n'.
+                           '• **Optional**: Interest rate, years, etc.\n\n'.
+                           "For example: *'Set mortgage on my house to 2,500,000 NOK'*",
+            ];
+        }
+
+        if (empty($mortgageData['amount']) && empty($mortgageData['interest_rate']) && empty($mortgageData['years'])) {
+            return [
+                'message' => '📝 **I need mortgage details to update.**\n\n'.
+                           'Please specify at least one of:\n'.
+                           '• **Mortgage amount** in NOK\n'.
+                           '• **Interest rate** (e.g., 4.5%)\n'.
+                           '• **Loan term** in years\n\n'.
+                           "For example: *'Set mortgage on my house to 2,500,000 NOK with 4.5% interest for 25 years'*",
+            ];
+        }
+
+        try {
+            if ($statusCallback) {
+                $statusCallback('🔎 Finding your asset...');
+            }
+
+            // Find the asset to update
+            $asset = $this->findAssetByIdentifier($mortgageData['asset_identifier'], $configurationId, $user);
+
+            if (! $asset) {
+                return [
+                    'message' => "❌ **Asset not found.**\n\n".
+                               "I couldn't find an asset matching '{$mortgageData['asset_identifier']}' in your configuration.\n\n".
+                               'Please check the asset name or add it first if it doesn\'t exist.',
+                ];
+            }
+
+            if ($statusCallback) {
+                $statusCallback('💾 Updating mortgage information...');
+            }
+
+            // Update or create asset year record with mortgage data
+            $this->updateAssetYearMortgage($asset, $mortgageData, $user);
+
+            if ($statusCallback) {
+                $statusCallback('✨ Formatting response...');
+            }
+
+            // Generate confirmation response
+            $response = $this->generateMortgageUpdateResponse($asset, $mortgageData);
+
+            return ['message' => $response];
+        } catch (\Exception $e) {
+            Log::error('Error updating mortgage', [
+                'message' => $message,
+                'user_id' => $user->id,
+                'configuration_id' => $configurationId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'message' => '❌ **Error updating mortgage information.**\n\n'.
+                           'There was an error updating the mortgage. Please try again or contact support if the problem persists.',
+            ];
+        }
     }
 
     protected function handleAddAsset(string $message, array $intent, User $user, ?int $configurationId): array
@@ -312,26 +511,7 @@ class AiAssistantService
             // Generate intelligent response based on extracted data
             $assetName = $this->generateAssetName($assetData);
             $formattedValue = number_format($assetData['value'], 0, ',', ' ');
-
-            $response = "## ✅ Asset Successfully Added!\n\n";
-            $response .= "I've successfully added your **{$assetName}** worth **{$formattedValue} NOK** to your configuration.";
-
-            // Add specific details based on asset type
-            if ($assetData['type'] === 'car' && isset($assetData['brand'])) {
-                $response .= "\n\n### 🚗 Asset Details:\n\n";
-                $response .= "- **Brand:** {$assetData['brand']}\n";
-                if (isset($assetData['model'])) {
-                    $response .= "- **Model:** {$assetData['model']}\n";
-                }
-                $response .= "- **Current Value:** {$formattedValue} NOK\n";
-            }
-
-            if (in_array($assetData['type'], ['house', 'car', 'boat', 'cabin'])) {
-                $response .= "\n\n### 🏦 Next Steps\n\n";
-                $response .= "**Do you have a mortgage or loan on this asset?**\n\n";
-                $response .= "If so, please tell me the loan amount and repayment period.\n\n";
-                $response .= "> **Example:** *'I have a 2,500,000 NOK mortgage with 20 years remaining'*";
-            }
+            $response = "✅ **{$assetName}** added with value **{$formattedValue} NOK**";
 
             return [
                 'message' => $response,
@@ -528,9 +708,9 @@ class AiAssistantService
             $data['birth_year'] = (int) ($matches[1] ?: $matches[2] ?: $matches[3]);
         }
 
-        // Extract death age
+        // Extract expected death age
         if (preg_match('/live.*?(\d{2,3})|death.*?age.*?(\d{2,3})|die.*?(\d{2,3})/i', $message, $matches)) {
-            $data['death_age'] = (int) ($matches[1] ?: $matches[2] ?: $matches[3]);
+            $data['expected_death_age'] = (int) ($matches[1] ?: $matches[2] ?: $matches[3]);
         }
 
         // Extract pension wish age
@@ -615,7 +795,9 @@ class AiAssistantService
             'boat' => [
                 'patterns' => [
                     '/\b(?:boat|yacht|sailboat|motorboat|vessel|ship|båt|seilbåt|motorbåt)\b/i',
+                    '/\b(?:princess|sunseeker|azimut|ferretti|pershing|riva|chris.?craft|sea.?ray|boston.?whaler|jeanneau|beneteau)\b/i',
                 ],
+                'brands' => ['princess', 'sunseeker', 'azimut', 'ferretti', 'pershing', 'riva', 'chris craft', 'sea ray', 'boston whaler', 'jeanneau', 'beneteau'],
             ],
             'cabin' => [
                 'patterns' => [
@@ -665,43 +847,84 @@ class AiAssistantService
         }
 
         // Extract specific asset name/brand for better naming
-        if (isset($data['type']) && $data['type'] === 'car') {
-            foreach ($assetTypePatterns['car']['brands'] as $brand) {
-                if (preg_match("/\b{$brand}\b/i", $message, $matches)) {
-                    $data['brand'] = ucfirst(strtolower($matches[0]));
+        if (isset($data['type'])) {
+            $assetType = $data['type'];
 
-                    // Try to extract model with better patterns
-                    $modelPatterns = [
-                        "/\b{$brand}\s+(model\s+[a-z0-9]+|[a-z0-9\-]+(?:\s+[a-z0-9\-]+)?)(?:\s+(?:worth|value|cost|price|to|as|\d+)|$)/i",
-                        "/\b{$brand}\s+([a-z0-9\s\-]+?)(?:\s+(?:car|vehicle|worth|value|cost|price|\d+)|$)/i",
-                    ];
+            // Extract brand for cars
+            if ($assetType === 'car' && isset($assetTypePatterns['car']['brands'])) {
+                foreach ($assetTypePatterns['car']['brands'] as $brand) {
+                    if (preg_match("/\b{$brand}\b/i", $message, $matches)) {
+                        $data['brand'] = ucfirst(strtolower($matches[0]));
 
-                    foreach ($modelPatterns as $pattern) {
-                        if (preg_match($pattern, $message, $modelMatches)) {
-                            $model = trim($modelMatches[1]);
-                            // Clean up common extraction issues
-                            $model = preg_replace('/\s+(car|vehicle|to|as|worth|value|cost|price).*$/i', '', $model);
-                            if (strlen($model) > 0 && strlen($model) < 30) {
-                                $data['model'] = $model;
-                                break;
+                        // Try to extract model with better patterns (avoiding Norwegian prepositions)
+                        $modelPatterns = [
+                            "/\b{$brand}\s+(model\s+[a-z0-9]+|[a-z0-9\-]+(?:\s+[a-z0-9\-]+)?)(?:\s+(?:worth|value|cost|price|to|as|til|verdi|med|\d+)|$)/i",
+                            "/\b{$brand}\s+([a-z0-9\s\-]+?)(?:\s+(?:car|vehicle|bil|worth|value|cost|price|til|verdi|med|\d+)|$)/i",
+                        ];
+
+                        foreach ($modelPatterns as $pattern) {
+                            if (preg_match($pattern, $message, $modelMatches)) {
+                                $model = trim($modelMatches[1]);
+                                // Clean up common extraction issues (including Norwegian words)
+                                $model = preg_replace('/\s+(car|vehicle|bil|to|as|til|worth|value|cost|price|verdi|med|av|på|en|et).*$/i', '', $model);
+                                // Skip if model contains Norwegian prepositions or common words
+                                if (preg_match('/\b(til|av|på|en|et|med|verdi|value|worth|cost|price)\b/i', $model)) {
+                                    continue;
+                                }
+                                if (strlen($model) > 0 && strlen($model) < 30) {
+                                    $data['model'] = $model;
+                                    break;
+                                }
                             }
                         }
+                        break;
                     }
-                    break;
+                }
+            }
+
+            // Extract brand for boats
+            if ($assetType === 'boat' && isset($assetTypePatterns['boat']['brands'])) {
+                foreach ($assetTypePatterns['boat']['brands'] as $brand) {
+                    if (preg_match("/\b{$brand}\b/i", $message, $matches)) {
+                        $data['brand'] = ucfirst(strtolower($matches[0]));
+
+                        // Try to extract model with better patterns for boats
+                        $modelPatterns = [
+                            "/\b{$brand}\s+([a-z0-9\-]+(?:\s+[a-z0-9\-]+)?)(?:\s+(?:boat|båt|yacht|worth|value|cost|price|verdi|\d+)|$)/i",
+                            "/\b{$brand}\s+([a-z0-9\s\-]+?)(?:\s+(?:boat|båt|yacht|worth|value|cost|price|verdi|\d+)|$)/i",
+                        ];
+
+                        foreach ($modelPatterns as $pattern) {
+                            if (preg_match($pattern, $message, $modelMatches)) {
+                                $model = trim($modelMatches[1]);
+                                // Clean up common extraction issues
+                                $model = preg_replace('/\s+(boat|båt|yacht|worth|value|cost|price|verdi).*$/i', '', $model);
+                                if (strlen($model) > 0 && strlen($model) < 30) {
+                                    $data['model'] = $model;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
                 }
             }
         }
 
         // Enhanced value extraction with better number parsing
+        // Only extract values that have clear monetary indicators
         $valuePatterns = [
-            // Handle various number formats: 500K, 500k, 500,000, 500 000, 500.000
-            '/(\d+(?:[,.\s]\d+)*)\s*k(?:r|roner)?\b/i' => 1000, // 500K, 500kr
-            '/(\d+(?:[,.\s]\d+)*)\s*(?:thousand|tusen)\b/i' => 1000,
-            '/(\d+(?:[,.\s]\d+)*)\s*m(?:illion)?\b/i' => 1000000, // 2M, 2 million
-            '/(\d+(?:[,.\s]\d+)*)\s*(?:million|millioner)\b/i' => 1000000,
+            // Handle various number formats with explicit monetary indicators
+            '/(?:worth|value|cost|price|verdi).*?(\d+(?:[,.\s]\d+)*)\s*k(?:r|roner)?\b/i' => 1000, // worth 500K, verdi 500kr
+            '/(?:worth|value|cost|price|verdi).*?(\d+(?:[,.\s]\d+)*)\s*(?:thousand|tusen)\b/i' => 1000,
+            '/(?:worth|value|cost|price|verdi).*?(\d+(?:[,.\s]\d+)*)\s*m(?:illion)?\b/i' => 1000000, // worth 2M
+            '/(?:worth|value|cost|price|verdi).*?(\d+(?:[,.\s]\d+)*)\s*(?:million|millioner)\b/i' => 1000000,
             '/(?:worth|value|cost|price|verdi).*?(\d+(?:[,.\s]\d+)*)\s*(?:nok|kr|kroner)?\b/i' => 1,
-            '/(\d+(?:[,.\s]\d+)*)\s*(?:nok|kr|kroner)\b/i' => 1,
-            '/(\d+(?:[,.\s]\d+)*)\b/i' => 1, // Plain numbers as fallback
+            '/(\d+(?:[,.\s]\d+)*)\s*(?:nok|kr|kroner)\b/i' => 1, // Direct currency indicators
+            '/(\d+(?:[,.\s]\d+)*)\s*k(?:r|roner)?\s*(?:worth|value|verdi)\b/i' => 1000, // 500K worth
+            '/(\d+(?:[,.\s]\d+)*)\s*m(?:illion)?\s*(?:worth|value|verdi)\b/i' => 1000000, // 2M worth
+            // Norwegian specific patterns that don't conflict with "legg til"
+            '/(?<!legg\s)til\s+(\d+(?:[,.\s]\d+)*)\s*(?:nok|kr|kroner)\b/i' => 1, // "til 500000 kr" but not "legg til"
         ];
 
         foreach ($valuePatterns as $pattern => $multiplier) {
@@ -712,13 +935,33 @@ class AiAssistantService
             }
         }
 
-        // Extract mortgage information
-        if (preg_match('/mortgage.*?(\d+(?:[,.\s]\d+)*)/i', $message, $matches)) {
-            $data['mortgage'] = (int) preg_replace('/[,\s]/', '', $matches[1]);
+        // Extract mortgage information (enhanced for Norwegian and various patterns)
+        // Pattern 1: "med et lån på X" or "with a loan of X" (with K/M multipliers)
+        if (preg_match('/(?:med|with).*(?:et|a).*(?:lån|loan).*(?:på|of).*?(\d+(?:[,.\s]\d+)*)\s*([KkMm])?/i', $message, $matches)) {
+            $amount = (int) preg_replace('/[,\s]/', '', $matches[1]);
+            $multiplier = isset($matches[2]) ? (strtolower($matches[2]) === 'k' ? 1000 : (strtolower($matches[2]) === 'm' ? 1000000 : 1)) : 1;
+            $data['mortgage'] = $amount * $multiplier;
+        }
+        // Pattern 2: "lån på X" or "loan of X" (with K/M multipliers)
+        elseif (preg_match('/(?:lån|loan).*(?:på|of).*?(\d+(?:[,.\s]\d+)*)\s*([KkMm])?/i', $message, $matches)) {
+            $amount = (int) preg_replace('/[,\s]/', '', $matches[1]);
+            $multiplier = isset($matches[2]) ? (strtolower($matches[2]) === 'k' ? 1000 : (strtolower($matches[2]) === 'm' ? 1000000 : 1)) : 1;
+            $data['mortgage'] = $amount * $multiplier;
+        }
+        // Pattern 3: Original mortgage pattern (with K/M multipliers)
+        elseif (preg_match('/mortgage.*?(\d+(?:[,.\s]\d+)*)\s*([KkMm])?/i', $message, $matches)) {
+            $amount = (int) preg_replace('/[,\s]/', '', $matches[1]);
+            $multiplier = isset($matches[2]) ? (strtolower($matches[2]) === 'k' ? 1000 : (strtolower($matches[2]) === 'm' ? 1000000 : 1)) : 1;
+            $data['mortgage'] = $amount * $multiplier;
         }
 
-        if (preg_match('/(\d+)\s*years?.*?mortgage|mortgage.*?(\d+)\s*years?/i', $message, $matches)) {
-            $data['mortgage_years'] = (int) ($matches[1] ?: $matches[2]);
+        // Extract mortgage years (enhanced for Norwegian)
+        if (preg_match('/(?:over|for).*?(\d+)\s*(?:years?|år)/i', $message, $matches)) {
+            $data['mortgage_years'] = (int) $matches[1];
+        } elseif (preg_match('/(\d+)\s*(?:years?|år).*?(?:mortgage|loan|lån)/i', $message, $matches)) {
+            $data['mortgage_years'] = (int) $matches[1];
+        } elseif (preg_match('/(?:mortgage|loan|lån).*?(\d+)\s*(?:years?|år)/i', $message, $matches)) {
+            $data['mortgage_years'] = (int) $matches[1];
         }
 
         return $data;
@@ -756,19 +999,38 @@ class AiAssistantService
                 'updated_checksum' => md5(json_encode($data)),
             ]);
 
-            // Create asset year with current value
-            AssetYear::create([
+            // Create asset year with current value and mortgage data
+            $assetYearData = [
                 'asset_id' => $asset->id,
                 'asset_configuration_id' => $configurationId,
                 'year' => now()->year,
                 'asset_market_amount' => $data['value'],
                 'user_id' => $user->id,
                 'team_id' => $user->current_team_id,
+                // Required fields with defaults
+                'income_amount' => 0,
+                'income_factor' => 'yearly',
+                'income_repeat' => false,
+                'expence_amount' => 0,
+                'expence_factor' => 'yearly',
+                'expence_repeat' => false,
+                'asset_acquisition_amount' => 0,
+                'asset_equity_amount' => 0,
+                'asset_taxable_initial_amount' => 0,
+                'asset_paid_amount' => 0,
+                'asset_repeat' => true,
+                'mortgage_amount' => $data['mortgage'] ?? 0,
+                'mortgage_years' => $data['mortgage_years'] ?? 0,
+                'mortgage_gebyr' => 0,
+                'mortgage_tax' => 0,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
-                'created_checksum' => md5(json_encode(['asset_market_amount' => $data['value']])),
-                'updated_checksum' => md5(json_encode(['asset_market_amount' => $data['value']])),
-            ]);
+            ];
+
+            $assetYearData['created_checksum'] = md5(json_encode($assetYearData));
+            $assetYearData['updated_checksum'] = md5(json_encode($assetYearData));
+
+            AssetYear::create($assetYearData);
 
             return $asset;
         });
@@ -1157,7 +1419,7 @@ class AiAssistantService
         ];
     }
 
-    protected function callAiService(string $message, string $contextData, User $user): string
+    protected function callAiService(string $message, string $contextData, User $user, array $conversation = []): string
     {
         try {
             if (! $this->apiKey) {
@@ -1166,7 +1428,7 @@ class AiAssistantService
 
             $systemPrompt = $this->buildSystemPrompt($contextData, $user);
 
-            $response = $this->makeAiApiCall($systemPrompt, $message);
+            $response = $this->makeAiApiCall($systemPrompt, $message, $conversation);
 
             return $response ?: $this->getFallbackResponse($message);
         } catch (\Exception $e) {
@@ -1180,11 +1442,11 @@ class AiAssistantService
         }
     }
 
-    protected function makeAiApiCall(string $systemPrompt, string $userMessage): ?string
+    protected function makeAiApiCall(string $systemPrompt, string $userMessage, array $conversation = []): ?string
     {
         $endpoint = $this->getApiEndpoint();
         $headers = $this->getApiHeaders();
-        $payload = $this->buildApiPayload($systemPrompt, $userMessage);
+        $payload = $this->buildApiPayload($systemPrompt, $userMessage, $conversation);
 
         $timeout = config("ai.settings.{$this->aiModel}.timeout", 30);
 
@@ -1226,35 +1488,60 @@ class AiAssistantService
         };
     }
 
-    protected function buildApiPayload(string $systemPrompt, string $userMessage): array
+    protected function buildApiPayload(string $systemPrompt, string $userMessage, array $conversation = []): array
     {
         $settings = config("ai.settings.{$this->aiModel}", [
             'max_tokens' => 1000,
             'temperature' => 0.7,
         ]);
 
+        // Build messages array starting with system prompt
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => $systemPrompt,
+            ],
+        ];
+
+        // Add conversation history (excluding the current message)
+        foreach ($conversation as $msg) {
+            if (isset($msg['type']) && isset($msg['message'])) {
+                $role = $msg['type'] === 'user' ? 'user' : 'assistant';
+                $messages[] = [
+                    'role' => $role,
+                    'content' => $msg['message'],
+                ];
+            }
+        }
+
+        // Add the current user message
+        $messages[] = [
+            'role' => 'user',
+            'content' => $userMessage,
+        ];
+
         $payload = [
             'model' => $this->aiModel,
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => $systemPrompt,
-                ],
-                [
-                    'role' => 'user',
-                    'content' => $userMessage,
-                ],
-            ],
+            'messages' => $messages,
             'max_tokens' => $settings['max_tokens'],
             'temperature' => $settings['temperature'],
         ];
 
         // Special handling for o1 models which don't support system messages
         if (str_starts_with($this->aiModel, 'o1-')) {
+            // For o1 models, combine system prompt with conversation history
+            $conversationText = '';
+            foreach ($conversation as $msg) {
+                if (isset($msg['type']) && isset($msg['message'])) {
+                    $role = $msg['type'] === 'user' ? 'User' : 'Assistant';
+                    $conversationText .= "\n{$role}: {$msg['message']}";
+                }
+            }
+
             $payload['messages'] = [
                 [
                     'role' => 'user',
-                    'content' => $systemPrompt."\n\nUser Question: ".$userMessage,
+                    'content' => $systemPrompt.$conversationText."\n\nUser Question: ".$userMessage,
                 ],
             ];
             // o1 models don't support temperature parameter
@@ -1292,13 +1579,83 @@ class AiAssistantService
 
     protected function getFallbackResponse(string $message): string
     {
-        return "I apologize, but I'm currently unable to access the AI service to provide a detailed analysis of your financial situation. ".
-               "However, I can see that you asked: \"{$message}\"\n\n".
-               'Please try again in a moment, or contact support if the issue persists. '.
-               "In the meantime, you can:\n".
-               "• View your asset configurations directly in the application\n".
-               "• Check your dashboard for financial summaries\n".
-               '• Use the simulation features for planning scenarios';
+        // Provide a more helpful, context-aware fallback response
+        $lowerMessage = strtolower($message);
+
+        // Check for specific topics and provide relevant guidance
+        if (str_contains($lowerMessage, 'asset') || str_contains($lowerMessage, 'eiendel')) {
+            return "**About Your Assets**\n\n".
+                   "I can see you're asking about assets. While I don't have AI analysis available right now, here's what you can do:\n\n".
+                   "• **View Assets**: Navigate to the Assets page to see all your assets\n".
+                   "• **Add Assets**: Use the 'Create Asset' button to add new assets\n".
+                   "• **Edit Values**: Click on any asset to update its current market value\n".
+                   "• **Asset Years**: Track how your assets change over time\n\n".
+                   '💡 **Tip**: The dashboard shows your total asset value and allocation by type.';
+        }
+
+        if (str_contains($lowerMessage, 'simulation') || str_contains($lowerMessage, 'simulering')) {
+            return "**About Simulations**\n\n".
+                   "Simulations help you plan different financial scenarios. Here's how to use them:\n\n".
+                   "• **Create Simulation**: Go to Simulations and click 'Create'\n".
+                   "• **Choose Prognosis**: Select realistic, positive, negative, or custom scenarios\n".
+                   "• **Run Analysis**: See how your wealth grows over time\n".
+                   "• **Compare Scenarios**: Run multiple simulations to compare outcomes\n\n".
+                   '💡 **Tip**: Simulations use your current assets and project them into the future.';
+        }
+
+        if (str_contains($lowerMessage, 'retire') || str_contains($lowerMessage, 'pensjon') || str_contains($lowerMessage, 'fire')) {
+            return "**About Retirement Planning**\n\n".
+                   "Planning for retirement is crucial. Here's what the system can help you with:\n\n".
+                   "• **FIRE Metrics**: Check your dashboard for Financial Independence progress\n".
+                   "• **Passive Income**: See how much income your assets can generate\n".
+                   "• **Crossover Point**: When your passive income exceeds expenses\n".
+                   "• **Simulations**: Model different retirement scenarios\n\n".
+                   '💡 **Tip**: The FIRE widgets show your progress toward financial independence.';
+        }
+
+        if (str_contains($lowerMessage, 'tax') || str_contains($lowerMessage, 'skatt')) {
+            return "**About Tax Planning**\n\n".
+                   "The system includes comprehensive tax calculations:\n\n".
+                   "• **Tax Types**: Different tax rates for different asset types\n".
+                   "• **Tax Configurations**: Country-specific tax rules (Norway, Sweden, Switzerland)\n".
+                   "• **Tax Projections**: See estimated taxes in simulations\n".
+                   "• **Optimization**: Structure assets to minimize tax burden\n\n".
+                   '💡 **Tip**: Check the Tax Configuration page for detailed tax rules.';
+        }
+
+        if (str_contains($lowerMessage, 'help') || str_contains($lowerMessage, 'hjelp')) {
+            return "**How I Can Help**\n\n".
+                   "I'm your AI financial assistant! Here's what I can help you with:\n\n".
+                   "**Asset Management**\n".
+                   "• Add, update, and track your assets\n".
+                   "• Monitor asset values over time\n".
+                   "• Manage mortgages and loans\n\n".
+                   "**Financial Planning**\n".
+                   "• Create financial configurations\n".
+                   "• Run simulations for different scenarios\n".
+                   "• Track progress toward financial goals\n\n".
+                   "**Analysis & Insights**\n".
+                   "• View net worth and cash flow\n".
+                   "• Monitor FIRE progress\n".
+                   "• Analyze asset allocation\n\n".
+                   '💡 **Note**: Full AI analysis requires an OpenAI API key to be configured.';
+        }
+
+        // Default fallback for general questions
+        return "**I'm Here to Help!**\n\n".
+               "You asked: *\"{$message}\"*\n\n".
+               "While I don't have full AI analysis available right now (requires OpenAI API key), I can still help you navigate the system:\n\n".
+               "**Quick Actions**\n".
+               "• 📊 **Dashboard**: View your financial overview\n".
+               "• 💰 **Assets**: Manage your assets and their values\n".
+               "• 🎯 **Simulations**: Run financial scenarios\n".
+               "• 📈 **Reports**: Analyze your wealth over time\n\n".
+               "**Try asking me about:**\n".
+               "• 'How do I add an asset?'\n".
+               "• 'Tell me about simulations'\n".
+               "• 'How do I plan for retirement?'\n".
+               "• 'What are the tax features?'\n\n".
+               '💡 **Tip**: I can help you with specific features even without AI - just ask!';
     }
 
     protected function logAiInteraction(string $type, array $data): void
@@ -1318,5 +1675,283 @@ class AiAssistantService
         if (config('logging.channels.ai')) {
             Log::channel('ai')->info("AI_INTERACTION_{$type}", $logData);
         }
+    }
+
+    protected function extractAssetUpdateData(string $message): array
+    {
+        $data = [];
+
+        // Extract asset identifier (brand, type, or name)
+        // Support patterns like "my toyota", "verdien på toyota", "the BMW", etc.
+
+        // Pattern 1: Norwegian "verdien på [asset]" pattern
+        if (preg_match('/(?:verdien|value)\s+(?:på|av|of)\s+(house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess)(?:\s+[a-zA-Z0-9\s\-]*)?/i', $message, $matches)) {
+            $data['asset_identifier'] = trim($matches[1]);
+        }
+        // Pattern 2: Possessive patterns "my toyota", "min bil"
+        elseif (preg_match('/(?:my|min|mine|the|den)\s+(house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess)(?:\s+[a-zA-Z0-9\s\-]*)?/i', $message, $matches)) {
+            $data['asset_identifier'] = trim($matches[1]);
+        }
+        // Pattern 3: General fallback for Norwegian "verdien på [anything]"
+        elseif (preg_match('/(?:verdien|value)\s+(?:på|av|of)\s+([a-zA-Z0-9\s\-]+?)(?:\s+(?:to|til))/i', $message, $matches)) {
+            $identifier = trim($matches[1]);
+            // Remove common words that shouldn't be part of the asset identifier
+            $identifier = preg_replace('/\b(?:value|verdi|worth|price|pris)\b/i', '', $identifier);
+            $identifier = trim($identifier);
+            if (! empty($identifier)) {
+                $data['asset_identifier'] = $identifier;
+            }
+        }
+        // Pattern 4: Possessive fallback
+        elseif (preg_match('/(?:my|min|mine|the|den)\s+([a-zA-Z0-9\s\-]+?)(?:\s+(?:to|til))/i', $message, $matches)) {
+            $identifier = trim($matches[1]);
+            // Remove common words that shouldn't be part of the asset identifier
+            $identifier = preg_replace('/\b(?:value|verdi|worth|price|pris)\b/i', '', $identifier);
+            $identifier = trim($identifier);
+            if (! empty($identifier)) {
+                $data['asset_identifier'] = $identifier;
+            }
+        }
+
+        // Extract new value using the same patterns as asset creation
+        $valuePatterns = [
+            '/(?:to|til)\s+(\d+(?:[,.\s]\d+)*)\s*k(?:r|roner)?\b/i' => 1000, // to 40K
+            '/(?:to|til)\s+(\d+(?:[,.\s]\d+)*)\s*(?:thousand|tusen)\b/i' => 1000,
+            '/(?:to|til)\s+(\d+(?:[,.\s]\d+)*)\s*m(?:illion)?\b/i' => 1000000, // to 2M
+            '/(?:to|til)\s+(\d+(?:[,.\s]\d+)*)\s*(?:million|millioner)\b/i' => 1000000,
+            '/(?:to|til)\s+(\d+(?:[,.\s]\d+)*)\s*(?:nok|kr|kroner)\b/i' => 1, // to 400000 NOK
+            '/(\d+(?:[,.\s]\d+)*)\s*(?:nok|kr|kroner)\b/i' => 1, // Direct currency indicators
+        ];
+
+        foreach ($valuePatterns as $pattern => $multiplier) {
+            if (preg_match($pattern, $message, $matches)) {
+                $value = preg_replace('/[,\s]/', '', $matches[1]);
+                $data['value'] = (int) ($value * $multiplier);
+                break;
+            }
+        }
+
+        return $data;
+    }
+
+    protected function findAssetByIdentifier(string $identifier, int $configurationId, User $user): ?Asset
+    {
+        // Clean up the identifier
+        $identifier = trim(strtolower($identifier));
+
+        // Try to find asset by exact name match first
+        $asset = Asset::where('asset_configuration_id', $configurationId)
+            ->where('team_id', $user->current_team_id)
+            ->whereRaw('LOWER(name) LIKE ?', ["%{$identifier}%"])
+            ->first();
+
+        if ($asset) {
+            return $asset;
+        }
+
+        // Try to find by asset type
+        $asset = Asset::where('asset_configuration_id', $configurationId)
+            ->where('team_id', $user->current_team_id)
+            ->whereRaw('LOWER(asset_type) = ?', [$identifier])
+            ->first();
+
+        if ($asset) {
+            return $asset;
+        }
+
+        // Try to find by brand/model in name
+        $assets = Asset::where('asset_configuration_id', $configurationId)
+            ->where('team_id', $user->current_team_id)
+            ->get();
+
+        foreach ($assets as $asset) {
+            $assetName = strtolower($asset->name);
+            if (str_contains($assetName, $identifier)) {
+                return $asset;
+            }
+        }
+
+        return null;
+    }
+
+    protected function updateAssetYearValue(Asset $asset, int $newValue, User $user): void
+    {
+        $currentYear = now()->year;
+
+        // Try to find existing asset year record for current year
+        $assetYear = AssetYear::where('asset_id', $asset->id)
+            ->where('year', $currentYear)
+            ->first();
+
+        if ($assetYear) {
+            // Update existing record
+            $assetYear->update([
+                'asset_market_amount' => $newValue,
+                'asset_configuration_id' => $asset->asset_configuration_id, // Ensure this is set
+                'updated_by' => $user->id,
+                'updated_checksum' => md5(json_encode(['asset_market_amount' => $newValue])),
+            ]);
+        } else {
+            // Create new record for current year
+            AssetYear::create([
+                'asset_id' => $asset->id,
+                'asset_configuration_id' => $asset->asset_configuration_id,
+                'year' => $currentYear,
+                'asset_market_amount' => $newValue,
+                'user_id' => $user->id,
+                'team_id' => $user->current_team_id,
+                // Required fields with defaults
+                'income_amount' => 0,
+                'income_factor' => 'yearly',
+                'income_repeat' => false,
+                'expence_amount' => 0,
+                'expence_factor' => 'yearly',
+                'expence_repeat' => false,
+                'asset_acquisition_amount' => 0,
+                'asset_equity_amount' => 0,
+                'asset_taxable_initial_amount' => 0,
+                'asset_paid_amount' => 0,
+                'asset_repeat' => true,
+                'mortgage_amount' => 0,
+                'mortgage_years' => 0,
+                'mortgage_gebyr' => 0,
+                'mortgage_tax' => 0,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+                'created_checksum' => md5(json_encode(['asset_market_amount' => $newValue])),
+                'updated_checksum' => md5(json_encode(['asset_market_amount' => $newValue])),
+            ]);
+        }
+    }
+
+    protected function extractMortgageUpdateData(string $message): array
+    {
+        $data = [];
+
+        // Extract asset identifier (similar to asset value updates)
+        // Pattern 1: Norwegian "lån på [asset]" pattern
+        if (preg_match('/(?:lån|lånet|mortgage|loan)\s+(?:på|av|of|for)\s+(house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|hus|bil|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess|mitt?\s+\w+|my\s+\w+)(?:\s+[a-zA-Z0-9\s\-]*)?/i', $message, $matches)) {
+            $data['asset_identifier'] = trim($matches[1]);
+        }
+        // Pattern 2: "set/update mortgage [interest] on [asset]" pattern
+        elseif (preg_match('/(?:set|sett|update|oppdater).*(?:mortgage|loan|lån|boliglån)(?:\s+interest|\s+rente)?\s+(?:on|på|for|til)\s+(house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|hus|bil|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess|mitt?\s+\w+|my\s+\w+)(?:\s+[a-zA-Z0-9\s\-]*)?/i', $message, $matches)) {
+            $data['asset_identifier'] = trim($matches[1]);
+        }
+        // Pattern 3: "[asset] mortgage" pattern
+        elseif (preg_match('/(house|car|boat|båt|cabin|hytte|fund|crypto|property|investment|eiendom|hus|bil|tesla|bmw|mercedes|audi|volvo|toyota|honda|ford|volkswagen|porsche|ferrari|lamborghini|maserati|bentley|rolls.?royce|bitcoin|ethereum|princess|mitt?\s+\w+|my\s+\w+)(?:\s+[a-zA-Z0-9\s\-]*)?.*(?:mortgage|loan|lån|boliglån)/i', $message, $matches)) {
+            $data['asset_identifier'] = trim($matches[1]);
+        }
+
+        // Extract mortgage amount (but not interest rates)
+        if (preg_match('/(?:mortgage|loan|lån|boliglån).*?(?:amount|beløp|sum).*?(\d+(?:[,.\s]\d+)*)/i', $message, $matches)) {
+            $data['amount'] = (float) preg_replace('/[,\s]/', '', $matches[1]);
+        }
+        // Pattern for "to X NOK" or "til X kroner" (but not percentages)
+        elseif (preg_match('/(?:to|til)\s+(\d+(?:[,.\s]\d+)*)\s*(?:nok|kroner|kr)\b/i', $message, $matches)) {
+            $data['amount'] = (float) preg_replace('/[,\s]/', '', $matches[1]);
+        }
+        // Pattern for large numbers with mortgage context (exclude percentages)
+        elseif (preg_match('/(?:mortgage|loan|lån|boliglån).*?(\d{6,}(?:[,.\s]\d+)*)/i', $message, $matches)) {
+            $data['amount'] = (float) preg_replace('/[,\s]/', '', $matches[1]);
+        }
+
+        // Extract interest rate
+        if (preg_match('/(?:interest|rente).*?(\d+(?:[,.]\d+)?)\s*%/i', $message, $matches)) {
+            $data['interest_rate'] = str_replace(',', '.', $matches[1]);
+        } elseif (preg_match('/(\d+(?:[,.]\d+)?)\s*%.*(?:interest|rente)/i', $message, $matches)) {
+            $data['interest_rate'] = str_replace(',', '.', $matches[1]);
+        }
+
+        // Extract loan term in years
+        if (preg_match('/(\d+)\s*(?:years?|år).*?(?:mortgage|loan|lån)/i', $message, $matches)) {
+            $data['years'] = (int) $matches[1];
+        } elseif (preg_match('/(?:mortgage|loan|lån).*?(\d+)\s*(?:years?|år)/i', $message, $matches)) {
+            $data['years'] = (int) $matches[1];
+        }
+
+        return $data;
+    }
+
+    protected function updateAssetYearMortgage(Asset $asset, array $mortgageData, User $user): void
+    {
+        $currentYear = (int) date('Y');
+
+        // Find or create asset year record
+        $assetYear = AssetYear::where('asset_id', $asset->id)
+            ->where('year', $currentYear)
+            ->first();
+
+        $updateData = [];
+
+        // Prepare update data
+        if (! empty($mortgageData['amount'])) {
+            $updateData['mortgage_amount'] = $mortgageData['amount'];
+        }
+
+        if (! empty($mortgageData['interest_rate'])) {
+            $updateData['mortgage_interest'] = $mortgageData['interest_rate'];
+        }
+
+        if (! empty($mortgageData['years'])) {
+            $updateData['mortgage_years'] = $mortgageData['years'];
+        }
+
+        // Always update audit fields
+        $updateData['updated_by'] = $user->id;
+        $updateData['updated_checksum'] = md5(json_encode($updateData));
+
+        if ($assetYear) {
+            // Update existing record
+            $updateData['asset_configuration_id'] = $asset->asset_configuration_id; // Ensure this is set
+            $assetYear->update($updateData);
+        } else {
+            // Create new record for current year with mortgage data
+            AssetYear::create(array_merge([
+                'asset_id' => $asset->id,
+                'asset_configuration_id' => $asset->asset_configuration_id,
+                'year' => $currentYear,
+                'user_id' => $user->id,
+                'team_id' => $user->current_team_id,
+                // Required fields with defaults
+                'income_amount' => 0,
+                'income_factor' => 'yearly',
+                'income_repeat' => false,
+                'expence_amount' => 0,
+                'expence_factor' => 'yearly',
+                'expence_repeat' => false,
+                'asset_market_amount' => 0,
+                'asset_acquisition_amount' => 0,
+                'asset_equity_amount' => 0,
+                'asset_taxable_initial_amount' => 0,
+                'asset_paid_amount' => 0,
+                'asset_repeat' => true,
+                'mortgage_amount' => 0,
+                'mortgage_years' => 0,
+                'mortgage_gebyr' => 0,
+                'mortgage_tax' => 0,
+                'created_by' => $user->id,
+                'created_checksum' => md5(json_encode($updateData)),
+            ], $updateData));
+        }
+    }
+
+    protected function generateMortgageUpdateResponse(Asset $asset, array $mortgageData): string
+    {
+        $response = "✅ **{$asset->name}** mortgage updated:\n\n";
+
+        if (! empty($mortgageData['amount'])) {
+            $formattedAmount = number_format($mortgageData['amount'], 0, ',', ' ');
+            $response .= "💰 **Amount**: {$formattedAmount} NOK\n";
+        }
+
+        if (! empty($mortgageData['interest_rate'])) {
+            $response .= "📈 **Interest Rate**: {$mortgageData['interest_rate']}%\n";
+        }
+
+        if (! empty($mortgageData['years'])) {
+            $response .= "📅 **Term**: {$mortgageData['years']} years\n";
+        }
+
+        return $response;
     }
 }
