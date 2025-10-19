@@ -26,6 +26,7 @@ class AssetTypeManagementTest extends TestCase
             'name' => 'Aksjefond',
             'category' => 'Investment Funds',
             'is_active' => true,
+            'is_investable' => true,
         ]);
 
         $this->assertDatabaseHas('asset_types', [
@@ -40,6 +41,7 @@ class AssetTypeManagementTest extends TestCase
             'name' => 'Krypto',
             'category' => 'Alternative Investments',
             'is_active' => true,
+            'is_investable' => true,
         ]);
 
         $this->assertDatabaseHas('asset_types', [
@@ -47,6 +49,7 @@ class AssetTypeManagementTest extends TestCase
             'name' => 'Aksjesparing med skattefradrag',
             'category' => 'Securities',
             'is_active' => true,
+            'is_investable' => true,
         ]);
 
         $this->assertDatabaseHas('asset_types', [
@@ -54,6 +57,14 @@ class AssetTypeManagementTest extends TestCase
             'name' => 'Hytte',
             'category' => 'Real Assets',
             'is_active' => true,
+        ]);
+
+        $this->assertDatabaseHas('asset_types', [
+            'type' => 'bank',
+            'name' => 'Bankkonto',
+            'category' => 'Cash Equivalents',
+            'is_active' => true,
+            'is_saving' => true,
         ]);
     }
 
@@ -170,5 +181,34 @@ class AssetTypeManagementTest extends TestCase
         ];
 
         $this->assertEquals($expectedCategories, $categories);
+    }
+
+    public function test_asset_type_table_shows_all_boolean_columns_and_hides_color()
+    {
+        $this->artisan('db:seed', ['--class' => 'DatabaseSeeder']);
+
+        $user = User::factory()->create();
+        Filament::setCurrentPanel('admin');
+
+        $response = $this->actingAs($user)
+            ->withoutMiddleware()
+            ->get('/admin/asset-types');
+
+        $response->assertStatus(200);
+
+        // Assert boolean column labels are visible
+        $response->assertSee('Active');
+        $response->assertSee('Private');
+        $response->assertSee('Company');
+        $response->assertSee('Tax Optimized');
+        $response->assertSee('Tax Shield');
+        $response->assertSee('Liquid');
+        $response->assertSee('Investable');
+        $response->assertSee('Saving');
+        $response->assertSee('Gen. Income');
+        $response->assertSee('Gen. Expenses');
+        $response->assertSee('Mortgage');
+        $response->assertSee('Market Value');
+
     }
 }

@@ -33,6 +33,8 @@ class AssetTypeFactory extends Factory
             'is_company' => $this->faker->boolean(30),
             'is_tax_optimized' => $this->faker->boolean(40),
             'is_liquid' => $this->faker->boolean(60),
+            'is_investable' => $this->faker->boolean(60),
+            'is_saving' => $this->faker->boolean(40),
             'can_generate_income' => $this->faker->boolean(50),
             'can_generate_expenses' => $this->faker->boolean(30),
             'can_have_mortgage' => $this->faker->boolean(20),

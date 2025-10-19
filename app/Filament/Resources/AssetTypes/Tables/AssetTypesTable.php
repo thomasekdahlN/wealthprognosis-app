@@ -68,13 +68,27 @@ class AssetTypesTable
                         return $state;
                     }),
 
-                TextColumn::make('color')
-                    ->label('Color')
-                    ->badge()
-                    ->color(fn ($state) => $state ?: 'gray'),
+                // Booleans in logical sequence
+                IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
 
-                IconColumn::make('is_liquid')
-                    ->label('Liquid')
+                IconColumn::make('is_private')
+                    ->label('Private')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('is_company')
+                    ->label('Company')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('is_tax_optimized')
+                    ->label('Tax Optimized')
                     ->boolean()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
@@ -85,10 +99,47 @@ class AssetTypesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
 
-                IconColumn::make('is_active')
-                    ->label('Active')
+                IconColumn::make('is_liquid')
+                    ->label('Liquid')
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('is_investable')
+                    ->label('Investable')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('is_saving')
+                    ->label('Saving')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('can_generate_income')
+                    ->label('Gen. Income')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('can_generate_expenses')
+                    ->label('Gen. Expenses')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('can_have_mortgage')
+                    ->label('Mortgage')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('can_have_market_value')
+                    ->label('Market Value')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 SelectFilter::make('category')
@@ -141,6 +192,18 @@ class AssetTypesTable
                     ->trueLabel('Liquid only')
                     ->falseLabel('Illiquid only'),
 
+                TernaryFilter::make('is_investable')
+                    ->label('Investable')
+                    ->placeholder('All')
+                    ->trueLabel('Investable only')
+                    ->falseLabel('Non-investable only'),
+
+                TernaryFilter::make('is_saving')
+                    ->label('Saving')
+                    ->placeholder('All')
+                    ->trueLabel('Saving only')
+                    ->falseLabel('Non-saving only'),
+
                 TernaryFilter::make('tax_shield')
                     ->label('Tax Shield')
                     ->placeholder('All')
@@ -172,8 +235,8 @@ class AssetTypesTable
                     ->falseLabel('Cannot have market value'),
             ])
             ->striped()
-            ->paginated([25, 50, 100, 150])
+            ->paginated([50, 100, 150])
             ->defaultPaginationPageOption(50)
-            ->paginationPageOptions([25, 50, 100, 150]);
+            ->paginationPageOptions([50, 100, 150]);
     }
 }

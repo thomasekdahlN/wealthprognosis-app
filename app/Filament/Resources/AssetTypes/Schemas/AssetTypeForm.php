@@ -109,6 +109,16 @@ class AssetTypeForm
                     ->default(false)
                     ->helperText('Can be sold in parts to generate cash flow when needed'),
 
+                Toggle::make('is_investable')
+                    ->label('Investable')
+                    ->default(false)
+                    ->helperText('This asset type represents investable assets (e.g., stocks, funds).'),
+
+                Toggle::make('is_saving')
+                    ->label('Saving')
+                    ->default(false)
+                    ->helperText('This asset type represents saving instruments (e.g., bank savings).'),
+
                 Toggle::make('tax_shield')
                     ->label('Tax Shield')
                     ->default(false)

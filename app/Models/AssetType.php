@@ -32,6 +32,9 @@ class AssetType extends Model
         'is_company',
         'is_tax_optimized',
         'is_liquid',
+        'tax_shield',
+        'is_investable',
+        'is_saving',
         'can_generate_income',
         'can_generate_expenses',
         'can_have_mortgage',
@@ -57,6 +60,9 @@ class AssetType extends Model
         'is_company' => 'boolean',
         'is_tax_optimized' => 'boolean',
         'is_liquid' => 'boolean',
+        'tax_shield' => 'boolean',
+        'is_investable' => 'boolean',
+        'is_saving' => 'boolean',
         'can_generate_income' => 'boolean',
         'can_generate_expenses' => 'boolean',
         'can_have_mortgage' => 'boolean',
@@ -101,6 +107,11 @@ class AssetType extends Model
     public function scopeLiquid($query)
     {
         return $query->where('is_liquid', true);
+    }
+
+    public function scopeTaxShield($query)
+    {
+        return $query->where('tax_shield', true);
     }
 
     public function assetCategory(): BelongsTo

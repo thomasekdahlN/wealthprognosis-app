@@ -768,9 +768,19 @@ class AssetTypeSeeder extends Seeder
 
         foreach ($assetTypes as $assetType) {
             // All capability flags are now defined directly in the array structure above
-            // No logic needed here - just use the values as-is
             $code = $assetType['type'];
             $cat = $assetType['category'] ?? null;
+
+            // Derive defaults for new flags when not explicitly provided
+            if (! array_key_exists('is_investable', $assetType)) {
+                $assetType['is_investable'] = in_array($cat, ['Investment Funds', 'Securities', 'Alternative Investments', 'Pension & Retirement'], true)
+                    || in_array($code, ['indexfund', 'equityfund', 'bondfund', 'mixedfund', 'stock', 'etf', 'crypto', 'ask', 'pensionfund', 'compensationfund'], true);
+            }
+
+            if (! array_key_exists('is_saving', $assetType)) {
+                $assetType['is_saving'] = in_array($cat, ['Cash Equivalents'], true)
+                    || in_array($code, ['savingsaccount', 'bankaccount', 'bankdeposit', 'cash'], true);
+            }
 
             // Set tax_shield based on asset type
             $assetType['tax_shield'] = in_array($code, $taxShieldTypes, true);
