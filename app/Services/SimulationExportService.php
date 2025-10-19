@@ -7,7 +7,6 @@ use App\Exports\PrognosisAssetSheet2;
 use App\Models\SimulationAsset;
 use App\Models\SimulationAssetYear;
 use App\Models\SimulationConfiguration;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -17,7 +16,7 @@ class SimulationExportService
     public static function export(SimulationConfiguration $simulation, ?string $filePath = null): string
     {
         // Prepare spreadsheet
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $spreadsheet->getProperties()
             ->setCreator('Wealth Prognosis')
             ->setLastModifiedBy('Wealth Prognosis')
@@ -35,7 +34,7 @@ class SimulationExportService
         $prognoseYear = $birthYear + (int) ($simulation->prognose_age ?? 0);
         $pensionOfficialYear = $birthYear + (int) ($simulation->pension_official_age ?? 0);
         $pensionWishYear = $birthYear + (int) ($simulation->pension_wish_age ?? 0);
-        $deathYear = $birthYear + (int) ($simulation->death_age ?? 0);
+        $deathYear = $birthYear + (int) ($simulation->expected_death_age ?? 0);
 
         $config = [
             'meta' => [
@@ -104,10 +103,10 @@ class SimulationExportService
     protected static function getExportStartYear(SimulationConfiguration $simulation): int
     {
         $min = SimulationAssetYear::whereIn('asset_id', function ($q) use ($simulation) {
-                $q->select('id')
-                    ->from((new SimulationAsset())->getTable())
-                    ->where('asset_configuration_id', $simulation->id);
-            })
+            $q->select('id')
+                ->from((new SimulationAsset)->getTable())
+                ->where('asset_configuration_id', $simulation->id);
+        })
             ->min('year');
 
         return $min ? (int) $min : (int) now()->year - 1;
@@ -216,6 +215,7 @@ class SimulationExportService
             foreach ($types as $type => $data) {
                 if ($type === 'total') {
                     $stats[$y]['total']['decimal'] = 1;
+
                     continue;
                 }
                 $amt = (float) ($data['amount'] ?? 0);
@@ -234,6 +234,7 @@ class SimulationExportService
             return 0.0;
         }
         $p = (float) $percent;
+
         return $p > 1 ? $p / 100.0 : $p; // Support both 12 and 0.12 inputs
     }
 
@@ -242,4 +243,3 @@ class SimulationExportService
         return $value !== null ? (float) $value : 0.0;
     }
 }
-

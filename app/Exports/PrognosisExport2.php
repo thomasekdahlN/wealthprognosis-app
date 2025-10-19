@@ -16,11 +16,11 @@
 
 namespace App\Exports;
 
-use App\Models\Changerate;
-use App\Models\Prognosis;
-use App\Models\TaxFortune;
-use App\Models\TaxIncome;
-use App\Models\TaxRealization;
+use App\Models\Core\Changerate;
+use App\Models\Core\Prognosis;
+use App\Models\Core\TaxFortune;
+use App\Models\Core\TaxIncome;
+use App\Models\Core\TaxRealization;
 use Illuminate\Support\Arr;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -294,4 +294,3 @@ class PrognosisExport2
             ->getStartColor()->setARGB($this->deathYearRowColor);
     }
 }
-

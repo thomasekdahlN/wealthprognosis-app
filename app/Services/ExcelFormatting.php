@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ExcelFormatting
 {
@@ -22,7 +22,7 @@ class ExcelFormatting
         $sheet->getStyle("B{$startRow}:AQ{$endRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
         // Percent columns
-        foreach (['D','F','H','J','O','Q','V','X','AD','AF','AG','AH','AK','AP'] as $col) {
+        foreach (['D', 'F', 'H', 'J', 'O', 'Q', 'V', 'X', 'AD', 'AF', 'AG', 'AH', 'AK', 'AP'] as $col) {
             $sheet->getStyle("{$col}{$startRow}:{$col}{$endRow}")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%');
         }
         $sheet->getStyle("Z{$startRow}:Z{$endRow}")->getNumberFormat()->setFormatCode('0.00%;[Red]-0.00%');
@@ -47,7 +47,9 @@ class ExcelFormatting
         ];
         $offset = 6;
         foreach ($rows as $year => $color) {
-            if ($year <= 0) continue;
+            if ($year <= 0) {
+                continue;
+            }
             $row = $year - $prevYear + $offset;
             if ($row >= $startRow && $row <= $endRow) {
                 $sheet->getStyle("A{$row}:AQ{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color);
