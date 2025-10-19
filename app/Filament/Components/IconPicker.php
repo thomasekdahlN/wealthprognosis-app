@@ -10,18 +10,20 @@ class IconPicker extends Select
     {
         parent::setUp();
 
-        $this->options($this->getHeroiconOptions())
+        $this->options($this->getHeroiconOptionsWithIcons())
             ->searchable()
             ->allowHtml()
             ->getSearchResultsUsing(function (string $search): array {
-                $icons = $this->getHeroiconOptions();
+                $icons = $this->getHeroiconOptionsWithIcons();
 
                 if (empty($search)) {
                     return array_slice($icons, 0, 50, true);
                 }
 
                 return array_filter($icons, function ($label, $value) use ($search) {
-                    return str_contains(strtolower($label), strtolower($search)) ||
+                    $plainLabel = strip_tags($label);
+
+                    return str_contains(strtolower($plainLabel), strtolower($search)) ||
                            str_contains(strtolower($value), strtolower($search));
                 }, ARRAY_FILTER_USE_BOTH);
             })
@@ -30,12 +32,30 @@ class IconPicker extends Select
                     return '';
                 }
 
-                $label = $this->getHeroiconOptions()[$value] ?? $value;
-
-                return (string) $label;
+                return $this->getHeroiconOptionsWithIcons()[$value] ?? $value;
             })
             ->placeholder('Select an icon...')
             ->helperText('Search for Heroicons by name');
+    }
+
+    protected function getHeroiconOptionsWithIcons(): array
+    {
+        $icons = $this->getHeroiconOptions();
+        $optionsWithIcons = [];
+
+        foreach ($icons as $value => $label) {
+            // Use svg() helper to render the icon with smaller size and inline style
+            try {
+                $svg = svg($value, 'flex-shrink-0')->toHtml();
+                // Add inline style to force small size and vertical alignment
+                $svg = str_replace('<svg', '<svg style="width: 1rem; height: 1rem; min-width: 1rem; min-height: 1rem; max-width: 1rem; max-height: 1rem; vertical-align: middle; display: inline-block;"', $svg);
+            } catch (\Exception $e) {
+                $svg = '';
+            }
+            $optionsWithIcons[$value] = '<div style="display: flex; align-items: center; gap: 0.5rem;">'.$svg.'<span style="line-height: 1rem;">'.$label.'</span></div>';
+        }
+
+        return $optionsWithIcons;
     }
 
     protected function getHeroiconOptions(): array

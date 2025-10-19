@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\SimulationConfigurations\Schemas;
 
 use App\Models\SimulationConfiguration;
-use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\RichEditor;
@@ -98,9 +97,9 @@ class SimulationConfigurationForm
                 ->maxValue(125)
                 ->helperText('Age when you want to retire'),
 
-            TextInput::make('death_age')
+            TextInput::make('expected_death_age')
                 ->numeric()
-                ->label('Life Expectancy')
+                ->label('Expected Death Age')
                 ->minValue(0)
                 ->maxValue(125)
                 ->default(85)
@@ -125,16 +124,32 @@ class SimulationConfigurationForm
             FileUpload::make('image')
                 ->label('Image')
                 ->image()
-                ->nullable(),
+                ->nullable()
+                ->validationAttribute('image'),
 
-            ColorPicker::make('color')
+            Select::make('color')
                 ->label('Color')
-                ->nullable(),
+                ->options([
+                    '#3b82f6' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #3b82f6; border: 1px solid #e5e7eb;"></span>Blue</span>',
+                    '#10b981' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #10b981; border: 1px solid #e5e7eb;"></span>Green</span>',
+                    '#f59e0b' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #f59e0b; border: 1px solid #e5e7eb;"></span>Amber</span>',
+                    '#ef4444' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #ef4444; border: 1px solid #e5e7eb;"></span>Red</span>',
+                    '#8b5cf6' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #8b5cf6; border: 1px solid #e5e7eb;"></span>Purple</span>',
+                    '#6b7280' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #6b7280; border: 1px solid #e5e7eb;"></span>Gray</span>',
+                ])
+                ->allowHtml()
+                ->default('#3b82f6')
+                ->nullable()
+                ->native(false)
+                ->suffixIcon('heroicon-o-swatch'),
 
             TagsInput::make('tags')
                 ->label('Tags')
                 ->nullable()
-                ->helperText('Add tags to categorize this simulation'),
+                ->helperText('Add tags to categorize this simulation')
+                ->separator(',')
+                ->splitKeys(['Tab', 'Enter', ','])
+                ->placeholder('Type and press Enter or comma to add tags'),
 
             Select::make('risk_tolerance')
                 ->label('Risk Tolerance')

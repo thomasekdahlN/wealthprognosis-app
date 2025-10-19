@@ -23,6 +23,7 @@ class SimulationStatsOverviewWidget extends BaseWidget
     {
         if ($simulationConfiguration) {
             $this->simulationConfiguration = $simulationConfiguration;
+
             return;
         }
 
@@ -32,16 +33,16 @@ class SimulationStatsOverviewWidget extends BaseWidget
         if ($simulationConfigurationId) {
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
-                'simulationAssets.simulationAssetYears'
+                'simulationAssets.simulationAssetYears',
             ])
-            ->where('user_id', auth()->id())
-            ->find($simulationConfigurationId);
+                ->where('user_id', auth()->id())
+                ->find($simulationConfigurationId);
         }
     }
 
     protected function getStats(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [];
         }
 
@@ -106,7 +107,7 @@ class SimulationStatsOverviewWidget extends BaseWidget
                 ->icon($totalGrowth >= 0 ? 'heroicon-o-arrow-trending-up' : 'heroicon-o-arrow-trending-down')
                 ->color($totalGrowth >= 0 ? 'success' : 'danger'),
 
-            Stat::make('Annual Growth Rate', number_format($annualGrowthRate, 2) . '%')
+            Stat::make('Annual Growth Rate', number_format($annualGrowthRate, 2).'%')
                 ->description('Compound annual growth rate')
                 ->icon('heroicon-o-calculator')
                 ->color($annualGrowthRate >= 0 ? 'success' : 'danger'),
@@ -131,7 +132,7 @@ class SimulationStatsOverviewWidget extends BaseWidget
                 ->icon('heroicon-o-receipt-percent')
                 ->color('warning'),
 
-            Stat::make('Simulation Period', $yearCount . ' years')
+            Stat::make('Simulation Period', $yearCount.' years')
                 ->description('Analysis timeframe')
                 ->icon('heroicon-o-calendar-days')
                 ->color('info'),

@@ -22,17 +22,17 @@ class FireAnalysisWidget extends BaseWidget
             if ($simulationConfigurationId) {
                 $this->simulationConfiguration = SimulationConfiguration::with([
                     'assetConfiguration',
-                    'simulationAssets.simulationAssetYears'
+                    'simulationAssets.simulationAssetYears',
                 ])
-                ->where('user_id', auth()->id())
-                ->find($simulationConfigurationId);
+                    ->where('user_id', auth()->id())
+                    ->find($simulationConfigurationId);
             }
         }
     }
 
     protected function getStats(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [];
         }
 
@@ -44,19 +44,19 @@ class FireAnalysisWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-fire')
                 ->color('warning'),
 
-            Stat::make('Current Progress', $fireAnalysis['fire_progress'] . '%')
+            Stat::make('Current Progress', $fireAnalysis['fire_progress'].'%')
                 ->description('Progress towards FIRE goal')
                 ->descriptionIcon('heroicon-m-chart-pie')
                 ->color($fireAnalysis['fire_progress'] >= 100 ? 'success' : 'info'),
 
             Stat::make('FIRE Achievement', $fireAnalysis['fire_achieved'] ? 'Achieved' : 'Not Achieved')
                 ->description($fireAnalysis['fire_achieved']
-                    ? 'FIRE achieved in ' . $fireAnalysis['fire_year']
-                    : 'Years to FIRE: ' . $fireAnalysis['years_to_fire'])
+                    ? 'FIRE achieved in '.$fireAnalysis['fire_year']
+                    : 'Years to FIRE: '.$fireAnalysis['years_to_fire'])
                 ->descriptionIcon($fireAnalysis['fire_achieved'] ? 'heroicon-m-check-circle' : 'heroicon-m-clock')
                 ->color($fireAnalysis['fire_achieved'] ? 'success' : 'warning'),
 
-            Stat::make('Safe Withdrawal Rate', $fireAnalysis['safe_withdrawal_rate'] . '%')
+            Stat::make('Safe Withdrawal Rate', $fireAnalysis['safe_withdrawal_rate'].'%')
                 ->description('Based on current portfolio')
                 ->descriptionIcon('heroicon-m-arrow-down-tray')
                 ->color('info'),
@@ -66,7 +66,7 @@ class FireAnalysisWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
 
-            Stat::make('Expense Coverage', $fireAnalysis['expense_coverage'] . '%')
+            Stat::make('Expense Coverage', $fireAnalysis['expense_coverage'].'%')
                 ->description('Passive income vs expenses')
                 ->descriptionIcon($fireAnalysis['expense_coverage'] >= 100 ? 'heroicon-m-shield-check' : 'heroicon-m-shield-exclamation')
                 ->color($fireAnalysis['expense_coverage'] >= 100 ? 'success' : 'danger'),
@@ -103,7 +103,7 @@ class FireAnalysisWidget extends BaseWidget
                     $yearPortfolioValue = $year->asset_market_amount ?? 0;
                     $fireNumber = $annualExpenses * 25; // 4% rule
 
-                    if ($yearPortfolioValue >= $fireNumber && !$fireAchieved) {
+                    if ($yearPortfolioValue >= $fireNumber && ! $fireAchieved) {
                         $fireAchieved = true;
                         $fireYear = $year->year;
                         break;
@@ -123,7 +123,7 @@ class FireAnalysisWidget extends BaseWidget
         $expenseCoverage = $annualExpenses > 0 ? round(($annualPassiveIncome / $annualExpenses) * 100, 1) : 0;
 
         // Calculate years to FIRE if not achieved
-        if (!$fireAchieved && $fireNumber > $currentPortfolioValue) {
+        if (! $fireAchieved && $fireNumber > $currentPortfolioValue) {
             $shortfall = $fireNumber - $currentPortfolioValue;
             // Assume 7% annual growth and calculate years needed
             if ($currentPortfolioValue > 0) {

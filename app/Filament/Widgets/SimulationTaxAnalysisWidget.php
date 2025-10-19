@@ -23,6 +23,7 @@ class SimulationTaxAnalysisWidget extends BaseWidget
     {
         if ($simulationConfiguration) {
             $this->simulationConfiguration = $simulationConfiguration;
+
             return;
         }
 
@@ -32,16 +33,16 @@ class SimulationTaxAnalysisWidget extends BaseWidget
         if ($simulationConfigurationId) {
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
-                'simulationAssets.simulationAssetYears'
+                'simulationAssets.simulationAssetYears',
             ])
-            ->where('user_id', auth()->id())
-            ->find($simulationConfigurationId);
+                ->where('user_id', auth()->id())
+                ->find($simulationConfigurationId);
         }
     }
 
     protected function getStats(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [];
         }
 
@@ -101,12 +102,12 @@ class SimulationTaxAnalysisWidget extends BaseWidget
                 ->icon('heroicon-o-calendar')
                 ->color('warning'),
 
-            Stat::make('Effective Tax Rate', number_format($effectiveTaxRate, 2) . '%')
+            Stat::make('Effective Tax Rate', number_format($effectiveTaxRate, 2).'%')
                 ->description('Tax as percentage of income')
                 ->icon('heroicon-o-calculator')
                 ->color($effectiveTaxRate > 30 ? 'danger' : ($effectiveTaxRate > 20 ? 'warning' : 'success')),
 
-            Stat::make('Tax on Gains Rate', number_format($taxOnGainsRate, 2) . '%')
+            Stat::make('Tax on Gains Rate', number_format($taxOnGainsRate, 2).'%')
                 ->description('Tax as percentage of capital gains')
                 ->icon('heroicon-o-chart-bar')
                 ->color($taxOnGainsRate > 25 ? 'danger' : ($taxOnGainsRate > 15 ? 'warning' : 'success')),
@@ -116,7 +117,7 @@ class SimulationTaxAnalysisWidget extends BaseWidget
                 ->icon('heroicon-o-arrow-up')
                 ->color('danger'),
 
-            Stat::make('Tax Efficiency Score', number_format(100 - min(100, $effectiveTaxRate), 2) . '%')
+            Stat::make('Tax Efficiency Score', number_format(100 - min(100, $effectiveTaxRate), 2).'%')
                 ->description('Higher is better')
                 ->icon('heroicon-o-bolt')
                 ->color($effectiveTaxRate < 20 ? 'success' : ($effectiveTaxRate < 30 ? 'warning' : 'danger')),

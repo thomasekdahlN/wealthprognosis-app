@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources\AssetConfigurations;
 
-use App\Filament\Resources\AssetConfigurations\Actions\CreateAiAssistedConfigurationAction;
-use App\Filament\Resources\AssetConfigurations\Actions\RunSimulationAction;
-use App\Filament\Resources\AssetConfigurations\Pages;
 use App\Filament\Resources\AssetConfigurations\Schemas\AssetConfigurationForm;
 use App\Filament\Resources\AssetConfigurations\Tables\AssetConfigurationsTable;
 use App\Models\AssetConfiguration;
@@ -30,6 +27,33 @@ class AssetConfigurationResource extends Resource
     {
         // Explicitly requested: Assets menu should lead to Asset Configurations listing
         return true;
+    }
+
+    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false): string
+    {
+        $name = $name ?? 'index';
+
+        // Map to our pretty route names
+        return match ($name) {
+            'index' => route('filament.admin.resources.asset-configurations.index.pretty', [], $isAbsolute),
+            'create' => route('filament.admin.resources.asset-configurations.create.pretty', [], $isAbsolute),
+            'edit' => (function () use ($parameters, $isAbsolute) {
+                $recordParam = $parameters['record'] ?? null;
+                if (! $recordParam) {
+                    // Defensive: if no record provided, fall back to index
+                    return route('filament.admin.resources.asset-configurations.index.pretty', [], $isAbsolute);
+                }
+
+                $recordId = $recordParam instanceof \Illuminate\Database\Eloquent\Model
+                    ? $recordParam->getKey()
+                    : $recordParam;
+
+                return route('filament.admin.resources.asset-configurations.edit.pretty', [
+                    'record' => $recordId,
+                ], $isAbsolute);
+            })(),
+            default => parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters),
+        };
     }
 
     public static function form(Schema $schema): Schema
@@ -66,5 +90,4 @@ class AssetConfigurationResource extends Resource
     {
         return 'primary';
     }
-
 }

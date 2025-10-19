@@ -19,33 +19,57 @@ class AssetYearsTable
                     ->description(fn ($record) => $record->description ? strip_tags($record->description) : null)
                     ->wrap(),
                 TextInputColumn::make('income_amount')
-                    ->type('number')
-                    ->step(0.01)
-                    ->rules(['nullable', 'numeric', 'min:0'])
+                    ->type('text')
+                    ->rules(['nullable', 'string'])
                     ->sortable()
                     ->alignRight()
-                    ->extraAttributes(AmountHelper::getRightAlignedStyle()),
+                    ->extraAttributes(AmountHelper::getRightAlignedStyle())
+                    ->getStateUsing(fn ($record) => AmountHelper::formatNorwegian($record->income_amount))
+                    ->updateStateUsing(function ($record, $state) {
+                        $amount = AmountHelper::parseNorwegianAmount((string) $state);
+                        $record->update(['income_amount' => $amount]);
+
+                        return AmountHelper::formatNorwegian($amount);
+                    }),
                 TextInputColumn::make('expence_amount')
-                    ->type('number')
-                    ->step(0.01)
-                    ->rules(['nullable', 'numeric', 'min:0'])
+                    ->type('text')
+                    ->rules(['nullable', 'string'])
                     ->sortable()
                     ->alignRight()
-                    ->extraAttributes(AmountHelper::getRightAlignedStyle()),
+                    ->extraAttributes(AmountHelper::getRightAlignedStyle())
+                    ->getStateUsing(fn ($record) => AmountHelper::formatNorwegian($record->expence_amount))
+                    ->updateStateUsing(function ($record, $state) {
+                        $amount = AmountHelper::parseNorwegianAmount((string) $state);
+                        $record->update(['expence_amount' => $amount]);
+
+                        return AmountHelper::formatNorwegian($amount);
+                    }),
                 TextInputColumn::make('asset_market_amount')
-                    ->type('number')
-                    ->step(0.01)
-                    ->rules(['nullable', 'numeric', 'min:0'])
+                    ->type('text')
+                    ->rules(['nullable', 'string'])
                     ->sortable()
                     ->alignRight()
-                    ->extraAttributes(AmountHelper::getRightAlignedStyle()),
+                    ->extraAttributes(AmountHelper::getRightAlignedStyle())
+                    ->getStateUsing(fn ($record) => AmountHelper::formatNorwegian($record->asset_market_amount))
+                    ->updateStateUsing(function ($record, $state) {
+                        $amount = AmountHelper::parseNorwegianAmount((string) $state);
+                        $record->update(['asset_market_amount' => $amount]);
+
+                        return AmountHelper::formatNorwegian($amount);
+                    }),
                 TextInputColumn::make('mortgage_amount')
-                    ->type('number')
-                    ->step(0.01)
-                    ->rules(['nullable', 'numeric', 'min:0'])
+                    ->type('text')
+                    ->rules(['nullable', 'string'])
                     ->sortable()
                     ->alignRight()
-                    ->extraAttributes(AmountHelper::getRightAlignedStyle()),
+                    ->extraAttributes(AmountHelper::getRightAlignedStyle())
+                    ->getStateUsing(fn ($record) => AmountHelper::formatNorwegian($record->mortgage_amount))
+                    ->updateStateUsing(function ($record, $state) {
+                        $amount = AmountHelper::parseNorwegianAmount((string) $state);
+                        $record->update(['mortgage_amount' => $amount]);
+
+                        return AmountHelper::formatNorwegian($amount);
+                    }),
                 TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])

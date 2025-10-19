@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Models\PrognosisChangeRate as AssetChangeRate;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -24,10 +23,8 @@ class ChangeRateTable extends Page implements HasForms, HasTable
     use InteractsWithForms, InteractsWithTable;
 
     protected static bool $shouldRegisterNavigation = false;
+
     protected string $view = 'filament.pages.change-rate-table';
-
-
-
 
     public string $scenario;
 
@@ -193,7 +190,6 @@ class ChangeRateTable extends Page implements HasForms, HasTable
             'asset' => $this->asset,
         ];
     }
-
 
     protected function getHeaderWidgets(): array
     {

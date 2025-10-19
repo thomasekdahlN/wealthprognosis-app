@@ -73,6 +73,18 @@ class AssetTypesTable
                     ->badge()
                     ->color(fn ($state) => $state ?: 'gray'),
 
+                IconColumn::make('is_liquid')
+                    ->label('Liquid')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                IconColumn::make('tax_shield')
+                    ->label('Tax Shield')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()
@@ -122,6 +134,18 @@ class AssetTypesTable
                     ->placeholder('All')
                     ->trueLabel('Tax optimized only')
                     ->falseLabel('Non-tax optimized only'),
+
+                TernaryFilter::make('is_liquid')
+                    ->label('Liquid')
+                    ->placeholder('All')
+                    ->trueLabel('Liquid only')
+                    ->falseLabel('Illiquid only'),
+
+                TernaryFilter::make('tax_shield')
+                    ->label('Tax Shield')
+                    ->placeholder('All')
+                    ->trueLabel('Tax shield only')
+                    ->falseLabel('No tax shield'),
 
                 TernaryFilter::make('can_generate_income')
                     ->label('Gen. Income')

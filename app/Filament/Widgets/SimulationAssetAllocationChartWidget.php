@@ -10,6 +10,7 @@ class SimulationAssetAllocationChartWidget extends ChartWidget
     protected static bool $isLazy = false;
 
     protected ?string $heading = 'Portfolio Allocation Evolution';
+
     protected static ?int $sort = 6;
 
     public ?SimulationConfiguration $simulationConfiguration = null;
@@ -18,6 +19,7 @@ class SimulationAssetAllocationChartWidget extends ChartWidget
     {
         if ($simulationConfiguration) {
             $this->simulationConfiguration = $simulationConfiguration;
+
             return;
         }
 
@@ -27,16 +29,16 @@ class SimulationAssetAllocationChartWidget extends ChartWidget
         if ($simulationConfigurationId) {
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
-                'simulationAssets.simulationAssetYears'
+                'simulationAssets.simulationAssetYears',
             ])
-            ->where('user_id', auth()->id())
-            ->find($simulationConfigurationId);
+                ->where('user_id', auth()->id())
+                ->find($simulationConfigurationId);
         }
     }
 
     protected function getData(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [
                 'datasets' => [],
                 'labels' => [],
@@ -70,7 +72,7 @@ class SimulationAssetAllocationChartWidget extends ChartWidget
                 $assetType = $asset->asset_type ?? 'Unknown';
                 $value = $lastYearData->end_value ?? 0;
 
-                if (!isset($assetAllocation[$assetType])) {
+                if (! isset($assetAllocation[$assetType])) {
                     $assetAllocation[$assetType] = 0;
                 }
                 $assetAllocation[$assetType] += $value;
@@ -101,7 +103,7 @@ class SimulationAssetAllocationChartWidget extends ChartWidget
         ];
 
         $backgroundColors = array_slice($colors, 0, count($labels));
-        $borderColors = array_map(function($color) {
+        $borderColors = array_map(function ($color) {
             return str_replace('0.8', '1', $color);
         }, $backgroundColors);
 

@@ -27,6 +27,7 @@ class CreateTaxConfiguration extends CreateRecord
             'year' => request()->route('year'),
         ]);
     }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['country_code'] = $data['country_code'] ?? (string) request()->route('country');
@@ -36,8 +37,6 @@ class CreateTaxConfiguration extends CreateRecord
 
         return $data;
     }
-
-
 
     protected static string $resource = TaxConfigurationResource::class;
 }

@@ -70,5 +70,4 @@ class AssetCategoryResource extends Resource
     {
         return 'warning';
     }
-
 }

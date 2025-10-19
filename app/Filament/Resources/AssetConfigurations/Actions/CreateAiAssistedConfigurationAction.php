@@ -2,16 +2,16 @@
 
 namespace App\Filament\Resources\AssetConfigurations\Actions;
 
-use App\Models\AssetConfiguration;
 use App\Models\Asset;
-use App\Models\AssetYear;
+use App\Models\AssetConfiguration;
 use App\Models\AssetType;
+use App\Models\AssetYear;
 use App\Models\TaxType;
 use App\Services\AiConfigurationAnalysisService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Components\Section;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -46,7 +46,7 @@ class CreateAiAssistedConfigurationAction extends Action
                             ->maxLength(5000)
                             ->helperText('Be specific about amounts, timeframes, asset types, income sources, expenses, and financial goals. The more detail you provide, the better the AI can create your configuration.')
                             ->columnSpanFull(),
-                    ])
+                    ]),
             ])
             ->action(function (array $data) {
                 try {
@@ -62,7 +62,7 @@ class CreateAiAssistedConfigurationAction extends Action
 
                     // Try to analyze the economic description using AI, fallback to basic config
                     try {
-                        $analysisService = new AiConfigurationAnalysisService();
+                        $analysisService = new AiConfigurationAnalysisService;
                         $analysisResult = $analysisService->analyzeEconomicSituation($data['economic_description']);
                     } catch (\Exception $aiException) {
                         Log::info('AI analysis failed, using fallback configuration', [
@@ -108,14 +108,14 @@ class CreateAiAssistedConfigurationAction extends Action
                                             'start_year' => (int) date('Y'),
                                             'end_year' => null,
                                             'sort_order' => 1,
-                                        ]
-                                    ]
-                                ]
-                            ]
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ];
                     }
 
-                    if (!$analysisResult || !isset($analysisResult['configuration'])) {
+                    if (! $analysisResult || ! isset($analysisResult['configuration'])) {
                         throw new \Exception('AI analysis failed to generate a valid configuration');
                     }
 
@@ -136,8 +136,8 @@ class CreateAiAssistedConfigurationAction extends Action
                         'export_start_age' => $configData['export_start_age'] ?? 25,
                         'created_by' => Auth::id(),
                         'updated_by' => Auth::id(),
-                        'created_checksum' => hash('sha256', json_encode($configData) . '_created'),
-                        'updated_checksum' => hash('sha256', json_encode($configData) . '_updated'),
+                        'created_checksum' => hash('sha256', json_encode($configData).'_created'),
+                        'updated_checksum' => hash('sha256', json_encode($configData).'_updated'),
                     ]);
 
                     // Create assets and asset years
@@ -146,14 +146,14 @@ class CreateAiAssistedConfigurationAction extends Action
                     foreach ($assetsData as $assetData) {
                         // Validate asset type exists
                         $assetType = AssetType::where('type', $assetData['asset_type'] ?? 'other')->first();
-                        if (!$assetType) {
+                        if (! $assetType) {
                             Log::warning('Asset type not found, using default', ['type' => $assetData['asset_type'] ?? 'other']);
                             $assetType = AssetType::where('type', 'other')->first();
                         }
 
                         // Validate tax type exists
                         $taxType = TaxType::where('type', $assetData['tax_type'] ?? 'none')->first();
-                        if (!$taxType) {
+                        if (! $taxType) {
                             Log::warning('Tax type not found, using default', ['type' => $assetData['tax_type'] ?? 'none']);
                             $taxType = TaxType::where('type', 'none')->first();
                         }
@@ -174,8 +174,8 @@ class CreateAiAssistedConfigurationAction extends Action
                             'sort_order' => $assetData['sort_order'] ?? 1,
                             'created_by' => Auth::id(),
                             'updated_by' => Auth::id(),
-                            'created_checksum' => hash('sha256', json_encode($assetData) . '_created'),
-                            'updated_checksum' => hash('sha256', json_encode($assetData) . '_updated'),
+                            'created_checksum' => hash('sha256', json_encode($assetData).'_created'),
+                            'updated_checksum' => hash('sha256', json_encode($assetData).'_updated'),
                         ]);
 
                         // Create asset years data
@@ -203,8 +203,8 @@ class CreateAiAssistedConfigurationAction extends Action
                                 'sort_order' => $yearData['sort_order'] ?? 1,
                                 'created_by' => Auth::id(),
                                 'updated_by' => Auth::id(),
-                                'created_checksum' => hash('sha256', json_encode($yearData) . '_created'),
-                                'updated_checksum' => hash('sha256', json_encode($yearData) . '_updated'),
+                                'created_checksum' => hash('sha256', json_encode($yearData).'_created'),
+                                'updated_checksum' => hash('sha256', json_encode($yearData).'_updated'),
                             ]);
                         }
                     }
@@ -217,7 +217,7 @@ class CreateAiAssistedConfigurationAction extends Action
                     // Show success notification
                     Notification::make()
                         ->title('AI Configuration Created Successfully')
-                        ->body("Created '{$assetConfiguration->name}' with " . count($assetsData) . " assets based on your description.")
+                        ->body("Created '{$assetConfiguration->name}' with ".count($assetsData).' assets based on your description.')
                         ->success()
                         ->duration(5000)
                         ->send();

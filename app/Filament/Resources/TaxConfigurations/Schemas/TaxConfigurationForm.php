@@ -38,16 +38,19 @@ class TaxConfigurationForm
                         if (is_array($state)) {
                             return json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                         }
+
                         return is_string($state) ? $state : '';
                     })
-                    ->dehydrateStateUsing(function ($state): array|null {
+                    ->dehydrateStateUsing(function ($state): ?array {
                         if (is_array($state)) {
                             return $state;
                         }
                         if (is_string($state) && $state !== '') {
                             $decoded = json_decode($state, true);
+
                             return is_array($decoded) ? $decoded : null;
                         }
+
                         return null;
                     })
                     ->dehydrated()

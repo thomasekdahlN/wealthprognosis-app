@@ -4,12 +4,13 @@ namespace App\Filament\Widgets;
 
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Number;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Number;
 
 class SimulationOverviewWidget extends BaseWidget
 {
     protected ?int $simulationConfigurationId = null;
+
     protected ?\App\Models\SimulationConfiguration $simulationConfiguration = null;
 
     public function mount($simulationConfiguration = null): void
@@ -24,17 +25,17 @@ class SimulationOverviewWidget extends BaseWidget
             if ($this->simulationConfigurationId) {
                 $this->simulationConfiguration = \App\Models\SimulationConfiguration::with([
                     'assetConfiguration',
-                    'simulationAssets.simulationAssetYears'
+                    'simulationAssets.simulationAssetYears',
                 ])
-                ->where('user_id', Auth::id())
-                ->find($this->simulationConfigurationId);
+                    ->where('user_id', Auth::id())
+                    ->find($this->simulationConfigurationId);
             }
         }
     }
 
     public function getStats(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [];
         }
 
@@ -52,11 +53,11 @@ class SimulationOverviewWidget extends BaseWidget
                 ->color('success'),
 
             Stat::make('Total Growth', Number::currency($summary['total_growth'], 'NOK'))
-                ->description($summary['growth_percentage'] . '% total return')
+                ->description($summary['growth_percentage'].'% total return')
                 ->descriptionIcon($summary['total_growth'] >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($summary['total_growth'] >= 0 ? 'success' : 'danger'),
 
-            Stat::make('Annual Growth Rate', $summary['annual_growth_rate'] . '%')
+            Stat::make('Annual Growth Rate', $summary['annual_growth_rate'].'%')
                 ->description('Average annual return')
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
@@ -77,12 +78,12 @@ class SimulationOverviewWidget extends BaseWidget
                 ->color($summary['net_cash_flow'] >= 0 ? 'success' : 'danger'),
 
             Stat::make('Tax Burden', Number::currency($summary['total_taxes'], 'NOK'))
-                ->description($summary['tax_rate'] . '% effective tax rate')
+                ->description($summary['tax_rate'].'% effective tax rate')
                 ->descriptionIcon('heroicon-m-receipt-percent')
                 ->color('warning'),
 
-            Stat::make('Simulation Period', $summary['years'] . ' years')
-                ->description($summary['start_year'] . ' - ' . $summary['end_year'])
+            Stat::make('Simulation Period', $summary['years'].' years')
+                ->description($summary['start_year'].' - '.$summary['end_year'])
                 ->descriptionIcon('heroicon-m-calendar-days')
                 ->color('gray'),
         ];

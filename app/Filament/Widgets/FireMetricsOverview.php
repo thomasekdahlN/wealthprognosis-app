@@ -45,9 +45,9 @@ class FireMetricsOverview extends ChartWidget
         // Get current financial data (respect active asset configuration)
         $assetConfigId = $activeScenario->id;
         $totalAssets = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
-                $query->where('user_id', $user->id)->where('is_active', true);
-                $query->where('asset_configuration_id', $assetConfigId);
-            })
+            $query->where('user_id', $user->id)->where('is_active', true);
+            $query->where('asset_configuration_id', $assetConfigId);
+        })
             ->where('year', now()->year)
             ->sum('asset_market_amount');
         $annualIncome = $this->calculateAnnualIncome($user, $assetConfigId);

@@ -66,35 +66,20 @@ class AssetTypeForm
                     ->label('Icon'),
 
                 Select::make('color')
-                    ->label('Color Theme')
+                    ->label('Color')
                     ->options([
-                        'gray' => 'Gray',
-                        'red' => 'Red',
-                        'orange' => 'Orange',
-                        'amber' => 'Amber',
-                        'yellow' => 'Yellow',
-                        'lime' => 'Lime',
-                        'green' => 'Green',
-                        'emerald' => 'Emerald',
-                        'teal' => 'Teal',
-                        'cyan' => 'Cyan',
-                        'sky' => 'Sky',
-                        'blue' => 'Blue',
-                        'indigo' => 'Indigo',
-                        'violet' => 'Violet',
-                        'purple' => 'Purple',
-                        'fuchsia' => 'Fuchsia',
-                        'pink' => 'Pink',
-                        'rose' => 'Rose',
-                        'success' => 'Success',
-                        'info' => 'Info',
-                        'warning' => 'Warning',
-                        'danger' => 'Danger',
-                        'primary' => 'Primary',
-                        'secondary' => 'Secondary',
+                        '#3b82f6' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #3b82f6; border: 1px solid #e5e7eb;"></span>Blue</span>',
+                        '#10b981' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #10b981; border: 1px solid #e5e7eb;"></span>Green</span>',
+                        '#f59e0b' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #f59e0b; border: 1px solid #e5e7eb;"></span>Amber</span>',
+                        '#ef4444' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #ef4444; border: 1px solid #e5e7eb;"></span>Red</span>',
+                        '#8b5cf6' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #8b5cf6; border: 1px solid #e5e7eb;"></span>Purple</span>',
+                        '#6b7280' => '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><span style="display: inline-block; width: 1rem; height: 1rem; border-radius: 0.25rem; background-color: #6b7280; border: 1px solid #e5e7eb;"></span>Gray</span>',
                     ])
-                    ->default('gray')
-                    ->searchable()
+                    ->allowHtml()
+                    ->default('#6b7280')
+                    ->required()
+                    ->native(false)
+                    ->suffixIcon('heroicon-o-swatch')
                     ->helperText('Color theme for badges and visual elements'),
 
                 TextInput::make('sort_order')
@@ -123,6 +108,11 @@ class AssetTypeForm
                     ->label('Liquid')
                     ->default(false)
                     ->helperText('Can be sold in parts to generate cash flow when needed'),
+
+                Toggle::make('tax_shield')
+                    ->label('Tax Shield')
+                    ->default(false)
+                    ->helperText('Asset provides tax deduction benefits (e.g., stocks, funds, ASK accounts)'),
 
                 Toggle::make('can_generate_income')
                     ->label('Can Generate Income')

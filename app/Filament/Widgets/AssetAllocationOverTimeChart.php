@@ -24,17 +24,17 @@ class AssetAllocationOverTimeChart extends ChartWidget
             if ($simulationConfigurationId) {
                 $this->simulationConfiguration = SimulationConfiguration::with([
                     'assetConfiguration',
-                    'simulationAssets.simulationAssetYears'
+                    'simulationAssets.simulationAssetYears',
                 ])
-                ->where('user_id', auth()->id())
-                ->find($simulationConfigurationId);
+                    ->where('user_id', auth()->id())
+                    ->find($simulationConfigurationId);
             }
         }
     }
 
     protected function getData(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [
                 'datasets' => [],
                 'labels' => [],
@@ -130,21 +130,21 @@ class AssetAllocationOverTimeChart extends ChartWidget
         // Collect all years and asset types
         foreach ($simulationAssets as $asset) {
             $assetType = $asset->asset_type;
-            if (!in_array($assetType, $assetTypes)) {
+            if (! in_array($assetType, $assetTypes)) {
                 $assetTypes[] = $assetType;
             }
 
             foreach ($asset->simulationAssetYears as $assetYear) {
                 $year = $assetYear->year;
 
-                if (!isset($yearlyData[$year])) {
+                if (! isset($yearlyData[$year])) {
                     $yearlyData[$year] = [
                         'total' => 0,
                         'by_type' => [],
                     ];
                 }
 
-                if (!isset($yearlyData[$year]['by_type'][$assetType])) {
+                if (! isset($yearlyData[$year]['by_type'][$assetType])) {
                     $yearlyData[$year]['by_type'][$assetType] = 0;
                 }
 

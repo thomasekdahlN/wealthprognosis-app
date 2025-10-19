@@ -74,5 +74,4 @@ class AssetTypeResource extends Resource
     {
         return 'success';
     }
-
 }

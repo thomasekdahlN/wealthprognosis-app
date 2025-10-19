@@ -22,17 +22,17 @@ class TaxAnalysisWidget extends BaseWidget
             if ($simulationConfigurationId) {
                 $this->simulationConfiguration = SimulationConfiguration::with([
                     'assetConfiguration',
-                    'simulationAssets.simulationAssetYears'
+                    'simulationAssets.simulationAssetYears',
                 ])
-                ->where('user_id', auth()->id())
-                ->find($simulationConfigurationId);
+                    ->where('user_id', auth()->id())
+                    ->find($simulationConfigurationId);
             }
         }
     }
 
     protected function getStats(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [];
         }
 
@@ -44,7 +44,7 @@ class TaxAnalysisWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-receipt-percent')
                 ->color('warning'),
 
-            Stat::make('Effective Tax Rate', $taxAnalysis['effective_tax_rate'] . '%')
+            Stat::make('Effective Tax Rate', $taxAnalysis['effective_tax_rate'].'%')
                 ->description('Average tax rate on income')
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
@@ -59,7 +59,7 @@ class TaxAnalysisWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('warning'),
 
-            Stat::make('Tax Efficiency Score', $taxAnalysis['tax_efficiency_score'] . '/100')
+            Stat::make('Tax Efficiency Score', $taxAnalysis['tax_efficiency_score'].'/100')
                 ->description('Portfolio tax optimization')
                 ->descriptionIcon($taxAnalysis['tax_efficiency_score'] >= 70 ? 'heroicon-m-shield-check' : 'heroicon-m-shield-exclamation')
                 ->color($taxAnalysis['tax_efficiency_score'] >= 70 ? 'success' : 'warning'),

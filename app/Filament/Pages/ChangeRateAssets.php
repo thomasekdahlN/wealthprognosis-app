@@ -20,9 +20,7 @@ class ChangeRateAssets extends Page implements HasTable
 
     protected static bool $shouldRegisterNavigation = false;
 
-
     protected string $view = 'filament.pages.change-rate-assets';
-
 
     public string $scenario;
 

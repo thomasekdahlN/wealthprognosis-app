@@ -79,6 +79,6 @@ class AssetConfigurationsTable
             ->paginated([50, 100, 150])
             ->defaultPaginationPageOption(50)
             ->paginationPageOptions([50, 100, 150])
-            ->recordUrl(fn (\App\Models\AssetConfiguration $record) => route('filament.admin.pages.config-assets.pretty', ['record' => $record->getKey()]));
+            ->recordUrl(fn (\App\Models\AssetConfiguration $record) => \App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('edit', ['record' => $record]));
     }
 }

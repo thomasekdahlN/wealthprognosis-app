@@ -74,6 +74,7 @@ class TaxPropertyResource extends Resource
             TextInput::make('taxHomePermill')->numeric()->label('Home rate (permille)')->helperText('Permille value, e.g. 3.500 for 0.35%'),
             TextInput::make('taxCompanyPermill')->numeric()->label('Company rate (permille)')->helperText('Permille value, e.g. 3.500 for 0.35%'),
             TextInput::make('deduction')->numeric()->label('Deduction (NOK)'),
+            TextInput::make('fortune_taxable_percent')->numeric()->label('Fortune taxable (%)')->helperText('Percentage of property value taxable for wealth tax, e.g. 70.00 for 70%'),
             Toggle::make('is_active')->default(true)->required(),
         ]);
     }
@@ -94,6 +95,8 @@ class TaxPropertyResource extends Resource
                     ->formatStateUsing(fn ($state) => $state === null ? '' : number_format((float) $state, 1, ',', ' ')),
                 TextColumn::make('deduction')->label('Deduction')->toggleable()->sortable()->alignment(Alignment::End)
                     ->formatStateUsing(fn ($state) => ($state === null || (is_numeric($state) && (float) $state == 0.0)) ? '' : AmountHelper::formatNorwegian((float) $state, 0)),
+                TextColumn::make('fortune_taxable_percent')->label('Fortune %')->toggleable()->sortable()->alignment(Alignment::End)
+                    ->formatStateUsing(fn ($state) => $state === null ? '' : number_format((float) $state, 2, ',', ' ').' %'),
             ])
             ->filters([
                 SelectFilter::make('country_code')

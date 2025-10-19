@@ -35,10 +35,7 @@ class ChangeRateScenarios extends Page implements HasTable
         return 'secondary';
     }
 
-
     protected string $view = 'filament.pages.change-rate-scenarios';
-
-
 
     public function getTitle(): string|Htmlable
     {

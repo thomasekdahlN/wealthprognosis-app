@@ -23,6 +23,7 @@ class SimulationFireAnalysisWidget extends BaseWidget
     {
         if ($simulationConfiguration) {
             $this->simulationConfiguration = $simulationConfiguration;
+
             return;
         }
 
@@ -32,16 +33,16 @@ class SimulationFireAnalysisWidget extends BaseWidget
         if ($simulationConfigurationId) {
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
-                'simulationAssets.simulationAssetYears'
+                'simulationAssets.simulationAssetYears',
             ])
-            ->where('user_id', auth()->id())
-            ->find($simulationConfigurationId);
+                ->where('user_id', auth()->id())
+                ->find($simulationConfigurationId);
         }
     }
 
     protected function getStats(): array
     {
-        if (!$this->simulationConfiguration) {
+        if (! $this->simulationConfiguration) {
             return [];
         }
 
@@ -115,12 +116,12 @@ class SimulationFireAnalysisWidget extends BaseWidget
                 ->icon('heroicon-o-banknotes')
                 ->color('success'),
 
-            Stat::make('Current Progress', number_format($fireProgress, 1) . '%')
+            Stat::make('Current Progress', number_format($fireProgress, 1).'%')
                 ->description($fireAchieved ? 'FIRE achieved!' : 'Progress to financial independence')
                 ->icon($fireAchieved ? 'heroicon-o-check-circle' : 'heroicon-o-clock')
                 ->color($fireAchieved ? 'success' : ($fireProgress > 50 ? 'warning' : 'danger')),
 
-            Stat::make('Years to FIRE', $fireAchieved ? 'Achieved' : $yearsToFire . ' years')
+            Stat::make('Years to FIRE', $fireAchieved ? 'Achieved' : $yearsToFire.' years')
                 ->description($fireAchieved ? 'Financial independence reached' : 'Estimated time to FIRE')
                 ->icon($fireAchieved ? 'heroicon-o-trophy' : 'heroicon-o-calendar')
                 ->color($fireAchieved ? 'success' : 'info'),
@@ -140,12 +141,12 @@ class SimulationFireAnalysisWidget extends BaseWidget
                 ->icon('heroicon-o-scale')
                 ->color('info'),
 
-            Stat::make('Expense Coverage', number_format($expenseCoverage, 1) . '%')
+            Stat::make('Expense Coverage', number_format($expenseCoverage, 1).'%')
                 ->description($expenseCoverage >= 100 ? 'Expenses fully covered' : 'Partial expense coverage')
                 ->icon($expenseCoverage >= 100 ? 'heroicon-o-shield-check' : 'heroicon-o-shield-exclamation')
                 ->color($expenseCoverage >= 100 ? 'success' : 'warning'),
 
-            Stat::make('FIRE Age', $fireAchieved ? $currentAge . ' years' : ($currentAge + $yearsToFire) . ' years')
+            Stat::make('FIRE Age', $fireAchieved ? $currentAge.' years' : ($currentAge + $yearsToFire).' years')
                 ->description($fireAchieved ? 'Current age (FIRE achieved)' : 'Projected FIRE age')
                 ->icon('heroicon-o-user')
                 ->color($fireAchieved ? 'success' : 'info'),

@@ -39,6 +39,9 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->assets([
+                \Filament\Support\Assets\Css::make('ai-assistant', resource_path('css/filament/admin/ai-assistant.css')),
+            ])
             ->resources([
                 \App\Filament\Resources\AssetYears\AssetYearResource::class,
             ])
@@ -91,6 +94,14 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->routes(function (): void {
+                // Pretty URLs for Asset Configurations
+                \Illuminate\Support\Facades\Route::get('config', \App\Filament\Resources\AssetConfigurations\Pages\ListAssetConfigurations::class)
+                    ->name('resources.asset-configurations.index.pretty');
+                \Illuminate\Support\Facades\Route::get('config/create', \App\Filament\Resources\AssetConfigurations\Pages\CreateAssetConfiguration::class)
+                    ->name('resources.asset-configurations.create.pretty');
+                \Illuminate\Support\Facades\Route::get('config/{record}/edit', \App\Filament\Resources\AssetConfigurations\Pages\EditAssetConfiguration::class)
+                    ->name('resources.asset-configurations.edit.pretty');
+
                 // Pretty URLs including configuration ID for Assets
                 \Illuminate\Support\Facades\Route::get('config/{configuration}/assets', \App\Filament\Resources\Assets\Pages\ListAssets::class)
                     ->name('resources.assets.index.pretty');
@@ -136,10 +147,12 @@ class AdminPanelProvider extends PanelProvider
             fn (): string => Blade::render('<span aria-hidden="true" class="inline-block" style="width: 2ch;"></span><div class="inline-flex items-center align-middle"><livewire:asset-configuration-picker /></div>')
         );
 
-        // Add AI Assistant Widget to all pages
+        // Add AI Assistant Widget to all pages (only for authenticated users with a team)
         FilamentView::registerRenderHook(
             PanelsRenderHook::BODY_END,
-            fn (): string => Blade::render('<livewire:ai-assistant-widget />')
+            fn (): string => auth()->check() && auth()->user()?->current_team_id
+                ? Blade::render('<livewire:ai-assistant-widget />')
+                : ''
         );
 
         // Global download handler for pages

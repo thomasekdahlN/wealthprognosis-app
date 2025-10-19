@@ -18,7 +18,7 @@ class CashFlowOverTime extends ChartWidget
 
         $assetConfig = app(CurrentAssetConfiguration::class)->get();
         if ($assetConfig) {
-            $heading .= ' - ' . $assetConfig->name;
+            $heading .= ' - '.$assetConfig->name;
         }
 
         return $heading;
@@ -40,11 +40,11 @@ class CashFlowOverTime extends ChartWidget
 
         // Collect years with data up to current year
         $years = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
-                $query->where('user_id', $user->id)->where('is_active', true);
-                if ($assetConfigId) {
-                    $query->where('asset_configuration_id', $assetConfigId);
-                }
-            })
+            $query->where('user_id', $user->id)->where('is_active', true);
+            if ($assetConfigId) {
+                $query->where('asset_configuration_id', $assetConfigId);
+            }
+        })
             ->where('year', '<=', now()->year)
             ->distinct()
             ->orderBy('year')
@@ -61,22 +61,22 @@ class CashFlowOverTime extends ChartWidget
 
         foreach ($years as $year) {
             $incomeRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
-                    $query->where('user_id', $user->id)->where('is_active', true);
-                    if ($assetConfigId) {
-                        $query->where('asset_configuration_id', $assetConfigId);
-                    }
-                })
+                $query->where('user_id', $user->id)->where('is_active', true);
+                if ($assetConfigId) {
+                    $query->where('asset_configuration_id', $assetConfigId);
+                }
+            })
                 ->where('year', $year)
                 ->whereNotNull('income_amount')
                 ->where('income_amount', '>', 0)
                 ->get();
 
             $expenseRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
-                    $query->where('user_id', $user->id)->where('is_active', true);
-                    if ($assetConfigId) {
-                        $query->where('asset_configuration_id', $assetConfigId);
-                    }
-                })
+                $query->where('user_id', $user->id)->where('is_active', true);
+                if ($assetConfigId) {
+                    $query->where('asset_configuration_id', $assetConfigId);
+                }
+            })
                 ->where('year', $year)
                 ->whereNotNull('expence_amount')
                 ->where('expence_amount', '>', 0)
@@ -84,11 +84,13 @@ class CashFlowOverTime extends ChartWidget
 
             $annualIncome = $incomeRecords->sum(function ($record) {
                 $factor = $record->income_factor === 'monthly' ? 12 : 1;
+
                 return $record->income_amount * $factor;
             });
 
             $annualExpenses = $expenseRecords->sum(function ($record) {
                 $factor = $record->expence_factor === 'monthly' ? 12 : 1;
+
                 return $record->expence_amount * $factor;
             });
 
@@ -170,4 +172,3 @@ class CashFlowOverTime extends ChartWidget
         ];
     }
 }
-
