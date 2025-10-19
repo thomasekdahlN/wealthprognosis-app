@@ -28,7 +28,7 @@ class AssetYearFactory extends Factory
 
             // Income data
             'income_amount' => 0,
-            'income_factor' => null,
+            'income_factor' => 'yearly',
             'income_rule' => null,
             'income_transfer' => null,
             'income_source' => null,
@@ -37,7 +37,7 @@ class AssetYearFactory extends Factory
 
             // Expense data
             'expence_amount' => 0,
-            'expence_factor' => null,
+            'expence_factor' => 'yearly',
             'expence_rule' => null,
             'expence_transfer' => null,
             'expence_source' => null,

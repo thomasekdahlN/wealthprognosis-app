@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\SimulationConfiguration;
 use App\Models\AssetConfiguration;
+use App\Models\SimulationConfiguration;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,19 +27,19 @@ class SimulationConfigurationFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true) . ' Simulation',
+            'name' => $this->faker->words(3, true).' Simulation',
             'description' => $this->faker->sentence(),
             'birth_year' => $this->faker->numberBetween(1970, 1990),
             'prognose_age' => $this->faker->numberBetween(40, 60),
             'pension_official_age' => 67,
             'pension_wish_age' => $this->faker->numberBetween(60, 67),
-            'death_age' => $this->faker->numberBetween(80, 95),
+            'expected_death_age' => $this->faker->numberBetween(80, 95),
             'export_start_age' => $this->faker->numberBetween(25, 35),
             'public' => false,
             'icon' => 'heroicon-o-calculator',
             'image' => null,
             'color' => $this->faker->hexColor(),
-            'tags' => json_encode([$this->faker->word(), $this->faker->word()]),
+            'tags' => [$this->faker->word(), $this->faker->word()],
             'risk_tolerance' => $this->faker->randomElement(['conservative', 'moderate_conservative', 'moderate', 'moderate_aggressive', 'aggressive']),
             'user_id' => User::factory(),
             'team_id' => null,
@@ -92,7 +92,7 @@ class SimulationConfigurationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'birth_year' => $birthYear,
-            'death_age' => $deathAge,
+            'expected_death_age' => $deathAge,
             'pension_official_age' => $pensionAge,
             'pension_wish_age' => $pensionAge,
         ]);

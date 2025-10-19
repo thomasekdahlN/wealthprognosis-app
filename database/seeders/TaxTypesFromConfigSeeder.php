@@ -31,6 +31,7 @@ class TaxTypesFromConfigSeeder extends Seeder
         $jsonPath = config_path('tax/tax_types.json');
         if (! File::exists($jsonPath)) {
             $this->command?->error("Tax types JSON not found: {$jsonPath}");
+
             return;
         }
 
@@ -41,6 +42,7 @@ class TaxTypesFromConfigSeeder extends Seeder
             $description = (string) ($row['description'] ?? null);
             if ($type === '') {
                 $this->command?->warn("Skipping item #{$i} with empty type");
+
                 continue;
             }
 
@@ -55,11 +57,10 @@ class TaxTypesFromConfigSeeder extends Seeder
                     'sort_order' => $i + 1,
                     'created_by' => $user->id,
                     'updated_by' => $user->id,
-                    'created_checksum' => hash('sha256', 'tax_type_created_' . $type),
-                    'updated_checksum' => hash('sha256', 'tax_type_updated_' . $type),
+                    'created_checksum' => hash('sha256', 'tax_type_created_'.$type),
+                    'updated_checksum' => hash('sha256', 'tax_type_updated_'.$type),
                 ]
             );
         }
     }
 }
-

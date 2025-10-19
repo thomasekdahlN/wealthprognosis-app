@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('prognose_age')->nullable();
             $table->integer('pension_official_age')->nullable();
             $table->integer('pension_wish_age')->nullable();
-            $table->integer('death_age')->nullable();
+            $table->integer('expected_death_age')->nullable();
             $table->integer('export_start_age')->nullable();
             $table->boolean('public')->default(false);
             $table->string('icon')->nullable();

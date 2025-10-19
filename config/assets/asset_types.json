@@ -40,6 +40,8 @@
   {"type":"inheritance","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
 
   {"type":"company","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"soleproprietorship","income_changerate":"changerates.kpi","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
+  {"type":"loantocompany","income_changerate":"changerates.cash","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
   {"type":"iphone","income_changerate":"changerates.zero","expence_changerate":"changerates.kpi","asset_changerate":"changerates.zero"},
   {"type":"applestock","income_changerate":"changerates.equityfund","expence_changerate":"changerates.kpi","asset_changerate":"changerates.equityfund"},
 

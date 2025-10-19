@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\SimulationAssetYear;
-use App\Models\SimulationAsset;
 use App\Models\AssetConfiguration;
+use App\Models\SimulationAsset;
+use App\Models\SimulationAssetYear;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

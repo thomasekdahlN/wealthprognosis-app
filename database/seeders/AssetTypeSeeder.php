@@ -635,6 +635,40 @@ class AssetTypeSeeder extends Seeder
                 'is_liquid' => false,
                 'sort_order' => 33,
             ],
+            [
+                'type' => 'soleproprietorship',
+                'name' => 'Enkeltpersonforetak',
+                'description' => 'Enkeltpersonforetak - sole proprietorship business',
+                'category' => 'Business',
+                'icon' => 'heroicon-o-user-circle',
+                'is_active' => true,
+                'is_private' => true,
+                'is_company' => false,
+                'is_tax_optimized' => false,
+                'can_generate_income' => true,
+                'can_generate_expenses' => true,
+                'can_have_mortgage' => false,
+                'can_have_market_value' => true,
+                'is_liquid' => false,
+                'sort_order' => 34,
+            ],
+            [
+                'type' => 'loantocompany',
+                'name' => 'Lån til selskap',
+                'description' => 'Lån til andre - loans to companies with potential tax deductions',
+                'category' => 'Debt & Liabilities',
+                'icon' => 'heroicon-o-banknotes',
+                'is_active' => true,
+                'is_private' => true,
+                'is_company' => true,
+                'is_tax_optimized' => false,
+                'can_generate_income' => true,
+                'can_generate_expenses' => false,
+                'can_have_mortgage' => false,
+                'can_have_market_value' => true,
+                'is_liquid' => false,
+                'sort_order' => 35,
+            ],
 
             // Technology & Consumer Goods
             [
@@ -652,7 +686,7 @@ class AssetTypeSeeder extends Seeder
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
                 'is_liquid' => false,
-                'sort_order' => 34,
+                'sort_order' => 36,
             ],
             [
                 'type' => 'applestock',
@@ -669,7 +703,7 @@ class AssetTypeSeeder extends Seeder
                 'can_have_mortgage' => false,
                 'can_have_market_value' => true,
                 'is_liquid' => true,
-                'sort_order' => 35,
+                'sort_order' => 37,
             ],
 
             // Test & Development
@@ -688,7 +722,7 @@ class AssetTypeSeeder extends Seeder
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
                 'is_liquid' => false,
-                'sort_order' => 36,
+                'sort_order' => 38,
             ],
             [
                 'type' => 'kpi',
@@ -705,7 +739,7 @@ class AssetTypeSeeder extends Seeder
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
                 'is_liquid' => false,
-                'sort_order' => 37,
+                'sort_order' => 39,
             ],
 
             // Special Categories
@@ -725,15 +759,21 @@ class AssetTypeSeeder extends Seeder
                 'can_have_mortgage' => false,
                 'can_have_market_value' => false,
                 'is_liquid' => false,
-                'sort_order' => 38,
+                'sort_order' => 40,
             ],
         ];
+
+        // Define which asset types have tax_shield capability
+        $taxShieldTypes = ['stock', 'equityfund', 'bondfund', 'ask', 'loantocompany', 'soleproprietorship'];
 
         foreach ($assetTypes as $assetType) {
             // All capability flags are now defined directly in the array structure above
             // No logic needed here - just use the values as-is
             $code = $assetType['type'];
             $cat = $assetType['category'] ?? null;
+
+            // Set tax_shield based on asset type
+            $assetType['tax_shield'] = in_array($code, $taxShieldTypes, true);
 
             // Stamp required ownership & audit fields
             $assetType['user_id'] = $user->id;

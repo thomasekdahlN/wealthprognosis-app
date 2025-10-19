@@ -45,6 +45,7 @@ class TaxPropertySeeder extends Seeder
                             'tax_home_permill' => (($v = ($conf['taxHomePermill'] ?? $conf['taxHomePercent'] ?? $conf['taxHome'] ?? $conf['averageRatePromille'] ?? null)) === null || (float) $v == 0.0 ? null : (float) $v),
                             'tax_company_permill' => (($v2 = ($conf['taxCompanyPermill'] ?? $conf['taxCompanyPercent'] ?? $conf['taxCompany'] ?? null)) === null || (float) $v2 == 0.0 ? null : (float) $v2),
                             'deduction' => (float) ($conf['deduction'] ?? $conf['standardDeduction'] ?? 0),
+                            'fortune_taxable_percent' => (($v3 = ($conf['fortune'] ?? $conf['fortuneTaxablePercent'] ?? null)) === null || (float) $v3 == 0.0 ? null : (float) $v3),
                             'is_active' => $conf['is_active'] ?? true,
                         ]
                     );

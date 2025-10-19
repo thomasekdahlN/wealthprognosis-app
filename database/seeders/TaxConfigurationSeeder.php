@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\TaxConfiguration;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
-use Carbon\Carbon;
 
 class TaxConfigurationSeeder extends Seeder
 {

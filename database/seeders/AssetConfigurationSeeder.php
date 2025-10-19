@@ -29,7 +29,7 @@ class AssetConfigurationSeeder extends Seeder
                 'prognose_age' => 50,
                 'pension_official_age' => 67,
                 'pension_wish_age' => 63,
-                'death_age' => 80,
+                'expected_death_age' => 80,
                 'export_start_age' => 2020,
                 'risk_tolerance' => 'moderate_aggressive',
                 'user_id' => $user->id,
