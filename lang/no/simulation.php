@@ -6,4 +6,3 @@ return [
     'back_to_simulations' => 'Tilbake til simuleringer',
     'simulations' => 'Simuleringer',
 ];
-

@@ -6,7 +6,3 @@ return [
     'back_to_simulations' => 'Back to Simulations',
     'simulations' => 'Simulations',
 ];
-    'back_to_simulations' => 'Back to Simulations',
-    'simulations' => 'Simulations',
-
-

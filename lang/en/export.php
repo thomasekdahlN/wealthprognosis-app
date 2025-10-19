@@ -15,4 +15,3 @@ return [
     'risk' => 'Risk',
     'created' => 'Created',
 ];
-

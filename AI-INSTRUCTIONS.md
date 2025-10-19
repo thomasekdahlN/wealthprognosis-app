@@ -83,3 +83,5 @@ Use pretty routes, avoid using query parameters to identify resources. Always us
 Remove html tags from the presentation of string and text fields that are listed in tables.
 HTML has to be removed from textfields before they are rendered in tables. (Not from the database, just to render the view nicely when you limit the amountof characters in a description)
 On labels and sentences it should only be uppercase letters on the first word
+
+Use conventional commits.
