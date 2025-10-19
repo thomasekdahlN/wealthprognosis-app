@@ -14,8 +14,9 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models;
+namespace App\Models\Core;
 
+use App\Models\AssetType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -36,16 +37,6 @@ class TaxRealization extends Model
      */
     public $taxH = [];
 
-    // Asset types that will automatically be calculated with tax shield
-    public $taxShieldTypes = [
-        'stock' => true,
-        'equityfund' => true,
-        'bondfund' => true,
-        'ask' => true,
-        'loantocompany' => true, // lån til andre, fradrag om det er låm
-        'soleproprietorship' => true, // Enkeltpersonforetak
-    ];
-
     /**
      * Constructor for the TaxRealization class.
      *
@@ -65,7 +56,20 @@ class TaxRealization extends Model
             $this->taxH[$type] = $typeH;
         }
 
-        $this->taxsalary = new \App\Models\TaxSalary;
+        $this->taxsalary = new \App\Models\Core\TaxSalary;
+    }
+
+    /**
+     * Check if an asset type has tax shield capability.
+     *
+     * @param  string  $assetType  The asset type to check.
+     * @return bool True if the asset type has tax shield capability, false otherwise.
+     */
+    public function hasTaxShield(string $assetType): bool
+    {
+        $assetTypeModel = AssetType::where('type', $assetType)->first();
+
+        return $assetTypeModel?->tax_shield ?? false;
     }
 
     /**
@@ -99,7 +103,7 @@ class TaxRealization extends Model
         $percent = 0;
 
         // Note: Not all assets types has tax shield
-        if (Arr::get($this->taxShieldTypes, $taxType)) {
+        if ($this->hasTaxShield($taxType)) {
             // Note: All Tax shield percentage are changed by the government yearly.
             $percent = Arr::get($this->taxH, "shareholdershield.$year", null);
             if (! isset($percent)) {
@@ -289,8 +293,7 @@ class TaxRealization extends Model
         // TaxShield handling
         // Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
-        if ($taxType == 'stock' || $taxType == 'equityfund' || $taxType == 'bondfund' || $taxType == 'ask' || $taxType == 'loantocompany' || $taxType == 'soleproprietorship') {
-            // Burde hatt en array med de asset typene som har taxShield.
+        if ($this->hasTaxShield($taxType)) {
             [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $this->taxShield($year, $taxGroup, $taxType, $transfer, $amount, $realizationTaxAmount, $taxShieldPrevAmount);
         }
         // ###############################################################################################################

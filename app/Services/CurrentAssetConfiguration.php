@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\AssetConfiguration;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\Session;
 
 class CurrentAssetConfiguration
@@ -14,6 +12,7 @@ class CurrentAssetConfiguration
     public function get(): ?AssetConfiguration
     {
         $id = Session::get(self::SESSION_KEY);
+
         return $id ? AssetConfiguration::find($id) : null;
     }
 
@@ -36,4 +35,3 @@ class CurrentAssetConfiguration
         return Session::has(self::SESSION_KEY) && $this->get() !== null;
     }
 }
-

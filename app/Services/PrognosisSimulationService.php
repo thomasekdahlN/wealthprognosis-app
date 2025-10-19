@@ -71,7 +71,7 @@ class PrognosisSimulationService
             'prognose_age' => $assetConfig->prognose_age,
             'pension_official_age' => $assetConfig->pension_official_age,
             'pension_wish_age' => $assetConfig->pension_wish_age,
-            'death_age' => $assetConfig->death_age,
+            'expected_death_age' => $assetConfig->expected_death_age,
             'export_start_age' => $assetConfig->export_start_age,
             'public' => false,
             'risk_tolerance' => $this->mapPrognosisTypeToRiskTolerance($prognosisType),

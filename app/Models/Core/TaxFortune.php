@@ -14,8 +14,9 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models;
+namespace App\Models\Core;
 
+use App\Models\TaxProperty;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -26,6 +27,12 @@ class TaxFortune extends Model
     use HasFactory;
 
     public $taxH = [];
+
+    protected $countryCode;
+
+    protected $startYear;
+
+    protected $stopYear;
 
     /**
      * Constructor for the TaxFortune class.
@@ -44,6 +51,11 @@ class TaxFortune extends Model
         foreach ($configH as $type => $typeH) {
             $this->taxH[$type] = $typeH;
         }
+
+        // Extract country code from config path (e.g., 'no/no-tax-2025' -> 'no')
+        $this->countryCode = explode('/', $config)[0] ?? 'no';
+        $this->startYear = $startYear;
+        $this->stopYear = $stopYear;
     }
 
     /**
@@ -102,15 +114,41 @@ class TaxFortune extends Model
 
     /**
      * Returns the taxable portion of the property.
+     * First tries to get from JSON config, then falls back to database TaxProperty model.
      *
-     * @param  string  $taxGroup  The tax group.
-     * @param  string  $taxProperty  The type of property.
+     * @param  string  $taxGroup  The tax group (e.g., 'private', 'company').
+     * @param  string  $taxProperty  The type of property (municipality code).
      * @param  int  $year  The year for which the tax is being calculated.
-     * @return float The taxable portion of the property.
+     * @return float The taxable portion of the property as a decimal (e.g., 0.70 for 70%).
      */
     public function getPropertyTaxable($taxGroup, $taxProperty, $year)
     {
-        return Arr::get($this->taxH, "property.$taxProperty.fortune", 0) / 100;
+        // First try to get from JSON config
+        $jsonValue = Arr::get($this->taxH, "property.$taxProperty.fortune");
+
+        if ($jsonValue !== null) {
+            return $jsonValue / 100;
+        }
+
+        // Fall back to database lookup
+        try {
+            $taxPropertyModel = TaxProperty::query()
+                ->forCountry($this->countryCode)
+                ->forYear($year)
+                ->where('code', $taxProperty)
+                ->active()
+                ->first();
+
+            if ($taxPropertyModel && $taxPropertyModel->fortune_taxable_percent !== null) {
+                // Database stores as percentage (e.g., 70.00), return as decimal (0.70)
+                return $taxPropertyModel->fortune_taxable_percent / 100;
+            }
+        } catch (\Throwable $e) {
+            // Log error if needed
+        }
+
+        // Default to 0 if neither source has the value
+        return 0;
     }
 
     /**

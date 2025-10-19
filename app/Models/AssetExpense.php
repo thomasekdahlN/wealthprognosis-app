@@ -51,6 +51,7 @@ class AssetExpense extends Model
 
     // Factor enum constants
     public const FACTOR_MONTHLY = 'monthly';
+
     public const FACTOR_YEARLY = 'yearly';
 
     /**

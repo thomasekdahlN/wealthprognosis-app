@@ -179,7 +179,7 @@ class AssetImportService
             'prognose_age' => $prognoseAge ?: null,
             'pension_official_age' => $pensionOfficialAge ?: null,
             'pension_wish_age' => $pensionWishAge ?: null,
-            'death_age' => $deathAge ?: null,
+            'expected_death_age' => $deathAge ?: null,
             'export_start_age' => $exportStartYear,
             'public' => false,
             'icon' => $validatedIcon,

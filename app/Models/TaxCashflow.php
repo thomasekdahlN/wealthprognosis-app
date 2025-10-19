@@ -48,6 +48,7 @@ class TaxCashflow extends Model
 
     /**
      * Get the cashflow tax rate for a specific tax group, type, and year.
+     * First tries to get the cashflow rate, then falls back to income rate, then defaults to 20%.
      *
      * @param  string  $taxGroup  The tax group (e.g., 'private', 'company').
      * @param  string  $taxType  The type of tax (e.g., 'salary', 'pension').
@@ -56,7 +57,22 @@ class TaxCashflow extends Model
      */
     public function getCashflowTax($taxGroup, $taxType, $year)
     {
-        return Arr::get($this->taxH, "$taxType.cashflow", 20) / 100;
+        // First try to get cashflow rate
+        $cashflowRate = Arr::get($this->taxH, "$taxType.cashflow");
+
+        if ($cashflowRate !== null) {
+            return $cashflowRate / 100;
+        }
+
+        // Fall back to income rate (cashflow tax is typically the same as income tax)
+        $incomeRate = Arr::get($this->taxH, "$taxType.income");
+
+        if ($incomeRate !== null) {
+            return $incomeRate / 100;
+        }
+
+        // Default to 20% if neither is found
+        return 20 / 100;
     }
 
     /**

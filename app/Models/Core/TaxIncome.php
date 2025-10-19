@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models;
+namespace App\Models\Core;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,7 +40,7 @@ class TaxIncome extends Model
             $this->taxH[$type] = $typeH;
         }
 
-        $this->taxsalary = new \App\Models\TaxSalary;
+        $this->taxsalary = new \App\Models\Core\TaxSalary;
     }
 
     public function getTaxIncome($taxGroup, $taxType, $year)

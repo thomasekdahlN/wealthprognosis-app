@@ -7,8 +7,8 @@ use App\Models\Scopes\TeamScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class SimulationConfiguration extends Model
@@ -37,7 +37,7 @@ class SimulationConfiguration extends Model
                 $countryCode = basename($directory);
 
                 // Map country codes to readable names
-                $countryName = match($countryCode) {
+                $countryName = match ($countryCode) {
                     'no' => 'Norway',
                     'se' => 'Sweden',
                     'ch' => 'Switzerland',
@@ -83,8 +83,8 @@ class SimulationConfiguration extends Model
             if (is_null($model->prognose_age)) {
                 $model->prognose_age = (int) now()->year - ($model->birth_year ?? now()->year - 40) + 10;
             }
-            if (is_null($model->death_age) && $model->birth_year) {
-                $model->death_age = 85; // Average life expectancy
+            if (is_null($model->expected_death_age) && $model->birth_year) {
+                $model->expected_death_age = 85; // Average life expectancy
             }
         });
     }
@@ -97,7 +97,7 @@ class SimulationConfiguration extends Model
         'prognose_age',
         'pension_official_age',
         'pension_wish_age',
-        'death_age',
+        'expected_death_age',
         'export_start_age',
         'public',
         'icon',
@@ -121,7 +121,7 @@ class SimulationConfiguration extends Model
         'prognose_age' => 'integer',
         'pension_official_age' => 'integer',
         'pension_wish_age' => 'integer',
-        'death_age' => 'integer',
+        'expected_death_age' => 'integer',
         'export_start_age' => 'integer',
         'public' => 'boolean',
         'tags' => 'array',

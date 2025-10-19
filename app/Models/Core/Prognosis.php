@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models;
+namespace App\Models\Core;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
@@ -52,23 +52,6 @@ class Prognosis
 
     // FIX: Kanskje feil å regne inn otp her? Der kan man jo ikke velge.
     // Assets som man kan selge deler av hvert år for å finansiere FIRE. Huset ditt kan du f.eks ikke selge deler av. Dette brukes for å beregne potensiell inntekt fra salg av disse assets.
-    public $firePartSalePossibleTypes = [
-        'boat' => false,
-        'car' => false,
-        'house' => false,
-        'rental' => false,
-        'cabin' => false,
-        'crypto' => true,
-        'bondfund' => true,
-        'equityfund' => true,
-        'stock' => false,
-        'otp' => true,
-        'ask' => true,
-        'cash' => true,
-        'bank' => true,
-        'ips' => true,
-        'pension' => true,
-    ];
 
     // Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
     public $fireSavingTypes = [
@@ -116,7 +99,7 @@ class Prognosis
         $this->taxfortune = $taxfortune;
         $this->taxrealization = $taxrealization;
         $this->changerate = $changerate;
-        $this->helper = new \App\Models\Helper;
+        $this->helper = new \App\Models\Core\Helper;
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
@@ -237,7 +220,7 @@ class Prognosis
 
                 if ($mortgage) {
                     // Kjører bare dette om mortgage strukturen i json er utfylt
-                    $this->dataH = (new Amortization($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
+                    $this->dataH = (new \App\Models\Core\Amortization($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
                 }
 
                 // ######################################################################################################
@@ -607,6 +590,24 @@ class Prognosis
         return [$newAmount, $diffAmount, $taxShieldAmount, $rule, $explanation]; // Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
 
+    /**
+     * Check if an asset type is liquid (can be sold in parts for FIRE)
+     * Uses the is_liquid parameter from the asset_types table
+     *
+     * @param  string  $assetType  The asset type code to check
+     * @return bool True if the asset type is liquid, false otherwise
+     */
+    public function isLiquid(string $assetType): bool
+    {
+        try {
+            $assetTypeModel = \App\Models\AssetType::where('type', $assetType)->first();
+
+            return $assetTypeModel?->is_liquid ?? false;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
     // Transferes the amount to another asset. This actualle has to change variables like assetEquityAmount, assetPaidAmount, realizationShieldAmount etc. Others are only simulations, not happening.
     public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount, float $taxShieldAmount, string $explanation)
     {
@@ -756,7 +757,7 @@ class Prognosis
             // Recalculate the mortgage from this year an onwards.
             if ($mortgage) {
                 print_r($mortgage);
-                $this->dataH = (new Amortization($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
+                $this->dataH = (new \App\Models\Core\Amortization($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
             }
 
         } else {
@@ -1251,7 +1252,7 @@ class Prognosis
 
         // FIX: Something is wrong with this classification, and automatically calculating sales of everything not in this list.
 
-        if (Arr::get($this->firePartSalePossibleTypes, $meta['type'])) {
+        if ($this->isLiquid($meta['type'])) {
             // Her kan vi selge biter av en asset (meta tagge opp det istedenfor tro?
             // FIRE income in this context is how much income can we generate from our FIRE assets. This is ignored for now since I like paying dividends on 1/penisonWishYear-detahYear better. Done in config.
             $firePercent = 0.04; // ToDo: 4% av en salgbar asset verdi. FIX: Konfigurerbart FIRE tall.

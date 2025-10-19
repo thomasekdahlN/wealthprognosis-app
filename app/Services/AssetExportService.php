@@ -56,7 +56,7 @@ class AssetExportService
             'prognoseAge' => (string) $this->assetConfiguration->prognose_age,
             'pensionOfficialAge' => (string) $this->assetConfiguration->pension_official_age,
             'pensionWishAge' => (string) $this->assetConfiguration->pension_wish_age,
-            'deathAge' => (string) $this->assetConfiguration->death_age,
+            'deathAge' => (string) $this->assetConfiguration->expected_death_age,
             'exportStartYear' => (string) $this->assetConfiguration->export_start_age,
         ];
 

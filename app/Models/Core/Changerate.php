@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models;
+namespace App\Models\Core;
 
 use Illuminate\Support\Arr;
 
@@ -23,7 +23,6 @@ use Illuminate\Support\Arr;
  */
 class Changerate
 {
-
     public $changerateH = [];
 
     // All chanegrates are stored as percentages, as this is the same as input. Can be retrieved as Decimal for easier calculation
@@ -33,7 +32,7 @@ class Changerate
 
         $startYear = 1950; // Since its so much trouble if we miss a sequenze
 
-        $file = __DIR__ . "/../../config/prognosis/$prognosis.json";
+        $file = base_path("config/prognosis/$prognosis.json");
         $configH = json_decode(file_get_contents($file), true);
         echo "Leser prognose fra : '$file'\n";
 

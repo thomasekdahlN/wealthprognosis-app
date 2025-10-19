@@ -210,6 +210,7 @@ class SimulationAssetYear extends Model
 
     // Factor enum constants
     public const FACTOR_MONTHLY = 'monthly';
+
     public const FACTOR_YEARLY = 'yearly';
 
     /**
@@ -285,7 +286,7 @@ class SimulationAssetYear extends Model
      */
     public function getNetCashflowAmount(): float
     {
-        return ($this->cashflow_after_taxamount ?? 0);
+        return $this->cashflow_after_taxamount ?? 0;
     }
 
     /**
@@ -293,7 +294,7 @@ class SimulationAssetYear extends Model
      */
     public function getFireSavingsRatePercent(): float
     {
-        return ($this->fire_savings_rate_percent ?? 0);
+        return $this->fire_savings_rate_percent ?? 0;
     }
 
     /**

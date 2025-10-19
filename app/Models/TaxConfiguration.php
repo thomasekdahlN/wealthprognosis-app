@@ -6,7 +6,6 @@ use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\TaxType;
 
 class TaxConfiguration extends Model
 {
@@ -75,7 +74,6 @@ class TaxConfiguration extends Model
     {
         return self::COUNTRIES[$this->country_code] ?? $this->country_code;
     }
-
 
     // Scope methods
     public function scopeForCountry($query, string $countryCode)

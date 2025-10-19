@@ -7,12 +7,19 @@ use Illuminate\Support\Facades\Log;
 class PrognosisNew
 {
     protected AssetConfiguration $assetConfiguration;
+
     protected string $prognosisType;
+
     protected string $assetScope;
+
     protected int $startYear;
+
     protected int $endYear;
+
     protected array $results = [];
+
     protected array $yearlyData = [];
+
     protected array $assetBreakdown = [];
 
     // Economic scenarios with different growth rates
@@ -169,9 +176,10 @@ class PrognosisNew
             ->orderBy('year', 'desc')
             ->first();
 
-        if (!$baselineAssetYear) {
+        if (! $baselineAssetYear) {
             // If no baseline data, skip this asset
             Log::warning('No baseline data for asset', ['asset_id' => $asset->id]);
+
             return;
         }
 
@@ -235,7 +243,7 @@ class PrognosisNew
     {
         $scenario = $this->economicScenarios[$this->prognosisType];
 
-        return match($asset->asset_type) {
+        return match ($asset->asset_type) {
             'equity', 'stock', 'mutual_fund' => $scenario['stock_growth'],
             'bond', 'fixed_income' => $scenario['bond_growth'],
             'real_estate', 'property' => $scenario['real_estate_growth'],
@@ -338,7 +346,7 @@ class PrognosisNew
         $fireAmount = $annualExpenses * 25; // 4% rule
 
         foreach ($this->yearlyData as $year => $data) {
-            if ($data['total_assets'] >= $fireAmount && !$fireAchieved) {
+            if ($data['total_assets'] >= $fireAmount && ! $fireAchieved) {
                 $fireAchieved = true;
                 $fireYear = $year;
                 break;

@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models;
+namespace App\Models\Core;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,6 +28,7 @@ class Helper extends Model
         // Handle null rule - multiply by factor
         if ($rule === null) {
             $factorAmount = $amount * $factor;
+
             return [$factorAmount, $factorAmount, null, "Multiplied by factor: $amount * $factor = $factorAmount"];
         }
 
@@ -145,7 +146,7 @@ class Helper extends Model
     {
         $extraAmount = $ruleH[2][0];
         // Handle empty or non-numeric values
-        if (empty($extraAmount) || !is_numeric($extraAmount)) {
+        if (empty($extraAmount) || ! is_numeric($extraAmount)) {
             $extraAmount = 0;
         }
         $baseCalcAmount = round($extraAmount * $factor);

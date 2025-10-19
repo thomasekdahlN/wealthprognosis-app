@@ -315,7 +315,7 @@ class FinancialPlanningService
         ]);
 
         // Add pension income from retirement until death
-        for ($year = $retirementYear; $year <= ($configuration->birth_year + $configuration->death_age); $year++) {
+        for ($year = $retirementYear; $year <= ($configuration->birth_year + $configuration->expected_death_age); $year++) {
             AssetYear::create([
                 'asset_id' => $asset->id,
                 'year' => $year,

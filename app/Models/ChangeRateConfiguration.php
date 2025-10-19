@@ -28,7 +28,7 @@ class ChangeRateConfiguration extends Model
     ];
 
     protected $casts = [
-        'change_rate' => 'decimal:4',
+        'change_rate' => 'decimal:2',
         'is_active' => 'boolean',
         'year' => 'integer',
     ];
