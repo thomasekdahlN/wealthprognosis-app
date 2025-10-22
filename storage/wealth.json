@@ -1,79 +1,79 @@
 {
-    "meta": {
-        "name": "Thomas Ekdahl",
-        "birthyear": "1974",
-        "prognoseyear": "2032"
+  "meta": {
+    "name": "Thomas Ekdahl",
+    "birthyear": "1974",
+    "prognoseyear": "2032"
+  },
+  "period": {
+    "start": 2006,
+    "end": 2030
+  },
+  "tax": {
+    "private": {
+      "yearly": 22,
+      "realization": 35.6
     },
-    "period": {
-        "start": 2006,
-        "end": 2030
-    },
-    "tax": {
-        "private": {
-            "yearly": 22,
-            "realization": 35.6
-        },
-        "company": {
-            "yearly": 22,
-            "realization": 35.6
-        }
-    },
-    "assets": {
-        "home": {
-            "type": "house",
-            "name": "Smørbukkveien 3",
-            "description": "Her bor jeg",
-            "value": {
-                "2009": {
-                    "value": 4000000,
-                    "changerate": 1.05,
-                    "description": "Kjøpte huset",
-                    "repeat": true
-                },
-                "2016": {
-                    "value": 5000000,
-                    "changerate": 1.06,
-                    "description": "Skilsmisse",
-                    "repeat": true
-                },
-                "2018": {
-                    "value": 600000,
-                    "changerate": 1.07,
-                    "description": "Takst",
-                    "repeat": true
-                }
-            },
-            "income": {
-                "2010": {
-                    "name": "Utleie",
-                    "description": "Utleie av leilighet",
-                    "value": 13000,
-                    "changerate": 1.05,
-                    "repeat": true
-                }
-            },
-            "expence": {
-                "2011": {
-                    "name": "Utgifter",
-                    "description": "Kommunale/Forsikring/Strøm",
-                    "value": 3000,
-                    "changerate": 1.05,
-                    "repeat": true
-                }
-            },
-            "mortgage": {
-                "2010": {
-                    "value": 3000000,
-                    "interest": "20",
-                    "gebyr": 600,
-                    "tax": 22,
-                    "paymentExtra": "home.$year.cashflow.amount",
-                    "years": 20
-                },
-                "2020": {
-                    "interest": "5"
-                }
-            }
-        }
+    "company": {
+      "yearly": 22,
+      "realization": 35.6
     }
+  },
+  "assets": {
+    "home": {
+      "type": "house",
+      "name": "Smørbukkveien 3",
+      "description": "Her bor jeg",
+      "value": {
+        "2009": {
+          "value": 4000000,
+          "changerate": 1.05,
+          "description": "Kjøpte huset",
+          "repeat": true
+        },
+        "2016": {
+          "value": 5000000,
+          "changerate": 1.06,
+          "description": "Skilsmisse",
+          "repeat": true
+        },
+        "2018": {
+          "value": 600000,
+          "changerate": 1.07,
+          "description": "Takst",
+          "repeat": true
+        }
+      },
+      "income": {
+        "2010": {
+          "name": "Utleie",
+          "description": "Utleie av leilighet",
+          "value": 13000,
+          "changerate": 1.05,
+          "repeat": true
+        }
+      },
+      "expence": {
+        "2011": {
+          "name": "Utgifter",
+          "description": "Kommunale/Forsikring/Strøm",
+          "value": 3000,
+          "changerate": 1.05,
+          "repeat": true
+        }
+      },
+      "mortgage": {
+        "2010": {
+          "value": 3000000,
+          "interest": "20",
+          "gebyr": 600,
+          "tax": 22,
+          "paymentExtra": "home.$year.cashflow.amount",
+          "years": 20
+        },
+        "2020": {
+          "interest": "5"
+        }
+      }
+    }
+  }
 }

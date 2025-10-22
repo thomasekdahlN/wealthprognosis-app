@@ -85,3 +85,5 @@ HTML has to be removed from textfields before they are rendered in tables. (Not 
 On labels and sentences it should only be uppercase letters on the first word
 
 Use conventional commits.
+
+Do not create files, classes and methods based on a test that thinks it is missing. Just remove the test.

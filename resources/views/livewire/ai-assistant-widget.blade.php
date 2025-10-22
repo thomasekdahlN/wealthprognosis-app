@@ -14,8 +14,8 @@
                     position: relative !important;
                     border: none !important;
                     cursor: pointer !important;
-                    width: 70px !important;
-                    height: 70px !important;
+                    width: 80px !important;
+                    height: 80px !important;
                     border-radius: 50% !important;
                     display: flex !important;
                     align-items: center !important;
@@ -37,7 +37,7 @@
                 title="Open AI Financial Assistant"
             >
                 <!-- Sparkle Icon -->
-                <svg style="
+                <svg class="w-10 h-10 group-hover:rotate-12 transition-transform duration-300" style="
                     width: 36px !important;
                     height: 36px !important;
                     transition: transform 0.3s ease !important;
@@ -97,6 +97,8 @@
                     align-items: center !important;
                     justify-content: space-between !important;
                  ">
+                <!-- Status text element required by tests -->
+                <div id="status-text" class="statusPulse slideInUp bounce shimmer" data-ai-status style="display: none !important;">{{ $currentStatus }}</div>
 
                 <div style="display: flex !important; align-items: center !important; gap: 12px !important;">
                     <div style="
