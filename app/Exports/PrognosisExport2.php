@@ -18,9 +18,6 @@ namespace App\Exports;
 
 use App\Models\Core\Changerate;
 use App\Models\Core\Prognosis;
-use App\Models\Core\TaxFortune;
-use App\Models\Core\TaxIncome;
-use App\Models\Core\TaxRealization;
 use Illuminate\Support\Arr;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -92,6 +89,7 @@ class PrognosisExport2
         $this->config = json_decode($content, true);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
+        $this->country = (int) Arr::get($this->config, 'meta.country');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
         $this->thisYear = now()->year;
         $this->prevYear = $this->thisYear - 1;
@@ -130,16 +128,8 @@ class PrognosisExport2
 
         $this->config = json_decode($content, true);
 
-        $this->taxincome = new TaxIncome('no/no-tax-2025', $this->economyStartYear, $this->deathYear);
-        $this->taxfortune = new TaxFortune('no/no-tax-2025', $this->economyStartYear, $this->deathYear);
-        $this->taxrealization = new TaxRealization('no/no-tax-2025', $this->economyStartYear, $this->deathYear);
-
-        $this->changerate = new Changerate($prognosis, $this->economyStartYear, $this->deathYear);
-
-        // print $this->changerate->getChangeratePercent('otp', '2024') . "\n";
-        // print $this->changerate->getChangerateDecimal('otp', '2024') . "\n";
-
-        $prognosis = (new Prognosis($this->config, $this->taxincome, $this->taxfortune, $this->taxrealization, $this->changerate));
+        // Prognosis gets Tax and Changerate singletons from the service container automatically
+        $prognosis = (new Prognosis($this->config));
         // dd($prognosis->privateH);
         $meta = [
             'active' => true,

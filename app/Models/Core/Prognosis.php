@@ -65,16 +65,22 @@ class Prognosis
 
     public $rules;
 
-    public function __construct(array $config, object $taxincome, object $taxfortune, object $taxrealization, object $changerate)
+    public function __construct(array $config)
     {
         // $this->test();
         $this->config = $config;
-        $this->taxincome = $taxincome;
-        $this->taxfortune = $taxfortune;
-        $this->taxrealization = $taxrealization;
-        $this->changerate = $changerate;
-        $this->helper = new \App\Models\Core\Helper;
-        $this->rules = new \App\Models\Core\Rules;
+
+        // Get Tax calculation singletons from the service container
+        $this->taxincome = app(\App\Models\Core\TaxIncome::class);
+        $this->taxfortune = app(\App\Models\Core\TaxFortune::class);
+        $this->taxrealization = app(\App\Models\Core\TaxRealization::class);
+
+        // Get Changerate singleton from the service container
+        $this->changerate = app(\App\Models\Core\Changerate::class);
+
+        // Get utility singletons from the service container
+        $this->helper = app(\App\Models\Core\Helper::class);
+        $this->rules = app(\App\Models\Core\Rules::class);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
