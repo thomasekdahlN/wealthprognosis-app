@@ -30,45 +30,30 @@ class TaxRealization extends Model
     use HasFactory;
 
     /**
-     * Retrieve the realization tax rate for a given group, tax type and year.
-     *
-     * This is a lightweight helper used by tests and consumers that only need
-     * the percentage (as a decimal), not a full calculation. It leverages the
-     * shared TaxConfigRepository which performs in-request caching so repeated
-     * calls for the same (country, taxType, year) avoid extra DB queries.
-     */
-    public function getTaxRealization(string $taxGroup, string $taxType, int $year): float
-    {
-        // $taxGroup is currently not influencing the rate lookup, but is kept
-        // for signature compatibility and potential future logic.
-        return $this->taxconfig->getTaxRealizationRate($taxType, $year);
-    }
-
-    /**
      * Country code for tax lookups (e.g., 'no').
      */
     private string $country = 'no';
 
     /**
-     * Shared repository for loading tax configs.
+     * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $repo;
+    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
 
     /**
      * Constructor for the TaxRealization class.
      *
      * @param  string  $config  Path-like identifier used to infer country code.
-     * @param  int  $startYear  Unused.
-     * @param  int  $stopYear  Unused.
      */
-    public function __construct($config, $startYear, $stopYear)
+    public function __construct($config)
     {
         // Infer country code from the first segment of the provided config path (e.g., 'no/no-tax-2025' -> 'no')
         $first = explode('/', (string) $config)[0] ?? 'no';
         $this->country = strtolower($first ?: 'no');
 
         $this->taxsalary = new \App\Models\Core\TaxSalary($this->country);
-        $this->taxconfig = new \App\Services\Tax\TaxConfigRepository($this->country);
+
+        // Use the singleton instance from the service container
+        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
     }
 
     /**
@@ -95,7 +80,7 @@ class TaxRealization extends Model
         $explanation = '';
         $numberOfYears = $year - $acquisitionYear;
 
-        $realizationTaxRate = $this->taxconfig->getTaxRealizationRate($taxType, $year);
+        $realizationTaxRate = $this->taxConfigRepo->getTaxRealizationRate($taxType, $year);
         $realizationTaxShieldAmount = 0;
         $realizationTaxShieldPercent = 0;
 
@@ -242,7 +227,7 @@ class TaxRealization extends Model
         // TaxShield handling
         // Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
-        if ($this->taxconfig->hasTaxShield($taxType)) {
+        if ($this->taxConfigRepo->hasTaxShield($taxType)) {
             [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $this->taxShield($year, $taxGroup, $taxType, $transfer, $amount, $realizationTaxAmount, $taxShieldPrevAmount);
         }
         // ###############################################################################################################
@@ -283,7 +268,7 @@ class TaxRealization extends Model
         $explanation = '';
         $realizationTaxShieldAmount = 0;
 
-        $realizationTaxShieldPercent = $this->taxconfig->getTaxShieldRealizationRate($taxType, $year);
+        $realizationTaxShieldPercent = $this->taxConfigRepo->getTaxShieldRealizationRate($taxType, $year);
 
         // Skjermingsfradrag
         if ($realizationTaxShieldPercent > 0) {

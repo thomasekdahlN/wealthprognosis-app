@@ -16,7 +16,7 @@
 
 namespace App\Models\Core;
 
-use App\Services\Tax\TaxConfigRepository;
+use App\Services\Tax\TaxPropertyRepository;
 
 /**
  * Class TaxProperty
@@ -26,12 +26,20 @@ use App\Services\Tax\TaxConfigRepository;
  */
 class TaxProperty
 {
+    protected $country;
+
     /**
-     * Create a new TaxProperty calculator.
-     *
-     * @param  TaxConfigRepository  $taxconfig  Repository for accessing tax configuration data
+     * Shared TaxPropertyRepository instance.
      */
-    public function __construct(public TaxConfigRepository $taxconfig) {}
+    private \App\Services\Tax\TaxPropertyRepository $taxPropertyRepo;
+
+    public function __construct(string $country = 'no')
+    {
+        $this->country = $country;
+
+        // Use the singleton instance from the service container
+        $this->taxPropertyRepo = app(\App\Services\Tax\TaxPropertyRepository::class);
+    }
 
     /**
      * Calculates the property tax based on the given parameters.
@@ -49,27 +57,27 @@ class TaxProperty
         $explanation = '';
 
         // Get the taxable property percent for the given tax group, property type and year
-        $taxablePropertyPercent = $this->taxconfig->getPropertyTaxable($taxGroup, $taxProperty, $year);
+        $taxablePropertyRate = $this->taxPropertyRepo->getPropertyTaxableRate($taxGroup, $taxProperty, $year);
 
         // Get the property tax percent for the given tax group, property type and year
-        $taxPropertyPercent = $this->taxconfig->getPropertyTax($taxGroup, $taxProperty, $year);
+        $taxPropertyRate = $this->taxPropertyRepo->getPropertyTaxRate($taxGroup, $taxProperty, $year);
 
         // Get the standard deduction for the given tax group, property type and year
-        $taxPropertyDeductionAmount = $this->taxconfig->getPropertyTaxStandardDeduction($taxGroup, $taxProperty, $year);
+        $taxPropertyDeductionAmount = $this->taxPropertyRepo->getPropertyTaxStandardDeductionAmount($taxGroup, $taxProperty, $year);
 
         // Calculate the taxable property amount after deduction
-        $taxablePropertyAmount = ($amount * $taxablePropertyPercent) - $taxPropertyDeductionAmount;
+        $taxablePropertyAmount = ($amount * $taxablePropertyRate) - $taxPropertyDeductionAmount;
 
         // Calculate the tax property amount and provide explanation based on the taxable property amount and tax property percent
-        if ($taxablePropertyAmount > 0 && $taxPropertyPercent > 0) {
-            $taxPropertyAmount = round($taxablePropertyAmount * $taxPropertyPercent);
-            $explanation = "Property tax $taxPropertyPercent% of $taxablePropertyAmount.";
+        if ($taxablePropertyAmount > 0 && $taxPropertyRate > 0) {
+            $taxPropertyAmount = round($taxablePropertyAmount * $taxPropertyRate);
+            $explanation = "Property tax $taxPropertyRate of $taxablePropertyAmount.";
         } else {
             $taxablePropertyAmount = 0.0; // Taxable property amount can not be zero
-            $taxablePropertyPercent = 0.0;
+            $taxablePropertyRate = 0.0;
             $explanation = 'No property tax. ';
         }
 
-        return [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation];
+        return [$taxablePropertyAmount, $taxablePropertyRate, $taxPropertyAmount, $taxPropertyRate, $explanation];
     }
 }

@@ -33,60 +33,29 @@ class TaxIncome extends Model
     use HasFactory;
 
     /**
-     * Get the income tax rate for a specific tax type and year.
-     *
-     * Lightweight helper used by tests/consumers to fetch configured rates
-     * directly with in-request caching via TaxConfigRepository.
-     *
-     * @param  string  $taxGroup  The tax group (currently not used for rate lookup)
-     * @param  string  $taxType  The type of income (e.g., 'salary', 'rental', 'stock')
-     * @param  int  $year  The tax year
-     * @return float The tax rate as a decimal (e.g., 0.22 for 22%)
-     */
-    public function getTaxIncome(string $taxGroup, string $taxType, int $year): float
-    {
-        // $taxGroup currently does not affect rate lookup; kept for BC.
-        return $this->taxconfig->getTaxIncomeRate($taxType, $year);
-    }
-
-    /**
-     * Get the standard deduction amount for a specific tax type and year.
-     *
-     * @param  string  $taxGroup  The tax group (currently not used for deduction lookup)
-     * @param  string  $taxType  The type of income (e.g., 'airbnb')
-     * @param  int  $year  The tax year
-     * @return float The standard deduction amount
-     */
-    public function getTaxStandardDeduction(string $taxGroup, string $taxType, int $year): float
-    {
-        return (float) $this->taxconfig->getTaxStandardDeductionAmount($taxType, $year);
-    }
-
-    /**
      * Country code for tax lookups (e.g., 'no').
      */
-    private string $countryCode = 'no';
+    private string $country = 'no';
 
     /**
-     * Shared repository for loading tax configs.
+     * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $repo;
+    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
 
     /**
      * Keep constructor signature but switch to DB-backed loading.
      *
      * @param  string  $config  Path-like identifier used only to infer country code (e.g., 'no/no-tax-2025').
-     * @param  int  $startYear  Unused, kept for BC.
-     * @param  int  $stopYear  Unused, kept for BC.
      */
-    public function __construct($config, $startYear, $stopYear)
+    public function __construct(string $country = 'no')
     {
-        // Infer country code from first path segment (e.g., 'no')
-        $first = explode('/', (string) $config)[0] ?? 'no';
-        $this->country = strtolower($first ?: 'no');
+
+        $this->country = $country;
 
         $this->taxsalary = new \App\Models\Core\TaxSalary($this->country);
-        $this->taxconfig = new \App\Services\Tax\TaxConfigRepository($this->country);
+
+        // Use the singleton instance from the service container
+        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
     }
 
     /**
@@ -106,7 +75,7 @@ class TaxIncome extends Model
         // Initialize explanation and income tax percent
         $debug = true;
         $explanation = '';
-        $incomeTaxRate = $this->taxconfig->getTaxIncomeRate($taxType, $year);
+        $incomeTaxRate = $this->taxConfigRepo->getTaxIncomeRate($taxType, $year);
         $incomeTaxAmount = 0;
 
         // Print debug information if debug is true
@@ -144,9 +113,9 @@ class TaxIncome extends Model
 
                 // For 'cabin' tax type, calculate Airbnb tax after deducting standard deduction
             case 'cabin':
-                $standardDeduction = $this->taxconfig->getTaxStandardDeductionAmount('airbnb', $year);
+                $standardDeduction = $this->taxConfigRepo->getTaxStandardDeductionAmount('airbnb', $year);
                 if (($income - $standardDeduction) > 0) {
-                    $incomeTaxRate = $this->taxconfig->getTaxIncomeRate('airbnb', $year);
+                    $incomeTaxRate = $this->taxConfigRepo->getTaxIncomeRate('airbnb', $year);
                     $incomeTaxAmount = round(($income - $standardDeduction) * $incomeTaxRate);
                 }
                 break;

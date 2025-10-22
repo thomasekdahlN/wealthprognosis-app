@@ -18,37 +18,37 @@ namespace App\Models\Core;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class TaxFortune extends Model
 {
     use HasFactory;
 
-    protected $countryCode;
-
-    protected $startYear;
-
-    protected $stopYear;
+    protected $country;
 
     /**
-     * Shared repository for loading tax configs.
+     * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $repo;
+    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
+
+    /**
+     * Shared TaxPropertyRepository instance.
+     */
+    private \App\Services\Tax\TaxPropertyRepository $taxPropertyRepo;
 
     /**
      * Constructor for the TaxFortune class.
      * Kept signature for backwards compatibility, but now reads from DB on demand.
      *
      * @param  string  $config  Path-like identifier (e.g., 'no/no-tax-2025') used to infer country.
-     * @param  int  $startYear  The start year for the tax calculation (informational only).
-     * @param  int  $stopYear  The stop year for the tax calculation (informational only).
      */
-    public function __construct($config, $startYear, $stopYear)
+    public function __construct(string $country)
     {
-        // Extract country code from config path (e.g., 'no/no-tax-2025' -> 'no')
-        $this->countryCode = strtolower(explode('/', (string) $config)[0] ?? 'no');
-        $this->startYear = (int) $startYear;
-        $this->stopYear = (int) $stopYear;
-        $this->taxconfig = new \App\Services\Tax\TaxConfigRepository($this->countryCode);
+        $this->country = $country;
+
+        // Use the singleton instances from the service container
+        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
+        $this->taxPropertyRepo = app(\App\Services\Tax\TaxPropertyRepository::class);
     }
 
     /**
@@ -77,7 +77,7 @@ class TaxFortune extends Model
         $taxPropertyAmount = 0;
         $taxablePropertyAmount = 0;
 
-        $taxableFortuneRate = $this->taxconfig->getTaxFortuneTaxableRate($taxType, $year);
+        $taxableFortuneRate = $this->taxConfigRepo->getTaxFortuneTaxableRate($taxType, $year);
 
         if ($taxableAmountOverride) {
             // Fortune tax can be negative by the amount of taxableInitualAmount minus mortgage if the asset value had been zero. This is how it is calculated in the tax system.
@@ -100,7 +100,7 @@ class TaxFortune extends Model
         [$taxAmount, $taxPercent, $taxableFortuneAmount, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount, $mortgageBalanceAmount, false);
 
         if ($taxProperty) {
-            $propertyTax = new \App\Models\Core\TaxProperty($this->taxconfig);
+            $propertyTax = app(\App\Models\Core\TaxProperty::class);
             [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation2] = $propertyTax->calculatePropertyTax($year, $taxGroup, $taxProperty, (float) $taxablePropertyAmount);
         }
         $explanation .= $explanation2.$explanation1;
@@ -121,7 +121,7 @@ class TaxFortune extends Model
      */
     public function getPropertyTaxable(string $taxGroup, string $taxProperty, int $year): float
     {
-        return $this->taxconfig->getPropertyTaxable($taxGroup, $taxProperty, $year);
+        return $this->taxPropertyRepo->getPropertyTaxableRate($taxGroup, $taxProperty, $year);
     }
 
     /**
@@ -140,15 +140,17 @@ class TaxFortune extends Model
         $explanation = '';
 
         // Get the standard deduction for the given tax group and year
-        $taxableDeductionAmount = $this->taxconfig->getFortuneTaxStandardDeduction($taxGroup, $year);
+        $taxableDeductionAmount = $this->taxConfigRepo->getFortuneTaxStandardDeduction($taxGroup, $year);
 
         // Get the low and high tax percentages for the given tax group and year
-        $taxLowPercent = $this->taxconfig->getFortuneTax($taxGroup, 'low', $year);
-        $taxHighPercent = $this->taxconfig->getFortuneTax($taxGroup, 'high', $year);
+        $taxLow = $this->taxConfigRepo->getFortuneTax('low', $year);
+        $taxHigh = $this->taxConfigRepo->getFortuneTax('high', $year);
 
-        // Get the low and high limit amounts for the given tax group and year
-        $taxLowLimitAmount = $this->taxconfig->getFortuneTaxAmount($taxGroup, 'low', $year);
-        $taxHighLimitAmount = $this->taxconfig->getFortuneTaxAmount($taxGroup, 'high', $year);
+        $taxLowPercent = Arr::get($taxLow, 'percent', 0);
+        $taxLowLimitAmount = Arr::get($taxLow, 'amount', 0);
+
+        $taxHighPercent = Arr::get($taxHigh, 'percent', 0);
+        $taxHighLimitAmount = Arr::get($taxHigh, 'amount', 0);
 
         if ($debug) {
             echo "   calculatefortunetax in: $year.$taxGroup, amount:$amount, mortgage: $mortgage\n";

@@ -2,7 +2,6 @@
 
 use App\Models\AssetType;
 use App\Models\TaxConfiguration;
-use App\Models\Core\TaxRealization;
 use App\Models\TaxType;
 use App\Models\Team;
 use App\Models\User;
@@ -107,36 +106,4 @@ it('loads shareholdershield percent from DB with fallback and respects tax_shiel
     // Asset without tax_shield -> 0
     $noShield = $repo->getTaxShieldRealizationRate('house', 2024);
     expect($noShield)->toBe(0.0);
-});
-
-it('caches configuration lookups for repeated calls', function () {
-    TaxConfiguration::create([
-        'country_code' => 'no',
-        'year' => 2025,
-        'tax_type' => 'equityfund',
-        'description' => 'Equity Fund realization 2025',
-        'is_active' => true,
-        'configuration' => [
-            'realization' => 31,
-        ],
-        'user_id' => $this->user->id,
-        'team_id' => $this->team->id,
-        'created_by' => $this->user->id,
-        'updated_by' => $this->user->id,
-        'created_checksum' => 'c3',
-        'updated_checksum' => 'u3',
-    ]);
-
-    $service = new TaxRealization('no/no-tax-2025', 2020, 2030);
-
-    DB::enableQueryLog();
-    $first = $service->getTaxRealization('private', 'equityfund', 2025); // should query
-    $second = $service->getTaxRealization('private', 'equityfund', 2025); // cached
-    $queries = DB::getQueryLog();
-
-    expect($first)->toBe(0.31);
-    expect($second)->toBe(0.31);
-
-    $count = collect($queries)->filter(fn ($q) => str_contains(strtolower($q['query']), 'tax_configurations'))->count();
-    expect($count)->toBe(1);
 });

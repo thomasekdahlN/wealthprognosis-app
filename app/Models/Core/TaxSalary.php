@@ -39,9 +39,9 @@ class TaxSalary extends Model
     private string $country;
 
     /**
-     * Shared repository for loading tax_configurations with fallback & caching.
+     * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $repo;
+    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
 
     /**
      * Create a new TaxSalary service.
@@ -50,7 +50,9 @@ class TaxSalary extends Model
     public function __construct(string $country = 'no')
     {
         $this->country = strtolower($country) ?: 'no';
-        $this->taxconfig = new \App\Services\Tax\TaxConfigRepository($this->country);
+
+        // Use the singleton instance from the service container
+        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
     }
 
     /**
@@ -72,10 +74,10 @@ class TaxSalary extends Model
         $socialSecurityTaxAmount = 0; // Trygdeavgift
         $totalTaxAmount = 0; // Utregnet hva skatten faktisk er basert på de faktiske skattebeløpene.
 
-        $commonTaxRate = $this->taxconfig->getSalaryTaxCommonRate($year);
+        $commonTaxRate = $this->taxConfigRepo->getSalaryTaxCommonRate($year);
         $commonTaxDeductionAmount = $this->commonDeduction($year, $amount);
 
-        $socialSecurityTaxRate = $this->taxconfig->getSalaryTaxSocialSecurityRate($year);
+        $socialSecurityTaxRate = $this->taxConfigRepo->getSalaryTaxSocialSecurityRate($year);
         $totalTaxPercent = 0; // Utregnet hva skatten faktisak er i kroner basert på de faktiske skattebeløpene.
 
         $socialSecurityTaxableAmount = $amount; // Man betaler trygdeavgift av hele lønnen uten fradrag
@@ -118,7 +120,7 @@ class TaxSalary extends Model
     {
         $count = 0;
         $explanation = '';
-        $brackets = $this->taxconfig->getSalaryTaxBracketConfig($year);
+        $brackets = $this->taxConfigRepo->getSalaryTaxBracketConfig($year);
 
         $bracketTaxAmount = 0;
         $bracketTotalTaxAmount = 0;
@@ -182,7 +184,7 @@ class TaxSalary extends Model
      */
     public function commonDeduction($year, $amount)
     {
-        $deductionConfig = $this->taxconfig->getSalaryTaxDeductionConfig($year);
+        $deductionConfig = $this->taxConfigRepo->getSalaryTaxDeductionConfig($year);
         $minAmount = Arr::get($deductionConfig, 'deduction.min');
         $maxAmount = Arr::get($deductionConfig, 'deduction.max');
         $percent = Arr::get($deductionConfig, 'deduction.percent');
