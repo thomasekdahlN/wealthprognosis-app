@@ -73,7 +73,7 @@ class TaxConfigRepository
         return Arr::get($configH, 'income', 0) / 100;
     }
 
-    //***************************************************************************************
+    // ***************************************************************************************
     // Fortune spesific helper functions.
     // Returns the percentage of the value of this taxtype that is taxable.
     public function getTaxFortuneTaxableRate(string $taxType, int $year): float
@@ -84,17 +84,17 @@ class TaxConfigRepository
     }
 
     /**
-     * Returns the fortune tax config for low/high values - this is independent of the tax type.
+     * Returns the fortune tax bracket configuration.
+     * Similar to salary tax brackets, supports dynamic number of tax levels.
      *
      * @param  int  $year  The year for which the tax is being calculated.
-     * @param  string  $type  The type of fortune tax low or high.
-     * @return float The fortune tax percentage.
+     * @return array The fortune tax bracket configuration.
      */
-    public function getFortuneTax(string $type, int $year): array
+    public function getFortuneTaxBracketConfig(int $year): array
     {
         $configH = $this->getTaxConfig($year, 'fortune');
 
-        return Arr::get($configH, $type, []);
+        return Arr::get($configH, 'bracket', []);
     }
 
     /**
@@ -111,7 +111,7 @@ class TaxConfigRepository
         return (int) Arr::get($configH, 'standardDeduction', 0);
     }
 
-    //***************************************************************************************
+    // ***************************************************************************************
     // ** Realization spesific helper functions */
     public function getTaxRealizationRate(string $taxType, int $year): float
     {
