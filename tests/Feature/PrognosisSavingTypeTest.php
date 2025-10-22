@@ -40,20 +40,8 @@ it('uses asset_types.is_saving instead of hardcoded list', function () {
         ],
     ];
 
-    // Create minimal stub objects for tax services not used in this test
-    $taxIncome = new class {};
-    $taxFortune = new class
-    {
-        public function calculatefortunetax(bool $debug, int $year, string $group, float $taxableAmount, float $mortgageAmount, bool $aggregate)
-        {
-            // Return zeros for the tuple expected by Prognosis::groupFortuneTax
-            return [0, 0.0, $taxableAmount, 'stubbed'];
-        }
-    };
-    $taxRealization = new class {};
-    $changerate = new class {};
-
-    $prognosis = new TestablePrognosis($config, $taxIncome, $taxFortune, $taxRealization, $changerate);
+    // Prognosis gets all singletons (Tax, Changerate, Helper, Rules) from service container
+    $prognosis = new TestablePrognosis($config);
 
     expect($prognosis->isSavingPublic('equityfund'))->toBeTrue();
     expect($prognosis->isSavingPublic('house'))->toBeFalse();

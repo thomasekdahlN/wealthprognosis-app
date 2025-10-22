@@ -17,7 +17,8 @@ class AmortizationTest extends TestCase
     {
         // Define the config, changerate, dataH, mortgages, and assetname
 
-        $changerate = new Changerate('tenpercent', 1990, 2054);
+        $changerate = new \App\Models\Core\Changerate('tenpercent');
+
         $config = [
             'test' => [
                 'mortgage' => [
