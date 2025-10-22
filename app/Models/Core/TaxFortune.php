@@ -142,65 +142,83 @@ class TaxFortune extends Model
         // Get the standard deduction for the given tax group and year
         $taxableDeductionAmount = $this->taxConfigRepo->getFortuneTaxStandardDeduction($taxGroup, $year);
 
-        // Get the low and high tax percentages for the given tax group and year
-        $taxLow = $this->taxConfigRepo->getFortuneTax('low', $year);
-        $taxHigh = $this->taxConfigRepo->getFortuneTax('high', $year);
-
-        $taxLowPercent = Arr::get($taxLow, 'percent', 0);
-        $taxLowLimitAmount = Arr::get($taxLow, 'amount', 0);
-
-        $taxHighPercent = Arr::get($taxHigh, 'percent', 0);
-        $taxHighLimitAmount = Arr::get($taxHigh, 'amount', 0);
+        // Get the fortune tax bracket configuration (dynamic, similar to salary tax)
+        $brackets = $this->taxConfigRepo->getFortuneTaxBracketConfig($year);
 
         if ($debug) {
             echo "   calculatefortunetax in: $year.$taxGroup, amount:$amount, mortgage: $mortgage\n";
         }
 
-        // FIX: Not all assets is allowed to have mortgage deducted. Only rivate house/rental/cabins. Check tax laws.
+        // FIX: Not all assets is allowed to have mortgage deducted. Only private house/rental/cabins. Check tax laws.
         $taxableAmount = $amount - $mortgage;
 
         if ($taxableAmount < 0) {
-            // If the taxable amount is negative before deduction, it is because the asset has a mortgage higher than the value of the asset. This is deductable on the fortune tax and should be calculated and returned as negative values reducing fortune taxable and fortune tax
-            // Just pass through and use the taxableAmount as is. Funny that this a if without changing anuthing, but it is here for readability
+            // If the taxable amount is negative before deduction, it is because the asset has a mortgage higher than the value of the asset.
+            // This is deductible on the fortune tax and should be calculated and returned as negative values reducing fortune taxable and fortune tax
+            // Just pass through and use the taxableAmount as is. Funny that this a if without changing anything, but it is here for readability
             $explanation = 'Negative asset value after deducting mortgage, reducing fortune value. ';
         } elseif ($deduct) {
-            // We are not deducting from every asset, because we sum the value afterwards and the calculation gets wrong. We only deduct on grouped assets since the deduction is on the total
+            // We are not deducting from every asset, because we sum the value afterwards and the calculation gets wrong.
+            // We only deduct on grouped assets since the deduction is on the total
             // https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/verdsettingsrabatt-ved-fastsetting-av-formue/
 
             if ($taxableAmount - $taxableDeductionAmount > 0) {
-                // If the taxable amount is bigger than the deduction, resulting in a postive taxable amount, we use the deduction to reduce the taxable amount
+                // If the taxable amount is bigger than the deduction, resulting in a positive taxable amount,
+                // we use the deduction to reduce the taxable amount
                 // The value can never go negative because of the deduction, so this scenario should never give a negative taxable amount or negative tax
-                $taxableAmount = $taxableAmount - $taxableDeductionAmount; // FIX. We can not deduct on every asset, only on the total - if not this gets very wrong when summed to the totals.
+                $taxableAmount = $taxableAmount - $taxableDeductionAmount;
                 $explanation = 'Positive asset value after deducting. ';
-
             } else {
-                // If the taxable amount is less than the deduction, we set the taxable amount to zero, since nothing taxable and value can not be negative after deduction
+                // If the taxable amount is less than the deduction, we set the taxable amount to zero,
+                // since nothing taxable and value can not be negative after deduction
                 // The value can never go negative because of the deduction, so this scenario should never give a negative taxable amount or negative tax
                 $taxableAmount = 0;
                 $explanation = 'Asset value set to zero after deducting. ';
             }
         }
 
-        // Calculate the tax amount and percentage based on the amount and the tax limits
-        if ($amount > $taxHighLimitAmount) {
-            // Higher fortune tax on more than 20million pr 2024
-            $taxHighAmount = ($amount - $taxHighLimitAmount) * $taxHighPercent;
-            $taxLowAmount = ($taxHighLimitAmount - $taxableDeductionAmount) * $taxLowPercent;
+        // Calculate the tax amount using bracket-based progressive taxation
+        // Similar to salary tax calculation but for fortune/wealth
+        if ($amount > $taxableDeductionAmount) {
+            $taxableFortuneAmount = $amount - $taxableDeductionAmount;
+            $previousLimit = 0;
 
-            $taxAmount = $taxHighAmount + $taxLowAmount;
-            $taxPercent = $taxHighPercent;
-            $explanation .= "High fortune tax > $taxHighLimitAmount (".$taxHighPercent * 100 .'%)';
+            foreach ($brackets as $bracket) {
+                $rate = Arr::get($bracket, 'rate', 0) / 100; // Convert percentage to decimal
+                $limit = Arr::get($bracket, 'limit', PHP_FLOAT_MAX); // If no limit, use max float
 
-        } elseif ($amount <= $taxHighLimitAmount) {
-            // Only fortune tax on more than 1.7million pr 2023
-            $taxAmount = $taxableAmount * $taxLowPercent;
-            $taxPercent = $taxLowPercent;
-            $explanation .= "Low fortune tax < $taxHighLimitAmount (".$taxLowPercent * 100 .'%)';
+                if ($taxableFortuneAmount > $previousLimit) {
+                    // Calculate the amount in this bracket
+                    $amountInBracket = min($taxableFortuneAmount, $limit) - $previousLimit;
+
+                    // Add tax for this bracket
+                    $taxAmount += $amountInBracket * $rate;
+
+                    if ($debug) {
+                        echo "   Bracket: limit=$limit, rate=".($rate * 100)."%, amountInBracket=$amountInBracket, bracketTax=".($amountInBracket * $rate)."\n";
+                    }
+
+                    // If we've reached the amount, stop
+                    if ($taxableFortuneAmount <= $limit) {
+                        break;
+                    }
+
+                    $previousLimit = $limit;
+                }
+            }
+
+            $taxPercent = $amount > 0 ? $taxAmount / $amount : 0;
+            $explanation .= 'Fortune tax calculated using bracket system. ';
+        } else {
+            // No fortune tax if amount is below standard deduction
+            $taxAmount = 0;
+            $taxPercent = 0;
+            $explanation .= "No fortune tax (amount below standard deduction of $taxableDeductionAmount). ";
         }
 
         // Print debug information if debug is true
         if ($debug) {
-            echo "   calculatefortunetax out: $year.$taxGroup, taxAmount:$taxAmount, taxPercent:$taxPercent, taxableAmount: $taxableAmount, taxLowLimitAmount:$taxLowLimitAmount, taxHighLimitAmount:$taxHighLimitAmount, $explanation\n";
+            echo "   calculatefortunetax out: $year.$taxGroup, taxAmount:$taxAmount, taxPercent:$taxPercent, taxableAmount: $taxableAmount, $explanation\n";
         }
 
         return [$taxAmount, $taxPercent, $taxableAmount, $explanation];
