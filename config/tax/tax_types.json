@@ -1,35 +1,118 @@
 [
-  {"type": "airbnb", "name": "Airbnb"},
-  {"type": "ask", "name": "ASK"},
-  {"type": "bank", "name": "Bank"},
-  {"type": "boat", "name": "Boat"},
-  {"type": "bondfund", "name": "Bond Fund"},
-  {"type": "cabin", "name": "Cabin"},
-  {"type": "car", "name": "Car"},
-  {"type": "cash", "name": "Cash"},
-  {"type": "child", "name": "Child"},
-  {"type": "crypto", "name": "Cryptocurrency"},
-  {"type": "equityfund", "name": "Equity Fund"},
-  {"type": "fortune", "name": "Wealth / Fortune"},
-  {"type": "gold", "name": "Gold"},
-  {"type": "house", "name": "House"},
-  {"type": "income", "name": "Income"},
-  {"type": "realization", "name": "Realization"},
-  {"type": "inheritance", "name": "Inheritance"},
-  {"type": "ips", "name": "IPS"},
-  {"type": "loantocompany", "name": "Loan to Company"},
-  {"type": "otp", "name": "Occupational Pension (OTP)"},
-  {"type": "property", "name": "Property (base)"},
-  {"type": "property_geneva", "name": "Property: Geneva"},
-  {"type": "property_gothenburg", "name": "Property: Gothenburg"},
-  {"type": "property_holmestrand", "name": "Property: Holmestrand"},
-  {"type": "property_ringerike", "name": "Property: Ringerike"},
-  {"type": "property_stockholm", "name": "Property: Stockholm"},
-  {"type": "property_zurich", "name": "Property: Zurich"},
-  {"type": "rental", "name": "Rental Property"},
-  {"type": "salary", "name": "Salary"},
-  {"type": "shareholdershield", "name": "Shareholder Shield"},
-  {"type": "soleproprietorship", "name": "Sole Proprietorship"},
-  {"type": "stock", "name": "Stock"}
+  {
+    "type": "airbnb",
+    "name": "Airbnb"
+  },
+  {
+    "type": "ask",
+    "name": "ASK"
+  },
+  {
+    "type": "bank",
+    "name": "Bank"
+  },
+  {
+    "type": "boat",
+    "name": "Boat"
+  },
+  {
+    "type": "bondfund",
+    "name": "Bond Fund"
+  },
+  {
+    "type": "cabin",
+    "name": "Cabin"
+  },
+  {
+    "type": "car",
+    "name": "Car"
+  },
+  {
+    "type": "cash",
+    "name": "Cash"
+  },
+  {
+    "type": "crypto",
+    "name": "Cryptocurrency"
+  },
+  {
+    "type": "equityfund",
+    "name": "Equity Fund"
+  },
+    {
+        "type": "mixedfund",
+        "name": "Mixed Fund"
+    },
+  {
+    "type": "fortune",
+    "name": "Wealth / Fortune"
+  },
+  {
+    "type": "gold",
+    "name": "Gold"
+  },
+  {
+    "type": "house",
+    "name": "House"
+  },
+  {
+    "type": "income",
+    "name": "Income"
+  },
+  {
+    "type": "realization",
+    "name": "Realization"
+  },
+  {
+    "type": "inheritance",
+    "name": "Inheritance"
+  },
+    {
+        "type": "pension",
+        "name": "Pension"
+    },
+  {
+    "type": "ips",
+    "name": "IPS"
+  },
+  {
+    "type": "loantocompany",
+    "name": "Loan to Company"
+  },
+  {
+    "type": "otp",
+    "name": "Occupational Pension (OTP)"
+  },
+  {
+    "type": "rental",
+    "name": "Rental Property"
+  },
+  {
+    "type": "salary",
+    "name": "Salary"
+  },
+  {
+    "type": "shareholdershield",
+    "name": "Shareholder Shield"
+  },
+  {
+    "type": "soleproprietorship",
+    "name": "Sole Proprietorship"
+  },
+  {
+    "type": "stock",
+    "name": "Stock"
+  },
+  {
+    "type": "mixedfund",
+    "name": "Mixed Fund"
+  },
+  {
+    "type": "test",
+    "name": "Test"
+  },
+    {
+        "type": "none",
+        "name": "None"
+    }
 ]
-
