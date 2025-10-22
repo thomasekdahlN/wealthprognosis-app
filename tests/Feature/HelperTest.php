@@ -14,7 +14,7 @@ class HelperTest extends TestCase
      */
     public function test_it_parses_path_to_elements()
     {
-        $helper = new Helper;
+        $helper = app(Helper::class);
         [$assetname, $year, $type, $field] = $helper->pathToElements('fund.2022.asset.marketAmount');
         $this->assertEquals('fund', $assetname);
         $this->assertEquals('2022', $year);
@@ -29,7 +29,7 @@ class HelperTest extends TestCase
      */
     public function test_it_throws_error_for_invalid_path()
     {
-        $helper = new Helper;
+        $helper = app(Helper::class);
         $this->expectException(\Exception::class);
         $helper->pathToElements('invalid');
     }

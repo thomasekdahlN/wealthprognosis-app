@@ -12,7 +12,7 @@ class ValueChangeTest extends TestCase
      */
     public function test_negative_percent_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;

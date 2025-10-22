@@ -14,7 +14,7 @@ class RulesTest extends TestCase
      */
     public function test_it_calculates_rule_with_percentage()
     {
-        $rules = new Rules;
+        $rules = app(Rules::class);
         [$newAmount, $calcAmount, $rule, $explanation] = $rules->calculateRule(false, 100, 0, '+20%');
         $this->assertEquals(120, $newAmount);
         $this->assertEquals(20, $calcAmount);
@@ -27,7 +27,7 @@ class RulesTest extends TestCase
      */
     public function test_it_calculates_rule_with_divisor()
     {
-        $rules = new Rules;
+        $rules = app(Rules::class);
         [$newAmount, $calcAmount, $rule, $explanation] = $rules->calculateRule(false, 100, 0, '1/2');
         $this->assertEquals(100, $newAmount);
         $this->assertEquals(50, $calcAmount);
@@ -40,7 +40,7 @@ class RulesTest extends TestCase
      */
     public function test_it_calculates_rule_with_dynamic_divisor()
     {
-        $rules = new Rules;
+        $rules = app(Rules::class);
         [$newAmount, $calcAmount, $rule, $explanation] = $rules->calculateRule(false, 100, 0, '1|2');
         $this->assertEquals(100, $newAmount);
         $this->assertEquals(50, $calcAmount);
@@ -54,7 +54,7 @@ class RulesTest extends TestCase
      */
     public function test_it_calculates_rule_with_plus_minus()
     {
-        $rules = new Rules;
+        $rules = app(Rules::class);
         [$newAmount, $calcAmount, $rule, $explanation] = $rules->calculateRule(false, 100, 0, '+20');
         $this->assertEquals(120, $newAmount);
         $this->assertEquals(20, $calcAmount);
@@ -67,7 +67,7 @@ class RulesTest extends TestCase
      */
     public function test_it_calculates_rule_with_invalid_rule()
     {
-        $rules = new Rules;
+        $rules = app(Rules::class);
         [$newAmount, $calcAmount, $rule, $explanation] = $rules->calculateRule(false, 100, 0, 'invalid');
         $this->assertEquals(100, $newAmount);
         $this->assertEquals(0, $calcAmount);
