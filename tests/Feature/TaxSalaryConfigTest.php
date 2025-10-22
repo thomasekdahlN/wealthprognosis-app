@@ -91,8 +91,8 @@ it('caches salary tax configuration per request to avoid duplicate queries', fun
     $repo = new \App\Services\Tax\TaxConfigRepository('no');
 
     DB::enableQueryLog();
-    $cfg1 = $repo->getTaxConfig('no', 2025, 'salary'); // should query once
-    $cfg2 = $repo->getTaxConfig('no', 2025, 'salary'); // should be cached
+    $cfg1 = $repo->getTaxConfig(2025, 'salary'); // should query once
+    $cfg2 = $repo->getTaxConfig(2025, 'salary'); // should be cached
     $queries = DB::getQueryLog();
 
     // Convert to decimal like getSalaryTaxCommonRate would

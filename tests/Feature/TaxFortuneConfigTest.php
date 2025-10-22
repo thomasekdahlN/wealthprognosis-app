@@ -63,7 +63,7 @@ it('loads asset-type fortune taxable percent with fallback to previous years', f
     expect($missing)->toBe(0.0);
 });
 
-it('loads fortune low/high and standard deduction from DB with fallback', function () {
+it('loads fortune bracket config and standard deduction from DB with fallback', function () {
     // Only insert 2023. 2024 should fallback to 2023.
     TaxConfiguration::create([
         'country_code' => 'no',
@@ -73,8 +73,15 @@ it('loads fortune low/high and standard deduction from DB with fallback', functi
         'is_active' => true,
         'configuration' => [
             'standardDeduction' => 1700000,
-            'low' => ['income' => 0.1, 'amount' => 1700000],
-            'high' => ['income' => 0.15, 'amount' => 20000000],
+            'bracket' => [
+                [
+                    'limit' => 20000000,
+                    'rate' => 1.0, // 1%
+                ],
+                [
+                    'rate' => 1.1, // 1.1%
+                ],
+            ],
         ],
         'user_id' => $this->user->id,
         'team_id' => $this->team->id,
@@ -87,14 +94,14 @@ it('loads fortune low/high and standard deduction from DB with fallback', functi
     $repo = new TaxConfigRepository('no');
 
     expect($repo->getFortuneTaxStandardDeduction('private', 2024))->toBe(1700000);
-    // Income values are percentages; getFortuneTaxRate divides by 100
-    expect($repo->getFortuneTaxRate(2024, 'low'))->toBe(0.001); // 0.1% -> 0.001
-    expect($repo->getFortuneTaxRate(2024, 'high'))->toBe(0.0015); // 0.15% -> 0.0015
 
-    // Amount lookups from the raw configuration
-    $cfg = $repo->getTaxConfig('no', 2024, 'fortune');
-    expect($cfg['low']['amount'] ?? null)->toBe(1700000);
-    expect($cfg['high']['amount'] ?? null)->toBe(20000000);
+    // Test bracket configuration with fallback to 2023
+    $brackets = $repo->getFortuneTaxBracketConfig(2024);
+    expect($brackets)->toBeArray();
+    expect($brackets)->toHaveCount(2);
+    expect($brackets[0]['limit'] ?? null)->toBe(20000000);
+    expect((float) ($brackets[0]['rate'] ?? null))->toBe(1.0);
+    expect((float) ($brackets[1]['rate'] ?? null))->toBe(1.1);
 });
 
 it('loads property tax percent and deduction from DB with fallback and caches results', function () {
@@ -122,10 +129,10 @@ it('loads property tax percent and deduction from DB with fallback and caches re
 
     DB::enableQueryLog();
     // First call should hit DB
-    $cfg1 = $repo->getTaxConfig('no', 2025, 'property_holmestrand');
+    $cfg1 = $repo->getTaxConfig(2025, 'property_holmestrand');
 
     // Second call should be served from cache
-    $cfg2 = $repo->getTaxConfig('no', 2025, 'property_holmestrand');
+    $cfg2 = $repo->getTaxConfig(2025, 'property_holmestrand');
     $queries = DB::getQueryLog();
 
     expect($cfg1['income'] ?? null)->toBe(0.2);

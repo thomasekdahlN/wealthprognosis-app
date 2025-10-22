@@ -47,8 +47,8 @@ it('falls back to previous year when exact year is missing', function () {
         'updated_checksum' => 'u',
     ]);
 
-    $repo = new TaxConfigRepository;
-    $cfg = $repo->getTaxConfig('no', 2024, 'salary');
+    $repo = new TaxConfigRepository('no');
+    $cfg = $repo->getTaxConfig(2024, 'salary');
     expect($cfg)->toBeArray()->and($cfg['salary']['common']['rate'] ?? null)->toBe(21);
 });
 
@@ -68,10 +68,10 @@ it('caches repeated lookups within the same run', function () {
         'updated_checksum' => 'u2',
     ]);
 
-    $repo = new TaxConfigRepository;
+    $repo = new TaxConfigRepository('no');
     DB::enableQueryLog();
-    $a = $repo->getTaxConfig('no', 2025, 'fortune');
-    $b = $repo->getTaxConfig('no', 2025, 'fortune');
+    $a = $repo->getTaxConfig(2025, 'fortune');
+    $b = $repo->getTaxConfig(2025, 'fortune');
     $queries = DB::getQueryLog();
     $count = collect($queries)->filter(fn ($q) => str_contains(strtolower($q['query']), 'tax_configurations'))->count();
 
@@ -96,6 +96,6 @@ it('loads property config via tax configuration lookup', function () {
     ]);
 
     $repo = new TaxConfigRepository('no');
-    $cfg = $repo->getTaxConfig('no', 2025, 'property_holmestrand');
+    $cfg = $repo->getTaxConfig(2025, 'property_holmestrand');
     expect($cfg['income'] ?? null)->toBe(0.2)->and($cfg['standardDeduction'] ?? null)->toBe(50000);
 });
