@@ -117,6 +117,12 @@ class AssetTypesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
 
+                IconColumn::make('show_statistics')
+                    ->label('Show statistics')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
                 IconColumn::make('can_generate_income')
                     ->label('Gen. Income')
                     ->boolean()
@@ -203,6 +209,12 @@ class AssetTypesTable
                     ->placeholder('All')
                     ->trueLabel('Saving only')
                     ->falseLabel('Non-saving only'),
+
+                TernaryFilter::make('show_statistics')
+                    ->label('Show statistics')
+                    ->placeholder('All')
+                    ->trueLabel('Show only in statistics')
+                    ->falseLabel('Hide from statistics'),
 
                 TernaryFilter::make('tax_shield')
                     ->label('Tax Shield')

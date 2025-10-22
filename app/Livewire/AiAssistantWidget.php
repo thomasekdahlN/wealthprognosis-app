@@ -47,13 +47,7 @@ class AiAssistantWidget extends Component
         // Get current configuration from session
         $this->detectCurrentConfiguration();
 
-        $this->conversation = [
-            [
-                'type' => 'assistant',
-                'message' => 'Hello! I\'m your AI financial assistant. I can help you create and manage your financial configurations, assets, and plan for your future. How can I help you today?',
-                'timestamp' => now()->format('H:i'),
-            ],
-        ];
+        $this->conversation = [];
     }
 
     protected function detectCurrentConfiguration(): void
@@ -233,13 +227,7 @@ class AiAssistantWidget extends Component
 
     public function clearConversation(): void
     {
-        $this->conversation = [
-            [
-                'type' => 'assistant',
-                'message' => 'Conversation cleared. How can I help you today?',
-                'timestamp' => now()->format('H:i'),
-            ],
-        ];
+        $this->conversation = [];
         $this->currentConfigurationId = null;
     }
 

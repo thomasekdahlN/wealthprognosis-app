@@ -55,12 +55,13 @@ class AssetTypeForm
                     ->searchable()
                     ->placeholder('Select or enter a category'),
 
-                Select::make('tax_type_id')
+                Select::make('tax_type')
                     ->label('Tax Type')
-                    ->options(TaxType::active()->ordered()->pluck('name', 'id'))
+                    ->options(TaxType::active()->ordered()->pluck('name', 'type'))
                     ->searchable()
-                    ->placeholder('Select applicable tax type')
-                    ->helperText('Choose the tax type that applies to this asset type'),
+                    ->nullable()
+                    ->placeholder('No tax handling')
+                    ->helperText('Leave empty if this asset type has no tax handling. Otherwise, choose the applicable tax type'),
 
                 \App\Filament\Components\IconPicker::make('icon')
                     ->label('Icon'),
@@ -118,6 +119,11 @@ class AssetTypeForm
                     ->label('Saving')
                     ->default(false)
                     ->helperText('This asset type represents saving instruments (e.g., bank savings).'),
+
+                Toggle::make('show_statistics')
+                    ->label('Show statistics')
+                    ->default(true)
+                    ->helperText('Include this asset type in statistics and charts.'),
 
                 Toggle::make('tax_shield')
                     ->label('Tax Shield')

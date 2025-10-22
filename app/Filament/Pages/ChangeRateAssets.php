@@ -74,8 +74,9 @@ class ChangeRateAssets extends Page implements HasTable
                 TextColumn::make('type')
                     ->label('Asset Type')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => AssetChangeRate::ASSET_TYPES[$state] ?? ucfirst($state)
-                    )
+                    ->formatStateUsing(function (string $state): string {
+                        return \App\Models\AssetType::query()->where('type', $state)->value('name') ?? ucfirst($state);
+                    })
                     ->color('primary')
                     ->sortable()
                     ->searchable(),
@@ -106,7 +107,7 @@ class ChangeRateAssets extends Page implements HasTable
             ->filters([
                 \Filament\Tables\Filters\SelectFilter::make('asset_type')
                     ->label('Asset Type')
-                    ->options(\App\Models\PrognosisChangeRate::ASSET_TYPES)
+                    ->options(\App\Models\PrognosisChangeRate::assetTypeOptions())
                     ->multiple()
                     ->preload()
                     ->query(function (\Illuminate\Database\Eloquent\Builder $query, array $data): \Illuminate\Database\Eloquent\Builder {
@@ -179,7 +180,7 @@ class ChangeRateAssets extends Page implements HasTable
 
             $assets[] = [
                 'type' => $type,
-                'label' => AssetChangeRate::ASSET_TYPES[$type] ?? ucfirst($type),
+                'label' => \App\Models\AssetType::query()->where('type', $type)->value('name') ?? ucfirst($type),
                 'description' => $this->getAssetDescription($type),
                 'record_count' => $recordCount,
                 'year_range' => $yearRange ? "{$yearRange->min_year} - {$yearRange->max_year}" : 'No data',

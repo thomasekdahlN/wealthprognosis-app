@@ -91,7 +91,7 @@ class SimulationConfigurationsTable
                         'variable' => 'primary',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => \App\Models\SimulationConfiguration::PROGNOSIS_TYPES[$state] ?? $state
+                    ->formatStateUsing(fn (string $state): string => \App\Models\PrognosisType::query()->where('code', $state)->value('label') ?? $state
                     )
                     ->toggleable(),
 
@@ -151,7 +151,7 @@ class SimulationConfigurationsTable
 
                 SelectFilter::make('prognosis_type')
                     ->label('Prognosis Type')
-                    ->options(\App\Models\SimulationConfiguration::PROGNOSIS_TYPES)
+                    ->options(\App\Models\PrognosisType::options())
                     ->multiple(),
 
                 SelectFilter::make('group')

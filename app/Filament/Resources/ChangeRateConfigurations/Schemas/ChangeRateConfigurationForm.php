@@ -27,7 +27,7 @@ class ChangeRateConfigurationForm
 
                         Select::make('asset_type')
                             ->label('Asset Type')
-                            ->options(\App\Models\PrognosisChangeRate::ASSET_TYPES)
+                            ->options(\App\Models\PrognosisChangeRate::assetTypeOptions())
                             ->required()
                             ->searchable()
                             ->preload(),

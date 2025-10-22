@@ -44,8 +44,9 @@ class ChangeRateConfigurationsTable
                 TextColumn::make('asset_type')
                     ->label('Asset Type')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => \App\Models\PrognosisChangeRate::ASSET_TYPES[$state] ?? ucfirst($state)
-                    )
+                    ->formatStateUsing(function (string $state): string {
+                        return \App\Models\AssetType::query()->where('type', $state)->value('name') ?? ucfirst($state);
+                    })
                     ->color('primary')
                     ->sortable()
                     ->searchable()
@@ -95,7 +96,7 @@ class ChangeRateConfigurationsTable
 
                 SelectFilter::make('asset_type')
                     ->label('Asset Type')
-                    ->options(\App\Models\PrognosisChangeRate::ASSET_TYPES)
+                    ->options(\App\Models\PrognosisChangeRate::assetTypeOptions())
                     ->multiple()
                     ->preload(),
 

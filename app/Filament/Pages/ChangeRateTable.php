@@ -39,7 +39,7 @@ class ChangeRateTable extends Page implements HasForms, HasTable
     public function getTitle(): string|Htmlable
     {
         $scenarioLabel = \App\Models\PrognosisType::where('code', $this->scenario)->value('label') ?? ucfirst($this->scenario);
-        $assetLabel = AssetChangeRate::ASSET_TYPES[$this->asset] ?? ucfirst($this->asset);
+        $assetLabel = \App\Models\AssetType::query()->where('type', $this->asset)->value('name') ?? ucfirst($this->asset);
 
         return "Prognosis Change Rates - {$scenarioLabel} - {$assetLabel}";
     }
@@ -47,7 +47,7 @@ class ChangeRateTable extends Page implements HasForms, HasTable
     public function getHeading(): string|Htmlable
     {
         $scenarioLabel = \App\Models\PrognosisType::where('code', $this->scenario)->value('label') ?? ucfirst($this->scenario);
-        $assetLabel = AssetChangeRate::ASSET_TYPES[$this->asset] ?? ucfirst($this->asset);
+        $assetLabel = \App\Models\AssetType::query()->where('type', $this->asset)->value('name') ?? ucfirst($this->asset);
 
         return "{$assetLabel} - {$scenarioLabel} Scenario";
     }

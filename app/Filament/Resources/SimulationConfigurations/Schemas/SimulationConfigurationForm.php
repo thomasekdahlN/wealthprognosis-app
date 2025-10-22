@@ -173,7 +173,7 @@ class SimulationConfigurationForm
 
             Select::make('prognosis_type')
                 ->label('Prognosis Type')
-                ->options(SimulationConfiguration::PROGNOSIS_TYPES)
+                ->options(\App\Models\PrognosisType::options())
                 ->default('realistic')
                 ->required()
                 ->helperText('Select the economic scenario for growth rate projections'),
