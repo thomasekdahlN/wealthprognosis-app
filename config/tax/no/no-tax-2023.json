@@ -145,16 +145,15 @@
   },
   "fortune": {
     "standardDeduction": 1700000,
-    "low": {
-      "amount": 0,
-      "income": 1,
-      "realization": 0
-    },
-    "high": {
-      "amount": 20000000,
-      "income": 1.1,
-      "realization": 0
-    }
+    "bracket": [
+      {
+        "limit": 20000000,
+        "rate": 1
+      },
+      {
+        "rate": 1.1
+      }
+    ]
   },
   "shareholdershield": {
     "2007": 3.3,

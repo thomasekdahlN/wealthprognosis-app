@@ -133,14 +133,11 @@
   },
   "fortune": {
     "standardDeduction": 870000,
-    "low": {
-      "amount": 0,
-      "rate": 1.1
-    },
-    "high": {
-      "amount": 0,
-      "rate": 1.1
-    }
+    "bracket": [
+      {
+        "rate": 1.1
+      }
+    ]
   },
   "shareholdershield": 2.5
 }
