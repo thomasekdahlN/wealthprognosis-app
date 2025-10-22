@@ -57,7 +57,10 @@ class TaxConfigurationSeeder extends Seeder
         $this->command->info("Loaded tax configuration for {$countryCode} {$year}");
     }
 
-    private function createTaxConfiguration(string $countryCode, int $year, string $assetType, array $config, Carbon $createdAt, Carbon $updatedAt): void
+    /**
+     * @param  mixed  $config  JSON-serializable configuration (array/object/scalar)
+     */
+    private function createTaxConfiguration(string $countryCode, int $year, string $assetType, mixed $config, Carbon $createdAt, Carbon $updatedAt): void
     {
         // Get or create a default user for seeding
         $user = \App\Models\User::first();
@@ -84,15 +87,24 @@ class TaxConfigurationSeeder extends Seeder
             ]);
         }
         // Handle nested configurations (like property with sub-configurations)
-        if (isset($config['holmestrand']) || isset($config['ringerike'])) {
+        if (is_array($config) && (isset($config['holmestrand']) || isset($config['ringerike']))) {
             // Property tax with municipality-specific configurations
             foreach ($config as $municipality => $municipalityConfig) {
                 if (is_array($municipalityConfig)) {
+                    $taxTypeKey = "{$assetType}_{$municipality}";
+
+                    // Validate referenced tax type exists to avoid FK errors
+                    if (! \App\Models\TaxType::query()->where('type', $taxTypeKey)->exists()) {
+                        $this->command?->warn("Skipping tax configuration '{$countryCode} {$year} {$taxTypeKey}': Unknown tax type. Add '{$taxTypeKey}' to config/tax/tax_types.json and re-seed if needed.");
+
+                        continue;
+                    }
+
                     $model = TaxConfiguration::updateOrCreate(
                         [
                             'country_code' => $countryCode,
                             'year' => $year,
-                            'tax_type' => "{$assetType}_{$municipality}",
+                            'tax_type' => $taxTypeKey,
                         ],
                         [
                             'user_id' => $user->id,
@@ -116,11 +128,20 @@ class TaxConfigurationSeeder extends Seeder
             }
         } else {
             // Standard asset configuration
+            $taxTypeKey = $assetType;
+
+            // Validate referenced tax type exists to avoid FK errors
+            if (! \App\Models\TaxType::query()->where('type', $taxTypeKey)->exists()) {
+                $this->command?->warn("Skipping tax configuration '{$countryCode} {$year} {$taxTypeKey}': Unknown tax type. Add '{$taxTypeKey}' to config/tax/tax_types.json and re-seed if needed.");
+
+                return; // Skip this item gracefully
+            }
+
             $model = TaxConfiguration::updateOrCreate(
                 [
                     'country_code' => $countryCode,
                     'year' => $year,
-                    'tax_type' => $assetType,
+                    'tax_type' => $taxTypeKey,
                 ],
                 [
                     'user_id' => $user->id,

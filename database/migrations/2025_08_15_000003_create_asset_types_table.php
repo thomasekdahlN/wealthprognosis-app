@@ -16,11 +16,11 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('type')->unique();
+            $table->string('tax_type')->nullable();
+            $table->foreign('tax_type')->references('type')->on('tax_types');
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('category')->nullable();
-            $table->string('icon')->nullable();
-            $table->string('color')->default('gray');
             $table->boolean('is_active')->default(true);
             $table->boolean('is_private')->default(false);
             $table->boolean('is_company')->default(false);
@@ -29,6 +29,7 @@ return new class extends Migration
             $table->boolean('tax_shield')->default(false);
             $table->boolean('is_investable')->default(false);
             $table->boolean('is_saving')->default(false);
+            $table->boolean('show_statistics')->default(true);
 
             // New capabilities flags
             $table->boolean('can_generate_income')->default(false);
@@ -41,9 +42,11 @@ return new class extends Migration
             $table->string('expence_changerate')->nullable();
             $table->string('asset_changerate')->nullable();
 
+            $table->string('icon')->nullable();
+            $table->string('color')->default('gray');
+
             $table->integer('sort_order')->default(0);
             $table->foreignId('asset_category_id')->nullable()->constrained('asset_categories');
-            $table->foreignId('tax_type_id')->nullable()->constrained('tax_types');
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->string('created_checksum')->nullable();
