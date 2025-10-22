@@ -79,22 +79,22 @@
       },
       {
         "limit": 108800,
-        "rate": 6.60
+        "rate": 6.6
       },
       {
         "limit": 141500,
-        "rate": 8.80
+        "rate": 8.8
       },
       {
         "limit": 184900,
-        "rate": 11.00
+        "rate": 11.0
       },
       {
         "limit": 793400,
-        "rate": 13.20
+        "rate": 13.2
       },
       {
-        "rate": 11.50
+        "rate": 11.5
       }
     ]
   },
@@ -165,16 +165,15 @@
   },
   "fortune": {
     "standardDeduction": 80000,
-    "low": {
-      "amount": 0,
-      "income": 0.05,
-      "realization": 0
-    },
-    "high": {
-      "amount": 3000000,
-      "income": 0.30,
-      "realization": 0
-    }
+    "bracket": [
+      {
+        "limit": 3000000,
+        "rate": 0.05
+      },
+      {
+        "rate": 0.3
+      }
+    ]
   },
-  "shareholdershield":  2.5
+  "shareholdershield": 2.5
 }
