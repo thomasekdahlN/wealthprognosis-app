@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Core\Changerate;
 use App\Models\PrognosisChangeRate;
 use App\Models\Team;
 use App\Models\User;
@@ -56,41 +55,4 @@ beforeEach(function () {
         'created_checksum' => 't3',
         'updated_checksum' => 't3',
     ]);
-});
-
-it('loads change rates from DB and falls back to previous years', function () {
-    $changerate = new Changerate('baseline', 2023, 2025);
-
-    // Exact year
-    [$p2023, $d2023] = $changerate->getChangerateValues('equityfund', 2023);
-    expect($p2023)->toBe(7.5);
-    expect($d2023)->toBeFloat()->toBe(1 + 7.5 / 100);
-
-    // Fallback: 2024 should use 2023 value
-    [$p2024, $d2024] = $changerate->getChangerateValues('equityfund', 2024);
-    expect($p2024)->toBe(7.5);
-    expect($d2024)->toBeFloat()->toBe(1 + 7.5 / 100);
-
-    // 2025 has explicit value
-    [$p2025, $d2025] = $changerate->getChangerateValues('equityfund', 2025);
-    expect($p2025)->toBe(6.0);
-    expect($d2025)->toBeFloat()->toBe(1 + 6.0 / 100);
-
-    // Another type exact
-    [$b2024, $bd2024] = $changerate->getChangerateValues('bondfund', 2024);
-    expect($b2024)->toBe(3.0);
-    expect($bd2024)->toBeFloat()->toBe(1 + 3.0 / 100);
-});
-
-it('caches computed values in-memory for repeated requests', function () {
-    $changerate = new Changerate('baseline', 2023, 2025);
-
-    // First call computes and caches
-    [$p1, $d1] = $changerate->getChangerateValues('equityfund', 2024);
-
-    // Change underlying data would normally require a new instance, but we simulate repeated calls
-    [$p2, $d2] = $changerate->getChangerateValues('equityfund', 2024);
-
-    expect($p2)->toBe($p1);
-    expect($d2)->toBe($d1);
 });

@@ -20,87 +20,81 @@ use App\Models\PrognosisChangeRate;
 
 /**
  * Class Changerate
+ *
+ * Lazy-loading repository for change rate data with in-memory caching.
+ * Cache structure: [scenarioType][assetType][year] => [percent, decimal]
  */
 class Changerate
 {
     /**
-     * Precomputed change rates map: [asset_type][year] => percent
+     * In-memory cache: [scenarioType][assetType][year] => [percent, decimal]
      *
-     * @var array<string, array<int, float|int>>
+     * @var array<string, array<string, array<int, array{0: float|int, 1: float}>>>
      */
-    public $changerateH = [];
-
-    /**
-     * Simple in-memory cache for value lookups: [asset_type][year] => [percent, decimal]
-     *
-     * @var array<string, array<int, array{0: float|int, 1: float}>>
-     */
-    private array $valueCache = [];
+    private array $cache = [];
 
     /**
      * Scenario type (aka prognosis code) used to fetch change rates from DB.
      */
     private string $scenarioType;
 
-    // All chanegrates are stored as percentages, as this is the same as input. Can be retrieved as Decimal for easier calculation
-    // Fill the changerate structure with prognosis for all years, so we never get an empty answer.
-    public function __construct(string $prognosis, int $startYear, int $stopYear)
+    /**
+     * Constructor - only stores the scenario type, does not preload data.
+     *
+     * @param  string  $scenarioType  The scenario/prognosis type (e.g., 'realistic', 'baseline')
+     */
+    public function __construct(string $scenarioType = 'realistic')
     {
-        $this->scenarioType = $prognosis;
-
-        // Always start at 1950 to avoid gaps as legacy behavior
-        $startYear = 1950;
-
-        // Preload all active change rates for this scenario from DB, but be resilient if table is missing
-        try {
-            $rows = PrognosisChangeRate::query()
-                ->active()
-                ->forScenario($this->scenarioType)
-                ->orderBy('asset_type')
-                ->orderBy('year')
-                ->get(['asset_type', 'year', 'change_rate']);
-        } catch (\Throwable $e) {
-            // In test contexts without migrations, safely fall back to an empty set
-            $rows = collect();
-        }
-
-        // Group by asset type and build a per-year map with fallback to previous years
-        $byType = [];
-        foreach ($rows as $row) {
-            $byType[$row->asset_type][(int) $row->year] = (float) $row->change_rate;
-        }
-
-        foreach ($byType as $type => $yearMap) {
-            $prevChangerate = 0.0;
-            for ($year = $startYear; $year <= $stopYear; $year++) {
-                $changerate = $yearMap[$year] ?? null;
-                if ($changerate !== null) {
-                    $prevChangerate = $changerate;
-                } else {
-                    $changerate = $prevChangerate; // fallback to previous known rate
-                }
-                $this->changerateH[$type][$year] = $changerate;
-            }
-        }
+        $this->scenarioType = $scenarioType;
     }
 
     /**
      * Retrieves the change rate and its decimal equivalent for a given type and year.
+     * If the exact year doesn't exist, finds the closest year that is less than the requested year.
      *
-     * @param  string  $type  The type of change for which to retrieve the rate.
+     * @param  string  $type  The asset type for which to retrieve the rate.
      * @param  int  $year  The year for which to retrieve the rate.
      * @return array{0: float|int, 1: float} An array containing the percentage rate and its decimal equivalent.
      */
     public function getChangerateValues(string $type, int $year): array
     {
-        if (isset($this->valueCache[$type][$year])) {
-            return $this->valueCache[$type][$year];
+        // Check cache first
+        if (isset($this->cache[$this->scenarioType][$type][$year])) {
+            return $this->cache[$this->scenarioType][$type][$year];
         }
 
-        $percent = $this->changerateH[$type][$year] ?? 0;
+        // Load from database
+        $percent = $this->loadChangeRate($type, $year);
         $decimal = $this->convertPercentToDecimal($percent);
 
-        return $this->valueCache[$type][$year] = [$percent, $decimal];
+        // Cache and return
+        return $this->cache[$this->scenarioType][$type][$year] = [$percent, $decimal];
+    }
+
+    /**
+     * Load the change rate for a specific scenario type, asset type, and year from the database.
+     * If the exact year doesn't exist, finds the closest year that is less than the requested year.
+     *
+     * @param  string  $type  The asset type
+     * @param  int  $year  The requested year
+     * @return float The change rate percentage
+     */
+    private function loadChangeRate(string $type, int $year): float
+    {
+        try {
+            $changeRate = PrognosisChangeRate::query()
+                ->active()
+                ->forScenario($this->scenarioType)
+                ->where('asset_type', $type)
+                ->where('year', '<=', $year)
+                ->orderBy('year', 'desc')
+                ->value('change_rate');
+
+            return $changeRate !== null ? (float) $changeRate : 0.0;
+        } catch (\Throwable $e) {
+            // In test contexts without migrations, safely fall back to 0
+            return 0.0;
+        }
     }
 
     public function convertPercentToDecimal(float|int $percent): float
@@ -117,51 +111,51 @@ class Changerate
     }
 
     // Should be moved to helper?
-    // Percent is either a percentage integer 7 or a text refering to the chanegrate structure dynamically like "equityfund" - It will look up equityfund changerates for that year.
+    // Percent is either a percentage integer or a text refering to the chanegrate structure dynamically like "equityfund" - It will look up equityfund changerates for that year.
     /**
      * Converts the change rate to its decimal equivalent and retrieves associated information.
      *
      * @param  bool  $debug  Indicates whether to enable debug mode.
      * @param  string|null  $original  The original value to be converted.
      * @param  int  $year  The year for which to retrieve the rate.
-     * @param  string|null  $variablename  The variable name to be used for substitution.
+     * @param  string|null  $type  The variable name to be used for substitution.
      * @return array{0: float|int, 1: float, 2: ?string, 3: string} An array containing the percentage rate, its decimal equivalent, the variable name, and an explanation.
      */
-    public function getChangerate(bool $debug, ?string $original, int $year, ?string $variablename): array
+    public function getChangerate(bool $debug, ?string $original, int $year, ?string $type): array
     {
         $percent = 0;
         $decimal = 1.0;
         $explanation = '';
 
         if ($debug) {
-            echo "    getChangerateStart($original, $year, $variablename)\n";
+            echo "    getChangerateStart($original, $year, $type)\n";
         }
 
-        // Hvis den originale verdien er satt, da må vi ikke huske eller bruke $variablename lenger
-        if ($original != null || $variablename != null) {
+        // Hvis den originale verdien er satt, da må vi ikke huske eller bruke $type lenger
+        if ($original != null || $type != null) {
             if ($original != null) {
-                $variablename = null;
+                $type = null;
 
                 if (is_numeric($original)) { // Just a percentage number, use it directly
                     $percent = (float) $original;
                     $decimal = $this->convertPercentToDecimal($percent);
-                } else { // Allow to read the changerate from the DB-backed structure using the variable name
-                    $variablename = $original; // This is a variable name, not a number, we keep it to repeat
+                } else { // Allow to read the changerate from the DB-backed structure using the type name
+                    $type = $original; // This is a variable name, not a number, we keep it to repeat
                     preg_match('/changerates.(\w*)/i', $original, $matches, PREG_OFFSET_CAPTURE);
                     [$percent, $decimal] = $this->getChangerateValues($matches[1][0], $year);
                 }
-            } elseif ($variablename) {
-                // Hvis original ikke er satt men variablename er satt, da bruker vi den inntil end repeat
-                // Her er vi sikre på at det er et variabelnavn og ikke en integer.
-                preg_match('/changerates.(\w*)/i', $variablename, $matches, PREG_OFFSET_CAPTURE);
+            } elseif ($type) {
+                // Hvis original ikke er satt men type er satt, da bruker vi den inntil end repeat
+                // Her er vi sikre på at type er et navn og ikke en integer.
+                preg_match('/changerates.(\w*)/i', $type, $matches, PREG_OFFSET_CAPTURE);
                 [$percent, $decimal] = $this->getChangerateValues($matches[1][0], $year);
             }
 
             if ($debug) {
-                echo "    getChangerateReturn($percent, $decimal, $variablename, $explanation)\n";
+                echo "    getChangerateReturn($percent, $decimal, $type, $explanation)\n";
             }
         }
 
-        return [$percent, $decimal, $variablename, $explanation];
+        return [$percent, $decimal, $type, $explanation];
     }
 }
