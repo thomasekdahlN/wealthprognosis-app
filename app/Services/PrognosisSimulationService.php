@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\AssetConfiguration;
-use App\Models\PrognosisNew;
 use App\Models\SimulationAsset;
 use App\Models\SimulationAssetYear;
 use App\Models\SimulationConfiguration;
@@ -39,9 +38,23 @@ class PrognosisSimulationService
         // Copy assets to simulation tables
         $this->copyAssetsToSimulation($assetConfiguration, $simulationConfig, $assetScope);
 
-        // Run the prognosis calculation
-        $prognosisEngine = new PrognosisNew($assetConfiguration, $prognosisType, $assetScope);
-        $results = $prognosisEngine->runSimulation();
+        // TODO: Implement prognosis calculation engine
+        // For now, return basic structure
+        $results = [
+            'configuration' => [
+                'asset_configuration_id' => $assetConfiguration->id,
+                'prognosis_type' => $prognosisType,
+                'asset_scope' => $assetScope,
+            ],
+            'summary' => [
+                'total_assets_start' => 0,
+                'total_assets_end' => 0,
+                'total_income' => 0,
+                'total_expenses' => 0,
+            ],
+            'yearly_data' => [],
+            'asset_breakdown' => [],
+        ];
 
         // Store detailed results in simulation tables
         $this->storeSimulationResults($simulationConfig, $results);

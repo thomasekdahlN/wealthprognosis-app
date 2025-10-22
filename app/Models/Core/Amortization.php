@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2024 Thomas Ekdahl
+/* Copyright (C) 2025 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -179,7 +179,29 @@ class Amortization extends Model
             // print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
             // }
         } else {
-            echo "Problems with Amortization deno: $deno, interest is probably 0 in config or changerates\n";
+            // Fallback: handle zero or invalid denominator gracefully (e.g., zero/negative interest)
+            $interestAmount = max(0.0, $this->remainingMortgageAmount * $interestDecimal);
+            // In a fallback scenario, treat as interest-only year; principal only from extra downpayment
+            $this->termAmount = $interestAmount;
+            $this->principalAmount = max(0.0, $extraDownpaymentAmount);
+            $this->balanceAmount = max(0.0, $this->remainingMortgageAmount - $this->principalAmount);
+
+            $this->dataH[$this->assettname][$year]['mortgage'] = [
+                'amount' => round($this->amount),
+                'termAmount' => round($this->termAmount),
+                'interest' => $this->assetChangerateValue,
+                'interestDecimal' => $interestPercent / 100,
+                'interestAmount' => round($interestAmount),
+                'principalAmount' => round($this->principalAmount),
+                'balanceAmount' => round($this->balanceAmount),
+                'extraDownpaymentAmount' => $extraDownpaymentAmount,
+                'years' => $this->period,
+                'interestOnlyYears' => $this->interestOnlyYears,
+                'gebyrAmount' => 0,
+                'description' => 'Fallback calculation used due to invalid denominator.',
+                'taxDeductableAmount' => round($interestAmount) * 0.22,
+                'taxDeductableDecimal' => 0.22,
+            ];
         }
     }
 

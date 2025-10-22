@@ -126,11 +126,6 @@ class Asset extends Model
         return $this->hasMany(AssetMortgage::class);
     }
 
-    public function rules(): HasMany
-    {
-        return $this->hasMany(AssetRule::class);
-    }
-
     // Helper methods
     public function getTypeLabel(): string
     {

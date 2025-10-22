@@ -12,6 +12,14 @@ class AssetType extends Model
 {
     use Auditable, HasFactory;
 
+    /**
+     * Get options array of active asset types [type => name].
+     */
+    public static function options(): array
+    {
+        return static::query()->active()->ordered()->pluck('name', 'type')->all();
+    }
+
     protected static function booted(): void
     {
         parent::booted();
@@ -35,6 +43,7 @@ class AssetType extends Model
         'tax_shield',
         'is_investable',
         'is_saving',
+        'show_statistics',
         'can_generate_income',
         'can_generate_expenses',
         'can_have_mortgage',
@@ -44,7 +53,7 @@ class AssetType extends Model
         'expence_changerate',
         'asset_changerate',
         'asset_category_id',
-        'tax_type_id',
+        'tax_type',
         'user_id',
         'team_id',
         'created_by',
@@ -63,6 +72,7 @@ class AssetType extends Model
         'tax_shield' => 'boolean',
         'is_investable' => 'boolean',
         'is_saving' => 'boolean',
+        'show_statistics' => 'boolean',
         'can_generate_income' => 'boolean',
         'can_generate_expenses' => 'boolean',
         'can_have_mortgage' => 'boolean',
@@ -121,7 +131,7 @@ class AssetType extends Model
 
     public function taxType(): BelongsTo
     {
-        return $this->belongsTo(TaxType::class);
+        return $this->belongsTo(TaxType::class, 'tax_type', 'type');
     }
 
     public function createdBy(): BelongsTo

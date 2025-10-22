@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2024 Thomas Ekdahl
+/* Copyright (C) 2025 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,35 @@ namespace App\Models\Core;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Rules
+ *
+ * Handles parsing and execution of financial rule strings for asset calculations.
+ * Supports percentage changes, divisors, dynamic divisors, and fixed amount adjustments.
+ *
+ * Rule formats:
+ * - Percentage: "+10%", "-5%", "10%" (add, subtract, or extract percentage)
+ * - Divisor: "+1/4", "-1/2", "1/10" (add, subtract, or extract fraction)
+ * - Dynamic Divisor: "+1|4", "-1|2" (counts down denominator each use)
+ * - Fixed Amount: "+1000", "-500" (add or subtract fixed amount, multiplied by factor)
+ */
 class Rules extends Model
 {
     use HasFactory;
 
+    /**
+     * Main entry point for calculating rule transformations on amounts.
+     *
+     * Parses a rule string and applies the appropriate calculation method.
+     * Returns the new amount, calculated difference, updated rule (for dynamic divisors), and explanation.
+     *
+     * @param  bool  $debug  Whether to output debug information
+     * @param  int  $amount  The current amount to transform
+     * @param  int  $acquisitionAmount  The original acquisition amount (used for context)
+     * @param  string|null  $rule  The rule string to parse and execute (e.g., "+10%", "1/4", "-1|2")
+     * @param  int  $factor  Multiplier for fixed amount rules (default: 1)
+     * @return array{0: int, 1: int, 2: string|null, 3: string} [newAmount, calcAmount, updatedRule, explanation]
+     */
     public function calculateRule(bool $debug, int $amount, int $acquisitionAmount, ?string $rule, int $factor = 1)
     {
         // Handle null rule - multiply by factor
@@ -63,6 +88,17 @@ class Rules extends Model
         return [$newAmount, $calcAmount, $rule, $explanation];
     }
 
+    /**
+     * Calculate a dynamic divisor rule that counts down with each use.
+     *
+     * Dynamic divisors use the pipe "|" symbol and decrement the denominator after each calculation.
+     * For example, "1|4" becomes "1/3" after use, then "1/2", then "1/1", then null.
+     *
+     * @param  bool  $debug  Whether to output debug information
+     * @param  string  $amount  The amount to calculate on
+     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @return array{0: int, 1: int, 2: string|null, 3: string} [newAmount, calcAmount, updatedRule, explanation]
+     */
     public function calculationDynamicDivisor(bool $debug, string $amount, array $ruleH)
     {
 
@@ -91,6 +127,19 @@ class Rules extends Model
         return [$newAmount, $calcAmount, $rule, $explanation]; // Returns rewritten rule, has to be remembered
     }
 
+    /**
+     * Calculate a divisor (fraction) rule.
+     *
+     * Divisor rules use the "/" symbol to divide the amount.
+     * - With "+": adds the fraction to the amount (e.g., "+1/4" adds 25%)
+     * - With "-": subtracts the fraction from the amount (e.g., "-1/2" subtracts 50%)
+     * - Without sign: extracts the fraction without changing the original amount
+     *
+     * @param  bool  $debug  Whether to output debug information
+     * @param  int  $amount  The amount to calculate on
+     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @return array{0: int, 1: int, 2: string} [newAmount, calcAmount, explanation]
+     */
     public function calculationDivisor(bool $debug, int $amount, array $ruleH)
     {
         $divisor = $ruleH[3][0];
@@ -115,6 +164,19 @@ class Rules extends Model
         return [$newAmount, $calcAmount, $explanation];
     }
 
+    /**
+     * Calculate a percentage rule.
+     *
+     * Percentage rules use the "%" symbol.
+     * - With "+": increases the amount by the percentage (e.g., "+10%" adds 10%)
+     * - With "-": decreases the amount by the percentage (e.g., "-5%" subtracts 5%)
+     * - Without sign: extracts the percentage without changing the original amount
+     *
+     * @param  bool  $debug  Whether to output debug information
+     * @param  string  $amount  The amount to calculate on
+     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @return array{0: int, 1: int, 2: string} [newAmount, calcAmount, explanation]
+     */
     public function calculationPercentage(bool $debug, string $amount, array $ruleH)
     {
 
@@ -142,6 +204,21 @@ class Rules extends Model
         return [$newAmount, $calcAmount, $explanation];
     }
 
+    /**
+     * Calculate a fixed amount (plus/minus) rule.
+     *
+     * Fixed amount rules use numeric values with optional +/- signs.
+     * The amount is multiplied by the factor parameter (useful for monthly vs yearly calculations).
+     * - With "+": adds the fixed amount (e.g., "+1000" adds 1000 * factor)
+     * - With "-": subtracts the fixed amount (e.g., "-500" subtracts 500 * factor)
+     * - Without sign: extracts the amount without changing the original amount
+     *
+     * @param  bool  $debug  Whether to output debug information
+     * @param  int  $amount  The amount to calculate on
+     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @param  int  $factor  Multiplier for the fixed amount (default: 1)
+     * @return array{0: int, 1: int, 2: string} [newAmount, calcAmount, explanation]
+     */
     public function calculationPlusMinus(bool $debug, int $amount, array $ruleH, int $factor = 1)
     {
         $extraAmount = $ruleH[2][0];
@@ -170,4 +247,3 @@ class Rules extends Model
         return [$newAmount, $calcAmount, $explanation];
     }
 }
-

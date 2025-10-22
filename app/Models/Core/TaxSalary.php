@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2024 Thomas Ekdahl
+/* Copyright (C) 2025 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -19,76 +19,76 @@ namespace App\Models\Core;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 
+/**
+ * Class TaxSalary
+ *
+ * Handles salary and pension tax calculations including:
+ * - Common tax (fellesskatt)
+ * - Bracket tax (trinnskatt)
+ * - Social security tax (trygdeavgift)
+ * - Standard deductions (minstefradrag)
+ */
 class TaxSalary extends Model
 {
     use HasFactory;
 
-    public $taxH = [];
+    /**
+     * Country code for tax lookups. Defaults to Norway (no).
+     */
+    private string $country;
 
-    // Will be rewritten to support yearly tax differences, just faking for now.
-    // Should probably be a deep nested json structure.
-    public function __construct()
+    /**
+     * Shared repository for loading tax_configurations with fallback & caching.
+     */
+    private \App\Services\Tax\TaxConfigRepository $repo;
+
+    /**
+     * Create a new TaxSalary service.
+     * Country defaults to 'no' to preserve current behavior.
+     */
+    public function __construct(string $country = 'no')
     {
-
-        $file = config_path('tax/no/no-tax-2025.json');
-        $configH = File::json($file);
-        // echo "Leser: '$file'\n";
-
-        foreach ($configH as $type => $typeH) {
-            $this->taxH[$type] = $typeH;
-        }
+        $this->country = strtolower($country) ?: 'no';
+        $this->taxconfig = new \App\Services\Tax\TaxConfigRepository($this->country);
     }
 
-    public function getTaxIncome($taxGroup, $taxType, $year)
-    {
-
-        return Arr::get($this->taxH, "$taxType.income", 0) / 100;
-    }
-
-    public function getTax($taxGroup, $taxType, $year)
-    {
-        return Arr::get($this->taxH, "salary.$taxType", 0) / 100;
-    }
-
-    public function getDeduction($taxGroup, $taxType, $year)
-    {
-        return Arr::get($this->taxH, "salary.$taxType", 0);
-    }
-
-    public function getTaxBracket($taxGroup, $year)
-    {
-
-        return Arr::get($this->taxH, 'salary.bracket');
-    }
-
+    /**
+     * Calculate total salary tax including all components.
+     *
+     * Calculates common tax, bracket tax, and social security tax,
+     * then returns the total tax amount and effective tax rate.
+     *
+     * @param  bool  $debug  Whether to output debug information
+     * @param  int  $year  The tax year
+     * @param  int  $amount  The salary/pension amount
+     * @return array{0: float, 1: float, 2: string} [totalTaxAmount, totalTaxPercent, explanation]
+     */
     public function calculatesalarytax(bool $debug, int $year, int $amount)
     {
         $explanation = '';
         $commonTaxAmount = 0; // Fellesskatt
         $bracketTaxAmount = 0; // Trinnskatt
         $socialSecurityTaxAmount = 0; // Trygdeavgift
-        $totalTaxAmount = 0; // Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
+        $totalTaxAmount = 0; // Utregnet hva skatten faktisk er basert på de faktiske skattebeløpene.
 
-        $commonTaxPercent = $this->getTax('private', 'common.rate', $year);
+        $commonTaxRate = $this->taxconfig->getSalaryTaxCommonRate($year);
         $commonTaxDeductionAmount = $this->commonDeduction($year, $amount);
 
-        $socialSecurityTaxPercent = $this->getTax('private', 'socialsecurity.rate', $year);
-        $socialSecurityTaxDeductionAmount = $this->getDeduction('private', 'socialsecurity.deduction', $year);
-        $totalTaxPercent = 0; // Utregnet hva skatten faktisak er basert på de faktiske skattebeløpene.
+        $socialSecurityTaxRate = $this->taxconfig->getSalaryTaxSocialSecurityRate($year);
+        $totalTaxPercent = 0; // Utregnet hva skatten faktisak er i kroner basert på de faktiske skattebeløpene.
 
         $socialSecurityTaxableAmount = $amount; // Man betaler trygdeavgift av hele lønnen uten fradrag
         if ($socialSecurityTaxableAmount > 0) {
-            $socialSecurityTaxAmount = round($socialSecurityTaxableAmount * $socialSecurityTaxPercent);
+            $socialSecurityTaxAmount = round($socialSecurityTaxableAmount * $socialSecurityTaxRate);
         }
 
         $commonTaxableAmount = $amount - $socialSecurityTaxAmount - $commonTaxDeductionAmount; // Man betaler fellesskatt av lønnen etter at trygdeavgidt og minstefradraget er trukket fra
-        $commonTaxAmount = round($commonTaxableAmount * $commonTaxPercent);
+        $commonTaxAmount = round($commonTaxableAmount * $commonTaxRate);
 
         [$bracketTaxAmount, $bracketTaxPercent, $explanation] = $this->calculateBracketTax(true, $year, $amount); // Man betaler trinnskatt av hele lønnen uten fradrag
 
-        $explanation = ' Fellesskatt: '.$commonTaxPercent * 100 ."% gir $commonTaxAmount skatt, Trygdeavgift ".$socialSecurityTaxPercent * 100 ."% gir $socialSecurityTaxAmount skatt ".$explanation;
+        $explanation = ' Fellesskatt: '.$commonTaxRate * 100 ."% gir $commonTaxAmount skatt, Trygdeavgift ".$socialSecurityTaxRate * 100 ."% gir $socialSecurityTaxAmount skatt ".$explanation;
 
         $totalTaxAmount = $bracketTaxAmount + $commonTaxAmount + $socialSecurityTaxAmount;
 
@@ -103,11 +103,22 @@ class TaxSalary extends Model
         return [$totalTaxAmount, $totalTaxPercent, $explanation];
     }
 
+    /**
+     * Calculate bracket tax (trinnskatt) based on progressive tax brackets.
+     *
+     * Applies different tax rates to income ranges defined in the tax configuration.
+     * Each bracket has a limit and a rate, with higher income taxed at higher rates.
+     *
+     * @param  bool  $debug  Whether to output debug information
+     * @param  int  $year  The tax year
+     * @param  int  $amount  The salary/pension amount
+     * @return array{0: float, 1: float, 2: string} [bracketTotalTaxAmount, bracketTotalTaxPercent, explanation]
+     */
     public function calculateBracketTax(bool $debug, int $year, int $amount)
     {
         $count = 0;
         $explanation = '';
-        $brackets = $this->getTaxBracket('private', 'bracket', $year);
+        $brackets = $this->taxconfig->getSalaryTaxBracketConfig($year);
 
         $bracketTaxAmount = 0;
         $bracketTotalTaxAmount = 0;
@@ -116,8 +127,8 @@ class TaxSalary extends Model
 
         $prevLimitAmount = 0;
         foreach ($brackets as $bracket) {
-            // print "Trinn " . $amount . " > " . $bracket['limit'] . "\n";
-            $bracketTaxPercent = $bracket['rate'] / 100;
+
+            $bracketTaxPercent = ($bracket['rate'] ?? 0) / 100;
 
             if (isset($bracket['limit']) && $amount > $bracket['limit']) {
                 $bracketTaxableAmount = $bracket['limit'] - $prevLimitAmount;
@@ -125,7 +136,7 @@ class TaxSalary extends Model
                 $bracketTotalTaxAmount += $bracketTaxAmount;
 
                 $explanation .= " Bracket$count ($bracket[limit])$bracket[rate]%=$bracketTaxAmount,";
-                // echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
             } elseif (isset($bracket['limit'])) {
                 // Amount is lower than limit, we are at the end and calculate the rest of the amount.
@@ -133,7 +144,7 @@ class TaxSalary extends Model
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
                 $explanation .= " Bracket$count ($amount<)".$bracket['limit'].")$bracket[rate]%=$bracketTaxAmount";
-                // echo "Bracket $amount < " . $bracket['limit'] . " taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                echo "Bracket $amount < ".$bracket['limit']." taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
                 break;
             } else {
@@ -142,11 +153,11 @@ class TaxSalary extends Model
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
                 $explanation .= " Bracket$count (>$prevLimitAmount)$bracket[rate]%=$bracketTaxAmount";
-                // echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
 
                 break;
             }
-            $prevLimitAmount = $bracket['limit'];
+            $prevLimitAmount = $bracket['limit'] ?? $prevLimitAmount;
             $count++;
         }
 
@@ -159,12 +170,22 @@ class TaxSalary extends Model
         return [$bracketTotalTaxAmount, $bracketTotalTaxPercent, $explanation];
     }
 
-    // Beregning av minstefradrag
+    /**
+     * Calculate the standard deduction (minstefradrag) for salary income.
+     *
+     * The deduction is calculated as a percentage of income, with minimum and maximum limits.
+     * This deduction reduces the taxable base for common tax calculations.
+     *
+     * @param  int  $year  The tax year
+     * @param  int  $amount  The salary/pension amount
+     * @return float The deduction amount
+     */
     public function commonDeduction($year, $amount)
     {
-        $minAmount = $this->getDeduction('private', 'deduction.min', $year);
-        $maxAmount = $this->getDeduction('private', 'deduction.max', $year);
-        $percent = $this->getTax('private', 'deduction.percent', $year);
+        $deductionConfig = $this->taxconfig->getSalaryTaxDeductionConfig($year);
+        $minAmount = Arr::get($deductionConfig, 'deduction.min');
+        $maxAmount = Arr::get($deductionConfig, 'deduction.max');
+        $percent = Arr::get($deductionConfig, 'deduction.percent');
 
         $deduction = $amount * $percent;
         if ($deduction > $maxAmount) {
@@ -174,7 +195,7 @@ class TaxSalary extends Model
             $deduction = $minAmount;
         }
 
-        // echo "amount: $amount, min: $minAmount, max: $maxAmount, percent: $percent, deduction: $deduction\n";
+        echo "amount: $amount, min: $minAmount, max: $maxAmount, percent: $percent, deduction: $deduction\n";
 
         return $deduction;
     }

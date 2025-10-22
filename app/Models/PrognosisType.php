@@ -35,6 +35,14 @@ class PrognosisType extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * Get options array of active prognosis types [code => label].
+     */
+    public static function options(): array
+    {
+        return static::query()->active()->orderBy('code')->pluck('label', 'code')->all();
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

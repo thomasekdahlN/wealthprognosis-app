@@ -171,6 +171,12 @@ class AiAssistantService
             return ['type' => 'add_life_event', 'confidence' => 0.7];
         }
 
+        // High-priority: explicit requests for complete financial data for analysis should show static summary view
+        // Catch phrases like 'complete financial data', 'full financial data', or 'financial data for analysis'
+        if (preg_match('/(?:complete|full)\s+financial\s+data/i', $message) || preg_match('/financial\s+data.*(?:analysis|analyze)/i', $message)) {
+            return ['type' => 'view_data', 'confidence' => 0.95];
+        }
+
         // Check for general questions about finances FIRST (needs AI context) - Enhanced Norwegian support
         // These should use AI for intelligent analysis, not just return static summaries
         if (preg_match('/(?:how.*much|what.*value|when.*retire|can.*afford|should.*invest|recommend|advice|analyze|analysis|compare|best|worst|risk|return|yield|profit|loss|tax|expense|income|cash.*flow|net.*worth|fire|financial.*independence|hvor.*mye|hva.*verdi|når.*pensjon|kan.*råd|bør.*investere|anbefal|råd|analyser|sammenlign|best|verst|risiko|avkastning|profitt|tap|skatt|utgift|inntekt|kontantstrøm|nettoformue)/i', $message)) {
@@ -180,6 +186,11 @@ class AiAssistantService
         // Check for questions about quantity/count of assets (needs AI analysis)
         if (preg_match('/(?:hvor.*mange|how.*many|count|antall).*(?:asset|eiendel|eiendom)/i', $message)) {
             return ['type' => 'general_question', 'confidence' => 0.9];
+        }
+
+        // Check for viewing ASSETS data explicitly (English and Norwegian)
+        if (preg_match('/(?:show|view|display|vis|se).*?(?:my|min|mine).*?(?:assets?|eiendeler)/i', $message)) {
+            return ['type' => 'view_data', 'confidence' => 0.8];
         }
 
         // Check for viewing CONFIGURATION data (static summary only) - Enhanced Norwegian support
@@ -511,7 +522,7 @@ class AiAssistantService
             // Generate intelligent response based on extracted data
             $assetName = $this->generateAssetName($assetData);
             $formattedValue = number_format($assetData['value'], 0, ',', ' ');
-            $response = "✅ **{$assetName}** added with value **{$formattedValue} NOK**";
+            $response = "✅ Asset Successfully Added: **{$assetName}** added with value **{$formattedValue} NOK**";
 
             return [
                 'message' => $response,
@@ -1644,7 +1655,7 @@ class AiAssistantService
         // Default fallback for general questions
         return "**I'm Here to Help!**\n\n".
                "You asked: *\"{$message}\"*\n\n".
-               "While I don't have full AI analysis available right now (requires OpenAI API key), I can still help you navigate the system:\n\n".
+               "I'm currently unable to access the AI service to generate a detailed answer. Please try again later, or configure an API key to enable AI-powered analysis.\n\n".
                "**Quick Actions**\n".
                "• 📊 **Dashboard**: View your financial overview\n".
                "• 💰 **Assets**: Manage your assets and their values\n".

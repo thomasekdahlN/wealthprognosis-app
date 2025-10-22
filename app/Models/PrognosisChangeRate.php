@@ -44,31 +44,20 @@ class PrognosisChangeRate extends Model
         return PrognosisType::query()->where('code', $this->scenario_type)->value('label') ?? $this->scenario_type;
     }
 
-    public const ASSET_TYPES = [
-        'kpi' => 'Consumer Price Index',
-        'crypto' => 'Cryptocurrency',
-        'gold' => 'Gold',
-        'bondfund' => 'Bond Fund',
-        'equityfund' => 'Equity Fund',
-        'stock' => 'Stock',
-        'cash' => 'Cash',
-        'house' => 'House',
-        'rental' => 'Rental Property',
-        'cabin' => 'Cabin',
-        'car' => 'Car',
-        'boat' => 'Boat',
-        'interest' => 'Interest Rate',
-        'otp' => 'Occupational Pension',
-        'ask' => 'Equity Savings Account',
-        'pension' => 'Public Pension',
-        'fire' => 'FIRE Rate',
-        'applestock' => 'Apple Stock',
-        'zero' => 'Zero Growth',
-    ];
+    /**
+     * Dynamic asset type options sourced from the asset_types table.
+     * Returns array [type => name].
+     */
+    public static function assetTypeOptions(): array
+    {
+        return \App\Models\AssetType::options();
+    }
 
     public function getAssetTypeLabel(): string
     {
-        return self::ASSET_TYPES[$this->asset_type] ?? $this->asset_type;
+        $label = \App\Models\AssetType::query()->where('type', $this->asset_type)->value('name');
+
+        return $label ?? $this->asset_type;
     }
 
     public function getChangeRateDecimal(): float
@@ -148,7 +137,7 @@ class PrognosisChangeRate extends Model
             if ($assetTypeModel) {
                 $label = $assetTypeModel->name;
             } else {
-                $label = self::ASSET_TYPES[$assetType] ?? ucfirst($assetType);
+                $label = ucfirst($assetType);
             }
 
             $options[$key] = $label;

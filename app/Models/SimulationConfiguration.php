@@ -54,14 +54,32 @@ class SimulationConfiguration extends Model
         return $countries;
     }
 
-    public const PROGNOSIS_TYPES = [
-        'realistic' => 'Realistic',
-        'positive' => 'Positive',
-        'negative' => 'Negative',
-        'tenpercent' => 'Ten Percent',
-        'zero' => 'Zero Growth',
-        'variable' => 'Variable',
-    ];
+    /**
+     * Options for prognosis types sourced from the database.
+     * Returns [code => label].
+     */
+    public static function prognosisTypeOptions(): array
+    {
+        return \App\Models\PrognosisType::options();
+    }
+
+    /**
+     * Validation rule for the prognosis_type attribute.
+     */
+    public static function getPrognosisTypeValidationRule(): Rule
+    {
+        return Rule::in(array_keys(self::prognosisTypeOptions()));
+    }
+
+    /**
+     * Accessor for a human-readable prognosis type label.
+     */
+    public function getPrognosisTypeLabelAttribute(): string
+    {
+        return (string) (\App\Models\PrognosisType::query()
+            ->where('code', $this->prognosis_type)
+            ->value('label') ?? $this->prognosis_type);
+    }
 
     public const GROUP_TYPES = [
         'private' => 'Private Assets Only',

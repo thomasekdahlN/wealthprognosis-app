@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2024 Thomas Ekdahl
+/* Copyright (C) 2025 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 
 namespace App\Models\Core;
 
+use App\Models\AssetType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -54,42 +55,15 @@ class Prognosis
     // Assets som man kan selge deler av hvert år for å finansiere FIRE. Huset ditt kan du f.eks ikke selge deler av. Dette brukes for å beregne potensiell inntekt fra salg av disse assets.
 
     // Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
-    public $fireSavingTypes = [
-        'boat' => false,
-        'car' => false,
-        'house' => true,
-        'rental' => true,
-        'cabin' => true,
-        'crypto' => true,
-        'bondfund' => true,
-        'equityfund' => true,
-        'stock' => true,
-        'otp' => true,
-        'ask' => true,
-        'cash' => true,
-        'bank' => true,
-        'ips' => true,
-        'pension' => true,
-    ];
+    // Replaced hardcoded list with DB-backed lookup from asset_types.is_saving.
+    private array $assetTypeSavingMap = [];
 
-    // Assetene vi viser frem i statistikken (i % av investeringene)
-    public $assetSpreadTypes = [
-        'boat' => true,
-        'bank' => true,
-        'car' => true,
-        'cash' => true,
-        'house' => true,
-        'rental' => true,
-        'cabin' => true,
-        'crypto' => true,
-        'bondfund' => true,
-        'equityfund' => true,
-        'stock' => true,
-        'otp' => true,
-        'ask' => true,
-        'ips' => true,
-        'pension' => true,
-    ];
+    // Asset types visibility for statistics is loaded from DB (asset_types.show_statistics)
+    private array $assetTypeShowStatisticsMap = [];
+
+    public $helper;
+
+    public $rules;
 
     public function __construct(array $config, object $taxincome, object $taxfortune, object $taxrealization, object $changerate)
     {
@@ -100,39 +74,55 @@ class Prognosis
         $this->taxrealization = $taxrealization;
         $this->changerate = $changerate;
         $this->helper = new \App\Models\Core\Helper;
+        $this->rules = new \App\Models\Core\Rules;
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
         $this->thisYear = now()->year;
-        $this->deathYear = (int) $this->birthYear + Arr::get($this->config, 'meta.deathYear');
+        $this->deathYear = (int) $this->birthYear + Arr::get($this->config, 'meta.deathAge');
+        // dd($this->config);
+
+        // Preload asset type saving flags to avoid repeated DB lookups
+        try {
+            $this->assetTypeSavingMap = AssetType::query()->pluck('is_saving', 'type')->toArray();
+        } catch (\Throwable $e) {
+            // In case database is not available (e.g., during certain CLI runs), default to empty map
+            $this->assetTypeSavingMap = [];
+        }
+
+        // Preload asset type statistics visibility flags
+        try {
+            $this->assetTypeShowStatisticsMap = AssetType::query()->pluck('show_statistics', 'type')->toArray();
+        } catch (\Throwable $e) {
+            $this->assetTypeShowStatisticsMap = [];
+        }
 
         foreach ($this->config as $assetname => $assetconfig) {
 
             if ($assetname == 'meta') {
-                // print "--- Jump over meta $assetname\n";
+                echo "--- Jump over meta $assetname\n";
+
                 continue;
             } // Hopp over metadata, reserved keyword meta.
-            // echo "*** Asset: $assetname\n";
-
-            // Store all metadata about the asset, the rest is yearly calculations
-            $this->dataH[$assetname]['meta'] = $this->ArrGetConfig("$assetname.meta"); // Copy metadata into dataH
 
             if (! $this->ArrGetConfig("$assetname.meta.active")) {
                 // print "--- Asset $assetname is not active\n";
                 continue;
             } // Jump past inactive assets
 
-            $assetTypeCode = $this->ArrGetConfig("$assetname.meta.type");
+            echo "#################### Asset: $assetname\n";
+
+            // Store all metadata about the asset, the rest is yearly calculations
+            $this->dataH[$assetname]['meta'] = $this->ArrGetConfig("$assetname.meta"); // Copy metadata into dataH
+            $assetType = $this->ArrGetConfig("$assetname.meta.type");
+
+            // Resolve tax type from asset type using centralized helper
+            $this->config[$assetname]['meta']['tax_type'] = \App\Support\TaxTypeResolver::resolve($assetType);
+
             $taxGroup = $this->ArrGetConfig("$assetname.meta.group"); // How tax is to be calculated for this asset
             $taxProperty = $this->ArrGetConfig("$assetname.meta.taxProperty"); // How tax is to be calculated for this asset
             // Derive tax type via asset type relation and default to 'none' when missing
-            $taxType = 'none';
-            try {
-                $assetType = \App\Models\AssetType::where('type', $assetTypeCode)->with('taxType')->first();
-                $taxType = $assetType?->taxType?->type ?? 'none';
-            } catch (\Throwable $e) {
-                $taxType = 'none';
-            }
+            $taxType = $this->ArrGetConfig("$assetname.meta.tax_type");
 
             $firsttime = false; // Only set to true on the first time we see a configuration on this asset.
             $assetMarketAmount = 0;
@@ -171,11 +161,12 @@ class Prognosis
 
             $restAccumulated = 0;
 
+            echo "economyStartYear: $this->economyStartYear, deathYear: $this->deathYear\n";
             for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
 
                 $prevYear = $year - 1;
                 $path = "$assetname.$year";
-                // echo "$path\n";
+                echo "$path\n";
 
                 // #######################################################################################################
                 // Expence
@@ -340,8 +331,8 @@ class Prognosis
 
                 // ######################################################################################################
                 $interestAmount = round($assetMarketAmount - $assetMarketInitialAmount); // ToDo - subtract the changerated amount from the initial amount to find the interest amount
-
-                [$cashflowTaxAmount, $cashflowTaxPercent, $cashflowDescription] = $this->taxincome->taxCalculationIncome(false, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
+                echo "***********taxCalculationIncome taxGroup:$taxGroup, taxType:$taxType, year:$year, incomeAmount:$incomeAmount, expenceAmount:$expenceAmount, interestAmount:$interestAmount\n";
+                [$cashflowTaxAmount, $cashflowTaxPercent, $cashflowDescription] = $this->taxincome->taxCalculationIncome(true, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
 
                 $cashflowBeforeTaxAmount =
                     $incomeAmount
@@ -358,7 +349,7 @@ class Prognosis
                     + $this->ArrGet("$path.mortgage.taxDeductableAmount") // Plus skattefradrag på renter
                     + $this->ArrGet("$path.income.transferedAmount");
 
-                // echo "$assetname.$year.income.incomeAmount:$incomeAmount,expenceAmount:$expenceAmount,interestAmount:$interestAmount, cashflowTaxAmount:$cashflowTaxAmount, cashflowBeforeTaxAmount:$cashflowBeforeTaxAmount, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, transferedAmount; ".$this->ArrGet("$path.income.transferedAmount")."\n";
+                echo "$assetname.$year.income.incomeAmount:$incomeAmount,expenceAmount:$expenceAmount,interestAmount:$interestAmount, cashflowTaxAmount:$cashflowTaxAmount, cashflowBeforeTaxAmount:$cashflowBeforeTaxAmount, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, transferedAmount; ".$this->ArrGet("$path.income.transferedAmount")."\n";
 
                 $cashflowNewRule = null;
                 if ($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
@@ -545,7 +536,7 @@ class Prognosis
             // $debug = true;
             // echo "    @@@@ transferTo set\n";
             if ($rule) {
-                [$newAmount, $transferAmount, $rule, $explanation] = $this->helper->calculateRule(false, $amount, $acquisitionAmount, $rule, $factor);
+                [$newAmount, $transferAmount, $rule, $explanation] = $this->rules->calculateRule(false, $amount, $acquisitionAmount, $rule, $factor);
                 // echo "    **** rule: $rule, transferAmount: $transferAmount --------------------------\n\n\n";
 
                 if ($transferAmount > 0) {
@@ -570,7 +561,7 @@ class Prognosis
             if ($debug) {
                 echo "  Normal rule\n";
             }
-            [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule(false, $amount, $acquisitionAmount, $rule, $factor);
+            [$newAmount, $diffAmount, $rule, $explanation] = $this->rules->calculateRule(false, $amount, $acquisitionAmount, $rule, $factor);
             $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); // The amount we transfered to - for later reference and calculation
             $this->ArrSet($transferedOriginDescription, Arr::get($this->dataH, $transferedOriginDescription, 0)." added $diffAmount from rule $rule"); // The amount we transfered to - for later reference and calculation
             $newAmount = $amount; // Since we started putting the transfer in the data structure, we can not add it here, because it is then added twice.
@@ -608,6 +599,16 @@ class Prognosis
         }
     }
 
+    protected function isSavingType(string $assetType): bool
+    {
+        return (bool) ($this->assetTypeSavingMap[$assetType] ?? false);
+    }
+
+    protected function isShownInStatistics(string $assetType): bool
+    {
+        return (bool) ($this->assetTypeShowStatisticsMap[$assetType] ?? false);
+    }
+
     // Transferes the amount to another asset. This actualle has to change variables like assetEquityAmount, assetPaidAmount, realizationShieldAmount etc. Others are only simulations, not happening.
     public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount, float $taxShieldAmount, string $explanation)
     {
@@ -637,11 +638,11 @@ class Prognosis
         // Realisation tax calculations here, because we have to realize a transfered asset.
         // Derive origin tax type via asset_type instead of meta.tax
         [$taxAssetname, $taxYear, $taxOriginGroup] = $this->getAssetMetaFromPath($transferOrigin, 'group');
-        [$originAssetnameMeta, $originYearMeta, $originAssetTypeCode] = $this->getAssetMetaFromPath($transferOrigin, 'type');
+        [$originAssetnameMeta, $originYearMeta, $originAssetType] = $this->getAssetMetaFromPath($transferOrigin, 'type');
         $taxOriginType = 'none';
         try {
-            $assetType = \App\Models\AssetType::where('type', $originAssetTypeCode)->with('taxType')->first();
-            $taxOriginType = $assetType?->taxType?->type ?? 'none';
+            $assetTypeO = \App\Models\AssetType::where('type', $originAssetType)->with('taxType')->first();
+            $taxOriginType = $assetTypeO?->taxType?->type ?? 'none';
         } catch (\Throwable $e) {
             $taxOriginType = 'none';
         }
@@ -976,11 +977,11 @@ class Prognosis
         [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
         [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($path, 'group');
         // derive tax type via asset_type
-        [$assetname, $year, $assetTypeCode] = $this->getAssetMetaFromPath($path, 'type');
+        [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($path, 'type');
         $taxType = 'none';
         try {
-            $assetType = \App\Models\AssetType::where('type', $assetTypeCode)->with('taxType')->first();
-            $taxType = $assetType?->taxType?->type ?? 'none';
+            $assetTypeO = \App\Models\AssetType::where('type', $assetType)->with('taxType')->first();
+            $taxType = $assetTypeO?->taxType?->type ?? 'none';
         } catch (\Throwable $e) {
             $taxType = 'none';
         }
@@ -1043,7 +1044,7 @@ class Prognosis
         $paidAmount = 0;
         $amount = $this->ArrGet($path); // Retrive the amount from another asset. Do not change the other asset.
 
-        [$newAmount, $diffAmount, $rule, $explanation] = $this->helper->calculateRule($debug, $amount, 0, $rule, 1);
+        [$newAmount, $diffAmount, $rule, $explanation] = $this->rules->calculateRule($debug, $amount, 0, $rule, 1);
         $explanation = " source $rule of $path $amount = $diffAmount\n";
 
         if ($debug) {
@@ -1200,11 +1201,11 @@ class Prognosis
     {
         // Retrieve the year and tax type from the asset metadata.
         // derive tax type via asset_type
-        [$assetname, $year, $assetTypeCode] = $this->getAssetMetaFromPath($path, 'type');
+        [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($path, 'type');
         $taxType = 'none';
         try {
-            $assetType = \App\Models\AssetType::where('type', $assetTypeCode)->with('taxType')->first();
-            $taxType = $assetType?->taxType?->type ?? 'none';
+            $assetTypeO = \App\Models\AssetType::where('type', $assetType)->with('taxType')->first();
+            $taxType = $assetTypeO?->taxType?->type ?? 'none';
         } catch (\Throwable $e) {
             $taxType = 'none';
         }
@@ -1283,7 +1284,7 @@ class Prognosis
         // ##############################################################
         // Calculate FIRE Savings amount
         $fireSavingAmount = 0;
-        if (Arr::get($this->fireSavingTypes, $meta['type'])) {
+        if ($this->isSavingType($meta['type'])) {
             // print "FIRE SAVING: $assetname: " . $meta['type'] . " : $incomeAmount \n";
             $fireSavingAmount = $acquisitionChangeAmount - $this->ArrGet("$path.mortgage.interestAmount"); // Renter is not saving, but prinicpal is
         }
@@ -1399,7 +1400,7 @@ class Prognosis
     {
 
         foreach ($this->groupH as $type => $asset) {
-            if (Arr::get($this->assetSpreadTypes, $type)) {
+            if ($this->isShownInStatistics($type)) {
                 // print "$type\n";
                 foreach ($asset as $year => $data) {
                     $amount = round(Arr::get($data, 'asset.marketAmount', 0));

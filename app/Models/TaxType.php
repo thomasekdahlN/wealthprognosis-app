@@ -42,6 +42,6 @@ class TaxType extends Model
 
     public function assetTypes(): HasMany
     {
-        return $this->hasMany(AssetType::class);
+        return $this->hasMany(AssetType::class, 'tax_type', 'type');
     }
 }

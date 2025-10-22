@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2024 Thomas Ekdahl
+/* Copyright (C) 2025 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -18,40 +18,75 @@ namespace App\Models\Core;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 
+/**
+ * Class TaxIncome
+ *
+ * Handles income tax calculations for various asset and income types.
+ * Supports different tax treatments for salary, pension, rental income,
+ * investment income, and other income sources.
+ *
+ * Uses TaxConfigRepository for database-backed tax configuration lookups.
+ */
 class TaxIncome extends Model
 {
     use HasFactory;
 
-    public $taxH = [];
+    /**
+     * Get the income tax rate for a specific tax type and year.
+     *
+     * Lightweight helper used by tests/consumers to fetch configured rates
+     * directly with in-request caching via TaxConfigRepository.
+     *
+     * @param  string  $taxGroup  The tax group (currently not used for rate lookup)
+     * @param  string  $taxType  The type of income (e.g., 'salary', 'rental', 'stock')
+     * @param  int  $year  The tax year
+     * @return float The tax rate as a decimal (e.g., 0.22 for 22%)
+     */
+    public function getTaxIncome(string $taxGroup, string $taxType, int $year): float
+    {
+        // $taxGroup currently does not affect rate lookup; kept for BC.
+        return $this->taxconfig->getTaxIncomeRate($taxType, $year);
+    }
 
-    // Will be rewritten to support yearly tax differences, just faking for now.
-    // Should probably be a deep nested json structure.
+    /**
+     * Get the standard deduction amount for a specific tax type and year.
+     *
+     * @param  string  $taxGroup  The tax group (currently not used for deduction lookup)
+     * @param  string  $taxType  The type of income (e.g., 'airbnb')
+     * @param  int  $year  The tax year
+     * @return float The standard deduction amount
+     */
+    public function getTaxStandardDeduction(string $taxGroup, string $taxType, int $year): float
+    {
+        return (float) $this->taxconfig->getTaxStandardDeductionAmount($taxType, $year);
+    }
+
+    /**
+     * Country code for tax lookups (e.g., 'no').
+     */
+    private string $countryCode = 'no';
+
+    /**
+     * Shared repository for loading tax configs.
+     */
+    private \App\Services\Tax\TaxConfigRepository $repo;
+
+    /**
+     * Keep constructor signature but switch to DB-backed loading.
+     *
+     * @param  string  $config  Path-like identifier used only to infer country code (e.g., 'no/no-tax-2025').
+     * @param  int  $startYear  Unused, kept for BC.
+     * @param  int  $stopYear  Unused, kept for BC.
+     */
     public function __construct($config, $startYear, $stopYear)
     {
+        // Infer country code from first path segment (e.g., 'no')
+        $first = explode('/', (string) $config)[0] ?? 'no';
+        $this->country = strtolower($first ?: 'no');
 
-        $file = config_path("tax/$config.json");
-        $configH = File::json($file);
-        echo "Leser: '$file'\n";
-
-        foreach ($configH as $type => $typeH) {
-            $this->taxH[$type] = $typeH;
-        }
-
-        $this->taxsalary = new \App\Models\Core\TaxSalary;
-    }
-
-    public function getTaxIncome($taxGroup, $taxType, $year)
-    {
-
-        return Arr::get($this->taxH, "$taxType.income", 0) / 100;
-    }
-
-    public function getTaxStandardDeduction($taxGroup, $taxType, $year)
-    {
-        return Arr::get($this->taxH, "$taxType.standardDeduction", 0);
+        $this->taxsalary = new \App\Models\Core\TaxSalary($this->country);
+        $this->taxconfig = new \App\Services\Tax\TaxConfigRepository($this->country);
     }
 
     /**
@@ -64,31 +99,35 @@ class TaxIncome extends Model
      * @param  float|null  $income  The income for the tax calculation.
      * @param  float|null  $expence  The expense for the tax calculation.
      * @param  float|null  $interestAmount  The interest amount for the tax calculation.
-     * @return array Returns an array containing the calculated income tax amount, income tax percent, and an explanation.
+     * @return array{0: float|int, 1: float|int, 2: string} Returns [amount, percent, explanation].
      */
     public function taxCalculationIncome(bool $debug, string $taxGroup, string $taxType, int $year, ?float $income, ?float $expence, ?float $interestAmount)
     {
         // Initialize explanation and income tax percent
+        $debug = true;
         $explanation = '';
-        $incomeTaxPercent = $this->getTaxIncome($taxGroup, $taxType, $year); // FIX
+        $incomeTaxRate = $this->taxconfig->getTaxIncomeRate($taxType, $year);
         $incomeTaxAmount = 0;
 
         // Print debug information if debug is true
         if ($debug) {
-            echo "\ntaxtype: $taxGroup.$taxType.$year: income: $income, expence: $expence, incomeTaxPercent: $incomeTaxPercent\n";
+            echo "\n\n\n********** taxtype: $taxGroup.$taxType.$year: income: $income, expence: $expence, incomeTaxPercent: $incomeTaxRate\n";
         }
 
         // Calculate income tax amount based on tax type
         switch ($taxType) {
             // For 'salary' and 'pension' tax types, calculate salary tax
             case 'salary':
+                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax(true, $year, (int) $income);
+                break;
+
             case 'pension':
-                [$incomeTaxAmount, $incomeTaxPercent, $explanation] = $this->taxsalary->calculatesalarytax(false, $year, $income);
+                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax(true, $year, (int) $income);
                 break;
 
                 // For 'income' tax type, calculate income tax after transfer to this category
             case 'income':
-                $incomeTaxAmount = round($income - $expence) * $incomeTaxPercent;
+                $incomeTaxAmount = round(($income - $expence) * $incomeTaxRate);
                 break;
 
                 // For 'house', 'rental', 'property', 'stock', 'equityfund', 'ask', 'otp', 'ips' tax types, calculate income tax after deducting expenses
@@ -100,15 +139,15 @@ class TaxIncome extends Model
             case 'ask':
             case 'otp':
             case 'ips':
-                $incomeTaxAmount = round($income - $expence) * $incomeTaxPercent;
+                $incomeTaxAmount = round(($income - $expence) * $incomeTaxRate);
                 break;
 
                 // For 'cabin' tax type, calculate Airbnb tax after deducting standard deduction
             case 'cabin':
-                $standardDeduction = $this->getTaxStandardDeduction($taxGroup, 'airbnb', $year);
-                if ($income - $standardDeduction > 0) {
-                    $incomeTaxPercent = $this->getTaxIncome($taxGroup, 'airbnb', $year);
-                    $incomeTaxAmount = round(($income - $standardDeduction) * $incomeTaxPercent);
+                $standardDeduction = $this->taxconfig->getTaxStandardDeductionAmount('airbnb', $year);
+                if (($income - $standardDeduction) > 0) {
+                    $incomeTaxRate = $this->taxconfig->getTaxIncomeRate('airbnb', $year);
+                    $incomeTaxAmount = round(($income - $standardDeduction) * $incomeTaxRate);
                 }
                 break;
 
@@ -116,29 +155,29 @@ class TaxIncome extends Model
             case 'bank':
             case 'cash':
             case 'equitybond':
-                $incomeTaxAmount = round($interestAmount * $incomeTaxPercent);
+                $incomeTaxAmount = round(((float) $interestAmount) * $incomeTaxRate);
                 if ($incomeTaxAmount != 0) {
-                    $explanation = $incomeTaxPercent * 100 ."% tax on interest $interestAmount=$incomeTaxAmount";
+                    $explanation = ($incomeTaxRate * 100)."% tax on interest $interestAmount=$incomeTaxAmount";
                 }
                 break;
             case 'none':
                 $incomeTaxAmount = 0;
-                $incomeTaxPercent = 0;
+                $incomeTaxRate = 0;
                 $explanation = 'Tax type set to none, calculating without tax';
                 break;
                 // For other tax types, calculate income tax after deducting expenses
             default:
-                $incomeTaxAmount = ($income - $expence) * $incomeTaxPercent;
+                $incomeTaxAmount = ($income - $expence) * $incomeTaxRate;
                 $explanation = "No tax rule found for: $taxType";
                 break;
         }
 
         // Print debug information if debug is true
         if ($debug) {
-            echo "$taxType.$year: income: $income, incomeTaxAmount: $incomeTaxAmount, incomeTaxPercent: $incomeTaxPercent, explanation:$explanation\n";
+            echo "$taxType.$year: income: $income, incomeTaxAmount: $incomeTaxAmount, incomeTaxPercent: $incomeTaxRate, explanation:$explanation\n";
         }
 
         // Return the calculated income tax amount, income tax percent, and explanation
-        return [$incomeTaxAmount, $incomeTaxPercent, $explanation];
+        return [$incomeTaxAmount, $incomeTaxRate, $explanation];
     }
 }

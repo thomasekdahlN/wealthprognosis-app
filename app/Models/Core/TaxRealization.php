@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2024 Thomas Ekdahl
+/* Copyright (C) 2025 Thomas Ekdahl
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,8 @@
 
 namespace App\Models\Core;
 
-use App\Models\AssetType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 
 /**
  * Class TaxRealization
@@ -33,88 +30,45 @@ class TaxRealization extends Model
     use HasFactory;
 
     /**
-     * @var array Holds the tax configuration.
+     * Retrieve the realization tax rate for a given group, tax type and year.
+     *
+     * This is a lightweight helper used by tests and consumers that only need
+     * the percentage (as a decimal), not a full calculation. It leverages the
+     * shared TaxConfigRepository which performs in-request caching so repeated
+     * calls for the same (country, taxType, year) avoid extra DB queries.
      */
-    public $taxH = [];
+    public function getTaxRealization(string $taxGroup, string $taxType, int $year): float
+    {
+        // $taxGroup is currently not influencing the rate lookup, but is kept
+        // for signature compatibility and potential future logic.
+        return $this->taxconfig->getTaxRealizationRate($taxType, $year);
+    }
+
+    /**
+     * Country code for tax lookups (e.g., 'no').
+     */
+    private string $country = 'no';
+
+    /**
+     * Shared repository for loading tax configs.
+     */
+    private \App\Services\Tax\TaxConfigRepository $repo;
 
     /**
      * Constructor for the TaxRealization class.
      *
-     * Reads the tax configuration from a JSON file and stores it in the taxH property.
-     * Note: This will be rewritten to support yearly tax differences.
-     *
-     * @param  string  $config  The name of the tax configuration file (without the .json extension).
-     * @param  int  $startYear  The start year for the tax calculation (currently not used).
-     * @param  int  $stopYear  The stop year for the tax calculation (currently not used).
+     * @param  string  $config  Path-like identifier used to infer country code.
+     * @param  int  $startYear  Unused.
+     * @param  int  $stopYear  Unused.
      */
     public function __construct($config, $startYear, $stopYear)
     {
-        $file = config_path("tax/$config.json");
-        $configH = File::json($file);
+        // Infer country code from the first segment of the provided config path (e.g., 'no/no-tax-2025' -> 'no')
+        $first = explode('/', (string) $config)[0] ?? 'no';
+        $this->country = strtolower($first ?: 'no');
 
-        foreach ($configH as $type => $typeH) {
-            $this->taxH[$type] = $typeH;
-        }
-
-        $this->taxsalary = new \App\Models\Core\TaxSalary;
-    }
-
-    /**
-     * Check if an asset type has tax shield capability.
-     *
-     * @param  string  $assetType  The asset type to check.
-     * @return bool True if the asset type has tax shield capability, false otherwise.
-     */
-    public function hasTaxShield(string $assetType): bool
-    {
-        $assetTypeModel = AssetType::where('type', $assetType)->first();
-
-        return $assetTypeModel?->tax_shield ?? false;
-    }
-
-    /**
-     * Returns the tax realization percentage.
-     *
-     * @param  string  $taxGroup  The tax group (e.g., 'company').
-     * @param  string  $taxType  The type of tax.
-     * @param  int  $year  The year for which the tax is being calculated.
-     * @return float The tax realization percentage. For companies, a hardcoded tax of 22% is returned.
-     */
-    public function getTaxRealization($taxGroup, $taxType, $year)
-    {
-        if ($taxGroup == 'company') {
-            // A company does not pay realization tax
-            return 22 / 100; // FIX: Hardcoded tax of all company assets, 22%
-        }
-
-        return Arr::get($this->taxH, "$taxType.realization", 0) / 100;
-    }
-
-    /**
-     * Returns the tax shield realization percentage.
-     *
-     * @param  string  $taxGroup  The tax group (e.g., 'company').
-     * @param  string  $taxType  The type of tax.
-     * @param  int  $year  The year for which the tax is being calculated.
-     * @return float The tax shield realization percentage. If no tax shield is available for the asset type, 0 is returned.
-     */
-    public function getTaxShieldRealization($taxGroup, $taxType, $year)
-    {
-        $percent = 0;
-
-        // Note: Not all assets types has tax shield
-        if ($this->hasTaxShield($taxType)) {
-            // Note: All Tax shield percentage are changed by the government yearly.
-            $percent = Arr::get($this->taxH, "shareholdershield.$year", null);
-            if (! isset($percent)) {
-                // Fallback to our prognosis for the comming years if no percentage curve is given
-                $percent = Arr::get($this->taxH, 'shareholdershield.all', 23);
-            }
-            // print "   shareholdershield.$year: $percent%\n";
-            $percent = $percent / 100;
-        }
-
-        return $percent;
+        $this->taxsalary = new \App\Models\Core\TaxSalary($this->country);
+        $this->taxconfig = new \App\Services\Tax\TaxConfigRepository($this->country);
     }
 
     /**
@@ -141,7 +95,7 @@ class TaxRealization extends Model
         $explanation = '';
         $numberOfYears = $year - $acquisitionYear;
 
-        $realizationTaxPercent = $this->getTaxRealization($taxGroup, $taxType, $year);
+        $realizationTaxRate = $this->taxconfig->getTaxRealizationRate($taxType, $year);
         $realizationTaxShieldAmount = 0;
         $realizationTaxShieldPercent = 0;
 
@@ -150,7 +104,7 @@ class TaxRealization extends Model
         $realizationTaxAmount = 0;
 
         if ($debug && $amount != 0) {
-            echo "\n  taxCalculationRealizationStart $taxGroup.$taxType.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, realizationTaxPercent: $realizationTaxPercent\n";
+            echo "\n  taxCalculationRealizationStart $taxGroup.$taxType.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, $realizationTaxRate: $realizationTaxRate\n";
         }
 
         switch ($taxType) {
@@ -192,14 +146,14 @@ class TaxRealization extends Model
             case 'property':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxPercent;  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = $realizationTaxableAmount * $realizationTaxRate;  // verdien nå minus inngangsverdien skal skattes ved salg
                 }
                 break;
 
             case 'rental':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien skal skattes ved salg
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien skal skattes ved salg
                 }
                 break;
 
@@ -214,7 +168,7 @@ class TaxRealization extends Model
                 } else {
                     if ($amount - $acquisitionAmount > 0) {
                         $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                        $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien skal skattes ved salg?
+                        $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien skal skattes ved salg?
                     }
                 }
                 break;
@@ -222,53 +176,48 @@ class TaxRealization extends Model
             case 'bondfund':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'equityfund':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'ask':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'otp':
                 // OTP skattes som pensjonsinntekt når den realiseres
-                [$realizationTaxAmount, $realizationTaxPercent, $explanation] = $this->taxsalary->calculatesalarytax(false, $year, $amount);
+                [$realizationTaxAmount, $realizationTaxRate, $explanation] = $this->taxsalary->calculatesalarytax(false, $year, $amount);
                 break;
 
             case 'ips':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'crypto':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
                 break;
 
             case 'gold':
                 if ($amount - $acquisitionAmount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                 }
-                break;
-
-            case 'bank':
-                $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                $realizationTaxAmount = 0;  // Ingen skatt ved salg.
                 break;
 
             case 'cash':
@@ -284,7 +233,7 @@ class TaxRealization extends Model
             default:
                 if ($amount > 0) {
                     $realizationTaxableAmount = $amount - $acquisitionAmount;  // verdien nå minus inngangsverdien skal skattes ved salg
-                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxPercent);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
+                    $realizationTaxAmount = round($realizationTaxableAmount * $realizationTaxRate);  // verdien nå minus inngangsverdien....... Så må ta vare på inngangsverdien
                     break;
                 }
         }
@@ -293,7 +242,7 @@ class TaxRealization extends Model
         // TaxShield handling
         // Skjermingsfradrag FIX: Trekker fra skjermingsfradraget fra skatten, men usikker på om det burde vært regnet ut i en ny kolonne igjen..... Litt inkonsekvent.
         $realizationBeforeShieldTaxAmount = $realizationTaxAmount;
-        if ($this->hasTaxShield($taxType)) {
+        if ($this->taxconfig->hasTaxShield($taxType)) {
             [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $this->taxShield($year, $taxGroup, $taxType, $transfer, $amount, $realizationTaxAmount, $taxShieldPrevAmount);
         }
         // ###############################################################################################################
@@ -306,19 +255,35 @@ class TaxRealization extends Model
         }
 
         if ($debug) {
-            echo "  taxCalculationRealizationEnd $taxGroup.$taxType.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationBeforeShieldTaxAmount: $realizationBeforeShieldTaxAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxPercent: $realizationTaxPercent, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
+            echo "  taxCalculationRealizationEnd $taxGroup.$taxType.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationBeforeShieldTaxAmount: $realizationBeforeShieldTaxAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxRate: $realizationTaxRate, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
         }
 
         // V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
-        return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
+        return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxRate, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
     }
 
+    /**
+     * Calculate the tax shield (skjermingsfradrag) for an asset.
+     *
+     * Tax shield accumulates annually based on the asset value and shield rate,
+     * and is used to reduce realization tax when assets are transferred or sold.
+     * Only applies to private assets, not company assets.
+     *
+     * @param  int  $year  The tax year
+     * @param  string  $taxGroup  The tax group ('private' or 'company')
+     * @param  string  $taxType  The type of asset
+     * @param  bool  $transfer  Whether this is an actual transfer (uses shield) or simulation (accumulates shield)
+     * @param  float  $amount  The asset value
+     * @param  float  $realizationTaxAmount  The calculated realization tax before shield
+     * @param  float  $taxShieldPrevAmount  The accumulated tax shield from previous years
+     * @return array{0: float, 1: float, 2: float, 3: string} [realizationTaxAmount, realizationTaxShieldAmount, realizationTaxShieldPercent, explanation]
+     */
     public function taxShield(int $year, string $taxGroup, string $taxType, bool $transfer, float $amount, float $realizationTaxAmount, float $taxShieldPrevAmount)
     {
         $explanation = '';
         $realizationTaxShieldAmount = 0;
 
-        $realizationTaxShieldPercent = $this->getTaxShieldRealization($taxGroup, $taxType, $year);
+        $realizationTaxShieldPercent = $this->taxconfig->getTaxShieldRealizationRate($taxType, $year);
 
         // Skjermingsfradrag
         if ($realizationTaxShieldPercent > 0) {
