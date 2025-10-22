@@ -16,10 +16,10 @@ class TaxTypeManagementTest extends TestCase
     {
         $this->artisan('db:seed', ['--class' => 'TaxTypesFromConfigSeeder']);
 
-        // Count should be at least the distinct types in config, including property_* entries
+        // Count should include core types from config.
         $this->assertDatabaseHas('tax_types', ['type' => 'equityfund']);
         $this->assertDatabaseHas('tax_types', ['type' => 'salary']);
-        $this->assertDatabaseHas('tax_types', ['type' => 'property_holmestrand']);
+        // Property municipal taxes are not registered as tax_types; they live in TaxConfiguration entries.
     }
 
     public function test_tax_type_model_scopes_work_correctly()

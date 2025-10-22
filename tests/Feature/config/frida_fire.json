@@ -1,232 +1,230 @@
 {
+  "meta": {
+    "name": "FIRE-Frida",
+    "description": "FIRE enthusiast who achieved financial independence in 2023 through systematic investing and frugal living",
+    "birthYear": "1990",
+    "icon": "heroicon-o-fire",
+    "tags": [
+      "advanced"
+    ],
+    "color": "#f97316",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "33",
+    "deathAge": "85"
+  },
+  "salary": {
     "meta": {
-        "name": "FIRE-Frida",
-        "description": "FIRE enthusiast who achieved financial independence in 2023 through systematic investing and frugal living",
-        "birthYear": "1990",
-        "icon": "heroicon-o-fire",
-        "tags": ["advanced"],
-        "color": "#f97316",
-        "prognoseAge": "50",
-        "pensionOfficialAge": "67",
-        "pensionWishAge": "33",
-        "deathAge": "85"
+      "type": "income",
+      "group": "private",
+      "name": "Software Engineer Salary",
+      "description": "High-income tech career enabling aggressive savings rate for FIRE strategy",
+      "active": true
     },
-    "salary": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Software Engineer Salary",
-            "description": "High-income tech career enabling aggressive savings rate for FIRE strategy",
-            "active": true
+    "years": {
+      "2019": {
+        "income": {
+          "name": "Annual Salary",
+          "description": "Software engineer salary with annual progression",
+          "amount": 65000,
+          "factor": "monthly",
+          "changerate": "changerates.kpi",
+          "repeat": true
         },
-        "years": {
-            "2019": {
-                "income": {
-                    "name": "Annual Salary",
-                    "description": "Software engineer salary with annual progression",
-                    "amount": 65000,
-                    "factor": "monthly",
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                },
-                "expence": {
-                    "name": "Living Expenses",
-                    "description": "Frugal living expenses - rent, food, transportation, minimal lifestyle",
-                    "amount": 25000,
-                    "factor": "monthly",
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
-            },
-            "2025": {
-                "income": {
-                    "name": "FIRE Achieved - Optional Work",
-                    "description": "Financial independence reached - work becomes optional",
-                    "amount": 0,
-                    "changerate": "changerates.zero",
-                    "repeat": false
-                },
-                "expence": {
-                    "name": "FIRE Lifestyle Expenses",
-                    "description": "Sustainable living expenses covered by investment returns",
-                    "amount": 30000,
-                    "factor": "monthly",
-                    "changerate": "changerates.kpi",
-                    "repeat": true
-                }
-            }
+        "expence": {
+          "name": "Living Expenses",
+          "description": "Frugal living expenses - rent, food, transportation, minimal lifestyle",
+          "amount": 25000,
+          "factor": "monthly",
+          "changerate": "changerates.kpi",
+          "repeat": true
         }
-    },
-    "global_equity_fund": {
-        "meta": {
-            "type": "equityfund",
-            "group": "private",
-            "name": "Global Equity Index Fund",
-            "description": "Core FIRE portfolio - low-cost global equity index fund with systematic monthly investments",
-            "active": true,
-
+      },
+      "2025": {
+        "income": {
+          "name": "FIRE Achieved - Optional Work",
+          "description": "Financial independence reached - work becomes optional",
+          "amount": 0,
+          "changerate": "changerates.zero",
+          "repeat": false
         },
-        "years": {
-            "2019": {
-                "asset": {
-                    "marketAmount": 50000,
-                    "rule": "+40000",
-                    "changerate": "changerates.equityfund",
-                    "description": "Initial investment plus aggressive monthly contributions (80% of income saved)",
-                    "repeat": true
-                }
-            },
-            "2020": {
-                "asset": {
-                    "rule": "+45000",
-                    "changerate": "changerates.equityfund",
-                    "description": "Increased contributions due to salary growth and maintained frugal lifestyle",
-                    "repeat": true
-                }
-            },
-            "2021": {
-                "asset": {
-                    "rule": "+50000",
-                    "changerate": "changerates.equityfund",
-                    "description": "Peak contribution year - maximizing investment during market volatility",
-                    "repeat": true
-                }
-            },
-            "2022": {
-                "asset": {
-                    "rule": "+55000",
-                    "changerate": "changerates.equityfund",
-                    "description": "Final accumulation year before reaching FIRE target",
-                    "repeat": true
-                }
-            },
-            "2023": {
-                "asset": {
-                    "transfer": "salary.$year.income.amount",
-                    "rule": "4|100",
-                    "changerate": "changerates.equityfund",
-                    "description": "FIRE withdrawal strategy - 4% rule for sustainable retirement income",
-                    "repeat": true
-                }
-            }
+        "expence": {
+          "name": "FIRE Lifestyle Expenses",
+          "description": "Sustainable living expenses covered by investment returns",
+          "amount": 30000,
+          "factor": "monthly",
+          "changerate": "changerates.kpi",
+          "repeat": true
         }
-    },
-    "emergency_fund": {
-        "meta": {
-            "type": "cash",
-            "group": "private",
-            "name": "Emergency Fund",
-            "description": "High-yield savings account maintaining 6 months of expenses for financial security",
-            "active": true,
-
-        },
-        "years": {
-            "2019": {
-                "asset": {
-                    "marketAmount": 15000,
-                    "rule": "+5000",
-                    "changerate": "changerates.cash",
-                    "description": "Building emergency fund to 6 months of expenses",
-                    "repeat": true
-                }
-            },
-            "2020": {
-                "asset": {
-                    "rule": "+2000",
-                    "changerate": "changerates.cash",
-                    "description": "Maintaining emergency fund at target level",
-                    "repeat": true
-                }
-            },
-            "2021": {
-                "asset": {
-                    "changerate": "changerates.cash",
-                    "description": "Emergency fund maintained at optimal level for FIRE strategy",
-                    "repeat": true
-                }
-            }
-        }
-    },
-    "reit_fund": {
-        "meta": {
-            "type": "equityfund",
-            "group": "private",
-            "name": "Real Estate Investment Trust Fund",
-            "description": "REIT fund for portfolio diversification and passive income generation",
-            "active": true,
-
-        },
-        "years": {
-            "2020": {
-                "asset": {
-                    "marketAmount": 25000,
-                    "rule": "+15000",
-                    "changerate": "changerates.equityfund",
-                    "description": "Adding real estate exposure for diversification",
-                    "repeat": true
-                }
-            },
-            "2021": {
-                "asset": {
-                    "rule": "+18000",
-                    "changerate": "changerates.equityfund",
-                    "description": "Increasing REIT allocation for income diversification",
-                    "repeat": true
-                }
-            },
-            "2022": {
-                "asset": {
-                    "rule": "+20000",
-                    "changerate": "changerates.equityfund",
-                    "description": "Final REIT contributions before FIRE transition",
-                    "repeat": true
-                }
-            },
-            "2023": {
-                "assetX": {
-                    "transfer": "salary.$year.income.amount",
-                    "rule": "4|100",
-                    "description": "REIT income contributing to FIRE withdrawal strategy",
-                    "repeat": true
-                }
-            }
-        }
-    },
-    "bond_fund": {
-        "meta": {
-            "type": "equityfund",
-            "group": "private",
-            "name": "Government Bond Index Fund",
-            "description": "Conservative bond allocation for portfolio stability and risk management",
-            "active": true,
-
-        },
-        "years": {
-            "2021": {
-                "asset": {
-                    "marketAmount": 20000,
-                    "rule": "+10000",
-                    "changerate": "changerates.bond",
-                    "description": "Adding bond allocation as portfolio approaches FIRE target",
-                    "repeat": true
-                }
-            },
-            "2022": {
-                "asset": {
-                    "rule": "+12000",
-                    "changerate": "changerates.bond",
-                    "description": "Increasing bond allocation for stability before retirement",
-                    "repeat": true
-                }
-            },
-            "2023": {
-                "assetX": {
-                    "transfer": "salary.$year.income.amount",
-                    "rule": "4|100",
-                    "description": "Bond income providing stability in FIRE withdrawal strategy",
-                    "repeat": true
-                }
-            }
-        }
+      }
     }
+  },
+  "global_equity_fund": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "Global Equity Index Fund",
+      "description": "Core FIRE portfolio - low-cost global equity index fund with systematic monthly investments",
+      "active": true
+    },
+    "years": {
+      "2019": {
+        "asset": {
+          "marketAmount": 50000,
+          "rule": "+40000",
+          "changerate": "changerates.equityfund",
+          "description": "Initial investment plus aggressive monthly contributions (80% of income saved)",
+          "repeat": true
+        }
+      },
+      "2020": {
+        "asset": {
+          "rule": "+45000",
+          "changerate": "changerates.equityfund",
+          "description": "Increased contributions due to salary growth and maintained frugal lifestyle",
+          "repeat": true
+        }
+      },
+      "2021": {
+        "asset": {
+          "rule": "+50000",
+          "changerate": "changerates.equityfund",
+          "description": "Peak contribution year - maximizing investment during market volatility",
+          "repeat": true
+        }
+      },
+      "2022": {
+        "asset": {
+          "rule": "+55000",
+          "changerate": "changerates.equityfund",
+          "description": "Final accumulation year before reaching FIRE target",
+          "repeat": true
+        }
+      },
+      "2023": {
+        "asset": {
+          "transfer": "salary.$year.income.amount",
+          "rule": "4|100",
+          "changerate": "changerates.equityfund",
+          "description": "FIRE withdrawal strategy - 4% rule for sustainable retirement income",
+          "repeat": true
+        }
+      }
+    }
+  },
+  "emergency_fund": {
+    "meta": {
+      "type": "cash",
+      "group": "private",
+      "name": "Emergency Fund",
+      "description": "High-yield savings account maintaining 6 months of expenses for financial security",
+      "active": true
+    },
+    "years": {
+      "2019": {
+        "asset": {
+          "marketAmount": 15000,
+          "rule": "+5000",
+          "changerate": "changerates.cash",
+          "description": "Building emergency fund to 6 months of expenses",
+          "repeat": true
+        }
+      },
+      "2020": {
+        "asset": {
+          "rule": "+2000",
+          "changerate": "changerates.cash",
+          "description": "Maintaining emergency fund at target level",
+          "repeat": true
+        }
+      },
+      "2021": {
+        "asset": {
+          "changerate": "changerates.cash",
+          "description": "Emergency fund maintained at optimal level for FIRE strategy",
+          "repeat": true
+        }
+      }
+    }
+  },
+  "reit_fund": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "Real Estate Investment Trust Fund",
+      "description": "REIT fund for portfolio diversification and passive income generation",
+      "active": true
+    },
+    "years": {
+      "2020": {
+        "asset": {
+          "marketAmount": 25000,
+          "rule": "+15000",
+          "changerate": "changerates.equityfund",
+          "description": "Adding real estate exposure for diversification",
+          "repeat": true
+        }
+      },
+      "2021": {
+        "asset": {
+          "rule": "+18000",
+          "changerate": "changerates.equityfund",
+          "description": "Increasing REIT allocation for income diversification",
+          "repeat": true
+        }
+      },
+      "2022": {
+        "asset": {
+          "rule": "+20000",
+          "changerate": "changerates.equityfund",
+          "description": "Final REIT contributions before FIRE transition",
+          "repeat": true
+        }
+      },
+      "2023": {
+        "assetX": {
+          "transfer": "salary.$year.income.amount",
+          "rule": "4|100",
+          "description": "REIT income contributing to FIRE withdrawal strategy",
+          "repeat": true
+        }
+      }
+    }
+  },
+  "bond_fund": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "Government Bond Index Fund",
+      "description": "Conservative bond allocation for portfolio stability and risk management",
+      "active": true
+    },
+    "years": {
+      "2021": {
+        "asset": {
+          "marketAmount": 20000,
+          "rule": "+10000",
+          "changerate": "changerates.bond",
+          "description": "Adding bond allocation as portfolio approaches FIRE target",
+          "repeat": true
+        }
+      },
+      "2022": {
+        "asset": {
+          "rule": "+12000",
+          "changerate": "changerates.bond",
+          "description": "Increasing bond allocation for stability before retirement",
+          "repeat": true
+        }
+      },
+      "2023": {
+        "assetX": {
+          "transfer": "salary.$year.income.amount",
+          "rule": "4|100",
+          "description": "Bond income providing stability in FIRE withdrawal strategy",
+          "repeat": true
+        }
+      }
+    }
+  }
 }

@@ -1,56 +1,58 @@
 {
+  "meta": {
+    "name": "Heidi Hytteeier",
+    "description": "Comprehensive cabin investment analysis with rental income and mortgage optimization",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-home-modern",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "cabin": {
     "meta": {
-        "name": "Heidi Hytteeier",
-        "description": "Comprehensive cabin investment analysis with rental income and mortgage optimization",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-home-modern",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "cabin",
+      "group": "private",
+      "name": "Lillehammer Mountain Cabin",
+      "description": "Premium mountain cabin with rental potential in Lillehammer ski resort area",
+      "active": true
     },
-    "cabin": {
-        "meta": {
-            "type": "cabin",
-            "group": "private",
-            "name": "Lillehammer Mountain Cabin",
-            "description": "Premium mountain cabin with rental potential in Lillehammer ski resort area",
-            "active": true
-        },
-        "2023": {
-            "description": "Income: Rental AirBNB | Expense: Expences | Asset: Fortune sets the value from the tax authorities | Mortgage: interest changerates.interest, years 20",
-            "asset": {
-                "marketAmount": 10000000,
-                "acquisitionAmount": 6000000,
-                "paiddAmount": 300000,
-                "taxableAmount": 200000,
-                "changerate": "changerates.cabin",
-                "description": "Fortune sets the value from the tax authorities, which is different from marketprice",
-                "repeat": true
-            },
-            "income": {
-                "name": "rental",
-                "description": "Rental AirBNB",
-                "amount": 0,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Expences",
-                "description": "Expences",
-                "amount": 2000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 5000000,
-                "interest": "changerates.interest",
-                "years": 20
-            }
-        }
+    "2023": {
+      "description": "Income: Rental AirBNB | Expense: Expences | Asset: Fortune sets the value from the tax authorities | Mortgage: interest changerates.interest, years 20",
+      "asset": {
+        "marketAmount": 10000000,
+        "acquisitionAmount": 6000000,
+        "paiddAmount": 300000,
+        "taxableAmount": 200000,
+        "changerate": "changerates.cabin",
+        "description": "Fortune sets the value from the tax authorities, which is different from marketprice",
+        "repeat": true
+      },
+      "income": {
+        "name": "rental",
+        "description": "Rental AirBNB",
+        "amount": 0,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Expences",
+        "description": "Expences",
+        "amount": 2000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 5000000,
+        "interest": "changerates.interest",
+        "years": 20
+      }
     }
+  }
 }

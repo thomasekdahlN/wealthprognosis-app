@@ -85,7 +85,7 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
         $taxType = TaxType::first();
         $category = AssetCategory::first();
 
-        // Create asset type with all relationships
+        // Create asset type with all relationships (using tax_type string field)
         $assetType = AssetType::factory()->create([
             'user_id' => $user->id,
             'team_id' => $team->id,
@@ -96,7 +96,7 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
             'color' => 'success',
             'is_active' => true,
             'is_liquid' => true,
-            'tax_type_id' => $taxType?->id,
+            'tax_type' => $taxType?->type,
             'asset_category_id' => $category?->id,
         ]);
 
@@ -176,7 +176,7 @@ class ConsolidatedAssetTypeMigrationTest extends TestCase
         $expectedColumns = [
             'id', 'user_id', 'team_id', 'type', 'name', 'description', 'category', 'icon', 'color',
             'is_active', 'is_private', 'is_company', 'is_tax_optimized', 'is_liquid',
-            'sort_order', 'asset_category_id', 'tax_type_id', 'created_by', 'updated_by',
+            'sort_order', 'asset_category_id', 'tax_type', 'created_by', 'updated_by',
             'created_checksum', 'updated_checksum', 'created_at', 'updated_at',
         ];
 

@@ -1,64 +1,66 @@
 {
+  "meta": {
+    "name": "Berit Barnetrygd",
+    "description": "Complete family financial planning including child benefits, education costs, and long-term family expenses",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-users",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "child": {
     "meta": {
-        "name": "Berit Barnetrygd",
-        "description": "Complete family financial planning including child benefits, education costs, and long-term family expenses",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-users",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "child",
+      "group": "private",
+      "name": "Emma - First Child (Born 2020)",
+      "description": "Financial planning for first child including benefits, education, and living expenses",
+      "active": true
     },
-    "child": {
-        "meta": {
-            "type": "child",
-            "group": "private",
-            "name": "Emma - First Child (Born 2020)",
-            "description": "Financial planning for first child including benefits, education, and living expenses",
-            "active": true
-        },
-        "2020": {
-            "description": "Income: Barnetrygd | Expense: Utgifter | Asset:  | Mortgage: ",
-            "income": {
-                "name": "barnetrygd",
-                "description": "Barnetrygd",
-                "amount": 1766,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Utgifter",
-                "amount": 2000,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
-        "2026": {
-            "description": "Income: Barnetrygd redusert etter 6 år",
-            "income": {
-                "name": "barnetrygd",
-                "description": "Barnetrygd redusert etter 6 år",
-                "amount": 1310,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
-        "2038": {
-            "description": "Income: Barnetrygd stopper ved 18 år",
-            "income": {
-                "name": "barnetrygd",
-                "description": "Barnetrygd stopper ved 18 år",
-                "amount": 0,
-                "factor": 12,
-                "changerate": "changerates.zero",
-                "repeat": false
-            }
-        }
+    "2020": {
+      "description": "Income: Barnetrygd | Expense: Utgifter | Asset:  | Mortgage: ",
+      "income": {
+        "name": "barnetrygd",
+        "description": "Barnetrygd",
+        "amount": 1766,
+        "factor": 12,
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Utgifter",
+        "amount": 2000,
+        "factor": 12,
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    },
+    "2026": {
+      "description": "Income: Barnetrygd redusert etter 6 år",
+      "income": {
+        "name": "barnetrygd",
+        "description": "Barnetrygd redusert etter 6 år",
+        "amount": 1310,
+        "factor": 12,
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    },
+    "2038": {
+      "description": "Income: Barnetrygd stopper ved 18 år",
+      "income": {
+        "name": "barnetrygd",
+        "description": "Barnetrygd stopper ved 18 år",
+        "amount": 0,
+        "factor": 12,
+        "changerate": "changerates.zero",
+        "repeat": false
+      }
     }
+  }
 }

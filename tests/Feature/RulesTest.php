@@ -73,4 +73,3 @@ class RulesTest extends TestCase
         $this->assertEquals(0, $calcAmount);
     }
 }
-

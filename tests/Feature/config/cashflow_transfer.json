@@ -1,67 +1,67 @@
 {
+  "meta": {
+    "name": "Per Pengeflyt",
+    "description": "Advanced cashflow transfer strategies and financial optimization techniques",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-arrows-right-left",
+    "color": "#f97316",
+    "tags": [
+      "advanced"
+    ]
+  },
+  "salary": {
     "meta": {
-        "name": "Per Pengeflyt",
-        "description": "Advanced cashflow transfer strategies and financial optimization techniques",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-arrows-right-left",
-        "color": "#f97316",
-        "tags": ["advanced"]
+      "type": "income",
+      "group": "private",
+      "name": "Salary",
+      "description": "Salary",
+      "active": true
     },
-    "salary": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Salary",
-            "description": "Salary",
-            "active": true,
-
-        },
-        "2022": {
-            "income": {
-                "name": "Income",
-                "description": "Income",
-                "amount": 40000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "cashflow": {
-                "name": "The calculated cashflow",
-                "rule": "100%",
-                "transfer": "fond.$year.asset.marketAmount",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "income": {
-                "name": "Salary",
-                "description": "Pensioned, no more salary from here",
-                "amount": "0",
-                "changerate": "changerates.zero",
-                "repeat": false
-            }
-        }
+    "2022": {
+      "income": {
+        "name": "Income",
+        "description": "Income",
+        "amount": 40000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "cashflow": {
+        "name": "The calculated cashflow",
+        "rule": "100%",
+        "transfer": "fond.$year.asset.marketAmount",
+        "repeat": true
+      }
     },
-    "fond": {
-        "meta" : {
-            "type": "equityfund",
-            "group": "private",
-            "name": "fond",
-            "description": "",
-            "active": true,
-
-        },
-        "2021": {
-            "asset": {
-                "marketAmount": 10000,
-                "changerate": "changerates.equityfund",
-                "description": "",
-                "repeat": true
-            }
-        }
+    "$pensionWishAge": {
+      "income": {
+        "name": "Salary",
+        "description": "Pensioned, no more salary from here",
+        "amount": "0",
+        "changerate": "changerates.zero",
+        "repeat": false
+      }
     }
+  },
+  "fond": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "fond",
+      "description": "",
+      "active": true
+    },
+    "2021": {
+      "asset": {
+        "marketAmount": 10000,
+        "changerate": "changerates.equityfund",
+        "description": "",
+        "repeat": true
+      }
+    }
+  }
 }

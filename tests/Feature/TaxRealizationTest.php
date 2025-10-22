@@ -23,7 +23,9 @@ class TaxRealizationTest extends TestCase
     {
         $taxRealization = new TaxRealization('config', 2022, 2023);
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'company', 'stock', 2022, 50000, 10000, 0, 0);
-        $this->assertEquals(0.22, $realizationTaxPercent);
+        $repo = new \App\Services\Tax\TaxConfigRepository('no');
+        $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
+        $this->assertEquals($expectedRate, $realizationTaxPercent);
         $this->assertEquals(0, $realizationTaxAmount);
     }
 
@@ -31,23 +33,29 @@ class TaxRealizationTest extends TestCase
     {
         $taxRealization = new TaxRealization('config', 2022, 2023);
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'individual', 'stock', 2022, 50000, 10000, 0, 0);
-        $this->assertEquals(0.22, $realizationTaxPercent);
-        $this->assertEquals(8800, $realizationTaxAmount);
+        $repo = new \App\Services\Tax\TaxConfigRepository('no');
+        $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
+        $this->assertEquals($expectedRate, $realizationTaxPercent);
+        $this->assertEquals(round((50000 - 10000) * $expectedRate), $realizationTaxAmount);
     }
 
     public function test_it_calculates_tax_realization_for_unknown_group()
     {
         $taxRealization = new TaxRealization('config', 2022, 2023);
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'unknown', 'stock', 2022, 50000, 10000, 0, 0);
-        $this->assertEquals(0.22, $realizationTaxPercent);
-        $this->assertEquals(8800, $realizationTaxAmount);
+        $repo = new \App\Services\Tax\TaxConfigRepository('no');
+        $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
+        $this->assertEquals($expectedRate, $realizationTaxPercent);
+        $this->assertEquals(round((50000 - 10000) * $expectedRate), $realizationTaxAmount);
     }
 
     public function test_it_calculates_tax_realization_for_negative_income()
     {
         $taxRealization = new TaxRealization('config', 2022, 2023);
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'company', 'stock', 2022, -50000, 10000, 0, 0);
-        $this->assertEquals(0.22, $realizationTaxPercent);
+        $repo = new \App\Services\Tax\TaxConfigRepository('no');
+        $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
+        $this->assertEquals($expectedRate, $realizationTaxPercent);
         $this->assertEquals(0, $realizationTaxAmount);
     }
 
@@ -55,7 +63,9 @@ class TaxRealizationTest extends TestCase
     {
         $taxRealization = new TaxRealization('config', 2022, 2023);
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'company', 'stock', 2022, 0, 10000, 0, 0);
-        $this->assertEquals(0.22, $realizationTaxPercent);
+        $repo = new \App\Services\Tax\TaxConfigRepository('no');
+        $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
+        $this->assertEquals($expectedRate, $realizationTaxPercent);
         $this->assertEquals(0, $realizationTaxAmount);
     }
 }

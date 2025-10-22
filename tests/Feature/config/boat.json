@@ -1,40 +1,42 @@
 {
+  "meta": {
+    "name": "Kaptein Knut",
+    "description": "Norwegian coastal lifestyle with recreational boating and potential charter income opportunities",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-map",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "boat": {
     "meta": {
-        "name": "Kaptein Knut",
-        "description": "Norwegian coastal lifestyle with recreational boating and potential charter income opportunities",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-map",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "boat",
+      "group": "private",
+      "name": "Jeanneau Sun Odyssey 349 - Sailing Yacht",
+      "description": "35-foot sailing yacht for coastal cruising and potential charter opportunities",
+      "active": true
     },
-    "boat": {
-        "meta": {
-            "type": "boat",
-            "group": "private",
-            "name": "Jeanneau Sun Odyssey 349 - Sailing Yacht",
-            "description": "35-foot sailing yacht for coastal cruising and potential charter opportunities",
-            "active": true
-        },
-        "2023": {
-            "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
-            "asset": {
-                "marketAmount": 200000,
-                "changerate": "changerates.boat",
-                "description": "verditap",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
-                "amount": 2000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
+    "2023": {
+      "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
+      "asset": {
+        "marketAmount": 200000,
+        "changerate": "changerates.boat",
+        "description": "verditap",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
+        "amount": 2000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
     }
+  }
 }

@@ -1,41 +1,42 @@
 {
+  "meta": {
+    "name": "Bjørn Bil",
+    "description": "Strategic transition from traditional to electric vehicles with cost analysis and environmental benefits",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-bolt",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "car": {
     "meta": {
-        "name": "Bjørn Bil",
-        "description": "Strategic transition from traditional to electric vehicles with cost analysis and environmental benefits",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-bolt",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "car",
+      "group": "private",
+      "name": "Tesla Model Y - Electric Vehicle",
+      "description": "Premium electric SUV with lower operating costs and environmental benefits",
+      "active": true
     },
-    "car": {
-        "meta": {
-            "type": "car",
-            "group": "private",
-            "name": "Tesla Model Y - Electric Vehicle",
-            "description": "Premium electric SUV with lower operating costs and environmental benefits",
-            "active": true,
-
-        },
-        "2023": {
-            "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
-            "asset": {
-                "marketAmount": 200000,
-                "changerate": "changerates.car",
-                "description": "verditap",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
-                "amount": 2000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
+    "2023": {
+      "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
+      "asset": {
+        "marketAmount": 200000,
+        "changerate": "changerates.car",
+        "description": "verditap",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
+        "amount": 2000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
     }
+  }
 }

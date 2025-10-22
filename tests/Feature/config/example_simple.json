@@ -1,226 +1,226 @@
 {
+  "meta": {
+    "name": "Even Enklel",
+    "description": "Comprehensive financial independence portfolio with diversified investments and strategic planning",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-fire",
+    "color": "#f97316",
+    "tags": [
+      "advanced"
+    ]
+  },
+  "income": {
     "meta": {
-        "name": "Even Enklel",
-        "description": "Comprehensive financial independence portfolio with diversified investments and strategic planning",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-fire",
-        "color": "#f97316",
-        "tags": ["advanced"]
+      "type": "income",
+      "group": "private",
+      "name": "Senior Software Engineer Salary",
+      "description": "Full-time software engineering position with annual increases",
+      "active": true
     },
-    "income": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Senior Software Engineer Salary",
-            "description": "Full-time software engineering position with annual increases",
-            "active": true
-
-        },
-        "2025": {
-            "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
-            "income": {
-                "name": "Income",
-                "description": "Income",
-                "amount": 40000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Expences",
-                "description": "",
-                "amount": 15000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "description": "Income: Pensioned, no more salary from here | Expense:  | Asset:  | Mortgage: ",
-            "income": {
-                "name": "Pension",
-                "description": "Pensioned, no more salary from here",
-                "amount": 0,
-                "changerate": "changerates.zero",
-                "repeat": false
-            }
-        }
+    "2025": {
+      "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
+      "income": {
+        "name": "Income",
+        "description": "Income",
+        "amount": 40000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Expences",
+        "description": "",
+        "amount": 15000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
     },
-    "inheritance": {
-        "meta": {
-            "type": "inheritance",
-            "group": "private",
-            "name": "Family Inheritance",
-            "description": "Expected inheritance from parents' estate",
-            "active": true
-        },
-        "2040": {
-            "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
-            "asset": {
-                "name": "inheritance",
-                "description": "",
-                "marketAmount": 2500000,
-                "acquisitionAmount": 10000,
-                "paidAmount": 10000,
-                "changerate": "changerates.kpi",
-                "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
-                "rule": "100%",
-                "transfer": "fond.$year.asset.marketAmount",
-                "transferX": "house.$year.mortgage.extraDownpaymentAmount",
-                "repeat": false
-            }
-        }
-    },
-    "pension": {
-        "meta": {
-            "type": "pension",
-            "group": "private",
-            "name": "Norwegian State Pension (Folketrygd)",
-            "description": "Government pension starting at official retirement age",
-            "active": true
-        },
-        "$pensionOfficialYear": {
-            "description": "Income: Pension from $pensionOfficialYear",
-            "income": {
-                "name": "Pension",
-                "description": "Pension from $pensionOfficialYear",
-                "amount": 15000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "otp": {
-        "meta": {
-            "type": "otp",
-            "group": "private",
-            "name": "Occupational Pension (OTP)",
-            "description": "Employer-sponsored pension with 5% annual contributions",
-            "active": true
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 2000000,
-                "rule": "5%",
-                "source": "income.$year.income.amount",
-                "changerate": "changerates.otp",
-                "description": "OTP Sparing frem til pensjonsår",
-                "repeat": true
-            }
-        },
-        "$otpStartYear": {
-            "asset": {
-                "rule": "1|$otpYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.otp",
-                "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
-                "repeat": true
-            }
-        }
-    },
-    "house": {
-        "meta": {
-            "type": "house",
-            "group": "private",
-            "name": "Oslo Apartment - Primary Residence",
-            "description": "Modern 3-bedroom apartment in central Oslo with mortgage",
-            "active": true
-        },
-        "2025": {
-            "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-            "asset": {
-                "marketAmount": "3000000",
-                "changerate": "changerates.house",
-                "description": "",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                "amount": 7300,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1000000,
-                "interest": "changerates.interest",
-                "years": 20
-            }
-        }
-    },
-    "fond": {
-        "meta": {
-            "type": "equityfund",
-            "group": "private",
-            "name": "Global Equity Fund Portfolio",
-            "description": "Diversified equity fund investments for long-term growth",
-            "active": true
-        },
-        "2025": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
-            "asset": {
-                "marketAmount": 10000,
-                "changerate": "changerates.equityfund",
-                "description": "",
-                "repeat": true
-            }
-        }
-    },
-    "cash": {
-        "meta": {
-            "type": "cash",
-            "group": "private",
-            "name": "Emergency Fund & Cash Reserves",
-            "description": "High-yield savings account for emergencies and opportunities",
-            "active": true
-        },
-        "2025": {
-            "description": "Income:  | Expense:  | Asset: Kontanter p.t. | Mortgage: ",
-            "asset": {
-                "marketAmount": 100000,
-                "changerate": "changerates.cash",
-                "description": "Kontanter p.t.",
-                "repeat": true
-            },
-            "$pensionWishYear": {
-                "rule": "1|$pensionWishYear",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.cash",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen",
-                "repeat": true
-            }
-        }
-    },
-    "car": {
-        "meta": {
-            "type": "car",
-            "group": "private",
-            "name": "Tesla Model Y - Electric Vehicle",
-            "description": "Electric vehicle with lower operating costs and depreciation",
-            "active": true
-        },
-        "2025": {
-            "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
-            "asset": {
-                "marketAmount": 200000,
-                "changerate": "changerates.car",
-                "description": "verditap",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
-                "amount": 2000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
+    "$pensionWishAge": {
+      "description": "Income: Pensioned, no more salary from here | Expense:  | Asset:  | Mortgage: ",
+      "income": {
+        "name": "Pension",
+        "description": "Pensioned, no more salary from here",
+        "amount": 0,
+        "changerate": "changerates.zero",
+        "repeat": false
+      }
     }
+  },
+  "inheritance": {
+    "meta": {
+      "type": "inheritance",
+      "group": "private",
+      "name": "Family Inheritance",
+      "description": "Expected inheritance from parents' estate",
+      "active": true
+    },
+    "2040": {
+      "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
+      "asset": {
+        "name": "inheritance",
+        "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
+        "marketAmount": 2500000,
+        "acquisitionAmount": 10000,
+        "paidAmount": 10000,
+        "changerate": "changerates.kpi",
+        "rule": "100%",
+        "transfer": "fond.$year.asset.marketAmount",
+        "transferX": "house.$year.mortgage.extraDownpaymentAmount",
+        "repeat": false
+      }
+    }
+  },
+  "pension": {
+    "meta": {
+      "type": "pension",
+      "group": "private",
+      "name": "Norwegian State Pension (Folketrygd)",
+      "description": "Government pension starting at official retirement age",
+      "active": true
+    },
+    "$pensionOfficialAge": {
+      "description": "Income: Pension from $pensionOfficialAge",
+      "income": {
+        "name": "Pension",
+        "description": "Pension from $pensionOfficialAge",
+        "amount": 15000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "otp": {
+    "meta": {
+      "type": "otp",
+      "group": "private",
+      "name": "Occupational Pension (OTP)",
+      "description": "Employer-sponsored pension with 5% annual contributions",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 2000000,
+        "rule": "5%",
+        "source": "income.$year.income.amount",
+        "changerate": "changerates.otp",
+        "description": "OTP Sparing frem til pensjonsår",
+        "repeat": true
+      }
+    },
+    "$otpStartYear": {
+      "asset": {
+        "rule": "1|$otpYears",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.otp",
+        "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
+        "repeat": true
+      }
+    }
+  },
+  "house": {
+    "meta": {
+      "type": "house",
+      "group": "private",
+      "name": "Oslo Apartment - Primary Residence",
+      "description": "Modern 3-bedroom apartment in central Oslo with mortgage",
+      "active": true
+    },
+    "2025": {
+      "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+      "asset": {
+        "marketAmount": "3000000",
+        "changerate": "changerates.house",
+        "description": "",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+        "amount": 7300,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1000000,
+        "interest": "changerates.interest",
+        "years": 20
+      }
+    }
+  },
+  "fond": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "Global Equity Fund Portfolio",
+      "description": "Diversified equity fund investments for long-term growth",
+      "active": true
+    },
+    "2025": {
+      "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
+      "asset": {
+        "marketAmount": 10000,
+        "changerate": "changerates.equityfund",
+        "description": "",
+        "repeat": true
+      }
+    }
+  },
+  "cash": {
+    "meta": {
+      "type": "cash",
+      "group": "private",
+      "name": "Emergency Fund & Cash Reserves",
+      "description": "High-yield savings account for emergencies and opportunities",
+      "active": true
+    },
+    "2025": {
+      "description": "Income:  | Expense:  | Asset: Kontanter p.t. | Mortgage: ",
+      "asset": {
+        "marketAmount": 100000,
+        "changerate": "changerates.cash",
+        "description": "Kontanter p.t.",
+        "repeat": true
+      },
+      "$pensionWishAge": {
+        "rule": "1|$pensionWishAge",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.cash",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAge av formuen",
+        "repeat": true
+      }
+    }
+  },
+  "car": {
+    "meta": {
+      "type": "car",
+      "group": "private",
+      "name": "Tesla Model Y - Electric Vehicle",
+      "description": "Electric vehicle with lower operating costs and depreciation",
+      "active": true
+    },
+    "2025": {
+      "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
+      "asset": {
+        "marketAmount": 200000,
+        "changerate": "changerates.car",
+        "description": "verditap",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
+        "amount": 2000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  }
 }

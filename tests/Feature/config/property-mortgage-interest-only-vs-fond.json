@@ -1,74 +1,74 @@
 {
+  "meta": {
+    "name": "Avdragsfri-Astrid - Rentefri-Strategien fra Askim",
+    "description": "Interest-only mortgage strategy comparison with fund investment alternatives",
+    "birthYear": "1995",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "70",
+    "icon": "heroicon-o-calculator",
+    "color": "#f97316",
+    "tags": [
+      "advanced"
+    ]
+  },
+  "house": {
     "meta": {
-        "name": "Avdragsfri-Astrid - Rentefri-Strategien fra Askim",
-        "description": "Interest-only mortgage strategy comparison with fund investment alternatives",
-        "birthYear": "1995",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "70",
-        "icon": "heroicon-o-calculator",
-        "color": "#f97316",
-        "tags": ["advanced"]
+      "type": "rental",
+      "group": "private",
+      "name": "House",
+      "description": "House with 10 interestOnlyYears, the rest of the money put into fond",
+      "active": true
     },
-    "house": {
-        "meta" : {
-            "type": "rental",
-            "group": "private",
-            "name": "House",
-            "description": "House with 10 interestOnlyYears, the rest of the money put into fond",
-            "active" : true,
-
-        },
-        "2024": {
-            "description": "Income: Income | Expense: Income | Asset:  | Mortgage: ",
-            "income": {
-                "name": "Income",
-                "description": "Income",
-                "amount": 20000,
-                "factor": 12,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "asset": {
-                "marketAmount": 3000000,
-                "changerate": "changerates.house",
-                "description": "",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1500000,
-                "interest": "changerates.interest",
-                "gebyr": 600,
-                "years": 20,
-                "interestOnlyYears": 10
-            },
-            "cashflow": {
-                "description": "We transfer the positive cashflow from interestOnly into a fund",
-                "rule": "100%",
-                "transfer": "fond.$year.asset.marketAmount",
-                "source": "",
-                "repeat": true
-            }
-        }
-    },
-    "fond": {
-        "meta" : {
-            "type": "equityfund",
-            "group": "private",
-            "name": "fond",
-            "description": "",
-            "active": true,
-
-        },
-        "2024": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
-            "asset": {
-                "marketAmount": 1000,
-                "changerate": "changerates.equityfund",
-                "description": "",
-                "repeat": true
-            }
-        }
+    "2024": {
+      "description": "Income: Income | Expense: Income | Asset:  | Mortgage: ",
+      "income": {
+        "name": "Income",
+        "description": "Income",
+        "amount": 20000,
+        "factor": 12,
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "asset": {
+        "marketAmount": 3000000,
+        "changerate": "changerates.house",
+        "description": "",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1500000,
+        "interest": "changerates.interest",
+        "gebyr": 600,
+        "years": 20,
+        "interestOnlyYears": 10
+      },
+      "cashflow": {
+        "description": "We transfer the positive cashflow from interestOnly into a fund",
+        "rule": "100%",
+        "transfer": "fond.$year.asset.marketAmount",
+        "source": "",
+        "repeat": true
+      }
     }
+  },
+  "fond": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "fond",
+      "description": "",
+      "active": true
+    },
+    "2024": {
+      "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
+      "asset": {
+        "marketAmount": 1000,
+        "changerate": "changerates.equityfund",
+        "description": "",
+        "repeat": true
+      }
+    }
+  }
 }

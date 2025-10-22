@@ -8,73 +8,7 @@ use Tests\TestCase;
 class HelperTest extends TestCase
 {
     /**
-     * Test the Amortization class
-     *
-     * @return void
-     */
-    public function test_it_calculates_rule_with_percentage()
-    {
-        $helper = new Helper;
-        [$newAmount, $calcAmount, $rule, $explanation] = $helper->calculateRule(false, 100, 0, '+20%');
-        $this->assertEquals(120, $newAmount);
-        $this->assertEquals(20, $calcAmount);
-    }
-
-    /**
-     * Test the Amortization class
-     *
-     * @return void
-     */
-    public function test_it_calculates_rule_with_divisor()
-    {
-        $helper = new Helper;
-        [$newAmount, $calcAmount, $rule, $explanation] = $helper->calculateRule(false, 100, 0, '1/2');
-        $this->assertEquals(100, $newAmount);
-        $this->assertEquals(50, $calcAmount);
-    }
-
-    /**
-     * Test the Amortization class
-     *
-     * @return void
-     */
-    public function test_it_calculates_rule_with_dynamic_divisor()
-    {
-        $helper = new Helper;
-        [$newAmount, $calcAmount, $rule, $explanation] = $helper->calculateRule(false, 100, 0, '1|2');
-        $this->assertEquals(100, $newAmount);
-        $this->assertEquals(50, $calcAmount);
-        $this->assertEquals('|1', $rule);
-    }
-
-    /**
-     * Test the Amortization class
-     *
-     * @return void
-     */
-    public function test_it_calculates_rule_with_plus_minus()
-    {
-        $helper = new Helper;
-        [$newAmount, $calcAmount, $rule, $explanation] = $helper->calculateRule(false, 100, 0, '+20');
-        $this->assertEquals(120, $newAmount);
-        $this->assertEquals(20, $calcAmount);
-    }
-
-    /**
-     * Test the Amortization class
-     *
-     * @return void
-     */
-    public function test_it_calculates_rule_with_invalid_rule()
-    {
-        $helper = new Helper;
-        [$newAmount, $calcAmount, $rule, $explanation] = $helper->calculateRule(false, 100, 0, 'invalid');
-        $this->assertEquals(100, $newAmount);
-        $this->assertEquals(0, $calcAmount);
-    }
-
-    /**
-     * Test the Amortization class
+     * Test the Helper class
      *
      * @return void
      */
@@ -89,7 +23,7 @@ class HelperTest extends TestCase
     }
 
     /**
-     * Test the Amortization class
+     * Test the Helper class
      *
      * @return void
      */

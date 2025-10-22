@@ -1,31 +1,33 @@
 {
+  "meta": {
+    "name": "KPI-Knut",
+    "description": "Consumer Price Index tracking and inflation-adjusted financial planning",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-chart-bar",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "kpi": {
     "meta": {
-        "name": "KPI-Knut",
-        "description": "Consumer Price Index tracking and inflation-adjusted financial planning",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-chart-bar",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "kpi",
+      "group": "private",
+      "name": "KPI",
+      "description": "",
+      "active": true
     },
-    "kpi": {
-        "meta" : {
-            "type": "kpi",
-            "group": "private",
-            "name": "KPI",
-            "description": "",
-            "active": true
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 100000,
-                "changerate": "changerates.kpi",
-                "description": "Kontanter p.t.",
-                "repeat": true
-            }
-        }
+    "2025": {
+      "asset": {
+        "marketAmount": 100000,
+        "changerate": "changerates.kpi",
+        "description": "Kontanter p.t.",
+        "repeat": true
+      }
     }
+  }
 }

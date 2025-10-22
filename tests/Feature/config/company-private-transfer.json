@@ -1,59 +1,62 @@
 {
+  "meta": {
+    "name": "Bjørg Bedrift Overføring",
+    "description": "Strategic transfers between company and private investments for tax optimization",
+    "birthYear": "1995",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "62",
+    "icon": "heroicon-o-building-office-2",
+    "color": "#7c3aed",
+    "tags": [
+      "company",
+      "private",
+      "transfer",
+      "tax-optimization"
+    ]
+  },
+  "fondcompany": {
     "meta": {
-        "name": "Bjørg Bedrift Overføring",
-        "description": "Strategic transfers between company and private investments for tax optimization",
-        "birthYear": "1995",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "62",
-        "icon": "heroicon-o-building-office-2",
-        "color": "#7c3aed",
-        "tags": ["company", "private", "transfer", "tax-optimization"]
+      "type": "equityfund",
+      "group": "company",
+      "name": "Fond - Firma",
+      "description": "Fond - Firma",
+      "active": true
     },
-    "fondcompany": {
-        "meta" : {
-            "type": "equityfund",
-            "group": "company",
-            "name": "Fond - Firma",
-            "description": "Fond - Firma",
-            "active": true,
-
-        },
-        "2020": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
-            "asset": {
-                "marketAmount": 1000000,
-                "changerate": "changerates.equityfund",
-                "description": "",
-                "repeat": true
-            }
-        },
-        "2025": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
-            "asset": {
-                "rule": "100%",
-                "transfer": "fondprivate.$year.asset.marketAmount",
-                "repeat": false
-            }
-        }
-     },
-    "fondprivate": {
-        "meta" : {
-            "type": "equityfund",
-            "group": "private",
-            "name": "Fond - Privat",
-            "description": "Fond - Privat",
-            "active": true,
-
-        },
-        "2020": {
-            "asset": {
-                "marketAmount": 100000,
-                "changerate": "changerates.otp",
-                "description": "OTP Sparing frem til pensjonsår",
-                "repeat": true
-            }
-        }
+    "2020": {
+      "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
+      "asset": {
+        "marketAmount": 1000000,
+        "changerate": "changerates.equityfund",
+        "description": "",
+        "repeat": true
+      }
+    },
+    "2025": {
+      "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
+      "asset": {
+        "rule": "100%",
+        "transfer": "fondprivate.$year.asset.marketAmount",
+        "repeat": false
+      }
     }
+  },
+  "fondprivate": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "Fond - Privat",
+      "description": "Fond - Privat",
+      "active": true
+    },
+    "2020": {
+      "asset": {
+        "marketAmount": 100000,
+        "changerate": "changerates.otp",
+        "description": "OTP Sparing frem til pensjonsår",
+        "repeat": true
+      }
+    }
+  }
 }

@@ -22,11 +22,11 @@ class AssetTypeTaxTypeRelationTest extends TestCase
         $this->assertNotNull($taxType);
         $this->assertNotNull($assetType);
 
-        // Assign tax type to asset type
-        $assetType->update(['tax_type_id' => $taxType->id]);
+        // Assign tax type to asset type (using tax_type string field)
+        $assetType->update(['tax_type' => $taxType->type]);
 
         // Test the relationship
-        $this->assertEquals($taxType->id, $assetType->tax_type_id);
+        $this->assertEquals($taxType->type, $assetType->tax_type);
         $this->assertEquals($taxType->name, $assetType->taxType->name);
         $this->assertTrue($taxType->assetTypes->contains($assetType));
     }
@@ -55,8 +55,8 @@ class AssetTypeTaxTypeRelationTest extends TestCase
         $this->assertNotNull($realizationTax, 'Realization tax type should exist');
         $this->assertNotNull($incomeTax, 'Income tax type should exist');
 
-        // Just test with one asset type that definitely exists
-        AssetType::where('type', 'equityfund')->update(['tax_type_id' => $realizationTax->id]);
+        // Just test with one asset type that definitely exists (using tax_type string field)
+        AssetType::where('type', 'equityfund')->update(['tax_type' => $realizationTax->type]);
 
         // Test that asset types with tax types can be retrieved
         $equityAsset = AssetType::with('taxType')->where('type', 'equityfund')->first();
@@ -75,8 +75,8 @@ class AssetTypeTaxTypeRelationTest extends TestCase
 
         $taxType = TaxType::where('type', 'realization')->first();
 
-        // Assign multiple asset types to this tax type
-        AssetType::whereIn('type', ['stock', 'equityfund', 'crypto'])->update(['tax_type_id' => $taxType->id]);
+        // Assign multiple asset types to this tax type (using tax_type string field)
+        AssetType::whereIn('type', ['stock', 'equityfund', 'crypto'])->update(['tax_type' => $taxType->type]);
 
         // Test the reverse relationship
         $assetTypes = $taxType->assetTypes;
@@ -94,11 +94,11 @@ class AssetTypeTaxTypeRelationTest extends TestCase
         $assetType = AssetType::factory()->create([
             'type' => 'test_no_tax',
             'name' => 'Test Asset Without Tax',
-            'tax_type_id' => null,
+            'tax_type' => null,
         ]);
 
         $this->assertNotNull($assetType);
-        $this->assertNull($assetType->tax_type_id);
+        $this->assertNull($assetType->tax_type);
         $this->assertNull($assetType->taxType);
     }
 
@@ -110,11 +110,11 @@ class AssetTypeTaxTypeRelationTest extends TestCase
             'type' => 'test_asset',
             'name' => 'Test Asset',
             'category' => 'Test Category',
-            'tax_type_id' => null,
+            'tax_type' => null,
         ]);
 
-        // Test that tax_type_id field exists and is fillable
-        $this->assertTrue(in_array('tax_type_id', $assetType->getFillable()));
-        $this->assertNull($assetType->tax_type_id);
+        // Test that tax_type field exists and is fillable
+        $this->assertTrue(in_array('tax_type', $assetType->getFillable()));
+        $this->assertNull($assetType->tax_type);
     }
 }

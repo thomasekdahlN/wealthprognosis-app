@@ -1,90 +1,89 @@
 {
+  "meta": {
+    "name": "Arving-Arne",
+    "description": "Strategic financial planning incorporating expected inheritance and optimal wealth transfer strategies",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-gift",
+    "color": "#f97316",
+    "tags": [
+      "advanced"
+    ]
+  },
+  "house": {
     "meta": {
-        "name": "Arving-Arne",
-        "description": "Strategic financial planning incorporating expected inheritance and optimal wealth transfer strategies",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-gift",
-        "color": "#f97316",
-        "tags": ["advanced"]
+      "type": "house",
+      "group": "private",
+      "name": "Arne Arving",
+      "description": "Established family home in Stavanger with remaining mortgage to be paid off",
+      "active": true
     },
-    "house": {
-        "meta": {
-            "type": "house",
-            "group": "private",
-            "name": "Arne Arving",
-            "description": "Established family home in Stavanger with remaining mortgage to be paid off",
-            "active": true,
-
-        },
-        "2025": {
-            "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Mortgage: interest changerates.interest, years 20",
-            "asset": {
-                "marketAmount": "3000000",
-                "changerate": "changerates.house",
-                "description": "",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                "amount": 7300,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1000000,
-                "interest": "changerates.interest",
-                "years": 20
-            }
-        }
-    },
-    "inheritance": {
-        "meta": {
-            "type": "inheritance",
-            "group": "private",
-            "name": "Parents' Estate Inheritance",
-            "description": "Expected inheritance from parents' estate including property and investments",
-            "active": true
-        },
-        "2037": {
-            "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
-            "asset": {
-                "name": "inheritance",
-                "description": "",
-                "marketAmount": 2500000,
-                "acquisitionAmount": 10000,
-                "paidAmount": 10000,
-                "changerate": "changerates.kpi",
-                "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
-                "rule": "100%",
-                "transfer": "fond.$year.asset.marketAmount",
-                "transferX": "house.$year.mortgage.extraDownpaymentAmount",
-                "repeat": false
-            }
-        }
-    },
-    "fond": {
-        "meta": {
-            "type": "equityfund",
-            "group": "private",
-            "name": "Diversified Investment Portfolio",
-            "description": "Long-term investment portfolio enhanced by inheritance allocation",
-            "active": true,
-
-        },
-        "2025": {
-            "description": "Asset: ",
-            "asset": {
-                "marketAmount": 10000,
-                "changerate": "changerates.equityfund",
-                "description": "",
-                "repeat": true
-            }
-        }
+    "2025": {
+      "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Mortgage: interest changerates.interest, years 20",
+      "asset": {
+        "marketAmount": "3000000",
+        "changerate": "changerates.house",
+        "description": "",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+        "amount": 7300,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1000000,
+        "interest": "changerates.interest",
+        "years": 20
+      }
     }
+  },
+  "inheritance": {
+    "meta": {
+      "type": "inheritance",
+      "group": "private",
+      "name": "Parents' Estate Inheritance",
+      "description": "Expected inheritance from parents' estate including property and investments",
+      "active": true
+    },
+    "2037": {
+      "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
+      "asset": {
+        "name": "inheritance",
+        "description": "We transfer the entire inheritance into a fund or as extraDownpayment on the house",
+        "marketAmount": 2500000,
+        "acquisitionAmount": 10000,
+        "paidAmount": 10000,
+        "changerate": "changerates.kpi",
+        "rule": "100%",
+        "transfer": "fond.$year.asset.marketAmount",
+        "transferX": "house.$year.mortgage.extraDownpaymentAmount",
+        "repeat": false
+      }
+    }
+  },
+  "fond": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "Diversified Investment Portfolio",
+      "description": "Long-term investment portfolio enhanced by inheritance allocation",
+      "active": true
+    },
+    "2025": {
+      "description": "Asset: ",
+      "asset": {
+        "marketAmount": 10000,
+        "changerate": "changerates.equityfund",
+        "description": "",
+        "repeat": true
+      }
+    }
+  }
 }

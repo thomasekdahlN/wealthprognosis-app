@@ -1,39 +1,41 @@
 {
+  "meta": {
+    "name": "Krypto-Kåre",
+    "description": "Strategic cryptocurrency investment with diversified digital assets and DeFi opportunities",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-currency-dollar",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "crypto": {
     "meta": {
-        "name": "Krypto-Kåre",
-        "description": "Strategic cryptocurrency investment with diversified digital assets and DeFi opportunities",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-currency-dollar",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "crypto",
+      "group": "private",
+      "name": "Bitcoin & Ethereum Portfolio",
+      "description": "Long-term cryptocurrency holdings as digital store of value and inflation hedge",
+      "active": true
     },
-    "crypto": {
-        "meta": {
-            "type": "crypto",
-            "group": "private",
-            "name": "Bitcoin & Ethereum Portfolio",
-            "description": "Long-term cryptocurrency holdings as digital store of value and inflation hedge",
-            "active": true
-        },
-        "2022": {
-            "description": "Income:  | Expense:  | Asset: ; Uttak fra $pensionWishYear, 1|$pensionWishYears | Mortgage: ",
-            "asset": {
-                "marketAmount": 1500000,
-                "changerate": "changerates.crypto",
-                "description": "",
-                "repeat": true
-            },
-            "$pensionWishYear": {
-                "rule": "1|$pensionWishYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.crypto",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
-                "repeat": true
-            }
-        }
+    "2022": {
+      "description": "Income:  | Expense:  | Asset: ; Uttak fra $pensionWishAge, 1|$pensionWishAges | Mortgage: ",
+      "asset": {
+        "marketAmount": 1500000,
+        "changerate": "changerates.crypto",
+        "description": "",
+        "repeat": true
+      },
+      "$pensionWishAge": {
+        "rule": "1|$pensionWishAges",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.crypto",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAges",
+        "repeat": true
+      }
     }
+  }
 }

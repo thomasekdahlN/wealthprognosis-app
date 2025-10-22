@@ -1,175 +1,181 @@
 {
+  "meta": {
+    "name": "iPhone vs Apple Aksjer",
+    "description": "Comparison analysis between buying iPhones vs investing in Apple stock over time",
+    "birthYear": "1987",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "37",
+    "exportStartYear": "2007",
+    "icon": "heroicon-o-device-phone-mobile",
+    "color": "#000000",
+    "tags": [
+      "apple",
+      "iphone",
+      "stocks",
+      "comparison",
+      "tech"
+    ]
+  },
+  "iphone": {
     "meta": {
-        "name": "iPhone vs Apple Aksjer",
-        "description": "Comparison analysis between buying iPhones vs investing in Apple stock over time",
-        "birthYear": "1987",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "37",
-        "exportStartYear": "2007",
-        "icon": "heroicon-o-device-phone-mobile",
-        "color": "#000000",
-        "tags": ["apple", "iphone", "stocks", "comparison", "tech"]
+      "type": "iphone",
+      "group": "private",
+      "name": "Iphone",
+      "description": "https://www.androidauthority.com/iphone-price-history-3221497/",
+      "active": true
     },
-    "iphone": {
-        "meta" : {
-            "type": "iphone",
-            "group": "private",
-            "name": "Iphone",
-            "description": "https://www.androidauthority.com/iphone-price-history-3221497/",
-            "active": true
-        },
-        "2007": {
-            "asset": {
-                "marketAmount": 4990,
-                "factor": "yearly"
-            }
-        },
-        "2008": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2009": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2010": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2011": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2012": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2013": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2014": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2015": {
-            "asset": {
-                "rule": "+1990",
-                "factor": "yearly"
-            }
-        },
-        "2016": {
-            "asset": {
-                "rule": "+6490",
-                "factor": "yearly"
-            }
-        },
-        "2017": {
-            "asset": {
-                "rule": "+6990",
-                "factor": "yearly"
-            }
-        },
-        "2018": {
-            "asset": {
-                "rule": "+7490",
-                "factor": "yearly"
-            }
-        },
-        "2019": {
-            "asset": {
-                "rule": "+6990",
-                "factor": "yearly"
-            }
-        },
-        "2020": {
-            "asset": {
-                "rule": "+7990",
-                "factor": "yearly"
-            }
-        },
-        "2021": {
-            "asset": {
-                "rule": "+7990",
-                "factor": "yearly"
-            }
-        },
-        "2022": {
-            "asset": {
-                "rule": "+7990",
-                "factor": "yearly"
-            }
-        },
-        "2023": {
-            "asset": {
-                "rule": "+7990",
-                "factor": "yearly"
-            }
-        },
-        "2024": {
-            "asset": {
-                "rule": "+7990",
-                "factor": "yearly",
-                "repeat": false
-            }
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 0
-            }
-        }
+    "2007": {
+      "asset": {
+        "marketAmount": 4990,
+        "factor": "yearly"
+      }
     },
-    "applestock": {
-        "meta" : {
-            "type": "applestock",
-            "group": "private",
-            "name": "Apple stock",
-            "description": "",
-            "active": true
-        },
-        "2007": {
-            "asset": {
-                "marketAmount": 4990,
-                "changerate": "changerates.applestock",
-                "factor": "yearly"
-            }
-        },
-        "2008": {
-            "asset": {
-                "rule": "+1990",
-                "changerate": "changerates.applestock",
-                "factor": "yearly"
-            }
-        },
-        "2009": {
-            "asset": {
-                "rule": "+1990",
-                "changerate": "changerates.applestock",
-                "factor": "yearly"
-            }
-        },
-        "2010": {
-            "asset": {
-                "rule": "+1990",
-                "changerate": "changerates.applestock",
-                "factor": "yearly"
-            }
-        }
+    "2008": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2009": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2010": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2011": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2012": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2013": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2014": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2015": {
+      "asset": {
+        "rule": "+1990",
+        "factor": "yearly"
+      }
+    },
+    "2016": {
+      "asset": {
+        "rule": "+6490",
+        "factor": "yearly"
+      }
+    },
+    "2017": {
+      "asset": {
+        "rule": "+6990",
+        "factor": "yearly"
+      }
+    },
+    "2018": {
+      "asset": {
+        "rule": "+7490",
+        "factor": "yearly"
+      }
+    },
+    "2019": {
+      "asset": {
+        "rule": "+6990",
+        "factor": "yearly"
+      }
+    },
+    "2020": {
+      "asset": {
+        "rule": "+7990",
+        "factor": "yearly"
+      }
+    },
+    "2021": {
+      "asset": {
+        "rule": "+7990",
+        "factor": "yearly"
+      }
+    },
+    "2022": {
+      "asset": {
+        "rule": "+7990",
+        "factor": "yearly"
+      }
+    },
+    "2023": {
+      "asset": {
+        "rule": "+7990",
+        "factor": "yearly"
+      }
+    },
+    "2024": {
+      "asset": {
+        "rule": "+7990",
+        "factor": "yearly",
+        "repeat": false
+      }
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 0
+      }
     }
+  },
+  "applestock": {
+    "meta": {
+      "type": "applestock",
+      "group": "private",
+      "name": "Apple stock",
+      "description": "",
+      "active": true
+    },
+    "2007": {
+      "asset": {
+        "marketAmount": 4990,
+        "changerate": "changerates.applestock",
+        "factor": "yearly"
+      }
+    },
+    "2008": {
+      "asset": {
+        "rule": "+1990",
+        "changerate": "changerates.applestock",
+        "factor": "yearly"
+      }
+    },
+    "2009": {
+      "asset": {
+        "rule": "+1990",
+        "changerate": "changerates.applestock",
+        "factor": "yearly"
+      }
+    },
+    "2010": {
+      "asset": {
+        "rule": "+1990",
+        "changerate": "changerates.applestock",
+        "factor": "yearly"
+      }
+    }
+  }
 }

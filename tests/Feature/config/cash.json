@@ -1,39 +1,41 @@
 {
+  "meta": {
+    "name": "Kontant-Kari",
+    "description": "Strategic cash management with emergency funds, high-yield savings, and liquidity optimization",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-banknotes",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "cash": {
     "meta": {
-        "name": "Kontant-Kari",
-        "description": "Strategic cash management with emergency funds, high-yield savings, and liquidity optimization",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-banknotes",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "cash",
+      "group": "private",
+      "name": "Emergency Fund - High-Yield Savings",
+      "description": "6-month emergency fund in high-yield savings account for financial security",
+      "active": true
     },
-    "cash": {
-        "meta": {
-            "type": "cash",
-            "group": "private",
-            "name": "Emergency Fund - High-Yield Savings",
-            "description": "6-month emergency fund in high-yield savings account for financial security",
-            "active": true
-        },
-        "2023": {
-            "description": "Income:  | Expense:  | Asset: Kontanter p.t.; Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen | Mortgage: ",
-            "asset": {
-                "marketAmount": 100000,
-                "changerate": "changerates.cash",
-                "description": "Kontanter p.t.",
-                "repeat": true
-            },
-            "$pensionWishYear": {
-                "rule": "1|$pensionWishYear",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.cash",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYear av formuen",
-                "repeat": true
-            }
-        }
+    "2023": {
+      "description": "Income:  | Expense:  | Asset: Kontanter p.t.; Uttak fra $pensionWishAge, 1|$pensionWishAge av formuen | Mortgage: ",
+      "asset": {
+        "marketAmount": 100000,
+        "changerate": "changerates.cash",
+        "description": "Kontanter p.t.",
+        "repeat": true
+      },
+      "$pensionWishAge": {
+        "rule": "1|$pensionWishAge",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.cash",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAge av formuen",
+        "repeat": true
+      }
     }
+  }
 }

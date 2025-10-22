@@ -1,12 +1,12 @@
 {
   "meta": {
-    "name": "Lønn-OTP",
-    "description": "Salary worker with occupational pension combining employment income and pension planning",
-    "birthYear": "1975",
+    "name": "Lønn",
+    "description": "Testkjøring av lønn",
+    "birthYear": "1985",
     "prognoseAge": "50",
     "pensionOfficialAge": "67",
     "pensionWishAge": "63",
-    "deathAge": "82",
+    "deathAge": "72",
     "icon": "heroicon-o-banknotes",
     "color": "#f97316",
     "tags": [
@@ -15,7 +15,7 @@
   },
   "salary": {
     "meta": {
-      "type": "income",
+      "type": "salary",
       "group": "private",
       "name": "Salary",
       "description": "Salary",
@@ -28,14 +28,6 @@
         "amount": 1650000,
         "changerate": "changerates.kpi",
         "repeat": true
-      },
-      "expence": {
-        "name": "Expences",
-        "description": "",
-        "amount": 15000,
-        "factor": 12,
-        "changerate": "changerates.kpi",
-        "repeat": true
       }
     },
     "$pensionWishAge": {
@@ -45,51 +37,6 @@
         "amount": "0",
         "changerate": "changerates.zero",
         "repeat": false
-      }
-    }
-  },
-  "otp": {
-    "meta": {
-      "type": "otp",
-      "group": "private",
-      "name": "OTP",
-      "description": "OTP",
-      "active": true
-    },
-    "2025": {
-      "asset": {
-        "rule": "5%",
-        "source": "salary.$year.income.amount",
-        "marketAmount": 1080000,
-        "changerate": "changerates.otp",
-        "description": "OTP Sparing frem til pensjonsår",
-        "repeat": true
-      }
-    },
-    "$pensionWishAge": {
-      "asset": {
-        "rule": "1|$pensionWishAges",
-        "transfer": "income.$year.income.amount",
-        "source": "",
-        "changerate": "changerates.otp",
-        "description": "OTP fra $pensionWishAge, 1|$pensionWishAges av formuen",
-        "repeat": true
-      }
-    }
-  },
-  "income": {
-    "meta": {
-      "type": "income",
-      "group": "private",
-      "name": "Income",
-      "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
-      "active": true
-    },
-    "2026": {
-      "income": {
-        "amount": 0,
-        "changerate": "changerates.kpi",
-        "repeat": true
       }
     }
   }

@@ -1,33 +1,34 @@
 {
+  "meta": {
+    "name": "Bjørg Bedrift",
+    "description": "Company stock ownership and business investment portfolio management",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-building-office",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "company": {
     "meta": {
-        "name": "Bjørg Bedrift",
-        "description": "Company stock ownership and business investment portfolio management",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-building-office",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "stock",
+      "group": "company",
+      "name": "Company AS",
+      "description": "I own stocks here",
+      "active": true
     },
-    "company": {
-        "meta": {
-            "type": "stock",
-            "group": "company",
-            "name": "Company AS",
-            "description": "I own stocks here",
-            "active": true,
-
-        },
-        "2022": {
-            "description": "Income:  | Expense:  | Asset: Initielt kjøp | Mortgage: ",
-            "asset": {
-                "marketAmount": 2500000,
-                "changerate": "changerates.stock",
-                "description": "Initielt kjøp",
-                "repeat": true
-            }
-        }
+    "2022": {
+      "description": "Income:  | Expense:  | Asset: Initielt kjøp | Mortgage: ",
+      "asset": {
+        "marketAmount": 2500000,
+        "changerate": "changerates.stock",
+        "description": "Initielt kjøp",
+        "repeat": true
+      }
     }
+  }
 }

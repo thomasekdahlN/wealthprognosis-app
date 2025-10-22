@@ -1,478 +1,476 @@
 {
+  "meta": {
+    "name": "Avansert-Astrid",
+    "description": "Advanced wealth management with complex asset structures and sophisticated financial planning",
+    "birthYear": "1985",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "80",
+    "icon": "heroicon-o-academic-cap",
+    "color": "#f97316",
+    "tags": [
+      "advanced"
+    ]
+  },
+  "salary": {
     "meta": {
-        "name": "Avansert-Astrid",
-        "description": "Advanced wealth management with complex asset structures and sophisticated financial planning",
-        "birthYear": "1985",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "80",
-        "icon": "heroicon-o-academic-cap",
-        "color": "#f97316",
-        "tags": ["advanced"]
+      "type": "income",
+      "group": "private",
+      "name": "Lønn",
+      "description": "Lønn",
+      "active": true
     },
-    "salary": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Lønn",
-            "description": "Lønn",
-            "active": true
-        },
-        "2025": {
-            "income": {
-                "name": "Income",
-                "description": "Income",
-                "amount": 40000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Expences",
-                "description": "",
-                "amount": 15000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "income": {
-                "name": "Income",
-                "description": "Pensioned, no more salary from here",
-                "amount": 0,
-                "changerate": "changerates.zero",
-                "repeat": false
-            }
-        }
+    "2025": {
+      "income": {
+        "name": "Income",
+        "description": "Income",
+        "amount": 40000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Expences",
+        "description": "",
+        "amount": 15000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
     },
-    "wife": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Wife",
-            "description": "Kone - å dele utgifter med",
-            "active": true
-        },
-        "2025": {
-            "income": {
-                "description": "Dele reelle utgifter på hus (4000) og mat (3000) - ikke lån - dvs 7000 spart pr mnd",
-                "amount": 7000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "child1": {
-        "meta": {
-            "type": "child",
-            "group": "private",
-            "name": "Child1",
-            "description": "Barnetrygd som inntekter på barn frem til 18 år, utgifter helt til de flytter ut",
-            "active": true
-        },
-        "2025": {
-            "income": {
-                "amount": 1000,
-                "factor": "monthly",
-                "name": "Barnetrygd",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "amount": 2800,
-                "factor": "monthly",
-                "name": "Utgifter",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
-        "2042": {
-            "income": {
-                "amount": 0,
-                "factor": "monthly",
-                "name": "Slutt på barnetrygd",
-                "changerate": "changerates.kpi",
-                "repeat": false
-            }
-        },
-        "2049": {
-            "expence": {
-                "name": "Utgifter",
-                "amount": 0,
-                "description": "Barn flyttet ut av huset ved 25 år",
-                "repeat": false
-            }
-        }
-    },
-    "inheritance": {
-        "meta": {
-            "type": "inheritance",
-            "group": "private",
-            "name": "inheritance",
-            "description": "Arv som kan prognostiseres om de har gjenlevende foreldre eller andre du kan arve av i fremtiden",
-            "active": true
-        },
-        "2037": {
-            "asset": {
-                "name": "inheritance",
-                "description": "",
-                "marketAmount": 1000000,
-                "acquisitionAmount" : 1,
-                "paidAmount": 1,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "pension": {
-        "meta": {
-            "type": "pension",
-            "group": "private",
-            "name": "Folketrygden",
-            "description": "Folketrygden",
-            "active": true
-        },
-        "$pensionOfficialYear": {
-            "income": {
-                "name": "Folketrygden",
-                "description": "Folketrygden fra $pensionOfficialYear",
-                "amount": 15000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "otp": {
-        "meta" : {
-            "type": "equityfund",
-            "group": "private",
-            "name": "OTP",
-            "description": "OTP",
-            "active": true
-        },
-        "2024": {
-            "asset": {
-                "rule": "5%",
-                "source": "income.$year.income.amount",
-                "marketAmount": 500000,
-                "changerate": "changerates.otp",
-                "description": "OTP Sparing frem til pensjonsår",
-                "repeat": true
-            }
-        },
-        "$otpStartYear": {
-            "asset": {
-                "rule": "1|$otpYears",
-                "transfer": "income.$year.income.amount",
-                "source": "",
-                "changerate": "changerates.otp",
-                "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
-                "repeat": true
-            }
-        }
-    },
-    "house": {
-        "meta" : {
-            "type": "house",
-            "group": "private",
-            "name": "My house",
-            "description": "Your house, with a apartment that you rent out",
-            "active" : true,
-
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 4000000,
-                "changerate": "changerates.house",
-                "description": "Bought the house",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 2000000,
-                "interest": "changerates.interest",
-                "gebyr": 600,
-                "tax": 22,
-                "paymentExtraX": "home.$year.cashflow.amount",
-                "years": 20
-            },
-            "income": {
-                "name": "Rental",
-                "description": "Rental 10000 pr month",
-                "amount": 10000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm 7300 mnd",
-                "amount": 7300,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "cabin": {
-        "meta": {
-            "type": "cabin",
-            "group": "private",
-            "name": "Cabin",
-            "description": "Hytte med litt AirBnb inntekt",
-            "active": true
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 5000000,
-                "acquisitionAmount": 1,
-                "paidAmount": 1,
-                "taxableInitialAmount": 250000,
-                "changerate": "changerates.cabin",
-                "description": "",
-                "repeat": true
-            },
-            "income": {
-                "name": "AirBnB inntekt",
-                "description": "",
-                "amount": 3000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "",
-                "amount": 2000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "rental": {
-        "meta" : {
-            "type": "rental",
-            "group": "private",
-            "name": "Rental",
-            "description": "Rental",
-            "active": true,
-
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 4000000,
-                "changerate": "changerates.house",
-                "description": "Kjøpesum",
-                "repeat": true
-            },
-            "income": {
-                "name": "Utleie",
-                "description": "Utleie av leilighet",
-                "amount": 12500,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm,- pr mnd",
-                "amount": 3000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 2000000,
-                "interest": "changerates.interest",
-                "gebyr": 600,
-                "tax": 22,
-                "years": 25
-            }
-        }
-    },
-    "crypto": {
-        "meta" : {
-            "type": "crypto",
-            "group": "private",
-            "name": "Crypto",
-            "description": "Crypto",
-            "active": true
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 5000,
-                "changerate": "changerates.crypto",
-                "description": "",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "asset": {
-                "rule": "1|$pensionWishYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.equityfund",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
-                "repeat": true
-            }
-        }
-    },
-    "gold": {
-        "meta" : {
-            "type": "gold",
-            "group": "private",
-            "name": "Gold",
-            "description": "Gold",
-            "active": true
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 5000,
-                "changerate": "changerates.gold",
-                "description": "",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "asset": {
-                "rule": "1|$pensionWishYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.gold",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
-                "repeat": true
-            }
-        }
-    },
-    "cash": {
-        "meta" : {
-            "type": "cash",
-            "group": "private",
-            "name": "Cash",
-            "description": "",
-            "active": true
-        },
-        "2024": {
-            "asset": {
-                "marketAmount": 50000,
-                "changerate": "changerates.cash",
-                "description": "Kontanter p.t.",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "asset": {
-                "rule": "1|$pensionWishYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.equityfund",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
-                "repeat": true
-            }
-        }
-    },
-    "car": {
-        "meta" : {
-            "type": "car",
-            "group": "private",
-            "name": "Avensis",
-            "description": "",
-            "active": true
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 50000,
-                "changerate": "changerates.car",
-                "description": "verditap",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
-                "amount": 3000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "boat": {
-        "meta" : {
-            "type": "boat",
-            "group": "private",
-            "name": "Boat",
-            "description": "",
-            "active": true
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 200000,
-                "changerate": "changerates.boat",
-                "description": "verditap",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
-                "amount": 2000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "CompanyAS": {
-        "meta" : {
-            "type": "stock",
-            "group": "company",
-            "name": "Company AS",
-            "description": "I own stocks here",
-            "active": true
-        },
-        "2024": {
-            "asset": {
-                "marketAmount": 2500000,
-                "changerate": "changerates.stock",
-                "description": "Initielt kjøp",
-                "repeat": true
-            }
-        }
-    },
-    "fond": {
-        "meta" : {
-            "type": "equityfund",
-            "group": "private",
-            "name": "fond privat",
-            "description": "Has to be the second last asset since we often trasfer from other assets when sold, to this asset",
-            "active": true
-        },
-        "2024": {
-            "asset": {
-                "marketAmount": 2000000,
-                "changerate": "changerates.equityfund",
-                "description": "Setter inn 6000,- ekstra pr år",
-                "rule": "+6000",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "asset": {
-                "rule": "1|$pensionWishYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.equityfund",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
-                "repeat": true
-            }
-        }
-    },
-    "income": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Income",
-            "description": "Amount in this asset is not taxed. Everything transfered here is taxed when transfered from fond/otp. Has to be the last asset in the config.",
-            "active": true
-        }
+    "$pensionWishAge": {
+      "income": {
+        "name": "Income",
+        "description": "Pensioned, no more salary from here",
+        "amount": 0,
+        "changerate": "changerates.zero",
+        "repeat": false
+      }
     }
+  },
+  "wife": {
+    "meta": {
+      "type": "income",
+      "group": "private",
+      "name": "Wife",
+      "description": "Kone - å dele utgifter med",
+      "active": true
+    },
+    "2025": {
+      "income": {
+        "description": "Dele reelle utgifter på hus (4000) og mat (3000) - ikke lån - dvs 7000 spart pr mnd",
+        "amount": 7000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "child1": {
+    "meta": {
+      "type": "child",
+      "group": "private",
+      "name": "Child1",
+      "description": "Barnetrygd som inntekter på barn frem til 18 år, utgifter helt til de flytter ut",
+      "active": true
+    },
+    "2025": {
+      "income": {
+        "amount": 1000,
+        "factor": "monthly",
+        "name": "Barnetrygd",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "amount": 2800,
+        "factor": "monthly",
+        "name": "Utgifter",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    },
+    "2042": {
+      "income": {
+        "amount": 0,
+        "factor": "monthly",
+        "name": "Slutt på barnetrygd",
+        "changerate": "changerates.kpi",
+        "repeat": false
+      }
+    },
+    "2049": {
+      "expence": {
+        "name": "Utgifter",
+        "amount": 0,
+        "description": "Barn flyttet ut av huset ved 25 år",
+        "repeat": false
+      }
+    }
+  },
+  "inheritance": {
+    "meta": {
+      "type": "inheritance",
+      "group": "private",
+      "name": "inheritance",
+      "description": "Arv som kan prognostiseres om de har gjenlevende foreldre eller andre du kan arve av i fremtiden",
+      "active": true
+    },
+    "2037": {
+      "asset": {
+        "name": "inheritance",
+        "description": "",
+        "marketAmount": 1000000,
+        "acquisitionAmount": 1,
+        "paidAmount": 1,
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "pension": {
+    "meta": {
+      "type": "pension",
+      "group": "private",
+      "name": "Folketrygden",
+      "description": "Folketrygden",
+      "active": true
+    },
+    "$pensionOfficialAge": {
+      "income": {
+        "name": "Folketrygden",
+        "description": "Folketrygden fra $pensionOfficialAge",
+        "amount": 15000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "otp": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "OTP",
+      "description": "OTP",
+      "active": true
+    },
+    "2024": {
+      "asset": {
+        "rule": "5%",
+        "source": "income.$year.income.amount",
+        "marketAmount": 500000,
+        "changerate": "changerates.otp",
+        "description": "OTP Sparing frem til pensjonsår",
+        "repeat": true
+      }
+    },
+    "$otpStartYear": {
+      "asset": {
+        "rule": "1|$otpYears",
+        "transfer": "income.$year.income.amount",
+        "source": "",
+        "changerate": "changerates.otp",
+        "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
+        "repeat": true
+      }
+    }
+  },
+  "house": {
+    "meta": {
+      "type": "house",
+      "group": "private",
+      "name": "My house",
+      "description": "Your house, with a apartment that you rent out",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 4000000,
+        "changerate": "changerates.house",
+        "description": "Bought the house",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 2000000,
+        "interest": "changerates.interest",
+        "gebyr": 600,
+        "paymentExtraX": "home.$year.cashflow.amount",
+        "years": 20
+      },
+      "income": {
+        "name": "Rental",
+        "description": "Rental 10000 pr month",
+        "amount": 10000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Kommunale/Forsikring/Strøm 7300 mnd",
+        "amount": 7300,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "cabin": {
+    "meta": {
+      "type": "cabin",
+      "group": "private",
+      "name": "Cabin",
+      "description": "Hytte med litt AirBnb inntekt",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 5000000,
+        "acquisitionAmount": 1,
+        "paidAmount": 1,
+        "taxableInitialAmount": 250000,
+        "changerate": "changerates.cabin",
+        "description": "",
+        "repeat": true
+      },
+      "income": {
+        "name": "AirBnB inntekt",
+        "description": "",
+        "amount": 3000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "",
+        "amount": 2000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "rental": {
+    "meta": {
+      "type": "rental",
+      "group": "private",
+      "name": "Rental",
+      "description": "Rental",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 4000000,
+        "changerate": "changerates.house",
+        "description": "Kjøpesum",
+        "repeat": true
+      },
+      "income": {
+        "name": "Utleie",
+        "description": "Utleie av leilighet",
+        "amount": 12500,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Kommunale/Forsikring/Strøm,- pr mnd",
+        "amount": 3000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 2000000,
+        "interest": "changerates.interest",
+        "gebyr": 600,
+        "years": 25
+      }
+    }
+  },
+  "crypto": {
+    "meta": {
+      "type": "crypto",
+      "group": "private",
+      "name": "Crypto",
+      "description": "Crypto",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 5000,
+        "changerate": "changerates.crypto",
+        "description": "",
+        "repeat": true
+      }
+    },
+    "$pensionWishAge": {
+      "asset": {
+        "rule": "1|$pensionWishAges",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.equityfund",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAges",
+        "repeat": true
+      }
+    }
+  },
+  "gold": {
+    "meta": {
+      "type": "gold",
+      "group": "private",
+      "name": "Gold",
+      "description": "Gold",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 5000,
+        "changerate": "changerates.gold",
+        "description": "",
+        "repeat": true
+      }
+    },
+    "$pensionWishAge": {
+      "asset": {
+        "rule": "1|$pensionWishAges",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.gold",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAges",
+        "repeat": true
+      }
+    }
+  },
+  "cash": {
+    "meta": {
+      "type": "cash",
+      "group": "private",
+      "name": "Cash",
+      "description": "",
+      "active": true
+    },
+    "2024": {
+      "asset": {
+        "marketAmount": 50000,
+        "changerate": "changerates.cash",
+        "description": "Kontanter p.t.",
+        "repeat": true
+      }
+    },
+    "$pensionWishAge": {
+      "asset": {
+        "rule": "1|$pensionWishAges",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.equityfund",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAges",
+        "repeat": true
+      }
+    }
+  },
+  "car": {
+    "meta": {
+      "type": "car",
+      "group": "private",
+      "name": "Avensis",
+      "description": "",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 50000,
+        "changerate": "changerates.car",
+        "description": "verditap",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Drivstoff/Forsikring/Vedlikehold 4000,- pr mnd (med høy dieselpris)",
+        "amount": 3000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "boat": {
+    "meta": {
+      "type": "boat",
+      "group": "private",
+      "name": "Boat",
+      "description": "",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 200000,
+        "changerate": "changerates.boat",
+        "description": "verditap",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Drivstoff/Forsikring/Vedlikehold/Opplag",
+        "amount": 2000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "CompanyAS": {
+    "meta": {
+      "type": "stock",
+      "group": "company",
+      "name": "Company AS",
+      "description": "I own stocks here",
+      "active": true
+    },
+    "2024": {
+      "asset": {
+        "marketAmount": 2500000,
+        "changerate": "changerates.stock",
+        "description": "Initielt kjøp",
+        "repeat": true
+      }
+    }
+  },
+  "fond": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "fond privat",
+      "description": "Has to be the second last asset since we often trasfer from other assets when sold, to this asset",
+      "active": true
+    },
+    "2024": {
+      "asset": {
+        "marketAmount": 2000000,
+        "changerate": "changerates.equityfund",
+        "description": "Setter inn 6000,- ekstra pr år",
+        "rule": "+6000",
+        "repeat": true
+      }
+    },
+    "$pensionWishAge": {
+      "asset": {
+        "rule": "1|$pensionWishAges",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.equityfund",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAges",
+        "repeat": true
+      }
+    }
+  },
+  "income": {
+    "meta": {
+      "type": "income",
+      "group": "private",
+      "name": "Income",
+      "description": "Amount in this asset is not taxed. Everything transfered here is taxed when transfered from fond/otp. Has to be the last asset in the config.",
+      "active": true
+    }
+  }
 }

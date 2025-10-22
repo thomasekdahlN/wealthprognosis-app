@@ -1,81 +1,82 @@
 {
+  "meta": {
+    "name": "Alex Aksjefond",
+    "description": "Early career professional building wealth through systematic fund investments and compound growth",
+    "birthYear": "2005",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "70",
+    "icon": "heroicon-o-chart-bar-square",
+    "color": "#f97316",
+    "tags": [
+      "advanced"
+    ]
+  },
+  "income": {
     "meta": {
-        "name": "Alex Aksjefond",
-        "description": "Early career professional building wealth through systematic fund investments and compound growth",
-        "birthYear": "2005",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "70",
-        "icon": "heroicon-o-chart-bar-square",
-        "color": "#f97316",
-        "tags": ["advanced"]
+      "type": "income",
+      "group": "private",
+      "name": "Software Developer Salary",
+      "description": "Entry-level to senior software developer career progression",
+      "active": true
     },
-    "income": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Software Developer Salary",
-            "description": "Entry-level to senior software developer career progression",
-            "active": true
-        },
-        "2025": {
-            "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
-            "income": {
-                "name": "Income",
-                "description": "Income",
-                "amount": 40000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Expences",
-                "description": "",
-                "amount": 15000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "description": "Income: Pensioned, no more salary from here",
-            "income": {
-                "name": "Pension",
-                "description": "Pensioned, no more salary from here",
-                "amount": 0,
-                "changerate": "changerates.zero",
-                "repeat": false
-            }
-        }
+    "2025": {
+      "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
+      "income": {
+        "name": "Income",
+        "description": "Income",
+        "amount": 40000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Expences",
+        "description": "",
+        "amount": 15000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
     },
-    "fond": {
-        "meta": {
-            "type": "equityfund",
-            "group": "private",
-            "name": "Global Equity Index Fund",
-            "description": "Low-cost global equity index fund for long-term wealth building",
-            "active": true,
-
-        },
-        "2025": {
-            "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
-            "asset": {
-                "marketAmount": 1000000,
-                "rule": "+5000",
-                "changerate": "changerates.equityfund",
-                "description": "",
-                "repeat": true
-            }
-        },
-        "$pensionWishYear": {
-            "description": "Income:  | Expense:  | Asset: Uttak fra $pensionWishYear, 1|$pensionWishYears | Mortgage: ",
-            "assetX": {
-                "transfer": "income.$year.income.amount",
-                "rule": "1|$pensionWishYears",
-                "description": "Uttak fra $pensionWishYear, 1|$pensionWishYears",
-                "repeat": true
-            }
-        }
+    "$pensionWishAge": {
+      "description": "Income: Pensioned, no more salary from here",
+      "income": {
+        "name": "Pension",
+        "description": "Pensioned, no more salary from here",
+        "amount": 0,
+        "changerate": "changerates.zero",
+        "repeat": false
+      }
     }
+  },
+  "fond": {
+    "meta": {
+      "type": "equityfund",
+      "group": "private",
+      "name": "Global Equity Index Fund",
+      "description": "Low-cost global equity index fund for long-term wealth building",
+      "active": true
+    },
+    "2025": {
+      "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
+      "asset": {
+        "marketAmount": 1000000,
+        "rule": "+5000",
+        "changerate": "changerates.equityfund",
+        "description": "",
+        "repeat": true
+      }
+    },
+    "$pensionWishAge": {
+      "description": "Income:  | Expense:  | Asset: Uttak fra $pensionWishAge, 1|$pensionWishAges | Mortgage: ",
+      "assetX": {
+        "transfer": "income.$year.income.amount",
+        "rule": "1|$pensionWishAges",
+        "description": "Uttak fra $pensionWishAge, 1|$pensionWishAges",
+        "repeat": true
+      }
+    }
+  }
 }

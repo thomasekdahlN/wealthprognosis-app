@@ -1,99 +1,99 @@
 {
+  "meta": {
+    "name": "Låne-Lasse",
+    "description": "Advanced mortgage strategies including interest-only periods and payment optimization",
+    "birthYear": "1995",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "48",
+    "icon": "heroicon-o-home",
+    "color": "#f97316",
+    "tags": [
+      "advanced"
+    ]
+  },
+  "house1": {
     "meta": {
-        "name": "Låne-Lasse",
-        "description": "Advanced mortgage strategies including interest-only periods and payment optimization",
-        "birthYear": "1995",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "48",
-        "icon": "heroicon-o-home",
-        "color": "#f97316",
-        "tags": ["advanced"]
+      "type": "house",
+      "group": "private",
+      "name": "InterestOnly5years",
+      "description": "Paying only interest for the first 5 years, then paying interest and principal for the remaining years",
+      "active": true
     },
-    "house1": {
-        "meta": {
-            "type": "house",
-            "group": "private",
-            "name": "InterestOnly5years",
-            "description": "Paying only interest for the first 5 years, then paying interest and principal for the remaining years",
-            "active": true
-        },
-        "2025": {
-            "income": {
-                "name": "Income",
-                "description": "Income",
-                "amount": 14500,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "asset": {
-                "marketAmount": "3000000",
-                "changerate": "changerates.house",
-                "description": "",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1500000,
-                "interest": "changerates.interest",
-                "years": 10,
-                "XinterestOnlyYears": 5
-            },
-            "cashflow": {
-                "description": "We do extra downpayment of mortgage with positive cashflow.",
-                "rule": "100%",
-                "transfer": "house1.$year.mortgage.extraDownpaymentAmount",
-                "source": "",
-                "repeat": true
-            }
-        }
-    },
-    "house2": {
-        "meta": {
-            "type": "house",
-            "group": "private",
-            "name": "ExtraDownpayment",
-            "description": "Paying interest and principal + 60 000 ekstra downpayment for all the years",
-            "active": false,
-
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": "3000000",
-                "changerate": "changerates.house",
-                "description": "",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1500000,
-                "interest": "changerates.interest",
-                "years": 10,
-                "extraDownpaymentAmount": 60000
-            }
-        }
-    },
-    "house3": {
-        "meta": {
-            "type": "house",
-            "group": "private",
-            "name": "Normal",
-            "description": "Paying interest and principal for all the years",
-            "active": true,
-
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": "3000000",
-                "changerate": "changerates.house",
-                "description": "",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1500000,
-                "interest": "changerates.interest",
-                "years": 10
-            }
-        }
+    "2025": {
+      "income": {
+        "name": "Income",
+        "description": "Income",
+        "amount": 14500,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "asset": {
+        "marketAmount": "3000000",
+        "changerate": "changerates.house",
+        "description": "",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1500000,
+        "interest": "changerates.interest",
+        "years": 10,
+        "XinterestOnlyYears": 5
+      },
+      "cashflow": {
+        "description": "We do extra downpayment of mortgage with positive cashflow.",
+        "rule": "100%",
+        "transfer": "house1.$year.mortgage.extraDownpaymentAmount",
+        "source": "",
+        "repeat": true
+      }
     }
+  },
+  "house2": {
+    "meta": {
+      "type": "house",
+      "group": "private",
+      "name": "ExtraDownpayment",
+      "description": "Paying interest and principal + 60 000 ekstra downpayment for all the years",
+      "active": false
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": "3000000",
+        "changerate": "changerates.house",
+        "description": "",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1500000,
+        "interest": "changerates.interest",
+        "years": 10,
+        "extraDownpaymentAmount": 60000
+      }
+    }
+  },
+  "house3": {
+    "meta": {
+      "type": "house",
+      "group": "private",
+      "name": "Normal",
+      "description": "Paying interest and principal for all the years",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": "3000000",
+        "changerate": "changerates.house",
+        "description": "",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1500000,
+        "interest": "changerates.interest",
+        "years": 10
+      }
+    }
+  }
 }

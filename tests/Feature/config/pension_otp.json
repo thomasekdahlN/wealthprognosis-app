@@ -1,116 +1,117 @@
 {
+  "meta": {
+    "name": "Pensjon-OTP",
+    "description": "Comprehensive pension planning combining state pension and occupational pension strategies",
+    "birthYear": "1985",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-user-circle",
+    "color": "#0891b2",
+    "tags": [
+      "pension",
+      "otp",
+      "state-pension",
+      "planning"
+    ]
+  },
+  "salary": {
     "meta": {
-        "name": "Pensjon-OTP",
-        "description": "Comprehensive pension planning combining state pension and occupational pension strategies",
-        "birthYear": "1985",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-user-circle",
-        "color": "#0891b2",
-        "tags": ["pension", "otp", "state-pension", "planning"]
+      "type": "salary",
+      "group": "private",
+      "name": "Salary",
+      "description": "Lønn",
+      "active": true
     },
-    "salary": {
-        "meta": {
-            "type": "salary",
-            "group": "private",
-            "name": "Salary",
-            "description": "Lønn",
-            "active": true,
-
-        },
-        "2025": {
-            "income": {
-                "name": "Lønn",
-                "description": "Lønn 600000",
-                "amount": 50000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "",
-                "amount": 10000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        },
-        "$pensionOfficialYear": {
-            "income": {
-                "name": "Slutt på lønn",
-                "description": "",
-                "amount": 0,
-                "repeat": false
-            }
-        }
+    "2025": {
+      "income": {
+        "name": "Lønn",
+        "description": "Lønn 600000",
+        "amount": 50000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "",
+        "amount": 10000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
     },
-    "pension": {
-        "meta": {
-            "type": "pension",
-            "group": "private",
-            "name": "Folketrygden",
-            "description": "Folketrygden",
-            "active": true,
-
-        },
-        "$pensionOfficialYear": {
-            "income": {
-                "name": "Folketrygden",
-                "description": "Folketrygden fra $pensionOfficialYear",
-                "amount": 15000,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
-    },
-    "otp": {
-        "meta" : {
-            "type": "otp",
-            "group": "private",
-            "name": "OTP",
-            "description": "OTP",
-            "active": true,
-
-        },
-        "2025": {
-            "asset": {
-                "marketAmount": 2000000,
-                "rule": "5%",
-                "source": "salary.$year.income.amount",
-                "changerate": "changerates.otp",
-                "description": "OTP Sparing frem til pensjonsår",
-                "repeat": true
-            }
-        },
-        "$otpStartYear": {
-            "asset": {
-                "rule": "1|$otpYears",
-                "transfer": "income.$year.income.amount",
-                "changerate": "changerates.otp",
-                "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
-                "repeat": true
-            }
-        }
-    },
-    "income": {
-        "meta": {
-            "type": "income",
-            "group": "private",
-            "name": "Income",
-            "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
-            "active": true,
-
-        },
-        "2025": {
-            "income": {
-                "amount": 0,
-                "changerate": "changerates.kpi",
-                "repeat": true
-            }
-        }
+    "$pensionOfficialAge": {
+      "income": {
+        "name": "Slutt på lønn",
+        "description": "",
+        "amount": 0,
+        "repeat": false
+      }
     }
+  },
+  "pension": {
+    "meta": {
+      "type": "pension",
+      "group": "private",
+      "name": "Folketrygden",
+      "description": "Folketrygden",
+      "active": true
+    },
+    "$pensionOfficialAge": {
+      "income": {
+        "name": "Folketrygden",
+        "description": "Folketrygden fra $pensionOfficialAge",
+        "amount": 15000,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  },
+  "otp": {
+    "meta": {
+      "type": "otp",
+      "group": "private",
+      "name": "OTP",
+      "description": "OTP",
+      "active": true
+    },
+    "2025": {
+      "asset": {
+        "marketAmount": 2000000,
+        "rule": "5%",
+        "source": "salary.$year.income.amount",
+        "changerate": "changerates.otp",
+        "description": "OTP Sparing frem til pensjonsår",
+        "repeat": true
+      }
+    },
+    "$otpStartYear": {
+      "asset": {
+        "rule": "1|$otpYears",
+        "transfer": "income.$year.income.amount",
+        "changerate": "changerates.otp",
+        "description": "OTP fra $otpStartYear, 1|$otpYears av formuen",
+        "repeat": true
+      }
+    }
+  },
+  "income": {
+    "meta": {
+      "type": "income",
+      "group": "private",
+      "name": "Income",
+      "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
+      "active": true
+    },
+    "2025": {
+      "income": {
+        "amount": 0,
+        "changerate": "changerates.kpi",
+        "repeat": true
+      }
+    }
+  }
 }

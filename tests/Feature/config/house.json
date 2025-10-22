@@ -1,46 +1,47 @@
 {
+  "meta": {
+    "name": "Bosse Boligeier",
+    "description": "Primary residence ownership with mortgage optimization and property appreciation analysis",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-home",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "house": {
     "meta": {
-        "name": "Bosse Boligeier",
-        "description": "Primary residence ownership with mortgage optimization and property appreciation analysis",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-home",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "house",
+      "group": "private",
+      "name": "Bergen Family Home",
+      "description": "4-bedroom family home in desirable Bergen neighborhood with mountain views",
+      "active": true
     },
-    "house": {
-        "meta": {
-            "type": "house",
-            "group": "private",
-            "name": "Bergen Family Home",
-            "description": "4-bedroom family home in desirable Bergen neighborhood with mountain views",
-            "active": true,
-
-        },
-        "2025": {
-            "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset:  | Mortgage: interest changerates.interest, years 20",
-            "asset": {
-                "marketAmount": "3000000",
-                "changerate": "changerates.house",
-                "description": "",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                "amount": 7300,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1000000,
-                "interest": "changerates.interest",
-                "years": 20
-            }
-        }
+    "2025": {
+      "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset:  | Mortgage: interest changerates.interest, years 20",
+      "asset": {
+        "marketAmount": "3000000",
+        "changerate": "changerates.house",
+        "description": "",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+        "amount": 7300,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1000000,
+        "interest": "changerates.interest",
+        "years": 20
+      }
     }
+  }
 }

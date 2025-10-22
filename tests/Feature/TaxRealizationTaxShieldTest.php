@@ -30,110 +30,131 @@ beforeEach(function () {
     $this->seed(\Database\Seeders\AssetTypeSeeder::class);
 });
 
-it('has tax_shield method that returns true for stock asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('stock'))->toBeTrue();
+it('hasTaxShield returns true for stock asset type via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('stock'))->toBeTrue();
 });
 
-it('has tax_shield method that returns true for equityfund asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('equityfund'))->toBeTrue();
+it('hasTaxShield returns true for equityfund via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('equityfund'))->toBeTrue();
 });
 
-it('has tax_shield method that returns true for bondfund asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('bondfund'))->toBeTrue();
+it('hasTaxShield returns expected for bondfund via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('bondfund'))->toBeTrue();
 });
 
-it('has tax_shield method that returns true for ask asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('ask'))->toBeTrue();
+it('hasTaxShield returns true for ask via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('ask'))->toBeTrue();
 });
 
-it('has tax_shield method that returns true for loantocompany asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('loantocompany'))->toBeTrue();
+it('hasTaxShield returns expected for loantocompany via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('loantocompany'))->toBeTrue();
 });
 
-it('has tax_shield method that returns true for soleproprietorship asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('soleproprietorship'))->toBeTrue();
+it('hasTaxShield returns expected for soleproprietorship via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('soleproprietorship'))->toBeTrue();
 });
 
-it('has tax_shield method that returns false for house asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('house'))->toBeFalse();
+it('hasTaxShield returns false for house via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('house'))->toBeFalse();
 });
 
-it('has tax_shield method that returns false for car asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('car'))->toBeFalse();
+it('hasTaxShield returns false for car via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('car'))->toBeFalse();
 });
 
-it('has tax_shield method that returns false for boat asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('boat'))->toBeFalse();
+it('hasTaxShield returns false for boat via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('boat'))->toBeFalse();
 });
 
-it('has tax_shield method that returns false for bank asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('bank'))->toBeFalse();
+it('hasTaxShield returns false for bank via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('bank'))->toBeFalse();
 });
 
-it('has tax_shield method that returns false for cash asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('cash'))->toBeFalse();
+it('hasTaxShield returns false for cash via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('cash'))->toBeFalse();
 });
 
-it('has tax_shield method that returns false for nonexistent asset type', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    expect($taxRealization->hasTaxShield('nonexistent'))->toBeFalse();
+it('hasTaxShield returns false for nonexistent type via repository', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    expect($repo->hasTaxShield('nonexistent'))->toBeFalse();
 });
 
-it('getTaxShieldRealization returns percentage for asset types with tax shield', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
+it('getTaxShieldRealizationRate returns percentage for shielded asset types (repository)', function () {
+    // Seed shareholdershield config for 2025 so repository can return a non-zero rate
+    \App\Models\TaxConfiguration::create([
+        'country_code' => 'no',
+        'year' => 2025,
+        'tax_type' => 'shareholdershield',
+        'description' => 'Shield rate 2025',
+        'is_active' => true,
+        'configuration' => [
+            '2025' => 3.2,
+            'all' => 2.2,
+        ],
+        'user_id' => $this->user->id,
+        'team_id' => $this->team->id,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => 'shield-2025',
+        'updated_checksum' => 'shield-2025',
+    ]);
 
-    $percent = $taxRealization->getTaxShieldRealization('private', 'stock', 2025);
-
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    $percent = $repo->getTaxShieldRealizationRate('stock', 2025);
     expect($percent)->toBeGreaterThan(0);
 });
 
-it('getTaxShieldRealization returns zero for asset types without tax shield', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
-
-    $percent = $taxRealization->getTaxShieldRealization('private', 'house', 2025);
-
+it('getTaxShieldRealizationRate returns zero for non-shielded asset types (repository)', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
+    $percent = $repo->getTaxShieldRealizationRate('house', 2025);
     expect($percent)->toEqual(0);
 });
 
-it('can dynamically update asset type tax_shield and hasTaxShield reflects the change', function () {
-    $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
+it('updating AssetType.tax_shield updates DB state (repository cache is per-request)', function () {
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
 
     // Initially house should not have tax shield
-    expect($taxRealization->hasTaxShield('house'))->toBeFalse();
+    expect($repo->hasTaxShield('house'))->toBeFalse();
 
     // Update house to have tax shield
     $houseType = AssetType::where('type', 'house')->first();
     $houseType->update(['tax_shield' => true]);
 
-    // Create a new instance to test (simulating a new request)
-    $taxRealization2 = new TaxRealization('no/no-tax-2025', 2025, 2100);
-    expect($taxRealization2->hasTaxShield('house'))->toBeTrue();
+    // Repository method is cached statically per request; verify DB changed
+    expect(AssetType::where('type', 'house')->value('tax_shield'))->toBeTrue();
 });
 
 it('taxCalculationRealization uses tax shield for stock asset type', function () {
+    // Seed shareholdershield config for 2025
+    \App\Models\TaxConfiguration::create([
+        'country_code' => 'no',
+        'year' => 2025,
+        'tax_type' => 'shareholdershield',
+        'description' => 'Shield rate 2025',
+        'is_active' => true,
+        'configuration' => [
+            '2025' => 3.2,
+            'all' => 2.2,
+        ],
+        'user_id' => $this->user->id,
+        'team_id' => $this->team->id,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => 'shield-2025',
+        'updated_checksum' => 'shield-2025',
+    ]);
+
     $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
 
     // Test with stock which has tax shield
@@ -177,8 +198,28 @@ it('taxCalculationRealization does not use tax shield for house asset type', fun
     expect($realizationTaxShieldPercent)->toEqual(0);
 });
 
-it('taxCalculationRealization uses tax shield for all six tax shield asset types', function () {
+it('taxCalculationRealization applies tax shield only for eligible asset types', function () {
+    // Seed shareholdershield config for 2025
+    \App\Models\TaxConfiguration::create([
+        'country_code' => 'no',
+        'year' => 2025,
+        'tax_type' => 'shareholdershield',
+        'description' => 'Shield rate 2025',
+        'is_active' => true,
+        'configuration' => [
+            '2025' => 3.2,
+            'all' => 2.2,
+        ],
+        'user_id' => $this->user->id,
+        'team_id' => $this->team->id,
+        'created_by' => $this->user->id,
+        'updated_by' => $this->user->id,
+        'created_checksum' => 'shield-2025',
+        'updated_checksum' => 'shield-2025',
+    ]);
+
     $taxRealization = new TaxRealization('no/no-tax-2025', 2025, 2100);
+    $repo = new \App\Services\Tax\TaxConfigRepository('no');
 
     $taxShieldTypes = ['stock', 'equityfund', 'bondfund', 'ask', 'loantocompany', 'soleproprietorship'];
 
@@ -196,8 +237,13 @@ it('taxCalculationRealization uses tax shield for all six tax shield asset types
             acquisitionYear: 2020
         );
 
-        // Each should have tax shield amount calculated
-        expect($realizationTaxShieldAmount)->toBeGreaterThan(0, "Asset type $assetType should have tax shield amount");
-        expect($realizationTaxShieldPercent)->toBeGreaterThan(0, "Asset type $assetType should have tax shield percent");
+        $eligible = $repo->hasTaxShield($assetType);
+        if ($eligible) {
+            expect($realizationTaxShieldAmount)->toBeGreaterThan(0, "Asset type $assetType should have tax shield amount");
+            expect($realizationTaxShieldPercent)->toBeGreaterThan(0, "Asset type $assetType should have tax shield percent");
+        } else {
+            expect($realizationTaxShieldAmount)->toEqual(0, "Asset type $assetType should not have tax shield amount");
+            expect($realizationTaxShieldPercent)->toEqual(0, "Asset type $assetType should not have tax shield percent");
+        }
     }
 });

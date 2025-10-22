@@ -1,49 +1,50 @@
 {
+  "meta": {
+    "name": "Eiendoms-Erik",
+    "description": "Rental property investment with income generation and property appreciation",
+    "birthYear": "1975",
+    "prognoseAge": "50",
+    "pensionOfficialAge": "67",
+    "pensionWishAge": "63",
+    "deathAge": "82",
+    "icon": "heroicon-o-building-office",
+    "color": "#22c55e",
+    "tags": [
+      "simple"
+    ]
+  },
+  "property": {
     "meta": {
-        "name": "Eiendoms-Erik",
-        "description": "Rental property investment with income generation and property appreciation",
-        "birthYear": "1975",
-        "prognoseYear": "50",
-        "pensionOfficialYear": "67",
-        "pensionWishYear": "63",
-        "deathYear": "82",
-        "icon": "heroicon-o-building-office",
-        "color": "#22c55e",
-        "tags": ["simple"]
+      "type": "house",
+      "group": "private",
+      "name": "My property",
+      "description": "Here I rent out the house",
+      "active": true,
+      "taxProperty": "ringerike"
     },
-    "property": {
-        "meta" : {
-            "type": "house",
-            "group": "private",
-            "name": "My property",
-            "description": "Here I rent out the house",
-            "active" : true,
-            "taxProperty": "ringerike"
-        },
-        "2025": {
-            "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset: Selling part of the house | Mortgage: interest changerates.interest, years 20",
-            "asset": {
-                "marketAmount": "3000000",
-                "changerate": "changerates.house",
-                "description": "Selling part of the house",
-                "repeat": true
-            },
-            "expence": {
-                "name": "Utgifter",
-                "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-                "amount": 7300,
-                "factor": "monthly",
-                "changerate": "changerates.kpi",
-                "repeat": true
-            },
-            "mortgage": {
-                "amount": 1500000,
-                "interest": "changerates.interest",
-                "gebyr": 600,
-                "tax": 22,
-                "paymentExtra": "home.$year.cashflow.amount",
-                "years": 20
-            }
-        }
+    "2025": {
+      "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset: Selling part of the house | Mortgage: interest changerates.interest, years 20",
+      "asset": {
+        "marketAmount": "3000000",
+        "changerate": "changerates.house",
+        "description": "Selling part of the house",
+        "repeat": true
+      },
+      "expence": {
+        "name": "Utgifter",
+        "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
+        "amount": 7300,
+        "factor": "monthly",
+        "changerate": "changerates.kpi",
+        "repeat": true
+      },
+      "mortgage": {
+        "amount": 1500000,
+        "interest": "changerates.interest",
+        "gebyr": 600,
+        "paymentExtra": "home.$year.cashflow.amount",
+        "years": 20
+      }
     }
+  }
 }
