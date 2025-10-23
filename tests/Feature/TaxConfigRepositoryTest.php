@@ -38,7 +38,7 @@ it('falls back to previous year when exact year is missing', function () {
         'tax_type' => 'salary',
         'description' => 'Salary 2023',
         'is_active' => true,
-        'configuration' => ['salary' => ['common' => ['rate' => 21]]],
+        'configuration' => ['salary' => ['common' => ['percent' => 21]]],
         'user_id' => $this->user->id,
         'team_id' => $this->team->id,
         'created_by' => $this->user->id,
@@ -49,7 +49,7 @@ it('falls back to previous year when exact year is missing', function () {
 
     $repo = new TaxConfigRepository('no');
     $cfg = $repo->getTaxConfig(2024, 'salary');
-    expect($cfg)->toBeArray()->and($cfg['salary']['common']['rate'] ?? null)->toBe(21);
+    expect($cfg)->toBeArray()->and($cfg['salary']['common']['percent'] ?? null)->toBe(21);
 });
 
 it('caches repeated lookups within the same run', function () {

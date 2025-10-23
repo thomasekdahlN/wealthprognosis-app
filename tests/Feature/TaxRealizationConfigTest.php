@@ -87,7 +87,7 @@ it('loads shareholdershield percent from DB with fallback and respects tax_shiel
         'description' => 'Shareholder shield 2023',
         'is_active' => true,
         'configuration' => [
-            'all' => 22, // percent
+            'percent' => 22,
         ],
         'user_id' => $this->user->id,
         'team_id' => $this->team->id,

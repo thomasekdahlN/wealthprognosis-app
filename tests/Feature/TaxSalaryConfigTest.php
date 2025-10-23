@@ -33,13 +33,13 @@ beforeEach(function () {
 function makeSalaryConfig(int $commonRate = 22): array
 {
     return [
-        'common' => ['rate' => $commonRate],
-        'socialsecurity' => ['rate' => 8.2, 'deduction' => 0],
+        'common' => ['percent' => $commonRate],
+        'socialsecurity' => ['percent' => 8.2, 'deduction' => 0],
         'deduction' => ['min' => 0, 'max' => 1000000, 'percent' => 10],
         'bracket' => [
-            ['limit' => 200000, 'rate' => 0],
-            ['limit' => 400000, 'rate' => 1.7],
-            ['rate' => 16.2], // last, no limit
+            ['limit' => 200000, 'percent' => 0],
+            ['limit' => 400000, 'percent' => 1.7],
+            ['percent' => 16.2], // last, no limit
         ],
     ];
 }
@@ -96,7 +96,7 @@ it('caches salary tax configuration per request to avoid duplicate queries', fun
     $queries = DB::getQueryLog();
 
     // Convert to decimal like getSalaryTaxCommonRate would
-    $rate = ($cfg1['common']['rate'] ?? 0) / 100;
+    $rate = ($cfg1['common']['percent'] ?? 0) / 100;
     expect($rate)->toBe(0.23);
     // Expect only one query against tax_configurations table
     $count = collect($queries)->filter(fn ($q) => str_contains(strtolower($q['query']), 'tax_configurations'))->count();
