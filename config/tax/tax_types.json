@@ -39,10 +39,10 @@
     "type": "equityfund",
     "name": "Equity Fund"
   },
-    {
-        "type": "mixedfund",
-        "name": "Mixed Fund"
-    },
+  {
+    "type": "mixedfund",
+    "name": "Mixed Fund"
+  },
   {
     "type": "fortune",
     "name": "Wealth / Fortune"
@@ -67,10 +67,10 @@
     "type": "inheritance",
     "name": "Inheritance"
   },
-    {
-        "type": "pension",
-        "name": "Pension"
-    },
+  {
+    "type": "pension",
+    "name": "Pension"
+  },
   {
     "type": "ips",
     "name": "IPS"
@@ -111,8 +111,8 @@
     "type": "test",
     "name": "Test"
   },
-    {
-        "type": "none",
-        "name": "None"
-    }
+  {
+    "type": "none",
+    "name": "None"
+  }
 ]
