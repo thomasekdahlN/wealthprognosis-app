@@ -116,13 +116,8 @@ class TaxConfigRepository
     public function getTaxShieldAmount(int $year): float
     {
         $config = $this->getTaxConfig($year, 'shareholdershield');
-        if (is_array($config)) {
-            $value = Arr::get($config, (string) $year, Arr::get($config, 'all', 0));
 
-            return (float) $value;
-        }
-
-        return (float) ($config ?? 0);
+        return (float) Arr::get($config, 'percent', 0);
     }
 
     /**
@@ -184,7 +179,7 @@ class TaxConfigRepository
     {
         $taxSalaryConfigH = $this->getTaxSalaryConfig('common', (int) $year);
 
-        return Arr::get($taxSalaryConfigH, 'rate', 0) / 100;
+        return Arr::get($taxSalaryConfigH, 'percent', 0) / 100;
     }
 
     public function getSalaryTaxDeductionConfig($year): array
@@ -196,7 +191,7 @@ class TaxConfigRepository
     {
         $taxSalaryConfigH = $this->getTaxSalaryConfig('socialsecurity', (int) $year);
 
-        return Arr::get($taxSalaryConfigH, 'rate', 0) / 100;
+        return Arr::get($taxSalaryConfigH, 'percent', 0) / 100;
     }
 
     public function getSalaryTaxBracketConfig($year): array
