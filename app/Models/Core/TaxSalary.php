@@ -130,23 +130,23 @@ class TaxSalary extends Model
         $prevLimitAmount = 0;
         foreach ($brackets as $bracket) {
 
-            $bracketTaxPercent = ($bracket['rate'] ?? 0) / 100;
+            $bracketTaxPercent = ($bracket['percent'] ?? 0) / 100;
 
             if (isset($bracket['limit']) && $amount > $bracket['limit']) {
                 $bracketTaxableAmount = $bracket['limit'] - $prevLimitAmount;
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
 
-                $explanation .= " Bracket$count ($bracket[limit])$bracket[rate]%=$bracketTaxAmount,";
-                echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                $explanation .= " Bracket$count ($bracket[limit])$bracket[percent]%=$bracketTaxAmount,";
+                echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[percent]% = tax: $bracketTaxAmount\n";
 
             } elseif (isset($bracket['limit'])) {
                 // Amount is lower than limit, we are at the end and calculate the rest of the amount.
                 $bracketTaxableAmount = $amount - $prevLimitAmount;
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
-                $explanation .= " Bracket$count ($amount<)".$bracket['limit'].")$bracket[rate]%=$bracketTaxAmount";
-                echo "Bracket $amount < ".$bracket['limit']." taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                $explanation .= " Bracket$count ($amount<)".$bracket['limit'].")$bracket[percent]%=$bracketTaxAmount";
+                echo "Bracket $amount < ".$bracket['limit']." taxableAmount:$bracketTaxableAmount * $bracket[percent]% = tax: $bracketTaxAmount\n";
 
                 break;
             } else {
@@ -154,8 +154,8 @@ class TaxSalary extends Model
                 $bracketTaxableAmount = $amount - $prevLimitAmount;
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
-                $explanation .= " Bracket$count (>$prevLimitAmount)$bracket[rate]%=$bracketTaxAmount";
-                echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[rate]% = tax: $bracketTaxAmount\n";
+                $explanation .= " Bracket$count (>$prevLimitAmount)$bracket[percent]%=$bracketTaxAmount";
+                echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[percent]% = tax: $bracketTaxAmount\n";
 
                 break;
             }
