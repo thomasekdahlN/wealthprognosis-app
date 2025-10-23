@@ -14,10 +14,10 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Models\Core\Calculation;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Core\ValueObjects\RuleCalculationResult;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Rules
@@ -31,10 +31,8 @@ use Illuminate\Database\Eloquent\Model;
  * - Dynamic Divisor: "+1|4", "-1|2" (counts down denominator each use)
  * - Fixed Amount: "+1000", "-500" (add or subtract fixed amount, multiplied by factor)
  */
-class Rules extends Model
+class Rules
 {
-    use HasFactory;
-
     /**
      * Main entry point for calculating rule transformations on amounts.
      *
@@ -46,22 +44,36 @@ class Rules extends Model
      * @param  int  $acquisitionAmount  The original acquisition amount (used for context)
      * @param  string|null  $rule  The rule string to parse and execute (e.g., "+10%", "1/4", "-1|2")
      * @param  int  $factor  Multiplier for fixed amount rules (default: 1)
-     * @return array{0: int, 1: int, 2: string|null, 3: string} [newAmount, calcAmount, updatedRule, explanation]
+     * @return array{0: int, 1: int, 2: string|null, 3: string} Returns array for backward compatibility
      */
-    public function calculateRule(bool $debug, int $amount, int $acquisitionAmount, ?string $rule, int $factor = 1)
+    public function calculateRule(bool $debug, int $amount, int $acquisitionAmount, ?string $rule, int $factor = 1): array
     {
         // Handle null rule - multiply by factor
         if ($rule === null) {
             $factorAmount = $amount * $factor;
+            $explanation = "Multiplied by factor: $amount * $factor = $factorAmount";
 
-            return [$factorAmount, $factorAmount, null, "Multiplied by factor: $amount * $factor = $factorAmount"];
+            if ($debug) {
+                Log::debug('Rule calculation: null rule', [
+                    'amount' => $amount,
+                    'factor' => $factor,
+                    'result' => $factorAmount,
+                ]);
+            }
+
+            // Return array for backward compatibility
+            return [$factorAmount, $factorAmount, null, $explanation];
         }
 
-        $totalAmount = 0;
-        $explanation = null;
+        $newAmount = 0;
+        $calcAmount = 0;
+        $explanation = '';
 
         if ($debug) {
-            echo "  calculateRule INPUT(amount: $amount, rule: $rule)\n";
+            Log::debug('Rule calculation input', [
+                'amount' => $amount,
+                'rule' => $rule,
+            ]);
         }
 
         if ($rule) {
@@ -70,7 +82,6 @@ class Rules extends Model
 
             } elseif (preg_match('/(\+|\-)?(\d*)\/(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
                 // When divisor sign is pipe / -Normal divisor
-
                 [$newAmount, $calcAmount, $explanation] = $this->calculationDivisor($debug, $amount, $ruleH);
 
             } elseif (preg_match('/(\+|\-)?(\d*)\|(\d*)/i', $rule, $ruleH, PREG_OFFSET_CAPTURE)) {
@@ -81,10 +92,11 @@ class Rules extends Model
                 [$newAmount, $calcAmount, $explanation] = $this->calculationPlusMinus($debug, $amount, $ruleH, $factor);
 
             } else {
-                echo "ERROR: calculateRule #$rule# not supported";
+                Log::error('Unsupported rule format', ['rule' => $rule]);
             }
         }
 
+        // Return array for backward compatibility
         return [$newAmount, $calcAmount, $rule, $explanation];
     }
 
@@ -95,13 +107,12 @@ class Rules extends Model
      * For example, "1|4" becomes "1/3" after use, then "1/2", then "1/1", then null.
      *
      * @param  bool  $debug  Whether to output debug information
-     * @param  string  $amount  The amount to calculate on
-     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @param  int  $amount  The amount to calculate on
+     * @param  array<int, array<int, mixed>>  $ruleH  Regex match array from preg_match containing rule components
      * @return array{0: int, 1: int, 2: string|null, 3: string} [newAmount, calcAmount, updatedRule, explanation]
      */
-    public function calculationDynamicDivisor(bool $debug, string $amount, array $ruleH)
+    private function calculationDynamicDivisor(bool $debug, int $amount, array $ruleH): array
     {
-
         $rule = null;
 
         [$newAmount, $calcAmount, $explanation] = $this->calculationDivisor($debug, $amount, $ruleH);
@@ -121,7 +132,12 @@ class Rules extends Model
         $explanation .= " rewritten rule: $rule";
 
         if ($debug) {
-            echo "  calculationDynamicDivisor OUTPUT(amount: $amount, newAmount: $newAmount, calcAmount: $calcAmount, newrule: $rule, explanation: $explanation)\n";
+            Log::debug('Dynamic divisor calculation', [
+                'amount' => $amount,
+                'new_amount' => $newAmount,
+                'calc_amount' => $calcAmount,
+                'new_rule' => $rule,
+            ]);
         }
 
         return [$newAmount, $calcAmount, $rule, $explanation]; // Returns rewritten rule, has to be remembered
@@ -137,13 +153,13 @@ class Rules extends Model
      *
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $amount  The amount to calculate on
-     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @param  array<int, array<int, mixed>>  $ruleH  Regex match array from preg_match containing rule components
      * @return array{0: int, 1: int, 2: string} [newAmount, calcAmount, explanation]
      */
-    public function calculationDivisor(bool $debug, int $amount, array $ruleH)
+    private function calculationDivisor(bool $debug, int $amount, array $ruleH): array
     {
-        $divisor = $ruleH[3][0];
-        $baseCalcAmount = round($amount / $divisor);
+        $divisor = (int) $ruleH[3][0];
+        $baseCalcAmount = (int) round($amount / $divisor);
 
         if ($ruleH[1][0] == '-') {
             $newAmount = $amount - $baseCalcAmount;
@@ -173,32 +189,30 @@ class Rules extends Model
      * - Without sign: extracts the percentage without changing the original amount
      *
      * @param  bool  $debug  Whether to output debug information
-     * @param  string  $amount  The amount to calculate on
-     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @param  int  $amount  The amount to calculate on
+     * @param  array<int, array<int, mixed>>  $ruleH  Regex match array from preg_match containing rule components
      * @return array{0: int, 1: int, 2: string} [newAmount, calcAmount, explanation]
      */
-    public function calculationPercentage(bool $debug, string $amount, array $ruleH)
+    private function calculationPercentage(bool $debug, int $amount, array $ruleH): array
     {
-
-        $percent = $ruleH[2][0];
+        $percent = (int) $ruleH[2][0];
         $calcAmount = 0;
 
         if ($ruleH[1][0] == '-') {
-            $newAmount = round($amount * ((-$percent / 100) + 1));
+            $newAmount = (int) round($amount * ((-$percent / 100) + 1));
             $explanation = "$amount-$percent%=$newAmount";
             $calcAmount = $newAmount - $amount;
 
         } elseif ($ruleH[1][0] == '+') {
-            $newAmount = round($amount * (($percent / 100) + 1));
+            $newAmount = (int) round($amount * (($percent / 100) + 1));
             $explanation = "$amount+$percent%=$newAmount";
             $calcAmount = $newAmount - $amount;
 
         } else {
             // When no sign is given, we only want the part of the amount. Its like taking this percentage out of the amount.
             $newAmount = $amount; // We do not change the original amount
-            $calcAmount = round($amount * ($percent / 100));
+            $calcAmount = (int) round($amount * ($percent / 100));
             $explanation = "$percent% of $amount=$calcAmount";
-            // $diffAmount = $newAmount - $amount;
         }
 
         return [$newAmount, $calcAmount, $explanation];
@@ -215,18 +229,18 @@ class Rules extends Model
      *
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $amount  The amount to calculate on
-     * @param  array  $ruleH  Regex match array from preg_match containing rule components
+     * @param  array<int, array<int, mixed>>  $ruleH  Regex match array from preg_match containing rule components
      * @param  int  $factor  Multiplier for the fixed amount (default: 1)
      * @return array{0: int, 1: int, 2: string} [newAmount, calcAmount, explanation]
      */
-    public function calculationPlusMinus(bool $debug, int $amount, array $ruleH, int $factor = 1)
+    private function calculationPlusMinus(bool $debug, int $amount, array $ruleH, int $factor = 1): array
     {
         $extraAmount = $ruleH[2][0];
         // Handle empty or non-numeric values
         if (empty($extraAmount) || ! is_numeric($extraAmount)) {
             $extraAmount = 0;
         }
-        $baseCalcAmount = round($extraAmount * $factor);
+        $baseCalcAmount = (int) round((int) $extraAmount * $factor);
 
         if ($ruleH[1][0] == '-') {
             $newAmount = $amount - $baseCalcAmount;
@@ -247,3 +261,4 @@ class Rules extends Model
         return [$newAmount, $calcAmount, $explanation];
     }
 }
+

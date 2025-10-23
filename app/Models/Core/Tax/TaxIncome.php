@@ -14,10 +14,12 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Models\Core\Tax;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Core\Contracts\TaxCalculatorInterface;
+use App\Models\Core\ValueObjects\TaxCalculationResult;
+use App\Services\Tax\TaxConfigRepository;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class TaxIncome
@@ -28,70 +30,95 @@ use Illuminate\Database\Eloquent\Model;
  *
  * Uses TaxConfigRepository for database-backed tax configuration lookups.
  */
-class TaxIncome extends Model
+class TaxIncome implements TaxCalculatorInterface
 {
-    use HasFactory;
-
     /**
      * Country code for tax lookups (e.g., 'no').
      */
-    private string $country = 'no';
+    private string $country;
 
     /**
      * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
+    private TaxConfigRepository $taxConfigRepo;
 
     /**
-     * Keep constructor signature but switch to DB-backed loading.
-     *
-     * @param  string  $config  Path-like identifier used only to infer country code (e.g., 'no/no-tax-2025').
+     * TaxSalary instance for salary/pension calculations.
      */
-    public function __construct(string $country = 'no')
+    private TaxSalary $taxsalary;
+
+    /**
+     * Create a new TaxIncome service.
+     *
+     * @param  string  $country  Country code for tax calculations (default: 'no')
+     * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
+     * @param  TaxSalary|null  $taxSalary  Optional TaxSalary instance for dependency injection
+     */
+    public function __construct(
+        string $country = 'no',
+        ?TaxConfigRepository $taxConfigRepo = null,
+        ?TaxSalary $taxSalary = null
+    ) {
+        $this->country = strtolower($country) ?: 'no';
+        $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
+        $this->taxsalary = $taxSalary ?? new TaxSalary($this->country, $this->taxConfigRepo);
+    }
+
+    /**
+     * Get the country code this calculator is configured for.
+     */
+    public function getCountry(): string
     {
-
-        $this->country = $country;
-
-        $this->taxsalary = new \App\Models\Core\TaxSalary($this->country);
-
-        // Use the singleton instance from the service container
-        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
+        return $this->country;
     }
 
     /**
      * Calculates the income tax based on the tax group, tax type, year, income, expense, and interest amount.
      *
-     * @param  bool  $debug  Indicates whether to print debug information.
+     * @param  bool  $debug  Indicates whether to log debug information.
      * @param  string  $taxGroup  The tax group to which the income belongs.
      * @param  string  $taxType  The type of tax to be calculated.
      * @param  int  $year  The year for which the tax is to be calculated.
      * @param  float|null  $income  The income for the tax calculation.
      * @param  float|null  $expence  The expense for the tax calculation.
      * @param  float|null  $interestAmount  The interest amount for the tax calculation.
-     * @return array{0: float|int, 1: float|int, 2: string} Returns [amount, percent, explanation].
+     * @return array{0: float, 1: float, 2: string} Returns array for backward compatibility
      */
-    public function taxCalculationIncome(bool $debug, string $taxGroup, string $taxType, int $year, ?float $income, ?float $expence, ?float $interestAmount)
-    {
+    public function taxCalculationIncome(
+        bool $debug,
+        string $taxGroup,
+        string $taxType,
+        int $year,
+        ?float $income,
+        ?float $expence,
+        ?float $interestAmount
+    ): array {
         // Initialize explanation and income tax percent
-        $debug = true;
         $explanation = '';
         $incomeTaxRate = $this->taxConfigRepo->getTaxIncomeRate($taxType, $year);
         $incomeTaxAmount = 0;
 
-        // Print debug information if debug is true
+        // Log debug information if debug is true
         if ($debug) {
-            echo "\n\n\n********** taxtype: $taxGroup.$taxType.$year: income: $income, expence: $expence, incomeTaxPercent: $incomeTaxRate\n";
+            Log::debug('Income tax calculation input', [
+                'tax_group' => $taxGroup,
+                'tax_type' => $taxType,
+                'year' => $year,
+                'income' => $income,
+                'expence' => $expence,
+                'income_tax_rate' => $incomeTaxRate,
+            ]);
         }
 
         // Calculate income tax amount based on tax type
         switch ($taxType) {
             // For 'salary' and 'pension' tax types, calculate salary tax
             case 'salary':
-                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax(true, $year, (int) $income);
+                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
                 break;
 
             case 'pension':
-                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax(true, $year, (int) $income);
+                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
                 break;
 
                 // For 'income' tax type, calculate income tax after transfer to this category
@@ -141,12 +168,20 @@ class TaxIncome extends Model
                 break;
         }
 
-        // Print debug information if debug is true
+        // Log debug information if debug is true
         if ($debug) {
-            echo "$taxType.$year: income: $income, incomeTaxAmount: $incomeTaxAmount, incomeTaxPercent: $incomeTaxRate, explanation:$explanation\n";
+            Log::debug('Income tax calculation output', [
+                'tax_type' => $taxType,
+                'year' => $year,
+                'income' => $income,
+                'income_tax_amount' => $incomeTaxAmount,
+                'income_tax_rate' => $incomeTaxRate,
+                'explanation' => $explanation,
+            ]);
         }
 
-        // Return the calculated income tax amount, income tax percent, and explanation
+        // Return the calculated income tax amount, income tax percent, and explanation (array for backward compatibility)
         return [$incomeTaxAmount, $incomeTaxRate, $explanation];
     }
 }
+

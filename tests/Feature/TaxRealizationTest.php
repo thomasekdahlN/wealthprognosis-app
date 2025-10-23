@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Core\TaxRealization;
+use App\Models\Core\Tax\TaxRealization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,7 +21,7 @@ class TaxRealizationTest extends TestCase
 
     public function test_it_calculates_tax_realization_for_company_group()
     {
-        $taxRealization = new TaxRealization('config', 2022, 2023);
+        $taxRealization = new TaxRealization('no');
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'company', 'stock', 2022, 50000, 10000, 0, 0);
         $repo = new \App\Services\Tax\TaxConfigRepository('no');
         $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
@@ -31,7 +31,7 @@ class TaxRealizationTest extends TestCase
 
     public function test_it_calculates_tax_realization_for_individual_group()
     {
-        $taxRealization = new TaxRealization('config', 2022, 2023);
+        $taxRealization = new TaxRealization('no');
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'individual', 'stock', 2022, 50000, 10000, 0, 0);
         $repo = new \App\Services\Tax\TaxConfigRepository('no');
         $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
@@ -41,7 +41,7 @@ class TaxRealizationTest extends TestCase
 
     public function test_it_calculates_tax_realization_for_unknown_group()
     {
-        $taxRealization = new TaxRealization('config', 2022, 2023);
+        $taxRealization = new TaxRealization('no');
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'unknown', 'stock', 2022, 50000, 10000, 0, 0);
         $repo = new \App\Services\Tax\TaxConfigRepository('no');
         $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
@@ -51,7 +51,7 @@ class TaxRealizationTest extends TestCase
 
     public function test_it_calculates_tax_realization_for_negative_income()
     {
-        $taxRealization = new TaxRealization('config', 2022, 2023);
+        $taxRealization = new TaxRealization('no');
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'company', 'stock', 2022, -50000, 10000, 0, 0);
         $repo = new \App\Services\Tax\TaxConfigRepository('no');
         $expectedRate = $repo->getTaxRealizationRate('stock', 2022);
@@ -61,7 +61,7 @@ class TaxRealizationTest extends TestCase
 
     public function test_it_calculates_tax_realization_for_zero_income()
     {
-        $taxRealization = new TaxRealization('config', 2022, 2023);
+        $taxRealization = new TaxRealization('no');
         [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(false, false, 'company', 'stock', 2022, 0, 10000, 0, 0);
         $repo = new \App\Services\Tax\TaxConfigRepository('no');
         $expectedRate = $repo->getTaxRealizationRate('stock', 2022);

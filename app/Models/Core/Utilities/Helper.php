@@ -14,10 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+namespace App\Models\Core\Utilities;
 
 /**
  * Class Helper
@@ -25,10 +22,8 @@ use Illuminate\Database\Eloquent\Model;
  * Utility class for parsing asset path strings used in the prognosis system.
  * Provides methods to extract components from dot-notation asset paths.
  */
-class Helper extends Model
+class Helper
 {
-    use HasFactory;
-
     /**
      * Parse an asset path string into its component elements.
      *
@@ -40,22 +35,17 @@ class Helper extends Model
      *
      * @throws \Exception If the path format is invalid
      */
-    public function pathToElements($path)
+    public function pathToElements(string $path): array
     {
-        $assetname = null;
-        $year = null;
-        $type = null;
-        $field = null;
-
         if (preg_match('/(\w+)\.(\w+)\.(\w+)\.(\w+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
-            $assetname = $matchesH[1][0];
-            $year = $matchesH[2][0];
-            $type = $matchesH[3][0];
-            $field = $matchesH[4][0];
-        } else {
-            throw new \Exception("Invalid path format: $path");
+            return [
+                $matchesH[1][0],
+                $matchesH[2][0],
+                $matchesH[3][0],
+                $matchesH[4][0],
+            ];
         }
 
-        return [$assetname, $year, $type, $field];
+        throw new \Exception("Invalid path format: $path");
     }
 }

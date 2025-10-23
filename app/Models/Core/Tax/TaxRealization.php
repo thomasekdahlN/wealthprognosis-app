@@ -14,46 +14,59 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Models\Core\Tax;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Core\Contracts\TaxCalculatorInterface;
+use App\Models\Core\ValueObjects\RealizationCalculationResult;
+use App\Services\Tax\TaxConfigRepository;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class TaxRealization
  *
- * This class extends the Model class and is responsible for handling tax calculations.
- * It uses the HasFactory trait provided by Laravel.
+ * Handles realization (capital gains) tax calculations for various asset types.
+ * Includes support for tax shield (skjermingsfradrag) calculations.
  */
-class TaxRealization extends Model
+class TaxRealization implements TaxCalculatorInterface
 {
-    use HasFactory;
-
     /**
      * Country code for tax lookups (e.g., 'no').
      */
-    private string $country = 'no';
+    private string $country;
 
     /**
      * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
+    private TaxConfigRepository $taxConfigRepo;
 
     /**
-     * Constructor for the TaxRealization class.
-     *
-     * @param  string  $config  Path-like identifier used to infer country code.
+     * TaxSalary instance for OTP calculations.
      */
-    public function __construct($config)
+    private TaxSalary $taxsalary;
+
+    /**
+     * Create a new TaxRealization service.
+     *
+     * @param  string  $country  Country code for tax calculations (default: 'no')
+     * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
+     * @param  TaxSalary|null  $taxSalary  Optional TaxSalary instance for dependency injection
+     */
+    public function __construct(
+        string $country = 'no',
+        ?TaxConfigRepository $taxConfigRepo = null,
+        ?TaxSalary $taxSalary = null
+    ) {
+        $this->country = strtolower($country) ?: 'no';
+        $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
+        $this->taxsalary = $taxSalary ?? new TaxSalary($this->country, $this->taxConfigRepo);
+    }
+
+    /**
+     * Get the country code this calculator is configured for.
+     */
+    public function getCountry(): string
     {
-        // Infer country code from the first segment of the provided config path (e.g., 'no/no-tax-2025' -> 'no')
-        $first = explode('/', (string) $config)[0] ?? 'no';
-        $this->country = strtolower($first ?: 'no');
-
-        $this->taxsalary = new \App\Models\Core\TaxSalary($this->country);
-
-        // Use the singleton instance from the service container
-        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
+        return $this->country;
     }
 
     /**
@@ -63,7 +76,7 @@ class TaxRealization extends Model
      * It handles different tax types and calculates the tax realization accordingly.
      * It also handles the tax shield, which is only used when transferring between private assets or from company to private asset.
      *
-     * @param  bool  $debug  If true, debug information will be printed.
+     * @param  bool  $debug  If true, debug information will be logged.
      * @param  bool  $transfer  If true, the tax shield is used.
      * @param  string  $taxGroup  The tax group for the calculation.
      * @param  string  $taxType  The type of tax for the calculation.
@@ -73,10 +86,20 @@ class TaxRealization extends Model
      * @param  float  $assetDiffAmount  The asset difference amount for the calculation.
      * @param  float  $taxShieldPrevAmount  The previous tax shield amount for the calculation.
      * @param  int|null  $acquisitionYear  The acquisition year for the calculation. If null, it is considered as 0.
-     * @return array Returns an array containing the taxable amount, tax amount, acquisition amount, tax percent, tax shield amount, and tax shield percent.
+     * @return array{0: float, 1: float, 2: float, 3: float, 4: float, 5: float, 6: string} Returns array for backward compatibility
      */
-    public function taxCalculationRealization(bool $debug, bool $transfer, string $taxGroup, string $taxType, int $year, float $amount, float $acquisitionAmount, float $assetDiffAmount, float $taxShieldPrevAmount = 0, ?int $acquisitionYear = 0)
-    {
+    public function taxCalculationRealization(
+        bool $debug,
+        bool $transfer,
+        string $taxGroup,
+        string $taxType,
+        int $year,
+        float $amount,
+        float $acquisitionAmount,
+        float $assetDiffAmount,
+        float $taxShieldPrevAmount = 0,
+        ?int $acquisitionYear = 0
+    ): array {
         $explanation = '';
         $numberOfYears = $year - $acquisitionYear;
 
@@ -89,7 +112,16 @@ class TaxRealization extends Model
         $realizationTaxAmount = 0;
 
         if ($debug && $amount != 0) {
-            echo "\n  taxCalculationRealizationStart $taxGroup.$taxType.$year: amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldPrevAmount: $taxShieldPrevAmount, acquisitionYear: $acquisitionYear, $realizationTaxRate: $realizationTaxRate\n";
+            Log::debug('Realization tax calculation start', [
+                'tax_group' => $taxGroup,
+                'tax_type' => $taxType,
+                'year' => $year,
+                'amount' => $amount,
+                'acquisition_amount' => $acquisitionAmount,
+                'tax_shield_prev_amount' => $taxShieldPrevAmount,
+                'acquisition_year' => $acquisitionYear,
+                'realization_tax_rate' => $realizationTaxRate,
+            ]);
         }
 
         switch ($taxType) {
@@ -240,11 +272,31 @@ class TaxRealization extends Model
         }
 
         if ($debug) {
-            echo "  taxCalculationRealizationEnd $taxGroup.$taxType.$year: realizationTaxableAmount: $realizationTaxableAmount, realizationBeforeShieldTaxAmount: $realizationBeforeShieldTaxAmount, realizationTaxAmount: $realizationTaxAmount, acquisitionAmount: $acquisitionAmount, realizationTaxRate: $realizationTaxRate, realizationTaxShieldAmount:$realizationTaxShieldAmount, realizationTaxShieldPercent:$realizationTaxShieldPercent\n";
+            Log::debug('Realization tax calculation end', [
+                'tax_group' => $taxGroup,
+                'tax_type' => $taxType,
+                'year' => $year,
+                'realization_taxable_amount' => $realizationTaxableAmount,
+                'realization_before_shield_tax_amount' => $realizationBeforeShieldTaxAmount,
+                'realization_tax_amount' => $realizationTaxAmount,
+                'acquisition_amount' => $acquisitionAmount,
+                'realization_tax_rate' => $realizationTaxRate,
+                'realization_tax_shield_amount' => $realizationTaxShieldAmount,
+                'realization_tax_shield_percent' => $realizationTaxShieldPercent,
+            ]);
         }
 
         // V kan ikke kalkulere videre på $fortuneTaxableAmount fordi det er summen av skatter som er for fradrag, vi kan ikke summere på dette tallet etterpå. Bunnfradraget må alltid gjøres på total summen. Denne regner det bare ut isolert sett for en asset.
-        return [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxRate, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
+        // Return array for backward compatibility
+        return [
+            $realizationTaxableAmount,
+            $realizationTaxAmount,
+            $acquisitionAmount,
+            $realizationTaxRate,
+            $realizationTaxShieldAmount,
+            $realizationTaxShieldPercent,
+            $explanation,
+        ];
     }
 
     /**
@@ -263,8 +315,15 @@ class TaxRealization extends Model
      * @param  float  $taxShieldPrevAmount  The accumulated tax shield from previous years
      * @return array{0: float, 1: float, 2: float, 3: string} [realizationTaxAmount, realizationTaxShieldAmount, realizationTaxShieldPercent, explanation]
      */
-    public function taxShield(int $year, string $taxGroup, string $taxType, bool $transfer, float $amount, float $realizationTaxAmount, float $taxShieldPrevAmount)
-    {
+    public function taxShield(
+        int $year,
+        string $taxGroup,
+        string $taxType,
+        bool $transfer,
+        float $amount,
+        float $realizationTaxAmount,
+        float $taxShieldPrevAmount
+    ): array {
         $explanation = '';
         $realizationTaxShieldAmount = 0;
 
@@ -274,7 +333,6 @@ class TaxRealization extends Model
         if ($realizationTaxShieldPercent > 0) {
             // TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
             $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); // Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
-            // print "    Skjermingsfradrag: acquisitionAmount: $acquisitionAmount, realizationTaxShieldAmount: $realizationTaxShieldAmount, realizationTaxShieldPercent: $realizationTaxShieldPercent\n";
             $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. ';
         } else {
             $realizationTaxShieldAmount = $taxShieldPrevAmount;
@@ -289,7 +347,6 @@ class TaxRealization extends Model
                 // tax shield is only used when tansfering between private assets or from company to private asset - never between company assets.
                 // We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
                 if ($realizationTaxAmount >= $realizationTaxShieldAmount) {
-                    // print "REDUCING TAX SHIELD1\n";
                     $explanation .= "Taxshield ($realizationTaxShieldAmount) lower than tax ($realizationTaxAmount), using entire shield. ";
 
                     $realizationTaxAmount -= $realizationTaxShieldAmount; // Reduce the tax amount by the taxShieldAmount
@@ -297,7 +354,6 @@ class TaxRealization extends Model
                 } else {
                     $explanation .= "Taxshield ($realizationTaxShieldAmount) bigger than tax ($realizationTaxAmount), using part of the shield. ";
 
-                    // print "REDUCING TAX SHIELD2\n";
                     $realizationTaxShieldAmount -= $realizationTaxAmount; // We reduce it by the amount we used
                     $realizationTaxAmount = 0; // Then taxAmount is zero, since the entire emount was taxShielded.
                 }
@@ -308,7 +364,15 @@ class TaxRealization extends Model
             $explanation .= 'Taxshield simulation, not an actual transfer. ';
         }
 
-        // print "    taxShield: $year, amount:$amount, realizationTaxAmount:$realizationTaxAmount, realizationTaxShieldAmount:$realizationTaxShieldAmount, $explanation\n";
+        Log::debug('Tax shield calculation', [
+            'year' => $year,
+            'amount' => $amount,
+            'realization_tax_amount' => $realizationTaxAmount,
+            'realization_tax_shield_amount' => $realizationTaxShieldAmount,
+            'explanation' => $explanation,
+        ]);
+
         return [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
     }
 }
+

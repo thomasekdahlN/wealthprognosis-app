@@ -71,16 +71,16 @@ class Prognosis
         $this->config = $config;
 
         // Get Tax calculation singletons from the service container
-        $this->taxincome = app(\App\Models\Core\TaxIncome::class);
-        $this->taxfortune = app(\App\Models\Core\TaxFortune::class);
-        $this->taxrealization = app(\App\Models\Core\TaxRealization::class);
+        $this->taxincome = app(\App\Models\Core\Tax\TaxIncome::class);
+        $this->taxfortune = app(\App\Models\Core\Tax\TaxFortune::class);
+        $this->taxrealization = app(\App\Models\Core\Tax\TaxRealization::class);
 
         // Get Changerate singleton from the service container
         $this->changerate = app(\App\Models\Core\Changerate::class);
 
         // Get utility singletons from the service container
-        $this->helper = app(\App\Models\Core\Helper::class);
-        $this->rules = app(\App\Models\Core\Rules::class);
+        $this->helper = app(\App\Models\Core\Utilities\Helper::class);
+        $this->rules = app(\App\Models\Core\Calculation\Rules::class);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age

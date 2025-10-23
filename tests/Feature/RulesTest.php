@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Core\Rules;
+use App\Models\Core\Calculation\Rules;
 use Tests\TestCase;
 
 class RulesTest extends TestCase

@@ -14,61 +14,91 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Models\Core\Tax;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Core\Contracts\TaxCalculatorInterface;
+use App\Models\Core\ValueObjects\FortuneCalculationResult;
+use App\Services\Tax\TaxConfigRepository;
+use App\Services\Tax\TaxPropertyRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
-class TaxFortune extends Model
+/**
+ * Class TaxFortune
+ *
+ * Handles fortune (wealth) tax calculations including:
+ * - Fortune tax (formuesskatt)
+ * - Property tax (eiendomsskatt)
+ * - Bracket-based progressive taxation
+ */
+class TaxFortune implements TaxCalculatorInterface
 {
-    use HasFactory;
-
-    protected $country;
+    /**
+     * Country code for tax lookups.
+     */
+    private string $country;
 
     /**
      * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
+    private TaxConfigRepository $taxConfigRepo;
 
     /**
      * Shared TaxPropertyRepository instance.
      */
-    private \App\Services\Tax\TaxPropertyRepository $taxPropertyRepo;
+    private TaxPropertyRepository $taxPropertyRepo;
 
     /**
-     * Constructor for the TaxFortune class.
-     * Kept signature for backwards compatibility, but now reads from DB on demand.
+     * Create a new TaxFortune service.
      *
-     * @param  string  $config  Path-like identifier (e.g., 'no/no-tax-2025') used to infer country.
+     * @param  string  $country  Country code for tax calculations (default: 'no')
+     * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
+     * @param  TaxPropertyRepository|null  $taxPropertyRepo  Optional property repository instance for dependency injection
      */
-    public function __construct(string $country)
-    {
-        $this->country = $country;
+    public function __construct(
+        string $country = 'no',
+        ?TaxConfigRepository $taxConfigRepo = null,
+        ?TaxPropertyRepository $taxPropertyRepo = null
+    ) {
+        $this->country = strtolower($country) ?: 'no';
+        $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
+        $this->taxPropertyRepo = $taxPropertyRepo ?? app(TaxPropertyRepository::class);
+    }
 
-        // Use the singleton instances from the service container
-        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
-        $this->taxPropertyRepo = app(\App\Services\Tax\TaxPropertyRepository::class);
+    /**
+     * Get the country code this calculator is configured for.
+     */
+    public function getCountry(): string
+    {
+        return $this->country;
     }
 
     /**
      * Calculates the fortune tax and property tax based on the given parameters.
      *
      * @param  string  $taxGroup  The tax group for the calculation.
-     * @param  string  $taxType  The tax type for the calculation.
+     * @param  string|null  $taxType  The tax type for the calculation.
      * @param  string|null  $taxProperty  The property type for the calculation. If null, property tax is not calculated.
      * @param  int  $year  The year for which the tax is being calculated.
      * @param  int|null  $marketAmount  The market amount for the calculation. If null, it is considered as 0.
-     * @param  int|null  $taxableAmount  The taxable amount for the calculation. If null, it is considered as 0.
+     * @param  int|null  $taxableInitialAmount  The taxable amount for the calculation. If null, it is considered as 0.
+     * @param  int|null  $mortgageBalanceAmount  The mortgage balance amount.
      * @param  bool|null  $taxableAmountOverride  If true, the taxable amount is overridden. If null, it is considered as false.
-     * @return array Returns an array containing the taxable amount, taxable percent, tax amount, tax percent, taxable property amount, taxable property percent, tax property amount, tax property percent and an explanation.
+     * @return array{0: float, 1: float, 2: float, 3: float, 4: float, 5: float, 6: float, 7: float, 8: string} Returns array for backward compatibility
      */
-    public function taxCalculationFortune(string $taxGroup, ?string $taxType, ?string $taxProperty, int $year, ?int $marketAmount, ?int $taxableInitialAmount, ?int $mortgageBalanceAmount, ?bool $taxableAmountOverride = false)
-    {
+    public function taxCalculationFortune(
+        string $taxGroup,
+        ?string $taxType,
+        ?string $taxProperty,
+        int $year,
+        ?int $marketAmount,
+        ?int $taxableInitialAmount,
+        ?int $mortgageBalanceAmount,
+        ?bool $taxableAmountOverride = false
+    ): array {
         $explanation = '';
         $explanation1 = '';
         $explanation2 = '';
-        $explanation = '';
         $taxableFortuneAmount = 0;
 
         // Property tax
@@ -88,12 +118,20 @@ class TaxFortune extends Model
             $taxableFortuneAmount = $taxableInitialAmount;
             $taxableFortunePercent = 0; // If $fortuneTaxableAmount is set, we ignore the $fortuneTaxablePercent since that should be calculated from the market value and when $fortuneTaxableAmount is set, we do not releate tax to market value anymore.
             $explanation .= 'Override taxable. ';
-            // echo "   taxableAmount ovveride: taxableInitialAmount:$taxableInitialAmount - mortgageBalanceAmount:$mortgageBalanceAmount\n";
+
+            Log::debug('Fortune tax calculation - override', [
+                'taxable_initial_amount' => $taxableInitialAmount,
+                'mortgage_balance_amount' => $mortgageBalanceAmount,
+            ]);
         } else {
             $taxablePropertyAmount = round($marketAmount);
             $taxableFortuneAmount = round($marketAmount * $taxableFortuneRate); // Calculate the amount from which the tax is calculated from the market value minus mortgage.
 
-            // echo "   taxableAmount normal: taxableFortuneAmount:$taxableFortuneAmount, taxableFortuneRate:$taxableFortuneRate\n";
+            Log::debug('Fortune tax calculation - normal', [
+                'taxable_fortune_amount' => $taxableFortuneAmount,
+                'taxable_fortune_rate' => $taxableFortuneRate,
+            ]);
+
             $explanation .= 'Market taxable. ';
         }
 
@@ -105,9 +143,29 @@ class TaxFortune extends Model
         }
         $explanation .= $explanation2.$explanation1;
 
-        // echo "   taxCalculationFortuneReturn: taxableFortuneAmount:$taxableFortuneAmount, taxableFortuneRate:$taxableFortuneRate, taxAmount:$taxAmount taxPercent:$taxPercent, taxablePropertyAmount:$taxablePropertyAmount,taxablePropertyPercent:$taxablePropertyPercent,taxPropertyAmount:$taxPropertyAmount,taxPropertyPercent:$taxPropertyPercent,$explanation\n";
+        Log::debug('Fortune tax calculation result', [
+            'taxable_fortune_amount' => $taxableFortuneAmount,
+            'taxable_fortune_rate' => $taxableFortuneRate,
+            'tax_amount' => $taxAmount,
+            'tax_percent' => $taxPercent,
+            'taxable_property_amount' => $taxablePropertyAmount,
+            'taxable_property_percent' => $taxablePropertyPercent,
+            'tax_property_amount' => $taxPropertyAmount,
+            'tax_property_percent' => $taxPropertyPercent,
+        ]);
 
-        return [$taxableFortuneAmount, $taxableFortuneRate, $taxAmount, $taxPercent, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation];
+        // Return array for backward compatibility
+        return [
+            $taxableFortuneAmount,
+            $taxableFortuneRate,
+            $taxAmount,
+            $taxPercent,
+            $taxablePropertyAmount,
+            $taxablePropertyPercent,
+            $taxPropertyAmount,
+            $taxPropertyPercent,
+            $explanation,
+        ];
     }
 
     /**
@@ -127,13 +185,15 @@ class TaxFortune extends Model
     /**
      * Calculates the fortune tax based on the given parameters.
      *
-     * @param  bool  $debug  If true, debug information will be printed.
+     * @param  bool  $debug  If true, debug information will be logged.
      * @param  int  $year  The year for which the tax is being calculated.
      * @param  string  $taxGroup  The tax group for the calculation.
      * @param  float  $amount  The amount of fortune for the calculation.
-     * @return array Returns an array containing the calculated tax amount, tax percent and an explanation.
+     * @param  float  $mortgage  The mortgage amount to deduct.
+     * @param  bool  $deduct  Whether to apply deductions (currently unused).
+     * @return array{0: float, 1: float, 2: float, 3: string} [taxAmount, taxPercent, taxableAmount, explanation]
      */
-    public function calculatefortunetax(bool $debug, int $year, string $taxGroup, float $amount, float $mortgage, bool $deduct = false)
+    public function calculatefortunetax(bool $debug, int $year, string $taxGroup, float $amount, float $mortgage, bool $deduct = false): array
     {
         $taxAmount = 0;
         $taxPercent = 0;
@@ -143,7 +203,12 @@ class TaxFortune extends Model
         $brackets = $this->taxConfigRepo->getFortuneTaxBracketConfig($year);
 
         if ($debug) {
-            echo "   calculatefortunetax in: $year.$taxGroup, amount:$amount, mortgage: $mortgage\n";
+            Log::debug('Fortune tax calculation input', [
+                'year' => $year,
+                'tax_group' => $taxGroup,
+                'amount' => $amount,
+                'mortgage' => $mortgage,
+            ]);
         }
 
         // FIX: Not all assets is allowed to have mortgage deducted. Only private house/rental/cabins. Check tax laws.
@@ -166,7 +231,12 @@ class TaxFortune extends Model
                 $taxAmount += $amountInBracket * $rate;
 
                 if ($debug) {
-                    echo "   Bracket: limit=$limit, percent=$percent%, amountInBracket=$amountInBracket, bracketTax=".($amountInBracket * $rate)."\n";
+                    Log::debug('Fortune tax bracket calculation', [
+                        'limit' => $limit,
+                        'percent' => $percent,
+                        'amount_in_bracket' => $amountInBracket,
+                        'bracket_tax' => $amountInBracket * $rate,
+                    ]);
                 }
 
                 // If we've reached the amount, stop
@@ -186,11 +256,19 @@ class TaxFortune extends Model
             $explanation = 'Negative asset value after deducting mortgage, reducing fortune value. ';
         }
 
-        // Print debug information if debug is true
+        // Log debug information if debug is true
         if ($debug) {
-            echo "   calculatefortunetax out: $year.$taxGroup, taxAmount:$taxAmount, taxPercent:$taxPercent, taxableAmount: $taxableAmount, $explanation\n";
+            Log::debug('Fortune tax calculation output', [
+                'year' => $year,
+                'tax_group' => $taxGroup,
+                'tax_amount' => $taxAmount,
+                'tax_percent' => $taxPercent,
+                'taxable_amount' => $taxableAmount,
+                'explanation' => $explanation,
+            ]);
         }
 
         return [$taxAmount, $taxPercent, $taxableAmount, $explanation];
     }
 }
+

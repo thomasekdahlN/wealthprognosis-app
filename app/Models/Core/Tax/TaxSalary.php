@@ -14,11 +14,13 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Models\Core\Tax;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Core\Contracts\TaxCalculatorInterface;
+use App\Models\Core\ValueObjects\TaxCalculationResult;
+use App\Services\Tax\TaxConfigRepository;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class TaxSalary
@@ -29,30 +31,36 @@ use Illuminate\Support\Arr;
  * - Social security tax (trygdeavgift)
  * - Standard deductions (minstefradrag)
  */
-class TaxSalary extends Model
+class TaxSalary implements TaxCalculatorInterface
 {
-    use HasFactory;
-
     /**
-     * Country code for tax lookups. Defaults to Norway (no).
+     * Country code for tax lookups.
      */
     private string $country;
 
     /**
      * Shared TaxConfigRepository instance.
      */
-    private \App\Services\Tax\TaxConfigRepository $taxConfigRepo;
+    private TaxConfigRepository $taxConfigRepo;
 
     /**
      * Create a new TaxSalary service.
-     * Country defaults to 'no' to preserve current behavior.
+     *
+     * @param  string  $country  Country code for tax calculations (default: 'no')
+     * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
      */
-    public function __construct(string $country = 'no')
+    public function __construct(string $country = 'no', ?TaxConfigRepository $taxConfigRepo = null)
     {
         $this->country = strtolower($country) ?: 'no';
+        $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
+    }
 
-        // Use the singleton instance from the service container
-        $this->taxConfigRepo = app(\App\Services\Tax\TaxConfigRepository::class);
+    /**
+     * Get the country code this calculator is configured for.
+     */
+    public function getCountry(): string
+    {
+        return $this->country;
     }
 
     /**
@@ -64,9 +72,9 @@ class TaxSalary extends Model
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
-     * @return array{0: float, 1: float, 2: string} [totalTaxAmount, totalTaxPercent, explanation]
+     * @return array{0: float, 1: float, 2: string}|TaxCalculationResult Returns array for backward compatibility
      */
-    public function calculatesalarytax(bool $debug, int $year, int $amount)
+    public function calculatesalarytax(bool $debug, int $year, int $amount): array
     {
         $explanation = '';
         $commonTaxAmount = 0; // Fellesskatt
@@ -88,7 +96,7 @@ class TaxSalary extends Model
         $commonTaxableAmount = $amount - $socialSecurityTaxAmount - $commonTaxDeductionAmount; // Man betaler fellesskatt av lønnen etter at trygdeavgidt og minstefradraget er trukket fra
         $commonTaxAmount = round($commonTaxableAmount * $commonTaxRate);
 
-        [$bracketTaxAmount, $bracketTaxPercent, $explanation] = $this->calculateBracketTax(true, $year, $amount); // Man betaler trinnskatt av hele lønnen uten fradrag
+        [$bracketTaxAmount, $bracketTaxPercent, $explanation] = $this->calculateBracketTax($debug, $year, $amount); // Man betaler trinnskatt av hele lønnen uten fradrag
 
         $explanation = ' Fellesskatt: '.$commonTaxRate * 100 ."% gir $commonTaxAmount skatt, Trygdeavgift ".$socialSecurityTaxRate * 100 ."% gir $socialSecurityTaxAmount skatt ".$explanation;
 
@@ -97,11 +105,21 @@ class TaxSalary extends Model
         if ($amount > 0) {
             $totalTaxPercent = round(($totalTaxAmount / $amount), 2); // We calculate a total percentage using the amounts
         }
-        // Print debug information if debug is true
+
+        // Log debug information if debug is true
         if ($debug) {
-            echo "   $year amount:$amount, commonTaxDeductionAmount:$commonTaxDeductionAmount, commonTaxableAmount:$commonTaxableAmount, totalTaxAmount:$totalTaxAmount, totalTaxPercent:".$totalTaxPercent * 100 .", $explanation\n";
+            Log::debug('Salary tax calculation', [
+                'year' => $year,
+                'amount' => $amount,
+                'common_tax_deduction_amount' => $commonTaxDeductionAmount,
+                'common_taxable_amount' => $commonTaxableAmount,
+                'total_tax_amount' => $totalTaxAmount,
+                'total_tax_percent' => $totalTaxPercent * 100,
+                'explanation' => $explanation,
+            ]);
         }
 
+        // Return array for backward compatibility
         return [$totalTaxAmount, $totalTaxPercent, $explanation];
     }
 
@@ -114,9 +132,9 @@ class TaxSalary extends Model
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
-     * @return array{0: float, 1: float, 2: string} [bracketTotalTaxAmount, bracketTotalTaxPercent, explanation]
+     * @return array{0: float, 1: float, 2: string} Returns array for backward compatibility
      */
-    public function calculateBracketTax(bool $debug, int $year, int $amount)
+    public function calculateBracketTax(bool $debug, int $year, int $amount): array
     {
         $count = 0;
         $explanation = '';
@@ -138,7 +156,17 @@ class TaxSalary extends Model
                 $bracketTotalTaxAmount += $bracketTaxAmount;
 
                 $explanation .= " Bracket$count ($bracket[limit])$bracket[percent]%=$bracketTaxAmount,";
-                echo "Bracket limit $bracket[limit], amount: $amount, taxableAmount:$bracketTaxableAmount * $bracket[percent]% = tax: $bracketTaxAmount\n";
+
+                if ($debug) {
+                    Log::debug('Bracket tax calculation - within limit', [
+                        'bracket' => $count,
+                        'limit' => $bracket['limit'],
+                        'amount' => $amount,
+                        'taxable_amount' => $bracketTaxableAmount,
+                        'percent' => $bracket['percent'],
+                        'tax' => $bracketTaxAmount,
+                    ]);
+                }
 
             } elseif (isset($bracket['limit'])) {
                 // Amount is lower than limit, we are at the end and calculate the rest of the amount.
@@ -146,7 +174,17 @@ class TaxSalary extends Model
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
                 $explanation .= " Bracket$count ($amount<)".$bracket['limit'].")$bracket[percent]%=$bracketTaxAmount";
-                echo "Bracket $amount < ".$bracket['limit']." taxableAmount:$bracketTaxableAmount * $bracket[percent]% = tax: $bracketTaxAmount\n";
+
+                if ($debug) {
+                    Log::debug('Bracket tax calculation - below limit', [
+                        'bracket' => $count,
+                        'amount' => $amount,
+                        'limit' => $bracket['limit'],
+                        'taxable_amount' => $bracketTaxableAmount,
+                        'percent' => $bracket['percent'],
+                        'tax' => $bracketTaxAmount,
+                    ]);
+                }
 
                 break;
             } else {
@@ -155,7 +193,16 @@ class TaxSalary extends Model
                 $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
                 $bracketTotalTaxAmount += $bracketTaxAmount;
                 $explanation .= " Bracket$count (>$prevLimitAmount)$bracket[percent]%=$bracketTaxAmount";
-                echo "Bracket limit bigger than $prevLimitAmount taxableAmount:$bracketTaxableAmount * $bracket[percent]% = tax: $bracketTaxAmount\n";
+
+                if ($debug) {
+                    Log::debug('Bracket tax calculation - above all limits', [
+                        'bracket' => $count,
+                        'prev_limit' => $prevLimitAmount,
+                        'taxable_amount' => $bracketTaxableAmount,
+                        'percent' => $bracket['percent'],
+                        'tax' => $bracketTaxAmount,
+                    ]);
+                }
 
                 break;
             }
@@ -169,6 +216,7 @@ class TaxSalary extends Model
 
         $explanation = " Trinnskatt:$bracketTotalTaxAmount snitt ".$bracketTotalTaxPercent * 100 .'%, '.$explanation;
 
+        // Return array for backward compatibility
         return [$bracketTotalTaxAmount, $bracketTotalTaxPercent, $explanation];
     }
 
@@ -182,7 +230,7 @@ class TaxSalary extends Model
      * @param  int  $amount  The salary/pension amount
      * @return float The deduction amount
      */
-    public function commonDeduction($year, $amount)
+    public function commonDeduction(int $year, int $amount): float
     {
         $deductionConfig = $this->taxConfigRepo->getSalaryTaxDeductionConfig($year);
         $minAmount = Arr::get($deductionConfig, 'deduction.min');
@@ -197,8 +245,15 @@ class TaxSalary extends Model
             $deduction = $minAmount;
         }
 
-        echo "amount: $amount, min: $minAmount, max: $maxAmount, percent: $percent, deduction: $deduction\n";
+        Log::debug('Common deduction calculation', [
+            'amount' => $amount,
+            'min' => $minAmount,
+            'max' => $maxAmount,
+            'percent' => $percent,
+            'deduction' => $deduction,
+        ]);
 
         return $deduction;
     }
 }
+

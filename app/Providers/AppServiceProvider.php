@@ -30,17 +30,36 @@ class AppServiceProvider extends ServiceProvider
             return new \App\Services\Tax\TaxPropertyRepository('no');
         });
 
-        // Register Tax calculation classes as singletons
-        $this->app->singleton(\App\Models\Core\TaxIncome::class, function ($app) {
-            return new \App\Models\Core\TaxIncome('no');
+        // Register Tax calculation classes as singletons with proper dependency injection
+        $this->app->singleton(\App\Models\Core\Tax\TaxSalary::class, function ($app) {
+            return new \App\Models\Core\Tax\TaxSalary(
+                'no',
+                $app->make(\App\Services\Tax\TaxConfigRepository::class)
+            );
         });
 
-        $this->app->singleton(\App\Models\Core\TaxFortune::class, function ($app) {
-            return new \App\Models\Core\TaxFortune('no');
+        $this->app->singleton(\App\Models\Core\Tax\TaxIncome::class, function ($app) {
+            return new \App\Models\Core\Tax\TaxIncome(
+                'no',
+                $app->make(\App\Services\Tax\TaxConfigRepository::class),
+                $app->make(\App\Models\Core\Tax\TaxSalary::class)
+            );
         });
 
-        $this->app->singleton(\App\Models\Core\TaxRealization::class, function ($app) {
-            return new \App\Models\Core\TaxRealization('no');
+        $this->app->singleton(\App\Models\Core\Tax\TaxFortune::class, function ($app) {
+            return new \App\Models\Core\Tax\TaxFortune(
+                'no',
+                $app->make(\App\Services\Tax\TaxConfigRepository::class),
+                $app->make(\App\Services\Tax\TaxPropertyRepository::class)
+            );
+        });
+
+        $this->app->singleton(\App\Models\Core\Tax\TaxRealization::class, function ($app) {
+            return new \App\Models\Core\Tax\TaxRealization(
+                'no',
+                $app->make(\App\Services\Tax\TaxConfigRepository::class),
+                $app->make(\App\Models\Core\Tax\TaxSalary::class)
+            );
         });
 
         $this->app->singleton(\App\Models\Core\TaxProperty::class, function ($app) {
@@ -48,12 +67,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Register utility classes as singletons
-        $this->app->singleton(\App\Models\Core\Helper::class, function ($app) {
-            return new \App\Models\Core\Helper;
+        $this->app->singleton(\App\Models\Core\Utilities\Helper::class, function ($app) {
+            return new \App\Models\Core\Utilities\Helper;
         });
 
-        $this->app->singleton(\App\Models\Core\Rules::class, function ($app) {
-            return new \App\Models\Core\Rules;
+        $this->app->singleton(\App\Models\Core\Calculation\Rules::class, function ($app) {
+            return new \App\Models\Core\Calculation\Rules;
         });
 
         // Register Changerate as a singleton

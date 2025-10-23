@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Core\Rules;
+use App\Models\Core\Calculation\Rules;
 use Tests\TestCase;
 
 class ValueChangeTest extends TestCase
@@ -26,7 +26,7 @@ class ValueChangeTest extends TestCase
 
     public function test_positive_percent_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;
@@ -40,7 +40,7 @@ class ValueChangeTest extends TestCase
 
     public function test_negative_divisor_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;
@@ -54,7 +54,7 @@ class ValueChangeTest extends TestCase
 
     public function test_positive_divisor_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 1000;
         $depositedAmount = 0;
@@ -68,7 +68,7 @@ class ValueChangeTest extends TestCase
 
     public function test_negative_dynamic_divisor_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $depositedAmount = 0;
         $amount = 1000;
@@ -83,7 +83,7 @@ class ValueChangeTest extends TestCase
 
     public function test_positive_dynamic_divisor_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $depositedAmount = 0;
         $amount = 1000;
@@ -98,7 +98,7 @@ class ValueChangeTest extends TestCase
 
     public function test_addition_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $depositedAmount = 0;
         $amount = 1000;
@@ -112,7 +112,7 @@ class ValueChangeTest extends TestCase
 
     public function test_subtraction_value_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 1000;
         $rule = '-500';
@@ -126,7 +126,7 @@ class ValueChangeTest extends TestCase
 
     public function test_addition_rule_to_existing_amount_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 105000;
         $rule = '+5000';
@@ -140,7 +140,7 @@ class ValueChangeTest extends TestCase
 
     public function test_income_factor_amount_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 40000; // salary pr mont
         $rule = null;
@@ -154,7 +154,7 @@ class ValueChangeTest extends TestCase
 
     public function test_factor_addition_rule_to_existing_amount_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 100000;
         $rule = '+5000';
@@ -168,7 +168,7 @@ class ValueChangeTest extends TestCase
 
     public function test_factor_subtraction_rule_to_existing_amount_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 100000;
         $rule = '-5000';
@@ -182,7 +182,7 @@ class ValueChangeTest extends TestCase
 
     public function test_asset_not_factored_amount_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = 100000;
         $rule = null;
@@ -196,7 +196,7 @@ class ValueChangeTest extends TestCase
 
     public function test_equals_factored_amount_change(): void
     {
-        $calculation = new Rules;
+        $calculation = app(Rules::class);
         $debug = false;
         $amount = '40000'; // Example, salary 40K pr month
         $rule = null;
