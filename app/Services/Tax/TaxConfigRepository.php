@@ -97,20 +97,6 @@ class TaxConfigRepository
         return Arr::get($configH, 'bracket', []);
     }
 
-    /**
-     * Returns the standard deduction for the fortune tax.
-     *
-     * @param  string  $taxGroup  The tax group.
-     * @param  int  $year  The year for which the tax is being calculated.
-     * @return int The standard deduction for the fortune tax.
-     */
-    public function getFortuneTaxStandardDeduction(string $taxGroup, int $year): int
-    {
-        $configH = $this->getTaxConfig($year, 'fortune');
-
-        return (int) Arr::get($configH, 'standardDeduction', 0);
-    }
-
     // ***************************************************************************************
     // ** Realization spesific helper functions */
     public function getTaxRealizationRate(string $taxType, int $year): float
