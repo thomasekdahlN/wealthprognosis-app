@@ -144,14 +144,17 @@
     "fortune": 100
   },
   "fortune": {
-    "standardDeduction": 1500000,
     "bracket": [
       {
-        "limit": 15000000,
-        "rate": 0.85
+        "limit": 1500000,
+        "percent": 0
       },
       {
-        "rate": 1.1
+        "limit": 15000000,
+        "percent": 0.85
+      },
+      {
+        "percent": 1.1
       }
     ]
   },
