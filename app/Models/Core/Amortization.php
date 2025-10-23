@@ -19,6 +19,7 @@ namespace App\Models\Core;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class Amortization extends Model
 {
@@ -145,7 +146,22 @@ class Amortization extends Model
             if ($this->balanceAmount > 0) {
 
                 if ($debug) {
-                    echo "      $year: years: $this->period, interestOnlyYears: $this->interestOnlyYears, deno: $deno : $interestPercent% = $interestDecimal : remainingMortgageAmount: ".round($this->remainingMortgageAmount).' termAmount: '.round($this->termAmount).' : interestAmount '.round($interestAmount).' : principalAmount: '.round($this->principalAmount).' : balanceAmount: '.round($this->balanceAmount)."\n";
+                    Log::debug('Mortgage amortization calculation', [
+                        'year' => $year,
+                        'period' => $this->period,
+                        'interest_only_years' => $this->interestOnlyYears,
+                        'deno' => $deno,
+                        'interest_percent' => $interestPercent,
+                        'interest_decimal' => $interestDecimal,
+                        'remaining_mortgage_amount' => round($this->remainingMortgageAmount),
+                        'term_amount' => round($this->termAmount),
+                        'interest_amount' => round($interestAmount),
+                        'principal_amount' => round($this->principalAmount),
+                        'balance_amount' => round($this->balanceAmount),
+                    ]);
+                    if (app()->runningInConsole()) {
+                        echo "      $year: years: $this->period, interestOnlyYears: $this->interestOnlyYears, deno: $deno : $interestPercent% = $interestDecimal : remainingMortgageAmount: ".round($this->remainingMortgageAmount).' termAmount: '.round($this->termAmount).' : interestAmount '.round($interestAmount).' : principalAmount: '.round($this->principalAmount).' : balanceAmount: '.round($this->balanceAmount)."\n";
+                    }
                 }
                 if ($extraDownpaymentAmount > 0) {
                     $description .= " extraDownpaymentAmount: $extraDownpaymentAmount\n";

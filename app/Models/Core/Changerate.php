@@ -17,6 +17,7 @@
 namespace App\Models\Core;
 
 use App\Models\PrognosisChangeRate;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Changerate
@@ -128,7 +129,14 @@ class Changerate
         $explanation = '';
 
         if ($debug) {
-            echo "    getChangerateStart($original, $year, $type)\n";
+            Log::debug('Get changerate start', [
+                'original' => $original,
+                'year' => $year,
+                'type' => $type,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "    getChangerateStart($original, $year, $type)\n";
+            }
         }
 
         // Hvis den originale verdien er satt, da må vi ikke huske eller bruke $type lenger
@@ -152,7 +160,15 @@ class Changerate
             }
 
             if ($debug) {
-                echo "    getChangerateReturn($percent, $decimal, $type, $explanation)\n";
+                Log::debug('Get changerate return', [
+                    'percent' => $percent,
+                    'decimal' => $decimal,
+                    'type' => $type,
+                    'explanation' => $explanation,
+                ]);
+                if (app()->runningInConsole()) {
+                    echo "    getChangerateReturn($percent, $decimal, $type, $explanation)\n";
+                }
             }
         }
 

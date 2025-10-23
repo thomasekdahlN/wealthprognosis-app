@@ -19,6 +19,7 @@ namespace App\Models\Core;
 use App\Models\AssetType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Prognosis
@@ -106,7 +107,10 @@ class Prognosis
         foreach ($this->config as $assetname => $assetconfig) {
 
             if ($assetname == 'meta') {
-                echo "--- Jump over meta $assetname\n";
+                Log::info('Skipping meta configuration', ['asset' => $assetname]);
+                if (app()->runningInConsole()) {
+                    echo "--- Jump over meta $assetname\n";
+                }
 
                 continue;
             } // Hopp over metadata, reserved keyword meta.
@@ -116,7 +120,10 @@ class Prognosis
                 continue;
             } // Jump past inactive assets
 
-            echo "#################### Asset: $assetname\n";
+            Log::info('Processing asset', ['asset' => $assetname]);
+            if (app()->runningInConsole()) {
+                echo "#################### Asset: $assetname\n";
+            }
 
             // Store all metadata about the asset, the rest is yearly calculations
             $this->dataH[$assetname]['meta'] = $this->ArrGetConfig("$assetname.meta"); // Copy metadata into dataH
@@ -167,12 +174,24 @@ class Prognosis
 
             $restAccumulated = 0;
 
-            echo "economyStartYear: $this->economyStartYear, deathYear: $this->deathYear\n";
+            Log::info('Processing years for asset', [
+                'asset' => $assetname,
+                'economy_start_year' => $this->economyStartYear,
+                'death_year' => $this->deathYear,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "economyStartYear: $this->economyStartYear, deathYear: $this->deathYear\n";
+            }
+
             for ($year = $this->economyStartYear; $year <= $this->deathYear; $year++) {
 
                 $prevYear = $year - 1;
                 $path = "$assetname.$year";
-                echo "$path\n";
+
+                Log::debug('Processing year', ['path' => $path]);
+                if (app()->runningInConsole()) {
+                    echo "$path\n";
+                }
 
                 // #######################################################################################################
                 // Expence
@@ -337,7 +356,19 @@ class Prognosis
 
                 // ######################################################################################################
                 $interestAmount = round($assetMarketAmount - $assetMarketInitialAmount); // ToDo - subtract the changerated amount from the initial amount to find the interest amount
-                echo "***********taxCalculationIncome taxGroup:$taxGroup, taxType:$taxType, year:$year, incomeAmount:$incomeAmount, expenceAmount:$expenceAmount, interestAmount:$interestAmount\n";
+
+                Log::debug('Tax calculation income input', [
+                    'tax_group' => $taxGroup,
+                    'tax_type' => $taxType,
+                    'year' => $year,
+                    'income_amount' => $incomeAmount,
+                    'expence_amount' => $expenceAmount,
+                    'interest_amount' => $interestAmount,
+                ]);
+                if (app()->runningInConsole()) {
+                    echo "***********taxCalculationIncome taxGroup:$taxGroup, taxType:$taxType, year:$year, incomeAmount:$incomeAmount, expenceAmount:$expenceAmount, interestAmount:$interestAmount\n";
+                }
+
                 [$cashflowTaxAmount, $cashflowTaxPercent, $cashflowDescription] = $this->taxincome->taxCalculationIncome(true, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
 
                 $cashflowBeforeTaxAmount =
@@ -355,7 +386,20 @@ class Prognosis
                     + $this->ArrGet("$path.mortgage.taxDeductableAmount") // Plus skattefradrag på renter
                     + $this->ArrGet("$path.income.transferedAmount");
 
-                echo "$assetname.$year.income.incomeAmount:$incomeAmount,expenceAmount:$expenceAmount,interestAmount:$interestAmount, cashflowTaxAmount:$cashflowTaxAmount, cashflowBeforeTaxAmount:$cashflowBeforeTaxAmount, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, transferedAmount; ".$this->ArrGet("$path.income.transferedAmount")."\n";
+                Log::info('Cashflow calculation result', [
+                    'asset' => $assetname,
+                    'year' => $year,
+                    'income_amount' => $incomeAmount,
+                    'expence_amount' => $expenceAmount,
+                    'interest_amount' => $interestAmount,
+                    'cashflow_tax_amount' => $cashflowTaxAmount,
+                    'cashflow_before_tax_amount' => $cashflowBeforeTaxAmount,
+                    'cashflow_after_tax_amount' => $cashflowAfterTaxAmount,
+                    'transferred_amount' => $this->ArrGet("$path.income.transferedAmount"),
+                ]);
+                if (app()->runningInConsole()) {
+                    echo "$assetname.$year.income.incomeAmount:$incomeAmount,expenceAmount:$expenceAmount,interestAmount:$interestAmount, cashflowTaxAmount:$cashflowTaxAmount, cashflowBeforeTaxAmount:$cashflowBeforeTaxAmount, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, transferedAmount; ".$this->ArrGet("$path.income.transferedAmount")."\n";
+                }
 
                 $cashflowNewRule = null;
                 if ($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
@@ -532,7 +576,19 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "    applyRule INPUT($originYear, amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldAmount: $taxShieldAmount, transfer $rule of $transferTo, source: $source factor: $factor)\n";
+            Log::debug('Apply rule input', [
+                'origin_year' => $originYear,
+                'amount' => $amount,
+                'acquisition_amount' => $acquisitionAmount,
+                'tax_shield_amount' => $taxShieldAmount,
+                'rule' => $rule,
+                'transfer_to' => $transferTo,
+                'source' => $source,
+                'factor' => $factor,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "    applyRule INPUT($originYear, amount: $amount, acquisitionAmount: $acquisitionAmount, taxShieldAmount: $taxShieldAmount, transfer $rule of $transferTo, source: $source factor: $factor)\n";
+            }
         }
 
         // ##############################################################################################################
@@ -565,7 +621,10 @@ class Prognosis
 
             // A rule without a transfer adds money to an asset without removing it from another asset. It is treated as a deposit.
             if ($debug) {
-                echo "  Normal rule\n";
+                Log::debug('Applying normal rule (deposit)');
+                if (app()->runningInConsole()) {
+                    echo "  Normal rule\n";
+                }
             }
             [$newAmount, $diffAmount, $rule, $explanation] = $this->rules->calculateRule(false, $amount, $acquisitionAmount, $rule, $factor);
             $this->ArrSet($transferedOriginAmount, Arr::get($this->dataH, $transferedOriginAmount, 0) + $diffAmount); // The amount we transfered to - for later reference and calculation
@@ -580,7 +639,17 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "    applyRule OUTPUT($originYear, newAmount: $newAmount, diffAmount: $diffAmount, taxShieldAmount: $taxShieldAmount, rule: $rule, explanation: $explanation)\n";
+            Log::debug('Apply rule output', [
+                'origin_year' => $originYear,
+                'new_amount' => $newAmount,
+                'diff_amount' => $diffAmount,
+                'tax_shield_amount' => $taxShieldAmount,
+                'rule' => $rule,
+                'explanation' => $explanation,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "    applyRule OUTPUT($originYear, newAmount: $newAmount, diffAmount: $diffAmount, taxShieldAmount: $taxShieldAmount, rule: $rule, explanation: $explanation)\n";
+            }
         }
 
         // print "return amountAdjustment($newAmount, $rule, $explanation)\n";
@@ -631,7 +700,14 @@ class Prognosis
         $paidAmount = 0;
         $explanation = " transfer $amount ($explanation) to $transferTo ";
         if ($debug) {
-            echo "        Transferto before: $transferTo ($explanation): ".Arr::get($this->dataH, $transferTo, 0)."\n";
+            Log::debug('Transfer before', [
+                'transfer_to' => $transferTo,
+                'explanation' => $explanation,
+                'current_value' => Arr::get($this->dataH, $transferTo, 0),
+            ]);
+            if (app()->runningInConsole()) {
+                echo "        Transferto before: $transferTo ($explanation): ".Arr::get($this->dataH, $transferTo, 0)."\n";
+            }
         }
 
         [$toAssetname, $toYear, $toType, $toField] = $this->helper->pathToElements($transferTo);
@@ -721,7 +797,13 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "        Transferto after: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
+            Log::debug('Transfer after', [
+                'transfer_to' => $transferTo,
+                'new_value' => Arr::get($this->dataH, $transferTo, 0),
+            ]);
+            if (app()->runningInConsole()) {
+                echo "        Transferto after: $transferTo: ".Arr::get($this->dataH, $transferTo, 0)."\n";
+            }
         }
 
         // ###########################################################################################################
@@ -743,7 +825,14 @@ class Prognosis
         // Mortage - has to be calculated before asset, since we use data from mortgage to calculate asset values correctly.
         // How can we ensure we are transfering to a valid mortgage, it could have been finished already.
 
-        echo "@@@@ $assetname.mortgageExtraDownPayment:$year extraDownPaymentAmount:$extraDownPaymentAmount\n";
+        Log::info('Mortgage extra down payment', [
+            'asset' => $assetname,
+            'year' => $year,
+            'extra_down_payment_amount' => $extraDownPaymentAmount,
+        ]);
+        if (app()->runningInConsole()) {
+            echo "@@@@ $assetname.mortgageExtraDownPayment:$year extraDownPaymentAmount:$extraDownPaymentAmount\n";
+        }
 
         $mortgageBalanceAmount = $this->ArrGet("$assetname.$year.mortgage.balanceAmount");
         $mortgage['amount'] = $mortgageBalanceAmount - $extraDownPaymentAmount; // Vi reberegner lånet minus ekstra innbetaliungen - basert på gjenværende lånebeløp dette året.
@@ -751,7 +840,15 @@ class Prognosis
 
             // This will only happen if we already have processed the mortgage of the asset in the sequenze
 
-            echo "*** Reberegner opprinnelig lån $mortgageBalanceAmount med ekstra innbetaling $year: $extraDownPaymentAmount = ny lånesum: ".$mortgage['amount']."\n";
+            Log::info('Recalculating mortgage with extra payment', [
+                'original_balance' => $mortgageBalanceAmount,
+                'year' => $year,
+                'extra_payment' => $extraDownPaymentAmount,
+                'new_amount' => $mortgage['amount'],
+            ]);
+            if (app()->runningInConsole()) {
+                echo "*** Reberegner opprinnelig lån $mortgageBalanceAmount med ekstra innbetaling $year: $extraDownPaymentAmount = ny lånesum: ".$mortgage['amount']."\n";
+            }
 
             // The mortgage has a remaining balance after extra payment, we recalculate on this amount.
             $mortgage['years'] = $this->ArrGet("$assetname.$year.mortgage.years"); // Vi reberegner slik at lånet er ferdig på samme år som det opprinnelige lånet
@@ -783,7 +880,12 @@ class Prognosis
 
             // FIX: The remaining extrapayment not neccessary for the mortgage downpayment has to get back into the asset and not deducted..........
 
-            echo "    notUsedExtraAmount: $notUsedExtraAmount - going back into cashflow\n";
+            Log::info('Unused extra payment going back to cashflow', [
+                'not_used_extra_amount' => $notUsedExtraAmount,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "    notUsedExtraAmount: $notUsedExtraAmount - going back into cashflow\n";
+            }
         }
 
         return [$notUsedExtraAmount, $description];
@@ -822,7 +924,16 @@ class Prognosis
             $repeat = $this->ArrGet("$assetname.$prevYear.$type.repeat"); // Check if we stopped repeating the previous year.
         }
         if ($debug) {
-            echo "      configOrPrevValueConfig: $assetname.$year.$type.$variable: $value\n";
+            Log::debug('Config or prev value - from config', [
+                'asset' => $assetname,
+                'year' => $year,
+                'type' => $type,
+                'variable' => $variable,
+                'value' => $value,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "      configOrPrevValueConfig: $assetname.$year.$type.$variable: $value\n";
+            }
         }
 
         // Trouble with bool handling here, and with amounts that are 0.0 (since amounts is set default to 0 so calculations shall work.
@@ -831,7 +942,16 @@ class Prognosis
         if ((! isset($value) && $repeat) || (is_numeric($value) && $value == 0 && $repeat)) {
             $value = $this->ArrGet("$assetname.$prevYear.$type.$variable"); // Retrive value from dataH previous year only if repeat is true
             if ($debug) {
-                echo "      configOrPrevValueData prev year: $assetname.$year.$type.$variable: $value\n";
+                Log::debug('Config or prev value - from data (prev year)', [
+                    'asset' => $assetname,
+                    'year' => $year,
+                    'type' => $type,
+                    'variable' => $variable,
+                    'value' => $value,
+                ]);
+                if (app()->runningInConsole()) {
+                    echo "      configOrPrevValueData prev year: $assetname.$year.$type.$variable: $value\n";
+                }
             }
         }
 
@@ -841,7 +961,16 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "      configOrPrevValueReturn: $assetname.$year.$type.$variable: $value\n";
+            Log::debug('Config or prev value - return', [
+                'asset' => $assetname,
+                'year' => $year,
+                'type' => $type,
+                'variable' => $variable,
+                'value' => $value,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "      configOrPrevValueReturn: $assetname.$year.$type.$variable: $value\n";
+            }
         }
 
         return $value;
@@ -856,7 +985,16 @@ class Prognosis
         if (! isset($value) || (is_numeric($value) && $value == 0)) {
             $value = $this->ArrGet("$assetname.$prevYear.$type.$variable"); // Retrive value from dataH previous year only if repeat is true
             if ($debug) {
-                echo "      configOrPrevValueRepeatData prev year: $assetname.$year.$type.$variable: $value\n";
+                Log::debug('Config or prev value repeat - from data (prev year)', [
+                    'asset' => $assetname,
+                    'year' => $year,
+                    'type' => $type,
+                    'variable' => $variable,
+                    'value' => $value,
+                ]);
+                if (app()->runningInConsole()) {
+                    echo "      configOrPrevValueRepeatData prev year: $assetname.$year.$type.$variable: $value\n";
+                }
             }
         }
 
@@ -866,7 +1004,16 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "      configOrPrevValueRepeat: $assetname.$year.$type.$variable: $value\n";
+            Log::debug('Config or prev value repeat - return', [
+                'asset' => $assetname,
+                'year' => $year,
+                'type' => $type,
+                'variable' => $variable,
+                'value' => $value,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "      configOrPrevValueRepeat: $assetname.$year.$type.$variable: $value\n";
+            }
         }
 
         return $value;
@@ -922,7 +1069,10 @@ class Prognosis
         }
 
         if ($debug) {
-            echo "ArrSet: $path:$value\n";
+            Log::debug('ArrSet', ['path' => $path, 'value' => $value]);
+            if (app()->runningInConsole()) {
+                echo "ArrSet: $path:$value\n";
+            }
         }
 
         return Arr::set($this->dataH, $path, $value);
@@ -1038,7 +1188,10 @@ class Prognosis
             $value = $this->ArrGetConfig("$assetname.meta.$field");
             // print_r($this->ArrGetConfig("$assetname.meta"));
         } else {
-            echo "ERROR with path: $path\n";
+            Log::error('Invalid path format', ['path' => $path]);
+            if (app()->runningInConsole()) {
+                echo "ERROR with path: $path\n";
+            }
         }
 
         return [$assetname, $year, $value];
@@ -1054,7 +1207,14 @@ class Prognosis
         $explanation = " source $rule of $path $amount = $diffAmount\n";
 
         if ($debug) {
-            echo "  Source: path: $path=$amount, $explanation\n";
+            Log::debug('Source calculation', [
+                'path' => $path,
+                'amount' => $amount,
+                'explanation' => $explanation,
+            ]);
+            if (app()->runningInConsole()) {
+                echo "  Source: path: $path=$amount, $explanation\n";
+            }
         }
 
         return [$diffAmount, $explanation];
