@@ -139,10 +139,7 @@ class TaxFortune extends Model
         $taxPercent = 0;
         $explanation = '';
 
-        // Get the standard deduction for the given tax group and year
-        $taxableDeductionAmount = $this->taxConfigRepo->getFortuneTaxStandardDeduction($taxGroup, $year);
-
-        // Get the fortune tax bracket configuration (dynamic, similar to salary tax)
+        // Get the fortune tax bracket configuration (includes standard deduction as first bracket with 0%)
         $brackets = $this->taxConfigRepo->getFortuneTaxBracketConfig($year);
 
         if ($debug) {
@@ -152,68 +149,41 @@ class TaxFortune extends Model
         // FIX: Not all assets is allowed to have mortgage deducted. Only private house/rental/cabins. Check tax laws.
         $taxableAmount = $amount - $mortgage;
 
-        if ($taxableAmount < 0) {
-            // If the taxable amount is negative before deduction, it is because the asset has a mortgage higher than the value of the asset.
-            // This is deductible on the fortune tax and should be calculated and returned as negative values reducing fortune taxable and fortune tax
-            // Just pass through and use the taxableAmount as is. Funny that this a if without changing anything, but it is here for readability
-            $explanation = 'Negative asset value after deducting mortgage, reducing fortune value. ';
-        } elseif ($deduct) {
-            // We are not deducting from every asset, because we sum the value afterwards and the calculation gets wrong.
-            // We only deduct on grouped assets since the deduction is on the total
-            // https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/verdsettingsrabatt-ved-fastsetting-av-formue/
+        // Calculate the tax amount using bracket-based progressive taxation
+        // The first bracket is typically the standard deduction with 0% tax
+        $previousLimit = 0;
 
-            if ($taxableAmount - $taxableDeductionAmount > 0) {
-                // If the taxable amount is bigger than the deduction, resulting in a positive taxable amount,
-                // we use the deduction to reduce the taxable amount
-                // The value can never go negative because of the deduction, so this scenario should never give a negative taxable amount or negative tax
-                $taxableAmount = $taxableAmount - $taxableDeductionAmount;
-                $explanation = 'Positive asset value after deducting. ';
-            } else {
-                // If the taxable amount is less than the deduction, we set the taxable amount to zero,
-                // since nothing taxable and value can not be negative after deduction
-                // The value can never go negative because of the deduction, so this scenario should never give a negative taxable amount or negative tax
-                $taxableAmount = 0;
-                $explanation = 'Asset value set to zero after deducting. ';
+        foreach ($brackets as $bracket) {
+            $percent = Arr::get($bracket, 'percent', 0); // Percentage (e.g., 1.0 = 1%)
+            $rate = $percent / 100; // Convert percentage to decimal
+            $limit = Arr::get($bracket, 'limit', PHP_FLOAT_MAX); // If no limit, use max float
+
+            if ($amount > $previousLimit) {
+                // Calculate the amount in this bracket
+                $amountInBracket = min($amount, $limit) - $previousLimit;
+
+                // Add tax for this bracket
+                $taxAmount += $amountInBracket * $rate;
+
+                if ($debug) {
+                    echo "   Bracket: limit=$limit, percent=$percent%, amountInBracket=$amountInBracket, bracketTax=".($amountInBracket * $rate)."\n";
+                }
+
+                // If we've reached the amount, stop
+                if ($amount <= $limit) {
+                    break;
+                }
+
+                $previousLimit = $limit;
             }
         }
 
-        // Calculate the tax amount using bracket-based progressive taxation
-        // Similar to salary tax calculation but for fortune/wealth
-        if ($amount > $taxableDeductionAmount) {
-            $taxableFortuneAmount = $amount - $taxableDeductionAmount;
-            $previousLimit = 0;
+        $taxPercent = $amount > 0 ? $taxAmount / $amount : 0;
+        $explanation = 'Fortune tax calculated using bracket system. ';
 
-            foreach ($brackets as $bracket) {
-                $rate = Arr::get($bracket, 'rate', 0) / 100; // Convert percentage to decimal
-                $limit = Arr::get($bracket, 'limit', PHP_FLOAT_MAX); // If no limit, use max float
-
-                if ($taxableFortuneAmount > $previousLimit) {
-                    // Calculate the amount in this bracket
-                    $amountInBracket = min($taxableFortuneAmount, $limit) - $previousLimit;
-
-                    // Add tax for this bracket
-                    $taxAmount += $amountInBracket * $rate;
-
-                    if ($debug) {
-                        echo "   Bracket: limit=$limit, rate=".($rate * 100)."%, amountInBracket=$amountInBracket, bracketTax=".($amountInBracket * $rate)."\n";
-                    }
-
-                    // If we've reached the amount, stop
-                    if ($taxableFortuneAmount <= $limit) {
-                        break;
-                    }
-
-                    $previousLimit = $limit;
-                }
-            }
-
-            $taxPercent = $amount > 0 ? $taxAmount / $amount : 0;
-            $explanation .= 'Fortune tax calculated using bracket system. ';
-        } else {
-            // No fortune tax if amount is below standard deduction
-            $taxAmount = 0;
-            $taxPercent = 0;
-            $explanation .= "No fortune tax (amount below standard deduction of $taxableDeductionAmount). ";
+        // Handle negative taxable amount (mortgage > asset value)
+        if ($taxableAmount < 0) {
+            $explanation = 'Negative asset value after deducting mortgage, reducing fortune value. ';
         }
 
         // Print debug information if debug is true
