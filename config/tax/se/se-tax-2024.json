@@ -128,10 +128,9 @@
     "fortune": 0
   },
   "fortune": {
-    "standardDeduction": 0,
     "bracket": [
       {
-        "rate": 0
+        "percent": 0
       }
     ]
   },
