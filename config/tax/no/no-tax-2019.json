@@ -42,7 +42,7 @@
   },
   "salary": {
     "common": {
-      "rate": 22
+      "percent": 22
     },
     "deduction": {
       "min": 4000,
@@ -50,27 +50,27 @@
       "percent": 45
     },
     "socialsecurity": {
-      "rate": 8.2
+      "percent": 8.2
     },
     "bracket": [
       {
         "limit": 174500,
-        "rate": 0
+        "percent": 0
       },
       {
         "limit": 245650,
-        "rate": 1.9
+        "percent": 1.9
       },
       {
         "limit": 617500,
-        "rate": 4.2
+        "percent": 4.2
       },
       {
         "limit": 964800,
-        "rate": 13.2
+        "percent": 13.2
       },
       {
-        "rate": 16.2
+        "percent": 16.2
       }
     ]
   },
@@ -150,5 +150,7 @@
       }
     ]
   },
-  "shareholdershield": 0
+  "shareholdershield": {
+    "percent": 0
+  }
 }
