@@ -63,7 +63,7 @@ it('loads asset-type fortune taxable percent with fallback to previous years', f
     expect($missing)->toBe(0.0);
 });
 
-it('loads fortune bracket config and standard deduction from DB with fallback', function () {
+it('loads fortune bracket config from DB with fallback', function () {
     // Only insert 2023. 2024 should fallback to 2023.
     TaxConfiguration::create([
         'country_code' => 'no',
@@ -72,14 +72,17 @@ it('loads fortune bracket config and standard deduction from DB with fallback', 
         'description' => 'NO Fortune 2023',
         'is_active' => true,
         'configuration' => [
-            'standardDeduction' => 1700000,
             'bracket' => [
                 [
-                    'limit' => 20000000,
-                    'rate' => 1.0, // 1%
+                    'limit' => 1700000,
+                    'percent' => 0, // Standard deduction with 0% tax
                 ],
                 [
-                    'rate' => 1.1, // 1.1%
+                    'limit' => 20000000,
+                    'percent' => 1.0, // 1%
+                ],
+                [
+                    'percent' => 1.1, // 1.1%
                 ],
             ],
         ],
@@ -93,15 +96,21 @@ it('loads fortune bracket config and standard deduction from DB with fallback', 
 
     $repo = new TaxConfigRepository('no');
 
-    expect($repo->getFortuneTaxStandardDeduction('private', 2024))->toBe(1700000);
-
     // Test bracket configuration with fallback to 2023
     $brackets = $repo->getFortuneTaxBracketConfig(2024);
     expect($brackets)->toBeArray();
-    expect($brackets)->toHaveCount(2);
-    expect($brackets[0]['limit'] ?? null)->toBe(20000000);
-    expect((float) ($brackets[0]['rate'] ?? null))->toBe(1.0);
-    expect((float) ($brackets[1]['rate'] ?? null))->toBe(1.1);
+    expect($brackets)->toHaveCount(3);
+
+    // First bracket is standard deduction with 0% tax
+    expect($brackets[0]['limit'] ?? null)->toBe(1700000);
+    expect((float) ($brackets[0]['percent'] ?? null))->toBe(0.0);
+
+    // Second bracket
+    expect($brackets[1]['limit'] ?? null)->toBe(20000000);
+    expect((float) ($brackets[1]['percent'] ?? null))->toBe(1.0);
+
+    // Third bracket (no limit)
+    expect((float) ($brackets[2]['percent'] ?? null))->toBe(1.1);
 });
 
 it('loads property tax percent and deduction from DB with fallback and caches results', function () {
