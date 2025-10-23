@@ -25,6 +25,8 @@ class Amortization extends Model
 {
     use HasFactory;
 
+    private bool $debug;
+
     private int $amount;
 
     private $year_start;
@@ -59,14 +61,16 @@ class Amortization extends Model
      * This constructor initializes the Amortization object with the provided configuration, change rate, data history, mortgages, and asset name.
      * It then calculates the amortization schedule for each mortgage in the provided mortgages array.
      *
+     * @param  bool  $debug  Debug flag to enable detailed logging.
      * @param  array  $config  Configuration array for the amortization calculation.
      * @param  object  $changerate  Object containing the change rate for the loan.
      * @param  array  $dataH  Array containing the data history for the loan.
      * @param  array  $mortgages  Array containing the mortgage details for the loan.
      * @param  string  $assettname  Name of the asset associated with the loan.
      */
-    public function __construct(array $config, object $changerate, array $dataH, array $mortgage, string $assettname, int $year)
+    public function __construct(bool $debug, array $config, object $changerate, array $dataH, array $mortgage, string $assettname, int $year)
     {
+        $this->debug = $debug;
         $this->dataH = $dataH;
         $this->config = $config;
         $this->assettname = $assettname;
@@ -145,7 +149,7 @@ class Amortization extends Model
 
             if ($this->balanceAmount > 0) {
 
-                if ($debug) {
+                if ($this->debug) {
                     Log::debug('Mortgage amortization calculation', [
                         'year' => $year,
                         'period' => $this->period,
