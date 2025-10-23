@@ -108,7 +108,7 @@ class TaxSalary implements TaxCalculatorInterface
 
         // Log debug information if debug is true
         if ($debug) {
-            Log::debug('Salary tax calculation', [
+            $debugData = [
                 'year' => $year,
                 'amount' => $amount,
                 'common_tax_deduction_amount' => $commonTaxDeductionAmount,
@@ -116,7 +116,13 @@ class TaxSalary implements TaxCalculatorInterface
                 'total_tax_amount' => $totalTaxAmount,
                 'total_tax_percent' => $totalTaxPercent * 100,
                 'explanation' => $explanation,
-            ]);
+            ];
+            Log::debug('Salary tax calculation', $debugData);
+
+            // Also output to console for CLI commands
+            if (app()->runningInConsole()) {
+                echo "Salary tax: year=$year, amount=$amount, tax=$totalTaxAmount (".($totalTaxPercent * 100)."%), $explanation\n";
+            }
         }
 
         // Return array for backward compatibility
@@ -158,14 +164,19 @@ class TaxSalary implements TaxCalculatorInterface
                 $explanation .= " Bracket$count ($bracket[limit])$bracket[percent]%=$bracketTaxAmount,";
 
                 if ($debug) {
-                    Log::debug('Bracket tax calculation - within limit', [
+                    $debugData = [
                         'bracket' => $count,
                         'limit' => $bracket['limit'],
                         'amount' => $amount,
                         'taxable_amount' => $bracketTaxableAmount,
                         'percent' => $bracket['percent'],
                         'tax' => $bracketTaxAmount,
-                    ]);
+                    ];
+                    Log::debug('Bracket tax calculation - within limit', $debugData);
+
+                    if (app()->runningInConsole()) {
+                        echo "  Bracket $count: limit={$bracket['limit']}, taxable=$bracketTaxableAmount, rate={$bracket['percent']}%, tax=$bracketTaxAmount\n";
+                    }
                 }
 
             } elseif (isset($bracket['limit'])) {
@@ -176,14 +187,19 @@ class TaxSalary implements TaxCalculatorInterface
                 $explanation .= " Bracket$count ($amount<)".$bracket['limit'].")$bracket[percent]%=$bracketTaxAmount";
 
                 if ($debug) {
-                    Log::debug('Bracket tax calculation - below limit', [
+                    $debugData = [
                         'bracket' => $count,
                         'amount' => $amount,
                         'limit' => $bracket['limit'],
                         'taxable_amount' => $bracketTaxableAmount,
                         'percent' => $bracket['percent'],
                         'tax' => $bracketTaxAmount,
-                    ]);
+                    ];
+                    Log::debug('Bracket tax calculation - below limit', $debugData);
+
+                    if (app()->runningInConsole()) {
+                        echo "  Bracket $count: amount=$amount < limit={$bracket['limit']}, taxable=$bracketTaxableAmount, rate={$bracket['percent']}%, tax=$bracketTaxAmount\n";
+                    }
                 }
 
                 break;
@@ -195,13 +211,18 @@ class TaxSalary implements TaxCalculatorInterface
                 $explanation .= " Bracket$count (>$prevLimitAmount)$bracket[percent]%=$bracketTaxAmount";
 
                 if ($debug) {
-                    Log::debug('Bracket tax calculation - above all limits', [
+                    $debugData = [
                         'bracket' => $count,
                         'prev_limit' => $prevLimitAmount,
                         'taxable_amount' => $bracketTaxableAmount,
                         'percent' => $bracket['percent'],
                         'tax' => $bracketTaxAmount,
-                    ]);
+                    ];
+                    Log::debug('Bracket tax calculation - above all limits', $debugData);
+
+                    if (app()->runningInConsole()) {
+                        echo "  Bracket $count: amount > $prevLimitAmount, taxable=$bracketTaxableAmount, rate={$bracket['percent']}%, tax=$bracketTaxAmount\n";
+                    }
                 }
 
                 break;
@@ -256,4 +277,3 @@ class TaxSalary implements TaxCalculatorInterface
         return $deduction;
     }
 }
-
