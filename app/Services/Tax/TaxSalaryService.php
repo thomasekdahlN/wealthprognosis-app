@@ -22,7 +22,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Class TaxSalary
+ * Class TaxSalaryService
  *
  * Handles salary and pension tax calculations including:
  * - Common tax (fellesskatt)
@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Log;
  * - Social security tax (trygdeavgift)
  * - Standard deductions (minstefradrag)
  */
-class TaxSalary implements TaxCalculatorInterface
+class TaxSalaryService implements TaxCalculatorInterface
 {
     /**
      * Country code for tax lookups.
@@ -43,7 +43,7 @@ class TaxSalary implements TaxCalculatorInterface
     private TaxConfigRepository $taxConfigRepo;
 
     /**
-     * Create a new TaxSalary service.
+     * Create a new TaxSalaryService service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection

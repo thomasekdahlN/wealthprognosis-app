@@ -68,9 +68,9 @@ class PrognosisService
         $this->config = $config;
 
         // Get singletons from the service container
-        $this->taxincome = app(\App\Services\Tax\TaxIncome::class);
-        $this->taxfortune = app(\App\Services\Tax\TaxFortune::class);
-        $this->taxrealization = app(\App\Services\Tax\TaxRealization::class);
+        $this->taxincome = app(\App\Services\Tax\TaxIncomeService::class);
+        $this->taxfortune = app(\App\Services\Tax\TaxFortuneService::class);
+        $this->taxrealization = app(\App\Services\Tax\TaxRealizationService::class);
         $this->changerate = app(\App\Services\Prognosis\ChangerateService::class);
         $this->helper = app(\App\Services\Utilities\HelperService::class);
         $this->rules = app(\App\Services\Utilities\RulesService::class);

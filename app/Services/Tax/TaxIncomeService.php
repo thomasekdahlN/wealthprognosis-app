@@ -20,7 +20,7 @@ use App\Support\Contracts\TaxCalculatorInterface;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Class TaxIncome
+ * Class TaxIncomeService
  *
  * Handles income tax calculations for various asset and income types.
  * Supports different tax treatments for salary, pension, rental income,
@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Log;
  *
  * Uses TaxConfigRepository for database-backed tax configuration lookups.
  */
-class TaxIncome implements TaxCalculatorInterface
+class TaxIncomeService implements TaxCalculatorInterface
 {
     /**
      * Country code for tax lookups (e.g., 'no').
@@ -41,25 +41,25 @@ class TaxIncome implements TaxCalculatorInterface
     private TaxConfigRepository $taxConfigRepo;
 
     /**
-     * TaxSalary instance for salary/pension calculations.
+     * TaxSalaryService instance for salary/pension calculations.
      */
-    private TaxSalary $taxsalary;
+    private TaxSalaryService $taxsalary;
 
     /**
-     * Create a new TaxIncome service.
+     * Create a new TaxIncomeService service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
-     * @param  TaxSalary|null  $taxSalary  Optional TaxSalary instance for dependency injection
+     * @param  TaxSalaryService|null  $taxSalary  Optional TaxSalaryService instance for dependency injection
      */
     public function __construct(
         string $country = 'no',
         ?TaxConfigRepository $taxConfigRepo = null,
-        ?TaxSalary $taxSalary = null
+        ?TaxSalaryService $taxSalary = null
     ) {
         $this->country = strtolower($country) ?: 'no';
         $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
-        $this->taxsalary = $taxSalary ?? new TaxSalary($this->country, $this->taxConfigRepo);
+        $this->taxsalary = $taxSalary ?? new TaxSalaryService($this->country, $this->taxConfigRepo);
     }
 
     /**

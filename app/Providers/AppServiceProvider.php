@@ -31,39 +31,39 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Register Tax calculation classes as singletons with proper dependency injection
-        $this->app->singleton(\App\Services\Tax\TaxSalary::class, function ($app) {
-            return new \App\Services\Tax\TaxSalary(
+        $this->app->singleton(\App\Services\Tax\TaxSalaryService::class, function ($app) {
+            return new \App\Services\Tax\TaxSalaryService(
                 'no',
                 $app->make(\App\Services\Tax\TaxConfigRepository::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxIncome::class, function ($app) {
-            return new \App\Services\Tax\TaxIncome(
+        $this->app->singleton(\App\Services\Tax\TaxIncomeService::class, function ($app) {
+            return new \App\Services\Tax\TaxIncomeService(
                 'no',
                 $app->make(\App\Services\Tax\TaxConfigRepository::class),
-                $app->make(\App\Services\Tax\TaxSalary::class)
+                $app->make(\App\Services\Tax\TaxSalaryService::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxFortune::class, function ($app) {
-            return new \App\Services\Tax\TaxFortune(
+        $this->app->singleton(\App\Services\Tax\TaxFortuneService::class, function ($app) {
+            return new \App\Services\Tax\TaxFortuneService(
                 'no',
                 $app->make(\App\Services\Tax\TaxConfigRepository::class),
                 $app->make(\App\Services\Tax\TaxConfigPropertyRepository::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxRealization::class, function ($app) {
-            return new \App\Services\Tax\TaxRealization(
+        $this->app->singleton(\App\Services\Tax\TaxRealizationService::class, function ($app) {
+            return new \App\Services\Tax\TaxRealizationService(
                 'no',
                 $app->make(\App\Services\Tax\TaxConfigRepository::class),
-                $app->make(\App\Services\Tax\TaxSalary::class)
+                $app->make(\App\Services\Tax\TaxSalaryService::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxProperty::class, function ($app) {
-            return new \App\Services\Tax\TaxProperty('no');
+        $this->app->singleton(\App\Services\Tax\TaxPropertyService::class, function ($app) {
+            return new \App\Services\Tax\TaxPropertyService('no');
         });
 
         // Register utility classes as singletons

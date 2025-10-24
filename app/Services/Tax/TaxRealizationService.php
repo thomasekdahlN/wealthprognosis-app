@@ -20,12 +20,12 @@ use App\Support\Contracts\TaxCalculatorInterface;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Class TaxRealization
+ * Class TaxRealizationService
  *
  * Handles realization (capital gains) tax calculations for various asset types.
  * Includes support for tax shield (skjermingsfradrag) calculations.
  */
-class TaxRealization implements TaxCalculatorInterface
+class TaxRealizationService implements TaxCalculatorInterface
 {
     /**
      * Country code for tax lookups (e.g., 'no').
@@ -38,25 +38,25 @@ class TaxRealization implements TaxCalculatorInterface
     private TaxConfigRepository $taxConfigRepo;
 
     /**
-     * TaxSalary instance for OTP calculations.
+     * TaxSalaryService instance for OTP calculations.
      */
-    private TaxSalary $taxsalary;
+    private TaxSalaryService $taxsalary;
 
     /**
-     * Create a new TaxRealization service.
+     * Create a new TaxRealizationService service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
-     * @param  TaxSalary|null  $taxSalary  Optional TaxSalary instance for dependency injection
+     * @param  TaxSalaryService|null  $taxSalary  Optional TaxSalaryService instance for dependency injection
      */
     public function __construct(
         string $country = 'no',
         ?TaxConfigRepository $taxConfigRepo = null,
-        ?TaxSalary $taxSalary = null
+        ?TaxSalaryService $taxSalary = null
     ) {
         $this->country = strtolower($country) ?: 'no';
         $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
-        $this->taxsalary = $taxSalary ?? new TaxSalary($this->country, $this->taxConfigRepo);
+        $this->taxsalary = $taxSalary ?? new TaxSalaryService($this->country, $this->taxConfigRepo);
     }
 
     /**

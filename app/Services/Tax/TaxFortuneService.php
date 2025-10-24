@@ -21,14 +21,14 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Class TaxFortune
+ * Class TaxFortuneService
  *
  * Handles fortune (wealth) tax calculations including:
  * - Fortune tax (formuesskatt)
  * - Property tax (eiendomsskatt)
  * - Bracket-based progressive taxation
  */
-class TaxFortune implements TaxCalculatorInterface
+class TaxFortuneService implements TaxCalculatorInterface
 {
     /**
      * Country code for tax lookups.
@@ -46,7 +46,7 @@ class TaxFortune implements TaxCalculatorInterface
     private TaxConfigPropertyRepository $taxPropertyRepo;
 
     /**
-     * Create a new TaxFortune service.
+     * Create a new TaxFortuneService service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection

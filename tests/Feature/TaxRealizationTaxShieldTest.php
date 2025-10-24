@@ -3,7 +3,7 @@
 use App\Models\AssetType;
 use App\Models\Team;
 use App\Models\User;
-use App\Services\Tax\TaxRealization;
+use App\Services\Tax\TaxRealizationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -153,7 +153,7 @@ it('taxCalculationRealization uses tax shield for stock asset type', function ()
         'updated_checksum' => 'shield-2025',
     ]);
 
-    $taxRealization = new TaxRealization('no');
+    $taxRealization = new TaxRealizationService('no');
 
     // Test with stock which has tax shield
     [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(
@@ -175,7 +175,7 @@ it('taxCalculationRealization uses tax shield for stock asset type', function ()
 });
 
 it('taxCalculationRealization does not use tax shield for house asset type', function () {
-    $taxRealization = new TaxRealization('no');
+    $taxRealization = new TaxRealizationService('no');
 
     // Test with house which does not have tax shield
     [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(
@@ -215,7 +215,7 @@ it('taxCalculationRealization applies tax shield only for eligible asset types',
         'updated_checksum' => 'shield-2025',
     ]);
 
-    $taxRealization = new TaxRealization('no');
+    $taxRealization = new TaxRealizationService('no');
     $repo = new \App\Services\Tax\TaxConfigRepository('no');
 
     $taxShieldTypes = ['stock', 'equityfund', 'bondfund', 'ask', 'loantocompany', 'soleproprietorship'];

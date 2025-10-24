@@ -17,12 +17,12 @@
 namespace App\Services\Tax;
 
 /**
- * Class TaxProperty
+ * Class TaxPropertyService
  *
  * Handles property tax calculations for real estate assets.
  * Property tax is calculated based on municipality-specific rates and taxable percentages.
  */
-class TaxProperty
+class TaxPropertyService
 {
     protected $country;
 
