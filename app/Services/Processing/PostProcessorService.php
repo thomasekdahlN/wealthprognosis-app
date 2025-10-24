@@ -98,7 +98,7 @@ class PostProcessorService
 
             for ($year = $economyStartYear; $year <= $deathYear; $year++) {
                 $datapath = "$assetname.$year";
-                
+
                 $this->yearlyProcessor->processIncomeYearly($dataH, $datapath);
                 $this->yearlyProcessor->processExpenceYearly($dataH, $datapath);
                 $this->yearlyProcessor->processFortuneTaxYearly($dataH, $datapath, $thisYear);
@@ -241,4 +241,3 @@ class PostProcessorService
         $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'fire.cashFlowAmount');
     }
 }
-

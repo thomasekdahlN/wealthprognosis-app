@@ -147,11 +147,11 @@ class GroupProcessor
         if (Arr::get($totalH, "$year.fire.savingAmount", 0) > 0) {
             Arr::set($totalH, "$year.fire.savingRate", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.savingAmount", 0), Arr::get($totalH, "$year.mortgage.balanceAmount", 0));
         }
-        
+
         if (Arr::get($companyH, "$year.fire.savingAmount", 0) > 0) {
             Arr::set($companyH, "$year.fire.savingRate", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.savingAmount", 0), Arr::get($companyH, "$year.mortgage.balanceAmount", 0));
         }
-        
+
         if (Arr::get($privateH, "$year.fire.savingAmount", 0) > 0) {
             Arr::set($privateH, "$year.fire.savingRate", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.savingAmount", 0), Arr::get($privateH, "$year.mortgage.balanceAmount", 0));
         }
@@ -170,11 +170,11 @@ class GroupProcessor
         if (Arr::get($totalH, "$year.fire.expenceAmount", 0) > 0) {
             Arr::set($totalH, "$year.fire.diffDecimal", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.expenceAmount", 0));
         }
-        
+
         if (Arr::get($companyH, "$year.fire.expenceAmount", 0) > 0) {
             Arr::set($companyH, "$year.fire.diffDecimal", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.expenceAmount", 0));
         }
-        
+
         if (Arr::get($privateH, "$year.fire.expenceAmount", 0) > 0) {
             Arr::set($privateH, "$year.fire.diffDecimal", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.expenceAmount", 0));
         }
@@ -279,5 +279,116 @@ class GroupProcessor
             Arr::set($privateH, "$year.asset.changeratePercent", 0);
         }
     }
-}
 
+    /**
+     * Calculate company dividend tax.
+     * This method calculates the amount that would be realized if company assets were transferred to a private person.
+     * It takes into account the tax implications of such a transfer.
+     *
+     * @param  array  $companyH  Reference to company group data
+     * @param  int  $year  Year to calculate for
+     */
+    public function calculateCompanyDividendTax(array &$companyH, int $year): void
+    {
+        // The tax rate for transferring company assets to a private person.
+        $realizationTaxDecimal = 37.8 / 100;
+
+        // Retrieve the amount after normal taxation from realization in the companyH array.
+        $originalAmount = Arr::get($companyH, "$year.realization.amount");
+        $originalTaxAmount = Arr::get($companyH, "$year.realization.taxAmount");
+
+        if ($originalAmount > 0) {
+            $dividendTaxAmount = round($originalAmount * $realizationTaxDecimal);
+
+            // Calculate the final amount by subtracting the dividend tax from the original amount.
+            $amount = round($originalAmount - $dividendTaxAmount);
+
+            // Calculate the tax amount by adding the company tax to the private person tax.
+            $taxAmount = $originalTaxAmount + $dividendTaxAmount;
+
+            // Print the calculated values for debugging purposes.
+            $description = " Company dividend tax on originalAmount: $originalAmount, originalTaxAmount: $originalTaxAmount, dividendTaxAmount:$dividendTaxAmount, newTaxAmount: $taxAmount, realizationamount: $amount";
+
+            // Update the companyH array with the calculated values.
+            Arr::set($companyH, "$year.realization.amount", $amount);
+            Arr::set($companyH, "$year.realization.taxAmount", $taxAmount);
+            Arr::set($companyH, "$year.realization.taxDecimal", $realizationTaxDecimal);
+            Arr::set($companyH, "$year.realization.description", $description);
+        }
+
+        Arr::set($companyH, "$year.realization.taxShieldAmount", 0);
+        Arr::set($companyH, "$year.realization.taxShieldDecimal", 0);
+    }
+
+    /**
+     * Calculate yield percentages for groups.
+     *
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  int  $year  Year to calculate for
+     */
+    public function calculateYield(array &$totalH, array &$companyH, array &$privateH, int $year): void
+    {
+        // Total yield
+        $bruttoPercent = 0;
+        $nettoPercent = 0;
+        if (Arr::get($totalH, "$year.asset.acquisitionAmount") > 1) {
+            $bruttoPercent = round((Arr::get($totalH, "$year.income.amount") / Arr::get($totalH, "$year.asset.acquisitionAmount")) * 100, 1);
+            $nettoPercent = round(((Arr::get($totalH, "$year.income.amount") - Arr::get($totalH, "$year.expence.amount")) / Arr::get($totalH, "$year.asset.acquisitionAmount")) * 100, 1);
+        }
+        Arr::set($totalH, "$year.yield.bruttoPercent", $bruttoPercent);
+        Arr::set($totalH, "$year.yield.nettoPercent", $nettoPercent);
+
+        // Company yield
+        $bruttoPercent = 0;
+        $nettoPercent = 0;
+        if (Arr::get($companyH, "$year.asset.acquisitionAmount") > 1) {
+            $bruttoPercent = round((Arr::get($companyH, "$year.income.amount") / Arr::get($companyH, "$year.asset.acquisitionAmount")) * 100, 1);
+            $nettoPercent = round(((Arr::get($companyH, "$year.income.amount") - Arr::get($companyH, "$year.expence.amount")) / Arr::get($companyH, "$year.asset.acquisitionAmount")) * 100, 1);
+        }
+        Arr::set($companyH, "$year.yield.bruttoPercent", $bruttoPercent);
+        Arr::set($companyH, "$year.yield.nettoPercent", $nettoPercent);
+
+        // Private yield
+        $bruttoPercent = 0;
+        $nettoPercent = 0;
+        if (Arr::get($privateH, "$year.asset.acquisitionAmount") > 1) {
+            $bruttoPercent = round((Arr::get($privateH, "$year.income.amount") / Arr::get($privateH, "$year.asset.acquisitionAmount")) * 100, 1);
+            $nettoPercent = round(((Arr::get($privateH, "$year.income.amount") - Arr::get($privateH, "$year.expence.amount")) / Arr::get($privateH, "$year.asset.acquisitionAmount")) * 100, 1);
+        }
+        Arr::set($privateH, "$year.yield.bruttoPercent", $bruttoPercent);
+        Arr::set($privateH, "$year.yield.nettoPercent", $nettoPercent);
+    }
+
+    /**
+     * Calculate asset type spread for statistics.
+     *
+     * @param  array  $groupH  Reference to group hierarchy data
+     * @param  array  $statisticsH  Reference to statistics data
+     * @param  callable  $isShownInStatistics  Callback to check if type should be shown in statistics
+     */
+    public function calculateAssetTypeSpread(array $groupH, array &$statisticsH, callable $isShownInStatistics): void
+    {
+        foreach ($groupH as $type => $asset) {
+            if ($isShownInStatistics($type)) {
+                foreach ($asset as $year => $data) {
+                    $amount = round(Arr::get($data, 'asset.marketAmount', 0));
+                    $statisticsH[$year][$type]['amount'] = $amount;
+                    $statisticsH[$year]['total']['amount'] = Arr::get($statisticsH, "$year.total.amount", 0) + $amount;
+                }
+
+                // Generate % spread
+                foreach ($statisticsH as $year => $typeH) {
+                    foreach ($typeH as $typename => $data) {
+                        if ($typeH['total']['amount'] > 0) {
+                            $statisticsH[$year][$typename]['percent'] = round(($data['amount'] / $typeH['total']['amount']) * 100);
+                        } else {
+                            $statisticsH[$year][$typename]['percent'] = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

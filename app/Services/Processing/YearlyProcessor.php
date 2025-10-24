@@ -68,7 +68,7 @@ class YearlyProcessor
     {
         [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
         [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($dataH, $path, 'group');
-        
+
         // derive tax type via asset_type
         [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
         $taxType = 'none';
@@ -215,7 +215,7 @@ class YearlyProcessor
     {
         $bruttoPercent = 0;
         $nettoPercent = 0;
-        
+
         if ($this->ArrGet($dataH, "$path.asset.acquisitionAmount") > 1) {
             // Calculate the brutto yield percentage
             $bruttoPercent = round(($this->ArrGet($dataH, "$path.income.amount") / $this->ArrGet($dataH, "$path.asset.acquisitionAmount")) * 100, 1);
@@ -305,8 +305,8 @@ class YearlyProcessor
      */
     private function ArrGet(array $dataH, string $path, mixed $default = null): mixed
     {
-        if (str_contains($path, 'Amount') || str_contains($path, 'Decimal') || str_contains($path, 'Percent') || 
-            str_contains($path, 'amount') || str_contains($path, 'decimal') || str_contains($path, 'percent') || 
+        if (str_contains($path, 'Amount') || str_contains($path, 'Decimal') || str_contains($path, 'Percent') ||
+            str_contains($path, 'amount') || str_contains($path, 'decimal') || str_contains($path, 'percent') ||
             str_contains($path, 'factor')) {
             $default = 0;
         }
@@ -322,4 +322,3 @@ class YearlyProcessor
         Arr::set($dataH, $path, $value);
     }
 }
-
