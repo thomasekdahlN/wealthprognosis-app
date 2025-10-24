@@ -1,0 +1,283 @@
+<?php
+
+/* Copyright (C) 2025 Thomas Ekdahl
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+namespace App\Services\Processing;
+
+use App\Services\Tax\TaxFortuneService;
+use Illuminate\Support\Arr;
+
+/**
+ * GroupProcessor
+ *
+ * Handles grouping and aggregation of prognosis data across assets.
+ * Processes totals, company/private splits, and statistical spreads.
+ */
+class GroupProcessor
+{
+    public function __construct(
+        private TaxFortuneService $taxfortune
+    ) {}
+
+    /**
+     * Initialize group structures with empty data for proper sorting.
+     *
+     * @param  array  $privateH  Reference to private group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  int  $economyStartYear  Start year for economy calculations
+     * @param  int  $deathYear  End year for calculations
+     */
+    public function initGroups(array &$privateH, array &$companyH, int $economyStartYear, int $deathYear): void
+    {
+        // Just to get the sorting right, it's better to start with an empty structure in correct yearly order
+        for ($year = $economyStartYear; $year <= $deathYear; $year++) {
+            Arr::set($privateH, "$year.asset.marketAmount", 0);
+            Arr::set($companyH, "$year.asset.marketAmount", 0);
+        }
+    }
+
+    /**
+     * Add a value to group totals.
+     *
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  array  $groupH  Reference to group hierarchy data
+     * @param  int  $year  Year for the data
+     * @param  array  $meta  Asset metadata
+     * @param  array  $data  Year data for the asset
+     * @param  string  $dotpath  Dot-notation path to the value
+     */
+    public function additionToGroup(
+        array &$totalH,
+        array &$companyH,
+        array &$privateH,
+        array &$groupH,
+        int $year,
+        array $meta,
+        array $data,
+        string $dotpath
+    ): void {
+        // Add to total
+        Arr::set($totalH, "$year.$dotpath", Arr::get($totalH, "$year.$dotpath", 0) + Arr::get($data, $dotpath, 0));
+
+        // Add to company group
+        if (Arr::get($meta, 'group') == 'company') {
+            Arr::set($companyH, "$year.$dotpath", Arr::get($companyH, "$year.$dotpath", 0) + Arr::get($data, $dotpath, 0));
+        }
+
+        // Add to private group
+        if (Arr::get($meta, 'group') == 'private') {
+            Arr::set($privateH, "$year.$dotpath", Arr::get($privateH, "$year.$dotpath", 0) + Arr::get($data, $dotpath, 0));
+        }
+
+        // Add to group and type hierarchies
+        $grouppath = Arr::get($meta, 'group').".$year.$dotpath";
+        $typepath = Arr::get($meta, 'type').".$year.$dotpath";
+        Arr::set($groupH, $grouppath, Arr::get($groupH, $grouppath, 0) + Arr::get($data, $dotpath, 0));
+        Arr::set($groupH, $typepath, Arr::get($groupH, $typepath, 0) + Arr::get($data, $dotpath, 0));
+    }
+
+    /**
+     * Set a value to group (not additive).
+     *
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  array  $groupH  Reference to group hierarchy data
+     * @param  int  $year  Year for the data
+     * @param  array  $meta  Asset metadata
+     * @param  array  $data  Year data for the asset
+     * @param  string  $dotpath  Dot-notation path to the value
+     */
+    public function setToGroup(
+        array &$totalH,
+        array &$companyH,
+        array &$privateH,
+        array &$groupH,
+        int $year,
+        array $meta,
+        array $data,
+        string $dotpath
+    ): void {
+        if (Arr::get($data, $dotpath)) {
+            // Set to total
+            Arr::set($totalH, "$year.$dotpath", Arr::get($data, $dotpath));
+
+            // Set to company group
+            if (Arr::get($meta, 'group') == 'company') {
+                Arr::set($companyH, "$year.$dotpath", Arr::get($data, $dotpath));
+            }
+
+            // Set to private group
+            if (Arr::get($meta, 'group') == 'private') {
+                Arr::set($privateH, "$year.$dotpath", Arr::get($data, $dotpath));
+            }
+
+            // Set to group and type hierarchies
+            $grouppath = Arr::get($meta, 'group').".$year.$dotpath";
+            $typepath = Arr::get($meta, 'type').".$year.$dotpath";
+            Arr::set($groupH, $grouppath, Arr::get($data, $dotpath));
+            Arr::set($groupH, $typepath, Arr::get($data, $dotpath));
+        }
+    }
+
+    /**
+     * Calculate FIRE saving rate for groups.
+     *
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  int  $year  Year to calculate for
+     */
+    public function calculateFireSaveRate(array &$totalH, array &$companyH, array &$privateH, int $year): void
+    {
+        if (Arr::get($totalH, "$year.fire.savingAmount", 0) > 0) {
+            Arr::set($totalH, "$year.fire.savingRate", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.savingAmount", 0), Arr::get($totalH, "$year.mortgage.balanceAmount", 0));
+        }
+        
+        if (Arr::get($companyH, "$year.fire.savingAmount", 0) > 0) {
+            Arr::set($companyH, "$year.fire.savingRate", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.savingAmount", 0), Arr::get($companyH, "$year.mortgage.balanceAmount", 0));
+        }
+        
+        if (Arr::get($privateH, "$year.fire.savingAmount", 0) > 0) {
+            Arr::set($privateH, "$year.fire.savingRate", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.savingAmount", 0), Arr::get($privateH, "$year.mortgage.balanceAmount", 0));
+        }
+    }
+
+    /**
+     * Calculate FIRE difference percentage for groups.
+     *
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  int  $year  Year to calculate for
+     */
+    public function calculateFirediffPercent(array &$totalH, array &$companyH, array &$privateH, int $year): void
+    {
+        if (Arr::get($totalH, "$year.fire.expenceAmount", 0) > 0) {
+            Arr::set($totalH, "$year.fire.diffDecimal", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.expenceAmount", 0));
+        }
+        
+        if (Arr::get($companyH, "$year.fire.expenceAmount", 0) > 0) {
+            Arr::set($companyH, "$year.fire.diffDecimal", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.expenceAmount", 0));
+        }
+        
+        if (Arr::get($privateH, "$year.fire.expenceAmount", 0) > 0) {
+            Arr::set($privateH, "$year.fire.diffDecimal", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.expenceAmount", 0));
+        }
+    }
+
+    /**
+     * Calculate fortune tax for groups.
+     * We can not subtract mortgage again, it is already subtracted in the taxableAmount part, therefore we send in zero as mortgage here.
+     *
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  int  $year  Year to calculate for
+     */
+    public function calculateFortuneTax(array &$totalH, array &$companyH, array &$privateH, int $year): void
+    {
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($totalH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($totalH, "$year.asset.taxableAmount", $taxableAmount);
+        Arr::set($totalH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($companyH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($companyH, "$year.asset.taxableAmount", $taxableAmount);
+        Arr::set($companyH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+
+        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($privateH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($privateH, "$year.asset.taxableAmount", $taxableAmount);
+        Arr::set($privateH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+    }
+
+    /**
+     * Calculate actual change rates of income, expense and assets - not the prognosed one.
+     *
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  int  $year  Year to calculate for
+     */
+    public function calculateChangerates(array &$totalH, array &$companyH, array &$privateH, int $year): void
+    {
+        $prevYear = $year - 1;
+
+        // Total income changerate
+        if (Arr::get($totalH, "$prevYear.income.amount") > 0) {
+            Arr::set($totalH, "$year.income.changeratePercent", ((Arr::get($totalH, "$year.income.amount") / Arr::get($totalH, "$prevYear.income.amount")) - 1) * 100);
+        } else {
+            Arr::set($totalH, "$year.income.changeratePercent", 0);
+        }
+
+        // Total expense changerate
+        if (Arr::get($totalH, "$prevYear.expence.amount") > 0) {
+            Arr::set($totalH, "$year.expence.changeratePercent", ((Arr::get($totalH, "$year.expence.amount") / Arr::get($totalH, "$prevYear.expence.amount")) - 1) * 100);
+        } else {
+            Arr::set($totalH, "$year.expence.changeratePercent", 0);
+        }
+
+        // Total asset changerate
+        if (Arr::get($totalH, "$prevYear.asset.marketAmount") > 0) {
+            Arr::set($totalH, "$year.asset.changeratePercent", ((Arr::get($totalH, "$year.asset.marketAmount") / Arr::get($totalH, "$prevYear.asset.marketAmount")) - 1) * 100);
+        } else {
+            Arr::set($totalH, "$year.asset.changeratePercent", 0);
+        }
+
+        // Company income changerate
+        if (Arr::get($companyH, "$prevYear.income.amount") > 0) {
+            Arr::set($companyH, "$year.income.changeratePercent", ((Arr::get($companyH, "$year.income.amount") / Arr::get($companyH, "$prevYear.income.amount")) - 1) * 100);
+        } else {
+            Arr::set($companyH, "$year.income.changeratePercent", 0);
+        }
+
+        // Company expense changerate
+        if (Arr::get($companyH, "$prevYear.expence.amount") > 0) {
+            Arr::set($companyH, "$year.expence.changeratePercent", ((Arr::get($companyH, "$year.expence.amount") / Arr::get($companyH, "$prevYear.expence.amount")) - 1) * 100);
+        } else {
+            Arr::set($companyH, "$year.expence.changeratePercent", 0);
+        }
+
+        // Company asset changerate
+        if (Arr::get($companyH, "$prevYear.asset.marketAmount") > 0) {
+            Arr::set($companyH, "$year.asset.changeratePercent", ((Arr::get($companyH, "$year.asset.marketAmount") / Arr::get($companyH, "$prevYear.asset.marketAmount")) - 1) * 100);
+        } else {
+            Arr::set($companyH, "$year.asset.changeratePercent", 0);
+        }
+
+        // Private income changerate
+        if (Arr::get($privateH, "$prevYear.income.amount") > 0) {
+            Arr::set($privateH, "$year.income.changeratePercent", ((Arr::get($privateH, "$year.income.amount") / Arr::get($privateH, "$prevYear.income.amount")) - 1) * 100);
+        } else {
+            Arr::set($privateH, "$year.income.changeratePercent", 0);
+        }
+
+        // Private expense changerate
+        if (Arr::get($privateH, "$prevYear.expence.amount") > 0) {
+            Arr::set($privateH, "$year.expence.changeratePercent", ((Arr::get($privateH, "$year.expence.amount") / Arr::get($privateH, "$prevYear.expence.amount")) - 1) * 100);
+        } else {
+            Arr::set($privateH, "$year.expence.changeratePercent", 0);
+        }
+
+        // Private asset changerate
+        if (Arr::get($privateH, "$prevYear.asset.marketAmount") > 0) {
+            Arr::set($privateH, "$year.asset.changeratePercent", ((Arr::get($privateH, "$year.asset.marketAmount") / Arr::get($privateH, "$prevYear.asset.marketAmount")) - 1) * 100);
+        } else {
+            Arr::set($privateH, "$year.asset.changeratePercent", 0);
+        }
+    }
+}
+
