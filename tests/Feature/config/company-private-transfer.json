@@ -9,6 +9,7 @@
     "deathAge": "62",
     "icon": "heroicon-o-building-office-2",
     "color": "#7c3aed",
+    "country": "no",
     "tags": [
       "company",
       "private",
@@ -22,7 +23,8 @@
       "group": "company",
       "name": "Fond - Firma",
       "description": "Fond - Firma",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2020": {
       "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
@@ -48,7 +50,8 @@
       "group": "private",
       "name": "Fond - Privat",
       "description": "Fond - Privat",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2020": {
       "asset": {

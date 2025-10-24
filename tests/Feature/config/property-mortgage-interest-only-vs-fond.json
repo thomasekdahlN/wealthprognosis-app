@@ -9,6 +9,7 @@
     "deathAge": "70",
     "icon": "heroicon-o-calculator",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "House",
       "description": "House with 10 interestOnlyYears, the rest of the money put into fond",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "description": "Income: Income | Expense: Income | Asset:  | Mortgage: ",
@@ -59,7 +61,8 @@
       "group": "private",
       "name": "fond",
       "description": "",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "description": "Income:  | Expense:  | Asset:  | Mortgage: ",

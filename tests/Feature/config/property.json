@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-building-office",
     "color": "#22c55e",
+    "country": "no",
     "tags": [
       "simple"
     ]
@@ -20,7 +21,8 @@
       "name": "My property",
       "description": "Here I rent out the house",
       "active": true,
-      "taxProperty": "ringerike"
+      "taxProperty": "ringerike",
+      "debug": true
     },
     "2025": {
       "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset: Selling part of the house | Mortgage: interest changerates.interest, years 20",

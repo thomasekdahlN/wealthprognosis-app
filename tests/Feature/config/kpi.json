@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-chart-bar",
     "color": "#22c55e",
+    "country": "no",
     "tags": [
       "simple"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "KPI",
       "description": "",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {

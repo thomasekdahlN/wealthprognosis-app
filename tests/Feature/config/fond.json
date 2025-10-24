@@ -9,6 +9,7 @@
     "deathAge": "70",
     "icon": "heroicon-o-chart-bar-square",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Software Developer Salary",
       "description": "Entry-level to senior software developer career progression",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
@@ -57,7 +59,8 @@
       "group": "private",
       "name": "Global Equity Index Fund",
       "description": "Low-cost global equity index fund for long-term wealth building",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Income:  | Expense:  | Asset:  | Mortgage: ",

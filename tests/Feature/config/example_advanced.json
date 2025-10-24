@@ -9,6 +9,7 @@
     "deathAge": "80",
     "icon": "heroicon-o-academic-cap",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Lønn",
       "description": "Lønn",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {
@@ -55,7 +57,8 @@
       "group": "private",
       "name": "Wife",
       "description": "Kone - å dele utgifter med",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {
@@ -73,7 +76,8 @@
       "group": "private",
       "name": "Child1",
       "description": "Barnetrygd som inntekter på barn frem til 18 år, utgifter helt til de flytter ut",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {
@@ -115,7 +119,8 @@
       "group": "private",
       "name": "inheritance",
       "description": "Arv som kan prognostiseres om de har gjenlevende foreldre eller andre du kan arve av i fremtiden",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2037": {
       "asset": {
@@ -135,7 +140,8 @@
       "group": "private",
       "name": "Folketrygden",
       "description": "Folketrygden",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "$pensionOfficialAge": {
       "income": {
@@ -154,7 +160,8 @@
       "group": "private",
       "name": "OTP",
       "description": "OTP",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "asset": {
@@ -183,7 +190,8 @@
       "group": "private",
       "name": "My house",
       "description": "Your house, with a apartment that you rent out",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -223,7 +231,8 @@
       "group": "private",
       "name": "Cabin",
       "description": "Hytte med litt AirBnb inntekt",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -259,7 +268,8 @@
       "group": "private",
       "name": "Rental",
       "description": "Rental",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -298,7 +308,8 @@
       "group": "private",
       "name": "Crypto",
       "description": "Crypto",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -324,7 +335,8 @@
       "group": "private",
       "name": "Gold",
       "description": "Gold",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -350,7 +362,8 @@
       "group": "private",
       "name": "Cash",
       "description": "",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "asset": {
@@ -376,7 +389,8 @@
       "group": "private",
       "name": "Avensis",
       "description": "",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -401,7 +415,8 @@
       "group": "private",
       "name": "Boat",
       "description": "",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -426,7 +441,8 @@
       "group": "company",
       "name": "Company AS",
       "description": "I own stocks here",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "asset": {
@@ -443,7 +459,8 @@
       "group": "private",
       "name": "fond privat",
       "description": "Has to be the second last asset since we often trasfer from other assets when sold, to this asset",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "asset": {
@@ -470,7 +487,8 @@
       "group": "private",
       "name": "Income",
       "description": "Amount in this asset is not taxed. Everything transfered here is taxed when transfered from fond/otp. Has to be the last asset in the config.",
-      "active": true
+      "active": true,
+      "debug": true
     }
   }
 }

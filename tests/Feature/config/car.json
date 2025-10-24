@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-bolt",
     "color": "#22c55e",
+    "country": "no",
     "tags": [
       "simple"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Tesla Model Y - Electric Vehicle",
       "description": "Premium electric SUV with lower operating costs and environmental benefits",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2023": {
       "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",

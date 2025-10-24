@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-chart-pie",
     "color": "#8b5cf6",
+    "country": "no",
     "tags": [
       "pension",
       "funds",
@@ -22,7 +23,8 @@
       "group": "private",
       "name": "Salary",
       "description": "Salary",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {
@@ -58,7 +60,8 @@
       "group": "private",
       "name": "equityfund",
       "description": "equityfund",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -86,7 +89,8 @@
       "group": "private",
       "name": "Income",
       "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {

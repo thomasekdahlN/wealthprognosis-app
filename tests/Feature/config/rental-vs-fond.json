@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-arrows-right-left",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Rental",
       "description": "Rental",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -58,7 +60,8 @@
       "group": "private",
       "name": "fond",
       "description": "",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {

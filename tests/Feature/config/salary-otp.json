@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-banknotes",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Salary",
       "description": "Salary",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {
@@ -54,7 +56,8 @@
       "group": "private",
       "name": "OTP",
       "description": "OTP",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -83,7 +86,8 @@
       "group": "private",
       "name": "Income",
       "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2026": {
       "income": {

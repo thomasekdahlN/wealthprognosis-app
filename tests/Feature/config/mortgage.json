@@ -9,6 +9,7 @@
     "deathAge": "48",
     "icon": "heroicon-o-home",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "InterestOnly5years",
       "description": "Paying only interest for the first 5 years, then paying interest and principal for the remaining years",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {
@@ -57,7 +59,8 @@
       "group": "private",
       "name": "ExtraDownpayment",
       "description": "Paying interest and principal + 60 000 ekstra downpayment for all the years",
-      "active": false
+      "active": false,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -80,7 +83,8 @@
       "group": "private",
       "name": "Normal",
       "description": "Paying interest and principal for all the years",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {

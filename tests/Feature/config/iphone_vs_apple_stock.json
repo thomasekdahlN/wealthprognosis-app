@@ -10,6 +10,7 @@
     "exportStartYear": "2007",
     "icon": "heroicon-o-device-phone-mobile",
     "color": "#000000",
+    "country": "no",
     "tags": [
       "apple",
       "iphone",
@@ -24,7 +25,8 @@
       "group": "private",
       "name": "Iphone",
       "description": "https://www.androidauthority.com/iphone-price-history-3221497/",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2007": {
       "asset": {
@@ -147,7 +149,8 @@
       "group": "private",
       "name": "Apple stock",
       "description": "",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2007": {
       "asset": {

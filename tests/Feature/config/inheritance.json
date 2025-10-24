@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-gift",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Arne Arving",
       "description": "Established family home in Stavanger with remaining mortgage to be paid off",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Mortgage: interest changerates.interest, years 20",
@@ -50,7 +52,8 @@
       "group": "private",
       "name": "Parents' Estate Inheritance",
       "description": "Expected inheritance from parents' estate including property and investments",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2037": {
       "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
@@ -74,7 +77,8 @@
       "group": "private",
       "name": "Diversified Investment Portfolio",
       "description": "Long-term investment portfolio enhanced by inheritance allocation",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Asset: ",

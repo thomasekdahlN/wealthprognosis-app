@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-key",
     "color": "#22c55e",
+    "country": "no",
     "tags": [
       "simple"
     ]
@@ -20,7 +21,8 @@
       "name": "My house",
       "description": "Here I live",
       "active": true,
-      "taxProperty": "ringerike"
+      "taxProperty": "ringerike",
+      "debug": true
     },
     "2023": {
       "description": "Income: Utleie av leilighet | Expense: Kommunale/Forsikring/Strøm 2600 mnd | Asset: Rental | Mortgage: ",

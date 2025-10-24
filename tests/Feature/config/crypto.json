@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-currency-dollar",
     "color": "#22c55e",
+    "country": "no",
     "tags": [
       "simple"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Bitcoin & Ethereum Portfolio",
       "description": "Long-term cryptocurrency holdings as digital store of value and inflation hedge",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2022": {
       "description": "Income:  | Expense:  | Asset: ; Uttak fra $pensionWishAge, 1|$pensionWishAges | Mortgage: ",

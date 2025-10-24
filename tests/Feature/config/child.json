@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-users",
     "color": "#22c55e",
+    "country": "no",
     "tags": [
       "simple"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Emma - First Child (Born 2020)",
       "description": "Financial planning for first child including benefits, education, and living expenses",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2020": {
       "description": "Income: Barnetrygd | Expense: Utgifter | Asset:  | Mortgage: ",

@@ -8,6 +8,7 @@
       "advanced"
     ],
     "color": "#f97316",
+    "country": "no",
     "prognoseAge": "50",
     "pensionOfficialAge": "67",
     "pensionWishAge": "33",
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Software Engineer Salary",
       "description": "High-income tech career enabling aggressive savings rate for FIRE strategy",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "years": {
       "2019": {
@@ -65,7 +67,8 @@
       "group": "private",
       "name": "Global Equity Index Fund",
       "description": "Core FIRE portfolio - low-cost global equity index fund with systematic monthly investments",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "years": {
       "2019": {
@@ -118,7 +121,8 @@
       "group": "private",
       "name": "Emergency Fund",
       "description": "High-yield savings account maintaining 6 months of expenses for financial security",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "years": {
       "2019": {
@@ -153,7 +157,8 @@
       "group": "private",
       "name": "Real Estate Investment Trust Fund",
       "description": "REIT fund for portfolio diversification and passive income generation",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "years": {
       "2020": {
@@ -197,7 +202,8 @@
       "group": "private",
       "name": "Government Bond Index Fund",
       "description": "Conservative bond allocation for portfolio stability and risk management",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "years": {
       "2021": {

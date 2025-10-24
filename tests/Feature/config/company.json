@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-building-office",
     "color": "#22c55e",
+    "country": "no",
     "tags": [
       "simple"
     ]
@@ -19,7 +20,8 @@
       "group": "company",
       "name": "Company AS",
       "description": "I own stocks here",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2022": {
       "description": "Income:  | Expense:  | Asset: Initielt kjøp | Mortgage: ",

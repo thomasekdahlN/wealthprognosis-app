@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-user-circle",
     "color": "#0891b2",
+    "country": "no",
     "tags": [
       "pension",
       "otp",
@@ -22,7 +23,8 @@
       "group": "private",
       "name": "Salary",
       "description": "Lønn",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {
@@ -57,7 +59,8 @@
       "group": "private",
       "name": "Folketrygden",
       "description": "Folketrygden",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "$pensionOfficialAge": {
       "income": {
@@ -76,7 +79,8 @@
       "group": "private",
       "name": "OTP",
       "description": "OTP",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -104,7 +108,8 @@
       "group": "private",
       "name": "Income",
       "description": "Inntekt fra investeringer, må være helt til slutt i konfigurasjonsfilen siden alle transfers til slutt havner her. Alle transfer hit er også ferdig skattet, så det skal ikke skattes i denne kategorien.",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "income": {

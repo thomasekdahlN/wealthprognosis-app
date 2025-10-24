@@ -9,6 +9,7 @@
     "deathAge": "59",
     "icon": "heroicon-o-fire",
     "color": "#dc2626",
+    "country": "no",
     "tags": [
       "FIRE",
       "podcast",
@@ -22,7 +23,8 @@
       "group": "private",
       "name": "House",
       "description": "House with normal mortgage, the rest is put into fund",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "income": {
@@ -68,7 +70,8 @@
       "group": "private",
       "name": "fond",
       "description": "Fra cash flow: 9388 x 12 hvert år",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2024": {
       "asset": {

@@ -9,6 +9,7 @@
     "deathAge": "82",
     "icon": "heroicon-o-fire",
     "color": "#f97316",
+    "country": "no",
     "tags": [
       "advanced"
     ]
@@ -19,7 +20,8 @@
       "group": "private",
       "name": "Senior Software Engineer Salary",
       "description": "Full-time software engineering position with annual increases",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Income: Income | Expense:  | Asset:  | Mortgage: ",
@@ -57,7 +59,8 @@
       "group": "private",
       "name": "Family Inheritance",
       "description": "Expected inheritance from parents' estate",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2040": {
       "description": "Asset: We transfer the entire inheritance into a fund or as extraDownpayment on the house",
@@ -81,7 +84,8 @@
       "group": "private",
       "name": "Norwegian State Pension (Folketrygd)",
       "description": "Government pension starting at official retirement age",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "$pensionOfficialAge": {
       "description": "Income: Pension from $pensionOfficialAge",
@@ -101,7 +105,8 @@
       "group": "private",
       "name": "Occupational Pension (OTP)",
       "description": "Employer-sponsored pension with 5% annual contributions",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "asset": {
@@ -129,7 +134,8 @@
       "group": "private",
       "name": "Oslo Apartment - Primary Residence",
       "description": "Modern 3-bedroom apartment in central Oslo with mortgage",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
@@ -160,7 +166,8 @@
       "group": "private",
       "name": "Global Equity Fund Portfolio",
       "description": "Diversified equity fund investments for long-term growth",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
@@ -178,7 +185,8 @@
       "group": "private",
       "name": "Emergency Fund & Cash Reserves",
       "description": "High-yield savings account for emergencies and opportunities",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Income:  | Expense:  | Asset: Kontanter p.t. | Mortgage: ",
@@ -203,7 +211,8 @@
       "group": "private",
       "name": "Tesla Model Y - Electric Vehicle",
       "description": "Electric vehicle with lower operating costs and depreciation",
-      "active": true
+      "active": true,
+      "debug": true
     },
     "2025": {
       "description": "Income:  | Expense: Drivstoff/Forsikring/Vedlikehold/Opplag | Asset: verditap | Mortgage: ",
