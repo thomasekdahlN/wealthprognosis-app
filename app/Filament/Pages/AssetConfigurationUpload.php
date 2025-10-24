@@ -137,13 +137,22 @@ class AssetConfigurationUpload extends Page implements HasForms
                         // Read and validate JSON
                         $configFilePath = Storage::disk('local')->path($configFile);
                         if (! file_exists($configFilePath)) {
-                            throw new \Exception('Configuration file not found at: '.$configFilePath);
+                            throw new \Exception("Configuration file not found!\n\nFile: {$configFilePath}\n\nPlease check that the file was uploaded correctly.");
                         }
 
                         $jsonContent = file_get_contents($configFilePath);
+                        if ($jsonContent === false) {
+                            throw new \Exception("Failed to read configuration file!\n\nFile: {$configFilePath}\n\nPlease check file permissions.");
+                        }
+
                         $jsonData = json_decode($jsonContent, true);
                         if (json_last_error() !== JSON_ERROR_NONE) {
-                            throw new \Exception('Invalid JSON file: '.json_last_error_msg());
+                            $jsonError = json_last_error_msg();
+                            throw new \Exception("Invalid JSON in configuration file!\n\nJSON Error: {$jsonError}\n\nPlease validate your JSON file using a JSON validator.\n\nCommon issues:\n- Missing or extra commas\n- Unquoted keys or values\n- Trailing commas before } or ]\n- Invalid escape sequences");
+                        }
+
+                        if (! is_array($jsonData)) {
+                            throw new \Exception("Invalid JSON structure!\n\nThe JSON file must contain a valid configuration object.");
                         }
 
                         // Generate the Excel file using the same export class as CLI

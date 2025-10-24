@@ -35,4 +35,60 @@ class PrognosisExport2Test extends TestCase
         echo "$generated_exportfile\n";
         $this->assertFileEquals($expected_exportfile, $generated_exportfile, "The generated file doesn't match the expected output.");
     }
+
+    /**
+     * Test that PrognosisExport2 throws exception when file does not exist
+     */
+    public function test_throws_exception_when_file_not_found(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Configuration file not found');
+
+        $nonExistentFile = '/tmp/nonexistent_file_'.uniqid().'.json';
+        $exportFile = '/tmp/export_'.uniqid().'.xlsx';
+
+        new PrognosisExport2($nonExistentFile, $exportFile, 'realistic', 'all');
+    }
+
+    /**
+     * Test that PrognosisExport2 throws exception when JSON is invalid
+     */
+    public function test_throws_exception_when_json_invalid(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid JSON');
+
+        // Create a temporary file with invalid JSON
+        $invalidJsonFile = tempnam(sys_get_temp_dir(), 'invalid_json_');
+        file_put_contents($invalidJsonFile, '{ "meta": { "name": "Test", invalid json here }');
+
+        $exportFile = '/tmp/export_'.uniqid().'.xlsx';
+
+        try {
+            new PrognosisExport2($invalidJsonFile, $exportFile, 'realistic', 'all');
+        } finally {
+            @unlink($invalidJsonFile);
+        }
+    }
+
+    /**
+     * Test that PrognosisExport2 throws exception when JSON is not an object/array
+     */
+    public function test_throws_exception_when_json_not_object(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('JSON content must be an object/array');
+
+        // Create a temporary file with valid JSON but not an object
+        $invalidStructureFile = tempnam(sys_get_temp_dir(), 'invalid_structure_');
+        file_put_contents($invalidStructureFile, '"just a string"');
+
+        $exportFile = '/tmp/export_'.uniqid().'.xlsx';
+
+        try {
+            new PrognosisExport2($invalidStructureFile, $exportFile, 'realistic', 'all');
+        } finally {
+            @unlink($invalidStructureFile);
+        }
+    }
 }

@@ -83,9 +83,53 @@ class PrognosisExport2
             ->setCategory('Wealth prognosis');
 
         $this->spreadsheet->removeSheetByIndex(0); // Siden jeg ikke klarte å navne det første
+
+        // Validate file exists
+        if (! file_exists($configfile)) {
+            $errorMsg = "\n❌ ERROR: Configuration file not found!\n";
+            $errorMsg .= "   File: {$configfile}\n";
+            $errorMsg .= "   Please check that the file path is correct and the file exists.\n\n";
+            echo $errorMsg;
+            throw new \InvalidArgumentException("Configuration file not found: {$configfile}");
+        }
+
         echo "Leser: '$configfile'\n";
+
+        // Read file content
         $content = file_get_contents($configfile);
+        if ($content === false) {
+            $errorMsg = "\n❌ ERROR: Failed to read configuration file!\n";
+            $errorMsg .= "   File: {$configfile}\n";
+            $errorMsg .= "   Please check file permissions.\n\n";
+            echo $errorMsg;
+            throw new \RuntimeException("Failed to read configuration file: {$configfile}");
+        }
+
+        // Decode JSON
         $this->config = json_decode($content, true);
+
+        // Validate JSON
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errorMsg = "\n❌ ERROR: Invalid JSON in configuration file!\n";
+            $errorMsg .= "   File: {$configfile}\n";
+            $errorMsg .= '   JSON Error: '.json_last_error_msg()."\n";
+            $errorMsg .= "   Please validate your JSON file using a JSON validator.\n";
+            $errorMsg .= "   Common issues:\n";
+            $errorMsg .= "   - Missing or extra commas\n";
+            $errorMsg .= "   - Unquoted keys or values\n";
+            $errorMsg .= "   - Trailing commas before } or ]\n";
+            $errorMsg .= "   - Invalid escape sequences\n\n";
+            echo $errorMsg;
+            throw new \InvalidArgumentException("Invalid JSON in file {$configfile}: ".json_last_error_msg());
+        }
+
+        if (! is_array($this->config)) {
+            $errorMsg = "\n❌ ERROR: JSON content must be an object/array!\n";
+            $errorMsg .= "   File: {$configfile}\n";
+            $errorMsg .= "   The JSON file must contain a valid configuration object.\n\n";
+            echo $errorMsg;
+            throw new \InvalidArgumentException("JSON content must be an object/array in file: {$configfile}");
+        }
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->country = (int) Arr::get($this->config, 'meta.country');
@@ -118,14 +162,34 @@ class PrognosisExport2
         // echo "totalYears: $this->totalYears, showYears: $this->showYears, exportStartYear: $this->exportStartYear, economyStartYear: $this->economyStartYear\n";
 
         // Variable replacement before start - but need to reed some variables before this, therefore generate json twice.
+        $rawContent = file_get_contents($configfile);
+        if ($rawContent === false) {
+            $errorMsg = "\n❌ ERROR: Failed to read configuration file for variable replacement!\n";
+            $errorMsg .= "   File: {$configfile}\n";
+            $errorMsg .= "   Please check file permissions.\n\n";
+            echo $errorMsg;
+            throw new \RuntimeException("Failed to read configuration file: {$configfile}");
+        }
+
         $content = str_replace(
             ['$birthYear', '$economyStartYear', '$thisYear', '$prognoseYear', '$pensionOfficialYears', '$pensionWishYears', '$pensionOfficialYear', '$pensionWishYear', '$otpStartYear', '$otpEndYear', '$otpYears', '$deathYear', '$leftYears', '$untilPensionYears'],
             [$this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionOfficialYears, $this->pensionWishYears, $this->pensionOfficialYear, $this->pensionWishYear, $this->otpStartYear, $this->otpEndYear, $this->otpYears, $this->deathYear, $this->leftYears, $this->untilPensionYears],
-            file_get_contents($configfile));
+            $rawContent);
 
         // print $content;
 
         $this->config = json_decode($content, true);
+
+        // Validate JSON after variable replacement
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $errorMsg = "\n❌ ERROR: Invalid JSON after variable replacement!\n";
+            $errorMsg .= "   File: {$configfile}\n";
+            $errorMsg .= '   JSON Error: '.json_last_error_msg()."\n";
+            $errorMsg .= "   This may be caused by invalid variable placeholders in the JSON.\n";
+            $errorMsg .= "   Please check that all $ variables are properly formatted.\n\n";
+            echo $errorMsg;
+            throw new \InvalidArgumentException("Invalid JSON after variable replacement in file {$configfile}: ".json_last_error_msg());
+        }
 
         // Prognosis gets Tax and Changerate singletons from the service container automatically
         $prognosis = (new PrognosisService($this->config));
