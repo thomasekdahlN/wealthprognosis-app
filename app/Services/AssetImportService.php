@@ -8,6 +8,7 @@ use App\Models\Asset;
 use App\Models\AssetConfiguration;
 use App\Models\AssetYear;
 use App\Models\User;
+use App\Services\Utilities\HelperService;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -28,10 +29,13 @@ class AssetImportService
 
     protected int $currentSortOrder = 1; // Track sort order for assets
 
+    protected HelperService $helper;
+
     public function __construct(?User $user = null, ?int $teamId = null)
     {
         $this->user = $user ?? Auth::user();
         $this->teamId = $teamId ?? $this->user?->current_team_id;
+        $this->helper = app(HelperService::class);
     }
 
     /**
@@ -443,15 +447,7 @@ class AssetImportService
      */
     protected function convertFactorToEnum($factor): string
     {
-        if (is_string($factor)) {
-            // Already an enum value, validate it
-            return in_array($factor, ['monthly', 'yearly']) ? $factor : 'yearly';
-        }
-
-        // Convert numeric factor to enum
-        $numericFactor = (int) $factor;
-
-        return $numericFactor === 12 ? 'monthly' : 'yearly';
+        return $this->helper->factorToEnum($factor);
     }
 
     /**
