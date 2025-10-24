@@ -48,4 +48,79 @@ class HelperService
 
         throw new \Exception("Invalid path format: $path");
     }
+
+    /**
+     * Normalize factor input to an integer multiplier.
+     *
+     * Accepts various input formats:
+     * - Integer values (1, 12, etc.)
+     * - Numeric strings ("1", "12", etc.)
+     * - String keywords ("monthly", "yearly", "annually", etc.)
+     *
+     * Returns:
+     * - 12 for monthly factors
+     * - 1 for yearly/annual factors
+     * - 1 as default for unknown input
+     *
+     * @param  mixed  $factor  The factor value to normalize
+     * @return int The normalized multiplier (1 or 12)
+     */
+    public function normalizeFactor(mixed $factor): int
+    {
+        if (is_int($factor)) {
+            return $factor > 0 ? $factor : 1;
+        }
+
+        if (is_numeric($factor)) {
+            $n = (int) $factor;
+
+            return $n > 0 ? $n : 1;
+        }
+
+        $map = [
+            'monthly' => 12,
+            'month' => 12,
+            'yearly' => 1,
+            'year' => 1,
+            'annually' => 1,
+            'annual' => 1,
+        ];
+
+        if (is_string($factor)) {
+            $key = strtolower(trim($factor));
+            if (isset($map[$key])) {
+                return $map[$key];
+            }
+        }
+
+        return 1;
+    }
+
+    /**
+     * Convert factor input to enum value ('monthly' or 'yearly').
+     *
+     * Accepts various input formats:
+     * - Integer values (1, 12, etc.)
+     * - Numeric strings ("1", "12", etc.)
+     * - String keywords ("monthly", "yearly", "annually", etc.)
+     *
+     * Returns:
+     * - 'monthly' for factors that equal 12
+     * - 'yearly' for all other values (default)
+     *
+     * @param  mixed  $factor  The factor value to convert
+     * @return string The enum value ('monthly' or 'yearly')
+     */
+    public function factorToEnum(mixed $factor): string
+    {
+        // If already a valid enum string, return it
+        if (is_string($factor) && in_array($factor, ['monthly', 'yearly'])) {
+            return $factor;
+        }
+
+        // Convert to multiplier and then to enum
+        $multiplier = $this->normalizeFactor($factor);
+
+        return $multiplier === 12 ? 'monthly' : 'yearly';
+    }
 }
