@@ -25,9 +25,9 @@ class AppServiceProvider extends ServiceProvider
             return new \App\Services\Tax\TaxConfigRepository('no');
         });
 
-        // Register TaxPropertyRepository as a singleton for property tax data
-        $this->app->singleton(\App\Services\Tax\TaxPropertyRepository::class, function ($app) {
-            return new \App\Services\Tax\TaxPropertyRepository('no');
+        // Register TaxConfigPropertyRepository as a singleton for property tax data
+        $this->app->singleton(\App\Services\Tax\TaxConfigPropertyRepository::class, function ($app) {
+            return new \App\Services\Tax\TaxConfigPropertyRepository('no');
         });
 
         // Register Tax calculation classes as singletons with proper dependency injection
@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
             return new \App\Services\Tax\TaxFortune(
                 'no',
                 $app->make(\App\Services\Tax\TaxConfigRepository::class),
-                $app->make(\App\Services\Tax\TaxPropertyRepository::class)
+                $app->make(\App\Services\Tax\TaxConfigPropertyRepository::class)
             );
         });
 
@@ -67,12 +67,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Register utility classes as singletons
-        $this->app->singleton(\App\Services\Utilities\PrognosisHelper::class, function ($app) {
-            return new \App\Services\Utilities\PrognosisHelper;
+        $this->app->singleton(\App\Services\Utilities\HelperService::class, function ($app) {
+            return new \App\Services\Utilities\HelperService;
         });
 
-        $this->app->singleton(\App\Services\Prognosis\RulesService::class, function ($app) {
-            return new \App\Services\Prognosis\RulesService;
+        $this->app->singleton(\App\Services\Utilities\RulesService::class, function ($app) {
+            return new \App\Services\Utilities\RulesService;
         });
 
         // Register Changerate as a singleton

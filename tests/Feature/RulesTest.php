@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Services\Prognosis\RulesService;
+use App\Services\Utilities\RulesService;
 use Tests\TestCase;
 
 class RulesTest extends TestCase

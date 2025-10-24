@@ -17,12 +17,12 @@
 namespace App\Services\Utilities;
 
 /**
- * Class Helper
+ * Class HelperService
  *
  * Utility class for parsing asset path strings used in the prognosis system.
  * Provides methods to extract components from dot-notation asset paths.
  */
-class PrognosisHelper
+class HelperService
 {
     /**
      * Parse an asset path string into its component elements.

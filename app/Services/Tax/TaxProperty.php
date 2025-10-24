@@ -27,16 +27,16 @@ class TaxProperty
     protected $country;
 
     /**
-     * Shared TaxPropertyRepository instance.
+     * Shared TaxConfigPropertyRepository instance.
      */
-    private \App\Services\Tax\TaxPropertyRepository $taxPropertyRepo;
+    private \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyRepo;
 
     public function __construct(string $country = 'no')
     {
         $this->country = $country;
 
         // Use the singleton instance from the service container
-        $this->taxPropertyRepo = app(\App\Services\Tax\TaxPropertyRepository::class);
+        $this->taxPropertyRepo = app(\App\Services\Tax\TaxConfigPropertyRepository::class);
     }
 
     /**

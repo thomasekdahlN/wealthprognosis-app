@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Services\Utilities\PrognosisHelper;
+use App\Services\Utilities\HelperService;
 use Tests\TestCase;
 
 class HelperTest extends TestCase
@@ -14,7 +14,7 @@ class HelperTest extends TestCase
      */
     public function test_it_parses_path_to_elements()
     {
-        $helper = app(PrognosisHelper::class);
+        $helper = app(HelperService::class);
         [$assetname, $year, $type, $field] = $helper->pathToElements('fund.2022.asset.marketAmount');
         $this->assertEquals('fund', $assetname);
         $this->assertEquals('2022', $year);
@@ -29,7 +29,7 @@ class HelperTest extends TestCase
      */
     public function test_it_throws_error_for_invalid_path()
     {
-        $helper = app(PrognosisHelper::class);
+        $helper = app(HelperService::class);
         $this->expectException(\Exception::class);
         $helper->pathToElements('invalid');
     }

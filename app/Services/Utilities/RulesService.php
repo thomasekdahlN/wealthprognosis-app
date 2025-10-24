@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Services\Prognosis;
+namespace App\Services\Utilities;
 
 use Illuminate\Support\Facades\Log;
 

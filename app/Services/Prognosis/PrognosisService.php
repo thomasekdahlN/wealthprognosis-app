@@ -72,8 +72,8 @@ class PrognosisService
         $this->taxfortune = app(\App\Services\Tax\TaxFortune::class);
         $this->taxrealization = app(\App\Services\Tax\TaxRealization::class);
         $this->changerate = app(\App\Services\Prognosis\ChangerateService::class);
-        $this->helper = app(\App\Services\Utilities\PrognosisHelper::class);
-        $this->rules = app(\App\Services\Prognosis\RulesService::class);
+        $this->helper = app(\App\Services\Utilities\HelperService::class);
+        $this->rules = app(\App\Services\Utilities\RulesService::class);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age

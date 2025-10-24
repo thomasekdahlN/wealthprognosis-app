@@ -41,25 +41,25 @@ class TaxFortune implements TaxCalculatorInterface
     private TaxConfigRepository $taxConfigRepo;
 
     /**
-     * Shared TaxPropertyRepository instance.
+     * Shared TaxConfigPropertyRepository instance.
      */
-    private TaxPropertyRepository $taxPropertyRepo;
+    private TaxConfigPropertyRepository $taxPropertyRepo;
 
     /**
      * Create a new TaxFortune service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
-     * @param  TaxPropertyRepository|null  $taxPropertyRepo  Optional property repository instance for dependency injection
+     * @param  TaxConfigPropertyRepository|null  $taxPropertyRepo  Optional property repository instance for dependency injection
      */
     public function __construct(
         string $country = 'no',
         ?TaxConfigRepository $taxConfigRepo = null,
-        ?TaxPropertyRepository $taxPropertyRepo = null
+        ?TaxConfigPropertyRepository $taxPropertyRepo = null
     ) {
         $this->country = strtolower($country) ?: 'no';
         $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
-        $this->taxPropertyRepo = $taxPropertyRepo ?? app(TaxPropertyRepository::class);
+        $this->taxPropertyRepo = $taxPropertyRepo ?? app(TaxConfigPropertyRepository::class);
     }
 
     /**

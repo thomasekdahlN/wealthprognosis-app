@@ -12,7 +12,7 @@ use App\Models\TaxProperty;
  * Retrieves property tax rates, deductions, and taxable percentages from the
  * TaxProperty model, falling back to the closest previous year if exact year is not found.
  */
-class TaxPropertyRepository
+class TaxConfigPropertyRepository
 {
     /**
      * Cache structure: [country][code][year][field] => value
