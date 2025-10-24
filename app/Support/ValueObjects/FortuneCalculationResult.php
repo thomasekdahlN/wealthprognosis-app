@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core\ValueObjects;
+namespace App\Support\ValueObjects;
 
 /**
  * Value object representing the result of a fortune tax calculation.

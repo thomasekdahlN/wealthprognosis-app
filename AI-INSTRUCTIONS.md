@@ -84,6 +84,6 @@ Remove html tags from the presentation of string and text fields that are listed
 HTML has to be removed from textfields before they are rendered in tables. (Not from the database, just to render the view nicely when you limit the amountof characters in a description)
 On labels and sentences it should only be uppercase letters on the first word
 
-Use conventional commits.
+Do not commit code to Git unless explicitly asked for it. Use conventional commits when asked to check in code to Git.
 
 Do not create files, classes and methods based on a test that thinks it is missing. Just remove the test.

@@ -14,9 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
-
-use App\Services\Tax\TaxPropertyRepository;
+namespace App\Services\Tax;
 
 /**
  * Class TaxProperty

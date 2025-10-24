@@ -14,27 +14,38 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core\ValueObjects;
+namespace App\Support\ValueObjects;
 
 /**
- * Value object representing the result of a rule calculation.
+ * Value object representing the result of a realization tax calculation.
  */
-readonly class RuleCalculationResult
+readonly class RealizationCalculationResult
 {
     public function __construct(
-        public int $newAmount,
-        public int $calcAmount,
-        public ?string $updatedRule,
+        public float $taxableAmount,
+        public float $taxAmount,
+        public float $acquisitionAmount,
+        public float $taxPercent,
+        public float $taxShieldAmount,
+        public float $taxShieldPercent,
         public string $explanation
     ) {}
 
     /**
      * Convert to array format for backward compatibility.
      *
-     * @return array{0: int, 1: int, 2: string|null, 3: string}
+     * @return array{0: float, 1: float, 2: float, 3: float, 4: float, 5: float, 6: string}
      */
     public function toArray(): array
     {
-        return [$this->newAmount, $this->calcAmount, $this->updatedRule, $this->explanation];
+        return [
+            $this->taxableAmount,
+            $this->taxAmount,
+            $this->acquisitionAmount,
+            $this->taxPercent,
+            $this->taxShieldAmount,
+            $this->taxShieldPercent,
+            $this->explanation,
+        ];
     }
 }

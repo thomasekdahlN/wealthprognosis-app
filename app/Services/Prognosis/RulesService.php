@@ -14,9 +14,8 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core\Calculation;
+namespace App\Services\Prognosis;
 
-use App\Models\Core\ValueObjects\RuleCalculationResult;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -31,7 +30,7 @@ use Illuminate\Support\Facades\Log;
  * - Dynamic Divisor: "+1|4", "-1|2" (counts down denominator each use)
  * - Fixed Amount: "+1000", "-500" (add or subtract fixed amount, multiplied by factor)
  */
-class Rules
+class RulesService
 {
     /**
      * Main entry point for calculating rule transformations on amounts.
@@ -261,4 +260,3 @@ class Rules
         return [$newAmount, $calcAmount, $explanation];
     }
 }
-

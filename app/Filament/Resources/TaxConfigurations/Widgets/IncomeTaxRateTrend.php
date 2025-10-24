@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\TaxConfigurations\Widgets;
 
-use App\Models\Core\TaxConfiguration;
+use App\Models\TaxConfiguration;
 use Filament\Widgets\ChartWidget;
 
 class IncomeTaxRateTrend extends ChartWidget

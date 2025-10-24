@@ -14,17 +14,13 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Services\Prognosis;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
-class Amortization extends Model
+class AmortizationService
 {
-    use HasFactory;
-
     private bool $debug;
 
     private int $amount;
@@ -50,6 +46,12 @@ class Amortization extends Model
     private float $term_pay;
 
     private array $data;
+
+    private float $principalAmount = 0;
+
+    private float $balanceAmount = 0;
+
+    private float $termAmount = 0;
 
     private string $assettname;
 

@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Services\Prognosis;
 
 use App\Models\PrognosisChangeRate;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Log;
  * Lazy-loading repository for change rate data with in-memory caching.
  * Cache structure: [scenarioType][assetType][year] => [percent, decimal]
  */
-class Changerate
+class ChangerateService
 {
     /**
      * In-memory cache: [scenarioType][assetType][year] => [percent, decimal]

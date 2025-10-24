@@ -14,12 +14,9 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core\Tax;
+namespace App\Services\Tax;
 
-use App\Models\Core\Contracts\TaxCalculatorInterface;
-use App\Models\Core\ValueObjects\FortuneCalculationResult;
-use App\Services\Tax\TaxConfigRepository;
-use App\Services\Tax\TaxPropertyRepository;
+use App\Support\Contracts\TaxCalculatorInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
@@ -271,4 +268,3 @@ class TaxFortune implements TaxCalculatorInterface
         return [$taxAmount, $taxPercent, $taxableAmount, $explanation];
     }
 }
-

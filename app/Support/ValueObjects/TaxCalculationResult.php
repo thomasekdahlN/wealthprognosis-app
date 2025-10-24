@@ -14,38 +14,28 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core\ValueObjects;
+namespace App\Support\ValueObjects;
 
 /**
- * Value object representing the result of a realization tax calculation.
+ * Value object representing the result of a tax calculation.
+ *
+ * Provides a structured, type-safe alternative to returning arrays.
  */
-readonly class RealizationCalculationResult
+readonly class TaxCalculationResult
 {
     public function __construct(
-        public float $taxableAmount,
         public float $taxAmount,
-        public float $acquisitionAmount,
         public float $taxPercent,
-        public float $taxShieldAmount,
-        public float $taxShieldPercent,
         public string $explanation
     ) {}
 
     /**
      * Convert to array format for backward compatibility.
      *
-     * @return array{0: float, 1: float, 2: float, 3: float, 4: float, 5: float, 6: string}
+     * @return array{0: float, 1: float, 2: string}
      */
     public function toArray(): array
     {
-        return [
-            $this->taxableAmount,
-            $this->taxAmount,
-            $this->acquisitionAmount,
-            $this->taxPercent,
-            $this->taxShieldAmount,
-            $this->taxShieldPercent,
-            $this->explanation,
-        ];
+        return [$this->taxAmount, $this->taxPercent, $this->explanation];
     }
 }

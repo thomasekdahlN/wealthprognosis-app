@@ -2,13 +2,12 @@
 
 namespace Tests\Helpers;
 
-use App\Models\Core\Prognosis;
+use App\Services\Prognosis\PrognosisService;
 
-class TestablePrognosisShowStatistics extends Prognosis
+class TestablePrognosisShowStatistics extends PrognosisService
 {
     public function isShownInStatisticsPublic(string $assetType): bool
     {
         return $this->isShownInStatistics($assetType);
     }
 }
-

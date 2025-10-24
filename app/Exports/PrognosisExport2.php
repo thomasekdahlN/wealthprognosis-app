@@ -16,8 +16,7 @@
 
 namespace App\Exports;
 
-use App\Models\Core\Changerate;
-use App\Models\Core\Prognosis;
+use App\Services\Prognosis\PrognosisService;
 use Illuminate\Support\Arr;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -129,7 +128,7 @@ class PrognosisExport2
         $this->config = json_decode($content, true);
 
         // Prognosis gets Tax and Changerate singletons from the service container automatically
-        $prognosis = (new Prognosis($this->config));
+        $prognosis = (new PrognosisService($this->config));
         // dd($prognosis->privateH);
         $meta = [
             'active' => true,

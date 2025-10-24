@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\AssetType;
-use App\Models\Core\Tax\TaxRealization;
 use App\Models\Team;
 use App\Models\User;
+use App\Services\Tax\TaxRealization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

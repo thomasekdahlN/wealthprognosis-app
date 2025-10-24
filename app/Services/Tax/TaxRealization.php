@@ -14,11 +14,9 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core\Tax;
+namespace App\Services\Tax;
 
-use App\Models\Core\Contracts\TaxCalculatorInterface;
-use App\Models\Core\ValueObjects\RealizationCalculationResult;
-use App\Services\Tax\TaxConfigRepository;
+use App\Support\Contracts\TaxCalculatorInterface;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -375,4 +373,3 @@ class TaxRealization implements TaxCalculatorInterface
         return [$realizationTaxAmount, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation];
     }
 }
-

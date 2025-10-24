@@ -2,8 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Core\Amortization;
-use App\Models\Core\Changerate;
+use App\Services\Prognosis\AmortizationService;
 use Tests\TestCase;
 
 class AmortizationTest extends TestCase
@@ -17,7 +16,7 @@ class AmortizationTest extends TestCase
     {
         // Define the config, changerate, dataH, mortgages, and assetname
 
-        $changerate = new \App\Models\Core\Changerate('tenpercent');
+        $changerate = new \App\Services\Prognosis\ChangerateService('tenpercent');
 
         $config = [
             'test' => [
@@ -41,7 +40,7 @@ class AmortizationTest extends TestCase
         $assettname = 'test';
 
         // Instantiate the Amortization class
-        $amortization = new Amortization(false, $config, $changerate, $dataH, $mortgages, $assettname, 2020);
+        $amortization = new AmortizationService(false, $config, $changerate, $dataH, $mortgages, $assettname, 2020);
 
         // Call the getSchedule method
         $dataH = $amortization->get();
@@ -60,7 +59,7 @@ class AmortizationTest extends TestCase
             }
         };
 
-        $amortization = new Amortization(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%'], 'asset', 2022);
+        $amortization = new AmortizationService(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%'], 'asset', 2022);
         $data = $amortization->get();
         $this->assertEquals(100000, $data['asset'][2022]['mortgage']['amount']);
         $this->assertEquals(12950, $data['asset'][2022]['mortgage']['termAmount']);
@@ -76,7 +75,7 @@ class AmortizationTest extends TestCase
             }
         };
 
-        $amortization = new Amortization(false, [], $changerate, [], ['amount' => 0, 'years' => 10, 'interest' => '5%'], 'asset', 2022);
+        $amortization = new AmortizationService(false, [], $changerate, [], ['amount' => 0, 'years' => 10, 'interest' => '5%'], 'asset', 2022);
         $data = $amortization->get();
         $this->assertEmpty($data); // When amount is 0, no data is generated
     }
@@ -91,7 +90,7 @@ class AmortizationTest extends TestCase
             }
         };
 
-        $amortization = new Amortization(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%', 'interestOnlyYears' => 5], 'asset', 2022);
+        $amortization = new AmortizationService(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%', 'interestOnlyYears' => 5], 'asset', 2022);
         $data = $amortization->get();
         $this->assertEquals(5000, $data['asset'][2022]['mortgage']['termAmount']);
     }
@@ -106,7 +105,7 @@ class AmortizationTest extends TestCase
             }
         };
 
-        $amortization = new Amortization(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%', 'extraDownpaymentAmount' => 5000], 'asset', 2022);
+        $amortization = new AmortizationService(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '5%', 'extraDownpaymentAmount' => 5000], 'asset', 2022);
         $data = $amortization->get();
         $this->assertEquals(87050, $data['asset'][2022]['mortgage']['balanceAmount']);
     }
@@ -121,7 +120,7 @@ class AmortizationTest extends TestCase
             }
         };
 
-        $amortization = new Amortization(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '-1%'], 'asset', 2022);
+        $amortization = new AmortizationService(false, [], $changerate, [], ['amount' => 100000, 'years' => 10, 'interest' => '-1%'], 'asset', 2022);
         $data = $amortization->get();
 
         // Should handle negative interest without throwing exception

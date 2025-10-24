@@ -14,7 +14,7 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core\Utilities;
+namespace App\Services\Utilities;
 
 /**
  * Class Helper
@@ -22,7 +22,7 @@ namespace App\Models\Core\Utilities;
  * Utility class for parsing asset path strings used in the prognosis system.
  * Provides methods to extract components from dot-notation asset paths.
  */
-class Helper
+class PrognosisHelper
 {
     /**
      * Parse an asset path string into its component elements.

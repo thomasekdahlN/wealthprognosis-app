@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Core\Tax\TaxRealization;
+use App\Services\Tax\TaxRealization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

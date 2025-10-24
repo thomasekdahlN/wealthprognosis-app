@@ -14,18 +14,15 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace App\Models\Core;
+namespace App\Services\Prognosis;
 
 use App\Models\AssetType;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class Prognosis
+class PrognosisService
 {
-    use HasFactory;
-
     public $thisYear;
 
     public $economyStartYear;
@@ -71,12 +68,12 @@ class Prognosis
         $this->config = $config;
 
         // Get singletons from the service container
-        $this->taxincome = app(\App\Models\Core\Tax\TaxIncome::class);
-        $this->taxfortune = app(\App\Models\Core\Tax\TaxFortune::class);
-        $this->taxrealization = app(\App\Models\Core\Tax\TaxRealization::class);
-        $this->changerate = app(\App\Models\Core\Changerate::class);
-        $this->helper = app(\App\Models\Core\Utilities\Helper::class);
-        $this->rules = app(\App\Models\Core\Calculation\Rules::class);
+        $this->taxincome = app(\App\Services\Tax\TaxIncome::class);
+        $this->taxfortune = app(\App\Services\Tax\TaxFortune::class);
+        $this->taxrealization = app(\App\Services\Tax\TaxRealization::class);
+        $this->changerate = app(\App\Services\Prognosis\ChangerateService::class);
+        $this->helper = app(\App\Services\Utilities\PrognosisHelper::class);
+        $this->rules = app(\App\Services\Prognosis\RulesService::class);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
@@ -234,7 +231,7 @@ class Prognosis
 
                 if ($mortgage) {
                     // Kjører bare dette om mortgage strukturen i json er utfylt
-                    $this->dataH = (new \App\Models\Core\Amortization($debug, $this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
+                    $this->dataH = (new \App\Services\Prognosis\AmortizationService($debug, $this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
                 }
 
                 // ######################################################################################################
@@ -859,7 +856,7 @@ class Prognosis
             // Recalculate the mortgage from this year an onwards.
             if ($mortgage) {
                 print_r($mortgage);
-                $this->dataH = (new \App\Models\Core\Amortization($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
+                $this->dataH = (new \App\Services\Prognosis\AmortizationService($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
             }
 
         } else {
@@ -929,9 +926,6 @@ class Prognosis
                 'variable' => $variable,
                 'value' => $value,
             ]);
-            if (app()->runningInConsole()) {
-                echo "      configOrPrevValueConfig: $assetname.$year.$type.$variable: $value\n";
-            }
         }
 
         // Trouble with bool handling here, and with amounts that are 0.0 (since amounts is set default to 0 so calculations shall work.
@@ -948,7 +942,7 @@ class Prognosis
                     'value' => $value,
                 ]);
                 if (app()->runningInConsole()) {
-                    echo "      configOrPrevValueData prev year: $assetname.$year.$type.$variable: $value\n";
+                    // echo "      configOrPrevValueData prev year: $assetname.$year.$type.$variable: $value\n";
                 }
             }
         }
@@ -967,7 +961,7 @@ class Prognosis
                 'value' => $value,
             ]);
             if (app()->runningInConsole()) {
-                echo "      configOrPrevValueReturn: $assetname.$year.$type.$variable: $value\n";
+                // echo "      configOrPrevValueReturn: $assetname.$year.$type.$variable: $value\n";
             }
         }
 
@@ -991,7 +985,7 @@ class Prognosis
                     'value' => $value,
                 ]);
                 if (app()->runningInConsole()) {
-                    echo "      configOrPrevValueRepeatData prev year: $assetname.$year.$type.$variable: $value\n";
+                    // echo "      configOrPrevValueRepeatData prev year: $assetname.$year.$type.$variable: $value\n";
                 }
             }
         }
@@ -1010,7 +1004,7 @@ class Prognosis
                 'value' => $value,
             ]);
             if (app()->runningInConsole()) {
-                echo "      configOrPrevValueRepeat: $assetname.$year.$type.$variable: $value\n";
+                // echo "      configOrPrevValueRepeat: $assetname.$year.$type.$variable: $value\n";
             }
         }
 
