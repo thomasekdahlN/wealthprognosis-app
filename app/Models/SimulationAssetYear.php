@@ -254,7 +254,7 @@ class SimulationAssetYear extends Model
      */
     public function getIncomeFactorMultiplier(): int
     {
-        return $this->income_factor === self::FACTOR_MONTHLY ? 12 : 1;
+        return app(\App\Services\Utilities\HelperService::class)->normalizeFactor($this->income_factor);
     }
 
     /**
@@ -262,7 +262,7 @@ class SimulationAssetYear extends Model
      */
     public function getExpenseFactorMultiplier(): int
     {
-        return $this->expence_factor === self::FACTOR_MONTHLY ? 12 : 1;
+        return app(\App\Services\Utilities\HelperService::class)->normalizeFactor($this->expence_factor);
     }
 
     /**

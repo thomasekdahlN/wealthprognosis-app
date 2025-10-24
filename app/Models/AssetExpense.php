@@ -70,7 +70,7 @@ class AssetExpense extends Model
      */
     public function getFactorMultiplier(): int
     {
-        return $this->factor === self::FACTOR_MONTHLY ? 12 : 1;
+        return app(\App\Services\Utilities\HelperService::class)->normalizeFactor($this->factor);
     }
 
     /**
