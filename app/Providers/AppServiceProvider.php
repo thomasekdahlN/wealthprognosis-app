@@ -84,6 +84,27 @@ class AppServiceProvider extends ServiceProvider
 
             return new \App\Services\Prognosis\ChangerateService($scenario);
         });
+
+        // Register Processing services as singletons
+        $this->app->singleton(\App\Services\Processing\YearlyProcessor::class, function ($app) {
+            return new \App\Services\Processing\YearlyProcessor(
+                $app->make(\App\Services\Tax\TaxFortuneService::class),
+                $app->make(\App\Services\Utilities\HelperService::class)
+            );
+        });
+
+        $this->app->singleton(\App\Services\Processing\GroupProcessor::class, function ($app) {
+            return new \App\Services\Processing\GroupProcessor(
+                $app->make(\App\Services\Tax\TaxFortuneService::class)
+            );
+        });
+
+        $this->app->singleton(\App\Services\Processing\PostProcessorService::class, function ($app) {
+            return new \App\Services\Processing\PostProcessorService(
+                $app->make(\App\Services\Processing\YearlyProcessor::class),
+                $app->make(\App\Services\Processing\GroupProcessor::class)
+            );
+        });
     }
 
     /**
