@@ -29,7 +29,7 @@ class SimulationAssetYears extends Page
                 // In tests, allow the page to render without strict params to validate routing
                 return;
             }
-            throw new \Filament\Support\Exceptions\Halt(404);
+            throw new \Filament\Support\Exceptions\Halt('404');
         }
 
         $this->simulationConfiguration = SimulationConfiguration::withoutGlobalScopes()->find($simulationConfigurationId);
@@ -38,7 +38,7 @@ class SimulationAssetYears extends Page
 
         if (! $this->simulationConfiguration) {
             if (! app()->runningUnitTests()) {
-                throw new \Filament\Support\Exceptions\Halt(404);
+                throw new \Filament\Support\Exceptions\Halt('404');
             }
 
             // In unit tests, allow rendering without existing records so pretty-route tests can pass.
@@ -47,7 +47,7 @@ class SimulationAssetYears extends Page
 
         // Ensure user has access
         if ($this->simulationConfiguration->user_id !== auth()->id()) {
-            throw new \Filament\Support\Exceptions\Halt(403);
+            throw new \Filament\Support\Exceptions\Halt('403');
         }
     }
 
@@ -168,6 +168,9 @@ class SimulationAssetYears extends Page
         ];
     }
 
+    /**
+     * @return array<string, class-string>
+     */
     public static function getRoutes(): array
     {
         return [

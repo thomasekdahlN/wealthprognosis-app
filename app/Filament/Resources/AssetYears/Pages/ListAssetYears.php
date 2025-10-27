@@ -7,7 +7,6 @@ use App\Models\Asset;
 use App\Models\AssetConfiguration;
 use App\Models\AssetYear;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
@@ -263,7 +262,7 @@ class ListAssetYears extends ListRecords
                     \Filament\Forms\Components\Select::make('group')
                         ->label('Group')
                         ->options(\App\Models\Asset::GROUPS)
-                        ->default($asset?->group ?? 'private')
+                        ->default($asset->group ?? 'private')
                         ->required()
                         ->helperText('Select whether this asset belongs to private or company portfolio'),
 
@@ -290,14 +289,14 @@ class ListAssetYears extends ListRecords
 
                             return $countries;
                         })
-                        ->default($asset?->tax_country ?? 'no')
+                        ->default($asset->tax_country ?? 'no')
                         ->searchable()
                         ->preload()
                         ->required(),
 
                     \Filament\Forms\Components\Toggle::make('is_active')
                         ->label('Active')
-                        ->default($asset?->is_active ?? true)
+                        ->default($asset->is_active ?? true)
                         ->required(),
                 ])
                 ->action(function (array $data) use ($asset) {
@@ -323,14 +322,15 @@ class ListAssetYears extends ListRecords
         ];
     }
 
+    /**
+     * @return array<\Filament\Actions\BulkAction>
+     */
     protected function getTableBulkActions(): array
     {
         return [
-            BulkActionGroup::make([
-                DeleteBulkAction::make()
-                    ->label('Delete selected years')
-                    ->requiresConfirmation(),
-            ]),
+            DeleteBulkAction::make()
+                ->label('Delete selected years')
+                ->requiresConfirmation(),
         ];
     }
 
@@ -361,12 +361,12 @@ class ListAssetYears extends ListRecords
 
         if ($configurationId) {
             $configuration = AssetConfiguration::find($configurationId);
-            $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $configurationId])] = $configuration?->name ?? (__('Configuration').' #'.$configurationId);
+            $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $configurationId])] = $configuration->name ?? (__('Configuration').' #'.$configurationId);
         }
 
         if ($assetId) {
             $asset = Asset::find($assetId);
-            $crumbs[] = $asset?->name ?? (__('Asset').' #'.$assetId); // final crumb as plain text
+            $crumbs[] = $asset->name ?? (__('Asset').' #'.$assetId); // final crumb as plain text
         }
 
         return $crumbs;

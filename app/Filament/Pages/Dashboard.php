@@ -77,6 +77,9 @@ class Dashboard extends BaseDashboard
         return $this->assetConfigurationId;
     }
 
+    /**
+     * @return array<string, class-string>
+     */
     public static function getRoutes(): array
     {
         return [

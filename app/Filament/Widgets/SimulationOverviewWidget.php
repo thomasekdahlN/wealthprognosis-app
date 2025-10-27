@@ -101,6 +101,7 @@ class SimulationOverviewWidget extends BaseWidget
         $startYear = null;
         $endYear = null;
 
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $assetYears = $asset->simulationAssetYears->sortBy('year');
 

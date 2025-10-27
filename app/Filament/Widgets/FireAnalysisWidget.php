@@ -85,6 +85,7 @@ class FireAnalysisWidget extends BaseWidget
         $fireYear = null;
         $yearsToFire = 'Unknown';
 
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $assetYears = $asset->simulationAssetYears->sortBy('year');
 

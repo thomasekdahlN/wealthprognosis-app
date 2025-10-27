@@ -22,7 +22,7 @@ class SimulationConfigurationsTable
                     ->size('lg')
                     ->color(fn ($record): string => $record->color ?: 'gray')
                     ->width('60px')
-                    ->tooltip(fn ($record): ?string => $record->icon ? "Icon: {$record->icon}" : 'Default calculator icon'),
+                    ->tooltip(fn ($record): string => $record->icon ? "Icon: {$record->icon}" : 'Default calculator icon'),
 
                 TextColumn::make('name')
                     ->searchable()

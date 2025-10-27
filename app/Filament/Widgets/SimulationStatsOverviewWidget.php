@@ -65,6 +65,7 @@ class SimulationStatsOverviewWidget extends BaseWidget
         $totalTaxes = 0;
         $yearCount = 0;
 
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $assetYears = $asset->simulationAssetYears;
 

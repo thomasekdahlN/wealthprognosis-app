@@ -42,43 +42,41 @@ class AssetResource extends Resource
         $name ??= 'index';
 
         // Prefer pretty routes that include configuration
-        if (in_array($name, ['index', 'create', 'edit'], true)) {
-            // Resolve configuration ID
-            $configurationId = $parameters['configuration'] ?? null;
-            if (! $configurationId && isset($parameters['record']) && $parameters['record'] instanceof \App\Models\Asset) {
-                $configurationId = $parameters['record']->asset_configuration_id;
+        // Resolve configuration ID
+        $configurationId = $parameters['configuration'] ?? null;
+        if (! $configurationId && isset($parameters['record']) && $parameters['record'] instanceof \App\Models\Asset) {
+            $configurationId = $parameters['record']->asset_configuration_id;
+        }
+
+        if (! $configurationId) {
+            $configurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
+        }
+
+        if ($configurationId && $name === 'index') {
+            return route('filament.admin.resources.assets.index.pretty', [
+                'configuration' => $configurationId,
+            ], $isAbsolute);
+        }
+
+        if ($configurationId && $name === 'create') {
+            return route('filament.admin.resources.assets.create.pretty', [
+                'configuration' => $configurationId,
+            ], $isAbsolute);
+        }
+
+        if ($configurationId && $name === 'edit') {
+            $recordParam = $parameters['record'] ?? $parameters['asset'] ?? null;
+            if (! $recordParam) {
+                // Defensive: if no record provided, fall back to index to avoid URL gen errors
+                return route('filament.admin.resources.assets.index.pretty', [
+                    'configuration' => $configurationId,
+                ], $isAbsolute);
             }
 
-            if (! $configurationId) {
-                $configurationId = app(\App\Services\CurrentAssetConfiguration::class)->id();
-            }
-
-            if ($configurationId) {
-                // Map to our pretty route names
-                return match ($name) {
-                    'index' => route('filament.admin.resources.assets.index.pretty', [
-                        'configuration' => $configurationId,
-                    ], $isAbsolute),
-                    'create' => route('filament.admin.resources.assets.create.pretty', [
-                        'configuration' => $configurationId,
-                    ], $isAbsolute),
-                    'edit' => (function () use ($configurationId, $parameters, $isAbsolute) {
-                        $recordParam = $parameters['record'] ?? $parameters['asset'] ?? null;
-                        if (! $recordParam) {
-                            // Defensive: if no record provided, fall back to index to avoid URL gen errors
-                            return route('filament.admin.resources.assets.index.pretty', [
-                                'configuration' => $configurationId,
-                            ], $isAbsolute);
-                        }
-
-                        return route('filament.admin.resources.assets.edit.pretty', [
-                            'configuration' => $configurationId,
-                            'record' => $recordParam,
-                        ], $isAbsolute);
-                    })(),
-                    default => parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters),
-                };
-            }
+            return route('filament.admin.resources.assets.edit.pretty', [
+                'configuration' => $configurationId,
+                'record' => $recordParam,
+            ], $isAbsolute);
         }
 
         return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters);

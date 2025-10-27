@@ -6,6 +6,9 @@ use App\Filament\Resources\SimulationConfigurations\SimulationConfigurationResou
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
+/**
+ * @method \App\Models\SimulationConfiguration getRecord()
+ */
 class ViewSimulationConfiguration extends ViewRecord
 {
     protected static string $resource = SimulationConfigurationResource::class;

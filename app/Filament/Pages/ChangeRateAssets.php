@@ -5,7 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\PrognosisChangeRate as AssetChangeRate;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -48,9 +48,9 @@ class ChangeRateAssets extends Page implements HasTable
         return 'Choose an asset type to configure its change rates over time';
     }
 
-    public function getMaxWidth(): MaxWidth
+    public function getMaxWidth(): Width
     {
-        return MaxWidth::Full;
+        return Width::Full;
     }
 
     protected function getHeaderActions(): array
@@ -131,6 +131,9 @@ class ChangeRateAssets extends Page implements HasTable
             ->emptyStateIcon('heroicon-o-building-library');
     }
 
+    /**
+     * @return Builder<AssetChangeRate>
+     */
     protected function getTableQuery(): Builder
     {
         return AssetChangeRate::query()
@@ -152,6 +155,9 @@ class ChangeRateAssets extends Page implements HasTable
         return $record->id ?? $record->type ?? 'unknown';
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getAssetTypes(): array
     {
         // Get all available asset types for this scenario
@@ -169,6 +175,7 @@ class ChangeRateAssets extends Page implements HasTable
                 ->where('asset_type', $type)
                 ->count();
 
+            /** @var object{min_year: int, max_year: int}|null $yearRange */
             $yearRange = AssetChangeRate::where('scenario_type', $this->scenario)
                 ->where('asset_type', $type)
                 ->selectRaw('MIN(year) as min_year, MAX(year) as max_year')
@@ -188,7 +195,7 @@ class ChangeRateAssets extends Page implements HasTable
             ];
         }
 
-        return $assets;
+        return collect($assets)->pluck('label', 'value')->toArray();
     }
 
     private function getAssetDescription(string $type): string

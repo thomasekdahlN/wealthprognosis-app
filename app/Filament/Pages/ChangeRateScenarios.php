@@ -5,7 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\PrognosisChangeRate as AssetChangeRate;
 use BackedEnum;
 use Filament\Pages\Page;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -52,9 +52,9 @@ class ChangeRateScenarios extends Page implements HasTable
         return 'Choose a prognosis to configure change rates';
     }
 
-    public function getMaxWidth(): MaxWidth
+    public function getMaxWidth(): Width
     {
-        return MaxWidth::Full;
+        return Width::Full;
     }
 
     public function table(Table $table): Table
@@ -68,7 +68,7 @@ class ChangeRateScenarios extends Page implements HasTable
                     ->formatStateUsing(function (string $state): string {
                         $p = \App\Models\PrognosisType::where('code', $state)->first();
 
-                        return $p?->label ?? ucfirst($state);
+                        return $p->label ?? ucfirst($state);
                     })
                     ->icon(fn (string $state) => optional(\App\Models\PrognosisType::where('code', $state)->first())->icon)
                     ->color(fn (string $state) => optional(\App\Models\PrognosisType::where('code', $state)->first())->color ?? 'gray')
@@ -114,6 +114,9 @@ class ChangeRateScenarios extends Page implements HasTable
             ->emptyStateIcon('heroicon-o-chart-bar');
     }
 
+    /**
+     * @return Builder<\App\Models\PrognosisType>
+     */
     protected function getTableQuery(): Builder
     {
         // Base on PrognosisType so all types are listed, even with 0 change rate records
@@ -143,6 +146,9 @@ class ChangeRateScenarios extends Page implements HasTable
         return (string) ($record->type ?? 'unknown');
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getScenarioTypes(): array
     {
         // Get all available scenario types from the database
@@ -170,7 +176,7 @@ class ChangeRateScenarios extends Page implements HasTable
             ];
         }
 
-        return $scenarios;
+        return collect($scenarios)->pluck('label', 'value')->toArray();
     }
 
     private function getScenarioDescription(string $type): string
@@ -184,17 +190,6 @@ class ChangeRateScenarios extends Page implements HasTable
             'variable' => 'Variable rates that change over time',
             'stole' => 'Custom scenario with specific assumptions',
             default => 'Custom scenario configuration',
-        };
-    }
-
-    private function getScenarioColor(string $type): string
-    {
-        return match ($type) {
-            'realistic' => 'success',
-            'positive' => 'info',
-            'negative' => 'danger',
-            'tenpercent' => 'warning',
-            default => 'gray',
         };
     }
 }

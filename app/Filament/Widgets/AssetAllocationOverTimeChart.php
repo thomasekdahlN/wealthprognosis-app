@@ -128,6 +128,7 @@ class AssetAllocationOverTimeChart extends ChartWidget
         $assetTypes = [];
 
         // Collect all years and asset types
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $assetType = $asset->asset_type;
             if (! in_array($assetType, $assetTypes)) {

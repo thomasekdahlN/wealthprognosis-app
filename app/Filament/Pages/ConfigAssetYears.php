@@ -60,7 +60,7 @@ class ConfigAssetYears extends Page implements HasTable
     public function getTitle(): string|Htmlable
     {
         if ($this->asset) {
-            $type = method_exists($this->asset, 'getTypeLabel') ? $this->asset->getTypeLabel() : '';
+            $type = $this->asset->getTypeLabel();
 
             return ($this->asset->name ?? ('Asset #'.$this->asset->id)).($type ? ' ('.$type.')' : '');
         }
@@ -117,6 +117,9 @@ class ConfigAssetYears extends Page implements HasTable
             ->query($this->getTableQuery());
     }
 
+    /**
+     * @return Builder<AssetYear>
+     */
     protected function getTableQuery(): Builder
     {
         // Prefer stored context during Livewire updates, fall back to route/query for initial GET.
@@ -156,17 +159,20 @@ class ConfigAssetYears extends Page implements HasTable
 
         if ($configurationId) {
             $configuration = AssetConfiguration::find($configurationId);
-            $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $configurationId])] = $configuration?->name ?? (__('Configuration').' #'.$configurationId);
+            $crumbs[\App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::getUrl('assets', ['record' => $configurationId])] = $configuration->name ?? (__('Configuration').' #'.$configurationId);
         }
 
         if ($assetId) {
             $asset = Asset::find($assetId);
-            $crumbs[] = $asset?->name ?? (__('Asset').' #'.$assetId);
+            $crumbs[] = $asset->name ?? (__('Asset').' #'.$assetId);
         }
 
         return $crumbs;
     }
 
+    /**
+     * @return array<string, class-string>
+     */
     public static function getRoutes(): array
     {
         // Register this page directly at the pretty URL under the admin panel

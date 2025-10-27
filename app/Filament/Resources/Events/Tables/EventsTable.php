@@ -141,7 +141,7 @@ class EventsTable
             ->paginationPageOptions([50, 100, 150])
             ->striped()
             ->persistFiltersInSession()
-            ->recordUrl(function ($record): ?string {
+            ->recordUrl(function ($record): string {
                 $configurationId = (int) (app(\App\Services\CurrentAssetConfiguration::class)->id() ?? 0);
 
                 return \App\Filament\Resources\AssetYears\AssetYearResource::getUrl('edit', [

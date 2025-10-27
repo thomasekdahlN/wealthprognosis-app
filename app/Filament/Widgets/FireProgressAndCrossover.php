@@ -35,14 +35,14 @@ class FireProgressAndCrossover extends ChartWidget
         })
             ->where('year', $currentYear)
             ->whereNotNull('expence_amount')
-            ->sum('expence_amount') ?? 0;
+            ->sum('expence_amount') ?: 0;
 
         $annualIncome = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
             ->where('year', $currentYear)
             ->whereNotNull('income_amount')
-            ->sum('income_amount') ?? 0;
+            ->sum('income_amount') ?: 0;
 
         $annualSavings = $annualIncome - $annualExpenses;
 

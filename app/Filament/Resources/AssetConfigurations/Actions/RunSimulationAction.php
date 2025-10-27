@@ -141,7 +141,7 @@ class RunSimulationAction extends Action
                         'prognosis_type' => $data['prognosis_type'],
                         'group' => $data['asset_scope'], // Map asset_scope to group field
                         'start_year' => date('Y'),
-                        'end_year' => $record->birth_year + $record->death_age,
+                        'end_year' => $record->birth_year + $record->expected_death_age,
                     ];
 
                     // Run the simulation using the new Prognosis engine

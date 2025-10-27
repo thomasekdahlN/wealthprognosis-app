@@ -12,7 +12,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -35,9 +35,9 @@ class AssetConfigurationUpload extends Page implements HasForms
         // Initialize data
     }
 
-    public function getMaxWidth(): MaxWidth
+    public function getMaxWidth(): Width
     {
-        return MaxWidth::Full;
+        return Width::Full;
     }
 
     public function getHeading(): string
@@ -115,7 +115,7 @@ class AssetConfigurationUpload extends Page implements HasForms
                         $originalName = pathinfo($configFile, PATHINFO_FILENAME);
                         $fileNameMap = $data['config_file_names'] ?? null;
                         if (is_array($fileNameMap)) {
-                            if (is_string($configFile) && isset($fileNameMap[$configFile]) && is_string($fileNameMap[$configFile])) {
+                            if (isset($fileNameMap[$configFile]) && is_string($fileNameMap[$configFile])) {
                                 $originalName = pathinfo($fileNameMap[$configFile], PATHINFO_FILENAME);
                             } else {
                                 $first = reset($fileNameMap);
@@ -156,7 +156,8 @@ class AssetConfigurationUpload extends Page implements HasForms
                         }
 
                         // Generate the Excel file using the same export class as CLI
-                        new PrognosisExport2($configFilePath, $exportPath, $scenario, $generate);
+                        $prognosisService = app(\App\Services\Prognosis\PrognosisService::class, ['config' => json_decode(file_get_contents($configFilePath), true)]);
+                        new PrognosisExport2($configFilePath, $exportPath, $prognosisService, $generate);
 
                         if (! file_exists($exportPath)) {
                             throw new \Exception('Failed to generate Excel file');

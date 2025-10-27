@@ -35,7 +35,7 @@ class SimulationAssets extends Page
         }
 
         if (! $simulationConfigurationId) {
-            throw new Halt(404);
+            throw new Halt('404');
         }
 
         $this->simulationConfiguration = SimulationConfiguration::with([
@@ -46,12 +46,12 @@ class SimulationAssets extends Page
         ])->find($simulationConfigurationId);
 
         if (! $this->simulationConfiguration) {
-            throw new Halt(404);
+            throw new Halt('404');
         }
 
         // Check if user has access to this simulation
         if ($this->simulationConfiguration->user_id !== auth()->id()) {
-            throw new Halt(403);
+            throw new Halt('403');
         }
 
         // Enable page-wide horizontal scrolling for wide tables
@@ -78,6 +78,7 @@ class SimulationAssets extends Page
             return 'Read-Only Simulation Data';
         }
 
+        /** @var \App\Models\AssetConfiguration $config */
         $config = $this->simulationConfiguration->assetConfiguration;
         $assetsCount = $this->simulationConfiguration->simulationAssets()->count();
 
@@ -120,10 +121,7 @@ class SimulationAssets extends Page
                 ->label(__('simulation.back_to_simulations'))
                 ->icon('heroicon-o-arrow-left')
                 ->color('gray')
-                ->url(fn () => $this->simulationConfiguration
-                    ? route('filament.admin.pages.config-simulations.pretty', ['configuration' => $this->simulationConfiguration->asset_configuration_id])
-                    : route('filament.admin.resources.simulation-configurations.index')
-                ),
+                ->url(fn () => route('filament.admin.pages.config-simulations.pretty', ['configuration' => $this->simulationConfiguration->asset_configuration_id])),
         ];
     }
 
@@ -161,6 +159,9 @@ class SimulationAssets extends Page
         return 'filament.admin.pages.simulation-assets';
     }
 
+    /**
+     * @return array<string, class-string>
+     */
     public static function getRoutes(): array
     {
         return [

@@ -47,15 +47,9 @@ class ListAssets extends ListRecords
         parent::mount();
 
         // Do not redirect; show the page as-is. Ensure no stale table state (search/filters) affects results
-        if (property_exists($this, 'tableSearch')) {
-            $this->tableSearch = null;
-        }
-        if (property_exists($this, 'tableColumnSearches')) {
-            $this->tableColumnSearches = [];
-        }
-        if (property_exists($this, 'tableFilters')) {
-            $this->tableFilters = [];
-        }
+        $this->tableSearch = null;
+        $this->tableColumnSearches = [];
+        $this->tableFilters = [];
         if (property_exists($this, 'tableSortColumn')) {
             $this->tableSortColumn = null;
         }

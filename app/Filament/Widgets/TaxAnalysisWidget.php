@@ -83,6 +83,7 @@ class TaxAnalysisWidget extends BaseWidget
         $taxAdvantageAssets = 0;
         $totalAssets = 0;
 
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $assetYears = $asset->simulationAssetYears;
             $isTaxAdvantaged = in_array($asset->tax_type, ['none', 'tax_deferred']);

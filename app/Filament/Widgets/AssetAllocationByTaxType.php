@@ -61,6 +61,7 @@ class AssetAllocationByTaxType extends ChartWidget
             ->with(['asset.assetType.taxType'])
             ->get()
             ->groupBy(function ($assetYear) {
+                /** @var \App\Models\AssetYear $assetYear */
                 return optional($assetYear->asset?->assetType?->taxType)->type ?? 'none';
             })
             ->map(function ($assetYears) {

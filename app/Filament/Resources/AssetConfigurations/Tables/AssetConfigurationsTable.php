@@ -21,7 +21,7 @@ class AssetConfigurationsTable
                     ->size('lg')
                     ->color(fn ($record): string => $record->color ?: 'gray')
                     ->width('60px')
-                    ->tooltip(fn ($record): ?string => $record->icon ? "Icon: {$record->icon}" : 'Default user icon'),
+                    ->tooltip(fn ($record): string => $record->icon ? "Icon: {$record->icon}" : 'Default user icon'),
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()

@@ -65,6 +65,7 @@ class SimulationTaxAnalysisWidget extends BaseWidget
         $maxTaxYear = 0;
         $minTaxYear = PHP_FLOAT_MAX;
 
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             foreach ($asset->simulationAssetYears as $year) {
                 $yearTax = $year->asset_tax_amount ?? 0;

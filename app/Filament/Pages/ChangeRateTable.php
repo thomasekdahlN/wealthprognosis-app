@@ -8,7 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\TextInputColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -57,9 +57,9 @@ class ChangeRateTable extends Page implements HasForms, HasTable
         return 'Configure change rates by year. Click on values to edit inline, or use the actions to add/delete rows.';
     }
 
-    public function getMaxWidth(): MaxWidth
+    public function getMaxWidth(): Width
     {
-        return MaxWidth::Full;
+        return Width::Full;
     }
 
     public function getNextAvailableYear(): int
@@ -124,7 +124,7 @@ class ChangeRateTable extends Page implements HasForms, HasTable
 
                 TextColumn::make('updated_by')
                     ->label('Updated By')
-                    ->formatStateUsing(fn ($state, $record): string => $record->updatedBy?->name ?? (string) $state)
+                    ->formatStateUsing(fn ($state, $record): string => $record->updatedBy->name ?? (string) $state)
                     ->searchable(),
             ])
             ->recordClasses(fn ($record) => (int) $record->year === (int) now()->year ? 'bg-primary-50 dark:bg-primary-900/30' : null)
@@ -196,12 +196,18 @@ class ChangeRateTable extends Page implements HasForms, HasTable
         return [];
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getWidgets(): array
     {
         // Removed ChangeRateTrendWidget per request
         return [];
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function getColumns(): int|string|array
     {
         return [

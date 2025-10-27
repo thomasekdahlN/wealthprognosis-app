@@ -177,7 +177,7 @@ class RetirementReadinessChart extends ChartWidget
         })
             ->where('year', $currentYear)
             ->whereNotNull('income_amount')
-            ->sum('income_amount') ?? 0;
+            ->sum('income_amount') ?: 0;
     }
 
     private function calculateAnnualExpenses(\App\Models\User $user): float
@@ -190,7 +190,7 @@ class RetirementReadinessChart extends ChartWidget
         })
             ->where('year', $currentYear)
             ->whereNotNull('expence_amount')
-            ->sum('expence_amount') ?? 0;
+            ->sum('expence_amount') ?: 0;
     }
 
     private function calculatePensionIncome(\App\Models\User $user, int $age, ?int $retirementAge): float

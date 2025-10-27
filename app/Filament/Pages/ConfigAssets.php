@@ -45,10 +45,6 @@ class ConfigAssets extends Page implements HasTable
             abort(404);
         }
 
-        if (! $this->record) {
-            abort(404);
-        }
-
         app(CurrentAssetConfiguration::class)->set($this->record);
     }
 
@@ -72,6 +68,9 @@ class ConfigAssets extends Page implements HasTable
         return true;
     }
 
+    /**
+     * @return Builder<Asset>
+     */
     protected function getTableQuery(): Builder
     {
         if (! $this->record) {
@@ -170,6 +169,9 @@ class ConfigAssets extends Page implements HasTable
         return $this->getTitle();
     }
 
+    /**
+     * @return array<string, class-string>
+     */
     public static function getRoutes(): array
     {
         return [

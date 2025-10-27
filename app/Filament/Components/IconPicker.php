@@ -38,6 +38,9 @@ class IconPicker extends Select
             ->helperText('Search for Heroicons by name');
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getHeroiconOptionsWithIcons(): array
     {
         $icons = $this->getHeroiconOptions();
@@ -58,6 +61,9 @@ class IconPicker extends Select
         return $optionsWithIcons;
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getHeroiconOptions(): array
     {
         return [

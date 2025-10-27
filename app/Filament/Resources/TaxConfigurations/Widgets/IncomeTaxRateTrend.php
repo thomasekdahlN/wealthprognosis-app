@@ -69,8 +69,13 @@ class IncomeTaxRateTrend extends ChartWidget
             ];
         }
 
-        $labels = $rows->pluck('year')->map(fn ($y) => (string) $y)->values()->all();
-        $data = $rows->pluck('configuration')->map(fn ($cfg) => (float) (($cfg['income'] ?? 0))).values()->all();
+        /** @var \Illuminate\Support\Collection<int, string> $labelsCollection */
+        $labelsCollection = $rows->pluck('year')->map(fn ($y) => (string) $y)->values();
+        $labels = $labelsCollection->all();
+
+        /** @var \Illuminate\Support\Collection<int, float> $dataCollection */
+        $dataCollection = $rows->pluck('configuration')->map(fn ($cfg) => (float) (($cfg['income'] ?? 0)))->values();
+        $data = $dataCollection->all();
 
         return [
             'datasets' => [[

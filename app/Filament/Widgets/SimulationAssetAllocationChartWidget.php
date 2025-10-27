@@ -58,6 +58,7 @@ class SimulationAssetAllocationChartWidget extends ChartWidget
         $latestYear = 0;
         $assetAllocation = [];
 
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $lastYearData = $asset->simulationAssetYears->last();
             if ($lastYearData) {
@@ -66,6 +67,7 @@ class SimulationAssetAllocationChartWidget extends ChartWidget
         }
 
         // Collect asset allocation for the latest year
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $lastYearData = $asset->simulationAssetYears->where('year', $latestYear)->first();
             if ($lastYearData && ($lastYearData->end_value ?? 0) > 0) {

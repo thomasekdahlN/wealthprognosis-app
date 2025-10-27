@@ -60,17 +60,14 @@ class SimulationDashboard extends Dashboard
 
                 $isDirect = ($routeObj instanceof Route) && ! \array_key_exists('uses', (array) $routeObj->getAction());
                 if (! is_object($routeObj)) {
-                    throw new Halt(404);
+                    throw new Halt('404');
                 }
 
-                $simParam = null;
-                if (method_exists($routeObj, 'parameter')) {
-                    $simParam = $routeObj->parameter('simulation');
-                }
+                $simParam = $routeObj->parameter('simulation');
                 if (! $simParam || ! is_numeric($simParam)) {
-                    $uri = method_exists($routeObj, 'uri') ? (string) $routeObj->uri() : '';
+                    $uri = (string) $routeObj->uri();
                     if ($uri !== '' && preg_match('#/sim/(\d+)#', $uri, $m)) {
-                        $simParam = (int) ($m[1] ?? null);
+                        $simParam = (int) $m[1];
                     }
                 }
 
@@ -81,7 +78,7 @@ class SimulationDashboard extends Dashboard
 
                         return;
                     }
-                    throw new Halt(404);
+                    throw new Halt('404');
                 }
 
                 $model = SimulationConfiguration::withoutGlobalScopes()->with([
@@ -94,7 +91,7 @@ class SimulationDashboard extends Dashboard
 
                         return;
                     }
-                    throw new Halt(404);
+                    throw new Halt('404');
                 }
 
                 if ($model->user_id !== (int) auth()->id()) {
@@ -103,7 +100,7 @@ class SimulationDashboard extends Dashboard
 
                         return;
                     }
-                    throw new Halt(403);
+                    throw new Halt('403');
                 }
 
                 $this->simulationConfiguration = $model;
@@ -119,19 +116,17 @@ class SimulationDashboard extends Dashboard
                 $routeObj = null;
             }
             if (! is_object($routeObj)) {
-                throw new Halt(404);
+                throw new Halt('404');
             }
 
-            $isDirect = ($routeObj instanceof Route) && ! \array_key_exists('uses', (array) $routeObj->getAction());
+            $isDirect = ! \array_key_exists('uses', (array) $routeObj->getAction());
 
             $simParam = null;
-            if (method_exists($routeObj, 'parameter')) {
-                $simParam = $routeObj->parameter('simulation');
-            }
+            $simParam = $routeObj->parameter('simulation');
             if (! $simParam || ! is_numeric($simParam)) {
-                $uri = method_exists($routeObj, 'uri') ? (string) $routeObj->uri() : '';
+                $uri = (string) $routeObj->uri();
                 if ($uri !== '' && preg_match('#/sim/(\d+)#', $uri, $m)) {
-                    $simParam = (int) ($m[1] ?? null);
+                    $simParam = (int) $m[1];
                 }
             }
 
@@ -141,7 +136,7 @@ class SimulationDashboard extends Dashboard
 
                     return;
                 }
-                throw new Halt(404);
+                throw new Halt('404');
             }
 
             $this->simulationConfiguration = SimulationConfiguration::withoutGlobalScopes()->with([
@@ -155,7 +150,7 @@ class SimulationDashboard extends Dashboard
 
                     return;
                 }
-                throw new Halt(404);
+                throw new Halt('404');
             }
 
             if ($this->simulationConfiguration->user_id !== (int) auth()->id()) {
@@ -164,7 +159,7 @@ class SimulationDashboard extends Dashboard
 
                     return;
                 }
-                throw new Halt(403);
+                throw new Halt('403');
             }
         } catch (Halt $e) {
             // In direct-instantiation tests, gracefully allow mounting when the simulation exists for the user
@@ -172,12 +167,12 @@ class SimulationDashboard extends Dashboard
                 try {
                     $routeObj = request()->route();
                     $simParam = null;
-                    if (is_object($routeObj)) {
-                        $simParam = method_exists($routeObj, 'parameter') ? $routeObj->parameter('simulation') : null;
+                    if ($routeObj instanceof Route) {
+                        $simParam = $routeObj->parameter('simulation');
                         if (! $simParam || ! is_numeric($simParam)) {
-                            $uri = method_exists($routeObj, 'uri') ? (string) $routeObj->uri() : '';
+                            $uri = (string) $routeObj->uri();
                             if ($uri !== '' && preg_match('#/sim/(\d+)#', $uri, $m)) {
-                                $simParam = (int) ($m[1] ?? null);
+                                $simParam = (int) $m[1];
                             }
                         }
                     }
@@ -219,6 +214,7 @@ class SimulationDashboard extends Dashboard
             return null;
         }
 
+        /** @var \App\Models\AssetConfiguration $config */
         $config = $this->simulationConfiguration->assetConfiguration;
         $assetsCount = $this->simulationConfiguration->simulationAssets()->count();
         $yearsCount = $this->simulationConfiguration->simulationAssets()
@@ -265,7 +261,7 @@ class SimulationDashboard extends Dashboard
     {
         $breadcrumbs = [];
 
-        $configId = $this->simulationConfiguration?->asset_configuration_id ?? $this->safeRouteParam('configuration');
+        $configId = $this->simulationConfiguration->asset_configuration_id ?? $this->safeRouteParam('configuration');
         try {
             if ($configId && \Illuminate\Support\Facades\Route::has('filament.admin.pages.config-simulations.pretty')) {
                 $breadcrumbs[route('filament.admin.pages.config-simulations.pretty', ['configuration' => $configId])] = 'Simulations';
@@ -337,6 +333,9 @@ class SimulationDashboard extends Dashboard
         return true;
     }
 
+    /**
+     * @return array<string, class-string>
+     */
     public static function getRoutes(): array
     {
         return [

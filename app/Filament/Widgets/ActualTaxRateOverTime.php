@@ -69,7 +69,7 @@ class ActualTaxRateOverTime extends ChartWidget
             })
                 ->where('year', $year)
                 ->whereNotNull('tax_amount')
-                ->sum('tax_amount') ?? 0;
+                ->sum('tax_amount') ?: 0;
 
             // If no tax_amount data, estimate tax based on Norwegian tax system
             if ($totalTax == 0 && $totalIncome > 0) {

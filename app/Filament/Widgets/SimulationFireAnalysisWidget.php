@@ -67,6 +67,7 @@ class SimulationFireAnalysisWidget extends BaseWidget
         $totalExpenses = 0;
         $yearCount = 0;
 
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             foreach ($asset->simulationAssetYears as $year) {
                 $totalExpenses += $year->expence_amount ?? 0;
@@ -81,6 +82,7 @@ class SimulationFireAnalysisWidget extends BaseWidget
 
         // Current portfolio value (from simulation start)
         $currentPortfolioValue = 0;
+        /** @var \App\Models\SimulationAsset $asset */
         foreach ($simulationAssets as $asset) {
             $firstYear = $asset->simulationAssetYears->first();
             if ($firstYear) {

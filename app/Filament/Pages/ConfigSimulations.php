@@ -57,6 +57,9 @@ class ConfigSimulations extends Page implements HasTable
         return true;
     }
 
+    /**
+     * @return Builder<SimulationConfiguration>
+     */
     protected function getTableQuery(): Builder
     {
         if (! $this->record) {

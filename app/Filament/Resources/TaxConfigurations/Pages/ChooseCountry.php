@@ -6,7 +6,7 @@ use App\Filament\Resources\TaxConfigurations\TaxConfigurationResource;
 use App\Models\TaxConfiguration;
 use BackedEnum;
 use Filament\Resources\Pages\Page;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -37,9 +37,9 @@ class ChooseCountry extends Page implements HasTable
         return false;
     }
 
-    public function getMaxWidth(): MaxWidth
+    public function getMaxWidth(): Width
     {
-        return MaxWidth::Full;
+        return Width::Full;
     }
 
     public function table(Table $table): Table

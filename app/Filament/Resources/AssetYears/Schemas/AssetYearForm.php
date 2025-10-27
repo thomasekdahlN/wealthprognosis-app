@@ -145,7 +145,7 @@ class AssetYearForm
                                         .'</div>'
                                     ))
                                     ->modalSubmitAction(false)
-                                    ->modalCancelAction(fn ($action) => $action->label('Close'))
+                                    ->modalCancelActionLabel('Close')
                             ),
                         Select::make('income_transfer')
                             ->helperText('Transfer income to the next asset (higher sort order).')
@@ -231,7 +231,7 @@ class AssetYearForm
                         }
                         $asset = \App\Models\Asset::with('assetType')->find($assetId);
 
-                        return (bool) ($asset?->assetType?->can_generate_income ?? true);
+                        return (bool) ($asset->assetType->can_generate_income ?? true);
                     }),
 
                 Section::make('Expense')
@@ -269,7 +269,7 @@ class AssetYearForm
                                         .'</div>'
                                     ))
                                     ->modalSubmitAction(false)
-                                    ->modalCancelAction(fn ($action) => $action->label('Close'))
+                                    ->modalCancelActionLabel('Close')
                             ),
                         Select::make('expence_transfer')
                             ->helperText('Transfer expense to the next asset (higher sort order).')
@@ -355,7 +355,7 @@ class AssetYearForm
                         }
                         $asset = \App\Models\Asset::with('assetType')->find($assetId);
 
-                        return (bool) ($asset?->assetType?->can_generate_expenses ?? true);
+                        return (bool) ($asset->assetType->can_generate_expenses ?? true);
                     }),
             ]),
 
@@ -411,7 +411,7 @@ class AssetYearForm
                                         .'</div>'
                                     ))
                                     ->modalSubmitAction(false)
-                                    ->modalCancelAction(fn ($action) => $action->label('Close'))
+                                    ->modalCancelActionLabel('Close')
                             ),
                         Select::make('asset_transfer')
                             ->helperText('Transfer market value to a later asset (higher sort order).')
@@ -480,7 +480,7 @@ class AssetYearForm
                         }
                         $asset = \App\Models\Asset::with('assetType')->find($assetId);
 
-                        return (bool) ($asset?->assetType?->can_have_market_value ?? true);
+                        return (bool) ($asset->assetType->can_have_market_value ?? true);
                     }),
 
                 Section::make('Mortgage')
@@ -502,7 +502,7 @@ class AssetYearForm
                         }
                         $asset = \App\Models\Asset::with('assetType')->find($assetId);
 
-                        return (bool) ($asset?->assetType?->can_have_mortgage ?? true);
+                        return (bool) ($asset->assetType->can_have_mortgage ?? true);
                     }),
             ]),
         ]);

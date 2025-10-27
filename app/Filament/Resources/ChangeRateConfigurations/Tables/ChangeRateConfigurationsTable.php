@@ -26,7 +26,7 @@ class ChangeRateConfigurationsTable
                     ->formatStateUsing(function (string $state): string {
                         $p = \App\Models\PrognosisType::where('code', $state)->first();
 
-                        return $p?->label ?? ucfirst($state);
+                        return $p->label ?? ucfirst($state);
                     })
                     ->icon(fn (string $state) => optional(\App\Models\PrognosisType::where('code', $state)->first())->icon)
                     ->color(fn (string $state) => optional(\App\Models\PrognosisType::where('code', $state)->first())->color ?? 'gray')

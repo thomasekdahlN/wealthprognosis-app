@@ -6,6 +6,9 @@ use App\Filament\Resources\Assets\AssetResource;
 use App\Models\AssetYear;
 use Filament\Resources\Pages\CreateRecord;
 
+/**
+ * @property \App\Models\Asset $record
+ */
 class CreateAsset extends CreateRecord
 {
     protected static string $resource = AssetResource::class;

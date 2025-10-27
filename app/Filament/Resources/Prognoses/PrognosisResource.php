@@ -36,8 +36,7 @@ class PrognosisResource extends Resource
             \Filament\Forms\Components\TextInput::make('code')->required()->unique(ignoreRecord: true),
             \Filament\Forms\Components\TextInput::make('label')->required(),
             \App\Filament\Components\IconPicker::make('icon')
-                ->label('Icon')
-                ->maxLength(100),
+                ->label('Icon'),
             \Filament\Forms\Components\Select::make('color')->options([
                 'primary' => 'Primary',
                 'success' => 'Success',

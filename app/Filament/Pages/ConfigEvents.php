@@ -67,6 +67,9 @@ class ConfigEvents extends Page implements HasTable
         return true;
     }
 
+    /**
+     * @return Builder<AssetYear>
+     */
     protected function getTableQuery(): Builder
     {
         $currentYear = (int) date('Y');

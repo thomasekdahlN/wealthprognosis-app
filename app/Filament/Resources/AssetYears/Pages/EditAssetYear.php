@@ -9,6 +9,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
+/**
+ * @method \App\Models\AssetYear getRecord()
+ */
 class EditAssetYear extends EditRecord
 {
     protected static string $resource = AssetYearResource::class;
@@ -65,7 +68,7 @@ class EditAssetYear extends EditRecord
                     \Filament\Forms\Components\Select::make('asset_id')
                         ->label('Asset')
                         ->options(function () use ($record) {
-                            if ($record?->asset_configuration_id) {
+                            if ($record->asset_configuration_id) {
                                 return \App\Models\Asset::query()
                                     ->where('asset_configuration_id', $record->asset_configuration_id)
                                     ->pluck('name', 'id');
