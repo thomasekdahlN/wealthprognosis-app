@@ -17,18 +17,14 @@
 namespace App\Exports;
 
 use Illuminate\Support\Arr;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AssetSpreadSheet
 {
-    private $name;
+    private Spreadsheet $spreadsheet;
 
-    private $asset;
-
-    private $meta;
-
-    private $spreadsheet;
-
-    public $worksheet;
+    public Worksheet $worksheet;
 
     public int $columns = 26;
 
@@ -38,11 +34,15 @@ class AssetSpreadSheet
 
     public int $groups = 1;
 
-    public $letter = 1;
+    public int $letter = 1;
 
-    public $alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+    /** @var array<int, string> */
+    public array $alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 
-    public function __construct($spreadsheet, $statistics)
+    /**
+     * @param  array<string, mixed>  $statistics
+     */
+    public function __construct(Spreadsheet $spreadsheet, array $statistics)
     {
         $this->spreadsheet = $spreadsheet;
         $this->worksheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, 'Statistics');

@@ -17,18 +17,26 @@
 namespace App\Exports;
 
 use Illuminate\Support\Arr;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class PrognosisAssetSheet2
 {
-    private $name;
+    /** @var array<string, mixed> */
+    private array $asset;
 
-    private $asset;
+    private Spreadsheet $spreadsheet;
 
-    private $meta;
+    public Worksheet $worksheet;
 
-    private $spreadsheet;
+    /** @var array<string, mixed> */
+    public array $config;
 
-    public $worksheet;
+    public int $thisYear;
+
+    public int $prevYear;
+
+    public int $exportStartYear;
 
     public int $columns = 28;
 
@@ -38,7 +46,12 @@ class PrognosisAssetSheet2
 
     public int $groups = 1;
 
-    public function __construct($spreadsheet, $config, $asset, $meta)
+    /**
+     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>  $asset
+     * @param  array<string, mixed>  $meta
+     */
+    public function __construct(Spreadsheet $spreadsheet, array $config, array $asset, array $meta)
     {
         $this->config = $config;
         $this->asset = $asset;
@@ -236,7 +249,7 @@ class PrognosisAssetSheet2
     }
 
     // Really to Excel.
-    public function percentToExcel(int $percent)
+    public function percentToExcel(int $percent): float
     {
 
         if ($percent > 0) {

@@ -17,32 +17,45 @@
 namespace App\Exports;
 
 use Illuminate\Support\Arr;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class PrognosisRealizationSheet2
 {
-    private $name;
+    private string $name;
 
-    private $totalH;
+    /** @var array<string, mixed> */
+    private array $totalH;
 
-    private $companyH;
+    /** @var array<string, mixed> */
+    private array $config;
 
-    private $config;
+    private Spreadsheet $spreadsheet;
 
-    private $spreadsheet;
+    public Worksheet $worksheet;
 
-    public $worksheet;
+    public int $periodStart;
 
-    public $periodStart;
+    public int $periodEnd;
 
-    public $periodEnd;
+    public int $birthYear;
 
-    public static $letters = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E', 6 => 'F', 7 => 'G', 8 => 'H', 9 => 'I', 10 => 'J', 11 => 'K', 12 => 'L', 13 => 'M', 14 => 'N', 15 => 'O', 16 => 'P', 17 => 'Q', 18 => 'R', 19 => 'S', 20 => 'T', 21 => 'U', 22 => 'V', 23 => 'W', 24 => 'X', 25 => 'Y', 26 => 'Z'];
+    public int $economyStartYear;
 
-    public $columns = 5;
+    public int $deathYear;
 
-    public $rows = 4;
+    /** @var array<int, string> */
+    public static array $letters = [1 => 'A', 2 => 'B', 3 => 'C', 4 => 'D', 5 => 'E', 6 => 'F', 7 => 'G', 8 => 'H', 9 => 'I', 10 => 'J', 11 => 'K', 12 => 'L', 13 => 'M', 14 => 'N', 15 => 'O', 16 => 'P', 17 => 'Q', 18 => 'R', 19 => 'S', 20 => 'T', 21 => 'U', 22 => 'V', 23 => 'W', 24 => 'X', 25 => 'Y', 26 => 'Z'];
 
-    public function __construct($spreadsheet, $config, $totalH)
+    public int $columns = 5;
+
+    public int $rows = 4;
+
+    /**
+     * @param  array<string, mixed>  $config
+     * @param  array<string, mixed>  $totalH
+     */
+    public function __construct(Spreadsheet $spreadsheet, array $config, array $totalH)
     {
         $this->name = 'Realisasjon';
         $this->config = $config;
@@ -92,7 +105,7 @@ class PrognosisRealizationSheet2
      * Convert a $number to the letter (or combination of letters) representing a column in excel.
      *   Will return an empty string if $number is not a valid value.
      *
-     * @param number Int must be is_numeric() and > 0 and < 16,385.
+     * @param  int  $number  Must be is_numeric() and > 0 and < 16,385.
      * @return string
      */
     public static function convertNumberToExcelCol($number)
@@ -100,7 +113,7 @@ class PrognosisRealizationSheet2
 
         $column = '';
 
-        if (is_numeric($number) and $number > 0 and $number < 16385) {
+        if ($number > 0 and $number < 16385) {
 
             if ($number < 27) {
 
@@ -126,9 +139,9 @@ class PrognosisRealizationSheet2
 
                     $compensation = floor($number / 26) - 26;
 
-                    $column = self::$letters[floor($number / 702)].self::convertNumberToExcelCol($number % 702 + ($compensation % 26 === 0 ? $compensation : $compensation - 1));
+                    $column = self::$letters[(int) floor($number / 702)].self::convertNumberToExcelCol((int) ($number % 702 + ($compensation % 26 === 0 ? $compensation : $compensation - 1)));
                 } else {
-                    $column = self::$letters[floor($number / 676)].self::convertNumberToExcelCol($number % 676);
+                    $column = self::$letters[(int) floor($number / 676)].self::convertNumberToExcelCol((int) ($number % 676));
                 }
             }
         }

@@ -23,49 +23,78 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PrognosisExport2
 {
-    public $configfile;
+    public string $configfile;
 
-    public $config;
+    /** @var array<string, mixed> */
+    public array $config;
 
-    public $tax;
+    /** @var array<string, mixed> */
+    public array $tax;
 
-    public $changerate;
+    /** @var array<string, mixed> */
+    public array $changerate;
 
-    public $birthYear;
+    public int $birthYear;
 
-    public $economyStartYear;
+    public int $economyStartYear;
 
-    public $thisYear;
+    public int $thisYear;
 
-    public $prognoseYear;
+    public int $prognoseYear;
 
-    public $pensionYear;
+    public int $deathYear;
 
-    public $deathYear;
+    public Spreadsheet $spreadsheet;
 
-    public $spreadsheet;
+    public string $country;
 
-    public $birthRowColor = 'BBBBBB';
+    public int $prevYear;
 
-    public $economyStartRowColor = 'BBBBBB';
+    public int $exportStartYear;
 
-    public $thisYearRowColor = '32CD32';
+    public int $pensionOfficialYear;
 
-    public $prognoseYearRowColor = '7FFFD4';
+    public int $pensionWishYear;
 
-    public $pensionOfficialYearRowColor = 'CCCCCC';
+    public int $otpStartYear;
 
-    public $pensionWishYearRowColor = 'FFA500';
+    public int $otpEndYear;
 
-    public $deathYearRowColor = 'FFCCCB';
+    public int $otpYears;
 
-    public $incomeColor = '90EE90';
+    public int $pensionWishYears;
 
-    public $expenceColor = 'FFCCCB';
+    public int $pensionOfficialYears;
 
-    public $cashflowColor = 'ADD8E6';
+    public int $leftYears;
 
-    public function __construct($configfile, $exportfile, $prognosis, $generate)
+    public int $untilPensionYears;
+
+    public int $totalYears;
+
+    public int $showYears;
+
+    public string $birthRowColor = 'BBBBBB';
+
+    public string $economyStartRowColor = 'BBBBBB';
+
+    public string $thisYearRowColor = '32CD32';
+
+    public string $prognoseYearRowColor = '7FFFD4';
+
+    public string $pensionOfficialYearRowColor = 'CCCCCC';
+
+    public string $pensionWishYearRowColor = 'FFA500';
+
+    public string $deathYearRowColor = 'FFCCCB';
+
+    public string $incomeColor = '90EE90';
+
+    public string $expenceColor = 'FFCCCB';
+
+    public string $cashflowColor = 'ADD8E6';
+
+    public function __construct(string $configfile, string $exportfile, string $prognosisType, string $generate)
     {
         $this->configfile = $configfile;
 
@@ -155,7 +184,7 @@ class PrognosisExport2
         $this->pensionWishYears = $this->deathYear - $this->pensionWishYear + 1; // The number of years you vil live with pension, used i divisor calculations
         $this->pensionOfficialYears = $this->deathYear - $this->pensionOfficialYear + 1; // The number of years you vil live with pension, used i divisor calculations
         $this->leftYears = $this->deathYear - $this->thisYear + 1; // The number of years until you die, used i divisor calculations
-        $this->untilPensionYears = $this->pensionYear - $this->thisYear + 1; // The number of years until pension, used i divisor calculations
+        $this->untilPensionYears = $this->pensionWishYear - $this->thisYear + 1; // The number of years until pension, used i divisor calculations
         $this->totalYears = $this->deathYear - $this->economyStartYear + 1; // Antall år vi gjør beregningen over
         $this->showYears = $this->deathYear - $this->exportStartYear + 1; // Antall år vi visualiserer beregningen
 
@@ -173,7 +202,7 @@ class PrognosisExport2
 
         $content = str_replace(
             ['$birthYear', '$economyStartYear', '$thisYear', '$prognoseYear', '$pensionOfficialYears', '$pensionWishYears', '$pensionOfficialYear', '$pensionWishYear', '$otpStartYear', '$otpEndYear', '$otpYears', '$deathYear', '$leftYears', '$untilPensionYears'],
-            [$this->thisYear, $this->economyStartYear, $this->thisYear, $this->prognoseYear, $this->pensionOfficialYears, $this->pensionWishYears, $this->pensionOfficialYear, $this->pensionWishYear, $this->otpStartYear, $this->otpEndYear, $this->otpYears, $this->deathYear, $this->leftYears, $this->untilPensionYears],
+            [(string) $this->thisYear, (string) $this->economyStartYear, (string) $this->thisYear, (string) $this->prognoseYear, (string) $this->pensionOfficialYears, (string) $this->pensionWishYears, (string) $this->pensionOfficialYear, (string) $this->pensionWishYear, (string) $this->otpStartYear, (string) $this->otpEndYear, (string) $this->otpYears, (string) $this->deathYear, (string) $this->leftYears, (string) $this->untilPensionYears],
             $rawContent);
 
         // print $content;
@@ -190,6 +219,11 @@ class PrognosisExport2
             echo $errorMsg;
             throw new \InvalidArgumentException("Invalid JSON after variable replacement in file {$configfile}: ".json_last_error_msg());
         }
+
+        // Bind ChangerateService with the specified prognosis type
+        app()->singleton(\App\Services\Prognosis\ChangerateService::class, function () use ($prognosisType) {
+            return new \App\Services\Prognosis\ChangerateService($prognosisType);
+        });
 
         // Prognosis gets Tax and Changerate singletons from the service container automatically
         $prognosis = (new PrognosisService($this->config));
@@ -244,7 +278,11 @@ class PrognosisExport2
         $writer->save($exportfile);
     }
 
-    public function page($asset, $meta)
+    /**
+     * @param  array<string, mixed>  $asset
+     * @param  array<string, mixed>  $meta
+     */
+    public function page(array $asset, array $meta): void
     {
 
         $prognosisAsset = new PrognosisAssetSheet2($this->spreadsheet, $this->config, $asset, $meta);
