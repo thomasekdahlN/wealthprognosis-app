@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('color')->nullable();
             $table->json('tags')->nullable();
             $table->enum('risk_tolerance', ['conservative', 'moderate_conservative', 'moderate', 'moderate_aggressive', 'aggressive'])->default('moderate');
+            $table->string('country', 5)->default('no');
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
