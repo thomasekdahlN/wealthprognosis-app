@@ -25,12 +25,16 @@ final class TaxTypeResolver
         }
 
         try {
+            /** @var \App\Models\AssetType|null $assetTypeO */
             $assetTypeO = AssetType::query()
                 ->where('type', $assetType)
                 ->with('taxType')
                 ->first();
 
-            return $cache[$assetType] = $assetTypeO?->taxType?->type;
+            /** @var \App\Models\TaxType|null $taxTypeModel */
+            $taxTypeModel = $assetTypeO?->taxType;
+
+            return $cache[$assetType] = $taxTypeModel?->type;
         } catch (\Throwable $e) {
             Log::warning('Failed to resolve tax_type for asset_type', [
                 'asset_type' => $assetType,
