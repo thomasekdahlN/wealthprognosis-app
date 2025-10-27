@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $interest_rate
+ * @property int $years
+ * @property int $interest_only_years
+ * @property string $amount
+ */
 class AssetMortgage extends Model
 {
     use Auditable, HasFactory;
@@ -49,18 +55,18 @@ class AssetMortgage extends Model
             return 0;
         }
 
-        $monthlyRate = $this->interest_rate / 100 / 12;
+        $monthlyRate = (float) $this->interest_rate / 100 / 12;
         $totalPayments = $this->years * 12;
 
         if ($this->interest_only_years > 0) {
             // Calculate interest-only period
             $interestOnlyPayments = $this->interest_only_years * 12;
-            $interestOnlyPayment = $this->amount * $monthlyRate;
+            $interestOnlyPayment = (float) $this->amount * $monthlyRate;
 
             // Calculate amortizing period
             $remainingPayments = $totalPayments - $interestOnlyPayments;
             if ($remainingPayments > 0) {
-                $amortizingPayment = $this->amount *
+                $amortizingPayment = (float) $this->amount *
                     ($monthlyRate * pow(1 + $monthlyRate, $remainingPayments)) /
                     (pow(1 + $monthlyRate, $remainingPayments) - 1);
 
@@ -71,7 +77,7 @@ class AssetMortgage extends Model
         }
 
         // Standard amortizing loan
-        return $this->amount *
+        return (float) $this->amount *
             ($monthlyRate * pow(1 + $monthlyRate, $totalPayments)) /
             (pow(1 + $monthlyRate, $totalPayments) - 1);
     }
@@ -83,6 +89,6 @@ class AssetMortgage extends Model
 
     public function getTotalInterest(): float
     {
-        return ($this->getAnnualPayment() * $this->years) - $this->amount;
+        return ($this->getAnnualPayment() * $this->years) - (float) $this->amount;
     }
 }

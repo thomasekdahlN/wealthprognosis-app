@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string $type
+ * @property string $name
+ * @property string|null $description
+ * @property bool $is_active
+ * @property int $sort_order
+ */
 class TaxType extends Model
 {
     use Auditable, HasFactory;

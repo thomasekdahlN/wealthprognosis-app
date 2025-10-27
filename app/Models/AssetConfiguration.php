@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property int $expected_death_age
+ * @property string $name
+ * @property string|null $description
+ * @property int $id
+ * @property int $asset_configuration_id
+ */
 class AssetConfiguration extends Model
 {
     use Auditable, HasFactory;
@@ -38,7 +45,7 @@ class AssetConfiguration extends Model
             if (is_null($model->prognose_age)) {
                 $model->prognose_age = (int) now()->year - ($model->birth_year ?? now()->year - 40) + 10;
             }
-            if (is_null($model->expected_death_age) && $model->birth_year) {
+            if ($model->birth_year && ! $model->expected_death_age) {
                 $model->expected_death_age = 85; // Average life expectancy
             }
         });
@@ -59,6 +66,7 @@ class AssetConfiguration extends Model
         'color',
         'tags',
         'risk_tolerance',
+        'country',
         'user_id',
         'team_id',
         'created_by',
@@ -101,7 +109,7 @@ class AssetConfiguration extends Model
      */
     public function getRiskToleranceLabelAttribute(): string
     {
-        return self::RISK_TOLERANCE_LEVELS[$this->risk_tolerance] ?? 'Unknown';
+        return self::RISK_TOLERANCE_LEVELS[$this->risk_tolerance];
     }
 
     public function assets(): HasMany

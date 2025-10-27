@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string $tax_home_permill
+ * @property string $tax_company_permill
+ */
 class TaxProperty extends Model
 {
     use HasFactory;
@@ -71,7 +75,7 @@ class TaxProperty extends Model
     protected function taxHomePermill(): Attribute
     {
         return Attribute::make(
-            get: function (): float|int|null {
+            get: function (): ?float {
                 $raw = $this->attributes['tax_home_permill'] ?? null;
                 if ($raw === null) {
                     return null;
@@ -93,7 +97,7 @@ class TaxProperty extends Model
     protected function taxCompanyPermill(): Attribute
     {
         return Attribute::make(
-            get: function (): float|int|null {
+            get: function (): ?float {
                 $raw = $this->attributes['tax_company_permill'] ?? null;
                 if ($raw === null) {
                     return null;

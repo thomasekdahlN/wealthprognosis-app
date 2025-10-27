@@ -99,7 +99,7 @@ class PrognosisChangeRate extends Model
             ->first();
 
         if ($config) {
-            return $config->change_rate;
+            return (float) $config->change_rate;
         }
 
         $config = self::forScenario($scenarioType)
@@ -109,7 +109,7 @@ class PrognosisChangeRate extends Model
             ->orderBy('year', 'desc')
             ->first();
 
-        return $config ? $config->change_rate : 0;
+        return $config ? (float) $config->change_rate : 0.0;
     }
 
     /**

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $factor
+ * @property string $amount
+ */
 class AssetExpense extends Model
 {
     use Auditable, HasFactory;
@@ -78,6 +82,6 @@ class AssetExpense extends Model
      */
     public function getTotalAmount(): float
     {
-        return $this->amount * $this->getFactorMultiplier();
+        return (float) $this->amount * $this->getFactorMultiplier();
     }
 }

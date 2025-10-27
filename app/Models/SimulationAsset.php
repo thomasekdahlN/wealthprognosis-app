@@ -11,6 +11,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\SimulationAssetYear> $simulationAssetYears
+ * @property string $name
+ * @property string $asset_type
+ * @property string $tax_type
+ * @property \App\Models\AssetType|null $assetType
+ */
 class SimulationAsset extends Model
 {
     use Auditable, HasFactory;

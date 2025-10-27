@@ -9,6 +9,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int|null $team_id
+ * @property int $year
+ * @property int $asset_id
+ * @property int|null $asset_configuration_id
+ * @property string|null $description
+ * @property string|null $income_changerate
+ * @property string|null $expence_changerate
+ * @property string|null $asset_changerate
+ * @property \App\Models\Asset|null $asset
+ * @property \App\Models\AssetConfiguration|null $assetConfiguration
+ *
+ * @method \Illuminate\Database\Eloquent\Relations\BelongsTo asset()
+ */
 class AssetYear extends Model
 {
     use Auditable, HasFactory;

@@ -11,6 +11,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssetYear> $years
+ * @property \App\Models\AssetType|null $assetType
+ * @property string $name
+ * @property string $asset_type
+ * @property string $group
+ * @property string|null $code
+ * @property bool $is_active
+ * @property string|null $tax_property
+ *
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany years()
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany assetYears()
+ */
 class Asset extends Model
 {
     use Auditable, HasFactory;

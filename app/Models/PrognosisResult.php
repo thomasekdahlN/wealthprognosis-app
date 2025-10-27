@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $asset_market_amount
+ * @property string $mortgage_balance_amount
+ * @property string $income_amount
+ * @property string $total_tax_amount
+ * @property string $fire_rate_decimal
+ */
 class PrognosisResult extends Model
 {
     use HasFactory;
@@ -123,26 +130,26 @@ class PrognosisResult extends Model
     // Helper methods
     public function getNetWorth(): float
     {
-        return $this->asset_market_amount - $this->mortgage_balance_amount;
+        return (float) $this->asset_market_amount - (float) $this->mortgage_balance_amount;
     }
 
     public function getTotalTaxRate(): float
     {
-        if ($this->income_amount <= 0) {
+        if ((float) $this->income_amount <= 0) {
             return 0;
         }
 
-        return $this->total_tax_amount / $this->income_amount;
+        return (float) $this->total_tax_amount / (float) $this->income_amount;
     }
 
     public function isFireAchieved(): bool
     {
-        return $this->fire_rate_decimal >= 1.0;
+        return (float) $this->fire_rate_decimal >= 1.0;
     }
 
     public function getFirePercentage(): float
     {
-        return $this->fire_rate_decimal * 100;
+        return (float) $this->fire_rate_decimal * 100;
     }
 
     // Scope methods

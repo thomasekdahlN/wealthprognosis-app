@@ -11,6 +11,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property string $name
+ * @property string|null $description
+ * @property int $asset_configuration_id
+ * @property int $id
+ *
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany simulationAssets()
+ */
 class SimulationConfiguration extends Model
 {
     use Auditable, HasFactory;
@@ -65,8 +73,10 @@ class SimulationConfiguration extends Model
 
     /**
      * Validation rule for the prognosis_type attribute.
+     *
+     * @return \Illuminate\Validation\Rules\In
      */
-    public static function getPrognosisTypeValidationRule(): Rule
+    public static function getPrognosisTypeValidationRule()
     {
         return Rule::in(array_keys(self::prognosisTypeOptions()));
     }
@@ -178,6 +188,6 @@ class SimulationConfiguration extends Model
      */
     public function getRiskToleranceLabelAttribute(): string
     {
-        return self::RISK_TOLERANCE_LEVELS[$this->risk_tolerance] ?? 'Unknown';
+        return self::RISK_TOLERANCE_LEVELS[$this->risk_tolerance];
     }
 }
