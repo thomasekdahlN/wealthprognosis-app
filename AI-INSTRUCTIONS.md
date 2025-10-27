@@ -48,7 +48,8 @@ Use input masking for amounts and numbers formatting in input fields
 
 Coding instructions
 The code should be correctly formatted according to PSR
-The code should be valid for Larastan level 9
+The code should always be be validated with Larastan level 9 after every code change.
+Always add PHPDoc @property @method annotations and proper type hints for Eloquent properties.
 The code should be syntactically correct
 The code should be complete and work
 Always return working code, not just a part of the code, but all the code.
