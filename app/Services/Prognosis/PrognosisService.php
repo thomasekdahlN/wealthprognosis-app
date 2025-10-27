@@ -23,48 +23,72 @@ use Illuminate\Support\Str;
 
 class PrognosisService
 {
-    public $thisYear;
+    public int $thisYear;
 
-    public $economyStartYear;
+    public int $economyStartYear;
 
-    public $deathYear;
+    public int $deathYear;
 
-    public $config;
+    /** @var array<string, mixed> */
+    public array $config;
 
-    public $tax;
+    /** @var array<string, mixed> */
+    public array $tax;
 
-    public $changerate;
+    public object $changerate;
 
-    public $dataH = [];
+    /** @var array<string, mixed> */
+    public array $dataH = [];
 
-    public $assetH = [];
+    /** @var array<string, mixed> */
+    public array $assetH = [];
 
-    public $totalH = [];
+    /** @var array<string, mixed> */
+    public array $totalH = [];
 
-    public $groupH = [];
+    /** @var array<string, mixed> */
+    public array $groupH = [];
 
-    public $privateH = [];
+    /** @var array<string, mixed> */
+    public array $privateH = [];
 
-    public $companyH = [];
+    /** @var array<string, mixed> */
+    public array $companyH = [];
 
-    public $statisticsH = [];
+    /** @var array<string, mixed> */
+    public array $statisticsH = [];
+
+    public bool $debug = false;
 
     // FIX: Kanskje feil å regne inn otp her? Der kan man jo ikke velge.
     // Assets som man kan selge deler av hvert år for å finansiere FIRE. Huset ditt kan du f.eks ikke selge deler av. Dette brukes for å beregne potensiell inntekt fra salg av disse assets.
 
     // Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
     // Replaced hardcoded list with DB-backed lookup from asset_types.is_saving.
+    /** @var array<string, bool> */
     private array $assetTypeSavingMap = [];
 
     // Asset types visibility for statistics is loaded from DB (asset_types.show_statistics)
+    /** @var array<string, bool> */
     private array $assetTypeShowStatisticsMap = [];
 
-    public $helper;
+    public object $helper;
 
-    public $rules;
+    public object $rules;
 
-    public $postProcessor;
+    public object $postProcessor;
 
+    public object $taxincome;
+
+    public object $taxfortune;
+
+    public object $taxrealization;
+
+    public int $birthYear;
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
     public function __construct(array $config)
     {
         $this->config = $config;
@@ -339,7 +363,7 @@ class PrognosisService
                     // echo "TaxFortuneBefore $assetname.$year, taxType:$taxType, taxProperty:$taxProperty, assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, balanceAmount:".$this->ArrGet("$assetname.$year.mortgage.balanceAmount")."\n";
                 }
                 // FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxFortuneAmount, $assetTaxFortuneDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $assetMarketAmount, $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
+                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxFortuneAmount, $assetTaxFortuneDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, (int) $assetMarketAmount, (int) $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
                 if ($assetname == 'xxx') {
                     // echo "   TaxFortuneAfter: $assetname.$year assetTaxableInitialAmount:$assetTaxableInitialAmount, assetTaxableAmount:$assetTaxableAmount, assetTaxAmount:$assetTaxFortuneAmount,assetTaxAmount:$assetTaxFortuneAmount\n";
                 }
@@ -549,8 +573,10 @@ class PrognosisService
      * -- -1|10 - Subtracts 1 tenth of the amount yearly. Then subtracts nevner with one. (so next value is 1/9, then 1/8, 1/7 etc). Perfect for usage to i.e empty an asset over 10 years.
      *
      * @path string - The path to what triggered this function. The origin.
+     *
+     * @return array{0: float, 1: float, 2: float, 3: string, 4: string}
      */
-    public function applyRule(bool $debug, string $transferOrigin, float $amount, float $acquisitionAmount, float $taxShieldAmount, ?string $rule, ?string $transferTo, ?string $source, int $factor = 1)
+    public function applyRule(bool $debug, string $transferOrigin, float $amount, float $acquisitionAmount, float $taxShieldAmount, ?string $rule, ?string $transferTo, ?string $source, int $factor = 1): array
     {
         // Careful: This divisor rule thing will be impossible to stop, since it has its own memory. Onlye divisor should have memory.
 
@@ -579,7 +605,7 @@ class PrognosisService
             $source);
 
         // This is really just a fixed number, but it can appear at the same time as a rule.
-        if (is_numeric($amount) && $amount != 0) {
+        if ($amount != 0) {
             // $explanation = 'Using current amount: '.round($amount)." * $factor ";
             $amount = $calculatedNumericAmount = round($amount * $factor);
             // This is not a deposit
@@ -678,7 +704,7 @@ class PrognosisService
         try {
             $assetTypeModel = \App\Models\AssetType::where('type', $assetType)->first();
 
-            return $assetTypeModel?->is_liquid ?? false;
+            return $assetTypeModel->is_liquid ?? false;
         } catch (\Throwable $e) {
             return false;
         }
@@ -695,7 +721,10 @@ class PrognosisService
     }
 
     // Transferes the amount to another asset. This actualle has to change variables like assetEquityAmount, assetPaidAmount, realizationShieldAmount etc. Others are only simulations, not happening.
-    public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount, float $taxShieldAmount, string $explanation)
+    /**
+     * @return array{0: float, 1: float, 2: float, 3: string}
+     */
+    public function transfer(bool $debug, string $transferOrigin, string $transferTo, float $amount, float $acquisitionAmount, float $taxShieldAmount, string $explanation): array
     {
 
         $realizationTaxableAmount = 0;
@@ -734,7 +763,7 @@ class PrognosisService
         $taxOriginType = 'none';
         try {
             $assetTypeO = \App\Models\AssetType::where('type', $originAssetType)->with('taxType')->first();
-            $taxOriginType = $assetTypeO?->taxType?->type ?? 'none';
+            $taxOriginType = $assetTypeO->taxType->type ?? 'none';
         } catch (\Throwable $e) {
             $taxOriginType = 'none';
         }
@@ -823,7 +852,10 @@ class PrognosisService
         return [$paidAmount, $notTransferedAmount, $taxShieldAmount, $explanation];
     }
 
-    public function mortgageExtraDownPayment($assetname, $year, $extraDownPaymentAmount)
+    /**
+     * @return array{0: float|int, 1: string|null}
+     */
+    public function mortgageExtraDownPayment(string $assetname, int $year, float|int $extraDownPaymentAmount): array
     {
 
         $description = null;
@@ -869,10 +901,8 @@ class PrognosisService
 
             $this->removeMortgageFrom($assetname, $year); // Clean up all mortage from dataH even from this year before recalculating it back into the array.
             // Recalculate the mortgage from this year an onwards.
-            if ($mortgage) {
-                print_r($mortgage);
-                $this->dataH = (new \App\Services\Prognosis\AmortizationService($this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
-            }
+            print_r($mortgage);
+            $this->dataH = (new \App\Services\Prognosis\AmortizationService($this->debug, $this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
 
         } else {
 
@@ -902,7 +932,7 @@ class PrognosisService
     }
 
     // FIX: This method is also in the Mortgage class
-    public function removeMortgageFrom($assetname, $fromYear)
+    public function removeMortgageFrom(string $assetname, int $fromYear): void
     {
         $toYear = $fromYear + 80;
         // print "    removeMortgageFrom($this->$assetname, $fromYear)\n";
@@ -984,7 +1014,7 @@ class PrognosisService
     }
 
     // We ignore the no repeat for these values
-    public function configOrPrevValue(bool $debug, string $assetname, int $year, string $type, string $variable)
+    public function configOrPrevValue(bool $debug, string $assetname, int $year, string $type, string $variable): mixed
     {
         $prevYear = $year - 1;
         $value = $this->ArrGetConfig("$assetname.$year.$type.$variable");
@@ -1028,7 +1058,7 @@ class PrognosisService
 
     // Do all calculations that should be done as the last thing, and requires that all other calculations is already done.
     // Special Arr get that onlye gets data from dataH to make cleaner code.
-    public function ArrGet(string $path)
+    public function ArrGet(string $path): mixed
     {
         $default = null;
         if (Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
@@ -1039,7 +1069,7 @@ class PrognosisService
         return Arr::get($this->dataH, $path, $default);
     }
 
-    public function ArrSet(string $path, $value)
+    public function ArrSet(string $path, mixed $value): void
     {
         $debug = false;
         if (Str::contains($path, ['marketAmountX', 'afterTaxAmountX'])) {
@@ -1053,11 +1083,11 @@ class PrognosisService
             }
         }
 
-        return Arr::set($this->dataH, $path, $value);
+        Arr::set($this->dataH, $path, $value);
     }
 
     // Special Arr get that onlye gets data from configH to make cleaner code.
-    public function ArrGetConfig(string $path)
+    public function ArrGetConfig(string $path): mixed
     {
         $default = null;
         if (Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
@@ -1068,7 +1098,10 @@ class PrognosisService
 
     }
 
-    public function getAssetMetaFromPath($path, $field)
+    /**
+     * @return array{0: string|null, 1: string|null, 2: mixed}
+     */
+    public function getAssetMetaFromPath(string $path, string $field): array
     {
         $value = null;
         $year = null;
@@ -1092,7 +1125,7 @@ class PrognosisService
     }
 
     // Calculates an amount based on the value of another asset
-    public function source(bool $debug, string $path, string $rule)
+    public function source(bool $debug, string $path, string $rule): float
     {
         $paidAmount = 0;
         $amount = $this->ArrGet($path); // Retrive the amount from another asset. Do not change the other asset.

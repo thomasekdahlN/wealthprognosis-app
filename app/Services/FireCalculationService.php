@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 
 class FireCalculationService
 {
+    /**
+     * @return array<string, mixed>
+     */
     public static function getFinancialData(?int $assetConfigId = null): array
     {
         $user = Auth::user();
@@ -33,7 +36,7 @@ class FireCalculationService
         $totalAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetConfigId) {
+            if ($assetConfigId > 0) {
                 $query->where('asset_configuration_id', $assetConfigId);
             }
 
@@ -43,30 +46,30 @@ class FireCalculationService
         })
             ->where('year', $currentYear)
             ->where('asset_market_amount', '>', 0)
-            ->sum('asset_market_amount') ?? 0;
+            ->sum('asset_market_amount') ?: 0;
 
         // Calculate ALL assets for Net Worth
         $allAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetConfigId) {
+            if ($assetConfigId > 0) {
                 $query->where('asset_configuration_id', $assetConfigId);
             }
         })
             ->where('year', $currentYear)
             ->where('asset_market_amount', '>', 0)
-            ->sum('asset_market_amount') ?? 0;
+            ->sum('asset_market_amount') ?: 0;
 
         // Calculate total liabilities
         $totalLiabilities = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
-            if ($assetConfigId) {
+            if ($assetConfigId > 0) {
                 $query->where('asset_configuration_id', $assetConfigId);
             }
         })
             ->where('year', $currentYear)
-            ->sum('mortgage_amount') ?? 0;
+            ->sum('mortgage_amount') ?: 0;
 
         // Calculate monthly income
         $incomeRecords = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
@@ -141,6 +144,9 @@ class FireCalculationService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private static function getEmptyData(): array
     {
         return [

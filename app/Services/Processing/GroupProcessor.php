@@ -34,8 +34,8 @@ class GroupProcessor
     /**
      * Initialize group structures with empty data for proper sorting.
      *
-     * @param  array  $privateH  Reference to private group data
-     * @param  array  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
      * @param  int  $economyStartYear  Start year for economy calculations
      * @param  int  $deathYear  End year for calculations
      */
@@ -51,13 +51,13 @@ class GroupProcessor
     /**
      * Add a value to group totals.
      *
-     * @param  array  $totalH  Reference to total group data
-     * @param  array  $companyH  Reference to company group data
-     * @param  array  $privateH  Reference to private group data
-     * @param  array  $groupH  Reference to group hierarchy data
+     * @param  array<string, mixed>  $totalH  Reference to total group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array<string, mixed>  $groupH  Reference to group hierarchy data
      * @param  int  $year  Year for the data
-     * @param  array  $meta  Asset metadata
-     * @param  array  $data  Year data for the asset
+     * @param  array<string, mixed>  $meta  Asset metadata
+     * @param  array<string, mixed>  $data  Year data for the asset
      * @param  string  $dotpath  Dot-notation path to the value
      */
     public function additionToGroup(
@@ -93,13 +93,13 @@ class GroupProcessor
     /**
      * Set a value to group (not additive).
      *
-     * @param  array  $totalH  Reference to total group data
-     * @param  array  $companyH  Reference to company group data
-     * @param  array  $privateH  Reference to private group data
-     * @param  array  $groupH  Reference to group hierarchy data
+     * @param  array<string, mixed>  $totalH  Reference to total group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array<string, mixed>  $groupH  Reference to group hierarchy data
      * @param  int  $year  Year for the data
-     * @param  array  $meta  Asset metadata
-     * @param  array  $data  Year data for the asset
+     * @param  array<string, mixed>  $meta  Asset metadata
+     * @param  array<string, mixed>  $data  Year data for the asset
      * @param  string  $dotpath  Dot-notation path to the value
      */
     public function setToGroup(
@@ -145,15 +145,15 @@ class GroupProcessor
     public function calculateFireSaveRate(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
         if (Arr::get($totalH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($totalH, "$year.fire.savingRate", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.savingAmount", 0), Arr::get($totalH, "$year.mortgage.balanceAmount", 0));
+            Arr::set($totalH, "$year.fire.savingRate", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.savingAmount", 0));
         }
 
         if (Arr::get($companyH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($companyH, "$year.fire.savingRate", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.savingAmount", 0), Arr::get($companyH, "$year.mortgage.balanceAmount", 0));
+            Arr::set($companyH, "$year.fire.savingRate", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.savingAmount", 0));
         }
 
         if (Arr::get($privateH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($privateH, "$year.fire.savingRate", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.savingAmount", 0), Arr::get($privateH, "$year.mortgage.balanceAmount", 0));
+            Arr::set($privateH, "$year.fire.savingRate", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.savingAmount", 0));
         }
     }
 
@@ -184,9 +184,9 @@ class GroupProcessor
      * Calculate fortune tax for groups.
      * We can not subtract mortgage again, it is already subtracted in the taxableAmount part, therefore we send in zero as mortgage here.
      *
-     * @param  array  $totalH  Reference to total group data
-     * @param  array  $companyH  Reference to company group data
-     * @param  array  $privateH  Reference to private group data
+     * @param  array<string, mixed>  $totalH  Reference to total group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
      */
     public function calculateFortuneTax(array &$totalH, array &$companyH, array &$privateH, int $year): void
@@ -207,9 +207,9 @@ class GroupProcessor
     /**
      * Calculate actual change rates of income, expense and assets - not the prognosed one.
      *
-     * @param  array  $totalH  Reference to total group data
-     * @param  array  $companyH  Reference to company group data
-     * @param  array  $privateH  Reference to private group data
+     * @param  array<string, mixed>  $totalH  Reference to total group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
      */
     public function calculateChangerates(array &$totalH, array &$companyH, array &$privateH, int $year): void
@@ -323,9 +323,9 @@ class GroupProcessor
     /**
      * Calculate yield percentages for groups.
      *
-     * @param  array  $totalH  Reference to total group data
-     * @param  array  $companyH  Reference to company group data
-     * @param  array  $privateH  Reference to private group data
+     * @param  array<string, mixed>  $totalH  Reference to total group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
      */
     public function calculateYield(array &$totalH, array &$companyH, array &$privateH, int $year): void

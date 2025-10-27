@@ -13,8 +13,10 @@ use Illuminate\Support\Facades\Log;
 
 class AiAssistantService
 {
+    /** @var array<string, mixed> */
     protected array $conversationState = [];
 
+    /** @var array<string, mixed> */
     protected array $pendingConfiguration = [];
 
     protected string $aiProvider;
@@ -27,9 +29,13 @@ class AiAssistantService
     {
         $this->aiProvider = config('ai.provider', 'openai');
         $this->aiModel = config('ai.model', 'gpt-4');
-        $this->apiKey = config('ai.api_key', env('OPENAI_API_KEY'));
+        $this->apiKey = config('ai.api_key', '');
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $conversation
+     * @return array<string, mixed>
+     */
     public function processMessage(string $message, array $conversation, User $user, ?int $currentConfigurationId = null, ?callable $statusCallback = null): array
     {
         $originalMessage = trim($message);
@@ -105,6 +111,10 @@ class AiAssistantService
         };
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $conversation
+     * @return array<string, mixed>
+     */
     protected function analyzeIntent(string $message, array $conversation): array
     {
         // Check for configuration switching keywords - Enhanced Norwegian support
@@ -238,6 +248,9 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     */
     protected function generateContextualResponse(string $originalMessage, string $contextData, array $intent): string
     {
         // This is where you would integrate with an actual AI service like OpenAI
@@ -274,6 +287,10 @@ class AiAssistantService
         return $responses[array_rand($responses)];
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleCreateConfiguration(string $message, array $intent, User $user): array
     {
         // Check if we have all required information
@@ -313,6 +330,10 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleSwitchConfiguration(string $message, array $intent, User $user): array
     {
         // Extract configuration ID from message
@@ -338,6 +359,10 @@ class AiAssistantService
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleUpdateAssetValue(string $message, array $intent, User $user, ?int $configurationId, ?callable $statusCallback = null): array
     {
         if (! $configurationId) {
@@ -411,6 +436,10 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleUpdateMortgage(string $message, array $intent, User $user, ?int $configurationId, ?callable $statusCallback = null): array
     {
         if (! $configurationId) {
@@ -495,6 +524,10 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleAddAsset(string $message, array $intent, User $user, ?int $configurationId): array
     {
         if (! $configurationId) {
@@ -537,6 +570,10 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleAddIncome(string $message, array $intent, User $user, ?int $configurationId): array
     {
         if (! $configurationId) {
@@ -572,6 +609,10 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleAddLifeEvent(string $message, array $intent, User $user, ?int $configurationId): array
     {
         if (! $configurationId) {
@@ -607,6 +648,10 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleViewData(string $message, array $intent, User $user, ?int $configurationId): array
     {
         if (! $configurationId) {
@@ -624,6 +669,10 @@ class AiAssistantService
         return $this->getConfigurationSummary($configurationId, $user);
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleCreateSimulation(string $message, array $intent, User $user, ?int $configurationId): array
     {
         if (! $configurationId) {
@@ -641,6 +690,10 @@ class AiAssistantService
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $intent
+     * @return array<string, mixed>
+     */
     protected function handleGeneralHelp(string $message, array $intent): array
     {
         return [
@@ -668,6 +721,9 @@ class AiAssistantService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function handleUnknown(string $message, ?int $currentConfigurationId = null, ?User $user = null): array
     {
         // If we have a configuration, try to provide contextual help
@@ -703,6 +759,9 @@ class AiAssistantService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractConfigurationData(string $message): array
     {
         $data = [];
@@ -742,6 +801,10 @@ class AiAssistantService
         return $data;
     }
 
+    /**
+     * @param  array<int, string>  $missingFields
+     * @param  array<string, mixed>  $extractedData
+     */
     protected function askForMissingConfigurationData(array $missingFields, array $extractedData): string
     {
         $questions = [
@@ -765,6 +828,9 @@ class AiAssistantService
         return "To create your financial configuration, I need some basic information.{$currentInfo}\n{$nextQuestion}";
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function createAssetConfiguration(array $data, User $user): AssetConfiguration
     {
         return DB::transaction(function () use ($data, $user) {
@@ -784,6 +850,9 @@ class AiAssistantService
         });
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractAssetData(string $message): array
     {
         $data = [];
@@ -862,8 +931,9 @@ class AiAssistantService
             $assetType = $data['type'];
 
             // Extract brand for cars
-            if ($assetType === 'car' && isset($assetTypePatterns['car']['brands'])) {
-                foreach ($assetTypePatterns['car']['brands'] as $brand) {
+            if ($assetType === 'car') {
+                $brands = $assetTypePatterns['car']['brands'];
+                foreach ($brands as $brand) {
                     if (preg_match("/\b{$brand}\b/i", $message, $matches)) {
                         $data['brand'] = ucfirst(strtolower($matches[0]));
 
@@ -894,8 +964,9 @@ class AiAssistantService
             }
 
             // Extract brand for boats
-            if ($assetType === 'boat' && isset($assetTypePatterns['boat']['brands'])) {
-                foreach ($assetTypePatterns['boat']['brands'] as $brand) {
+            if ($assetType === 'boat') {
+                $brands = $assetTypePatterns['boat']['brands'];
+                foreach ($brands as $brand) {
                     if (preg_match("/\b{$brand}\b/i", $message, $matches)) {
                         $data['brand'] = ucfirst(strtolower($matches[0]));
 
@@ -978,6 +1049,9 @@ class AiAssistantService
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function createAsset(array $data, int $configurationId, User $user): Asset
     {
         return DB::transaction(function () use ($data, $configurationId, $user) {
@@ -1047,6 +1121,9 @@ class AiAssistantService
         });
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function generateAssetName(array $data): string
     {
         $type = $data['type'];
@@ -1109,6 +1186,9 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractIncomeData(string $message): array
     {
         $data = [];
@@ -1143,6 +1223,9 @@ class AiAssistantService
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function createIncomeAsset(array $data, int $configurationId, User $user): Asset
     {
         return DB::transaction(function () use ($data, $configurationId, $user) {
@@ -1187,6 +1270,9 @@ class AiAssistantService
         });
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractLifeEventData(string $message): array
     {
         $data = [];
@@ -1222,6 +1308,10 @@ class AiAssistantService
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function createLifeEvents(array $data, int $configurationId, User $user): array
     {
         $events = [];
@@ -1244,6 +1334,10 @@ class AiAssistantService
         return $events;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return list<string>
+     */
     protected function createRetirementEvents(array $data, int $configurationId, User $user): array
     {
         $configuration = AssetConfiguration::find($configurationId);
@@ -1273,6 +1367,10 @@ class AiAssistantService
         return $events;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function createChildrenEvents(array $data, int $configurationId, User $user): array
     {
         $planningService = app(FinancialPlanningService::class);
@@ -1280,6 +1378,10 @@ class AiAssistantService
         return $planningService->createChildrenEvents($data, $configurationId, $user);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     protected function createInheritanceEvent(array $data, int $configurationId, User $user): array
     {
         $planningService = app(FinancialPlanningService::class);
@@ -1287,6 +1389,10 @@ class AiAssistantService
         return $planningService->createInheritanceEvent($data, $configurationId, $user);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, string>
+     */
     protected function createPropertyChangeEvent(array $data, int $configurationId, User $user): array
     {
         $planningService = app(FinancialPlanningService::class);
@@ -1294,6 +1400,9 @@ class AiAssistantService
         return $planningService->createPropertyChangeEvent($data, $configurationId, $user);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getConfigurationSummary(int $configurationId, User $user): array
     {
         $configuration = AssetConfiguration::with(['assets.years'])
@@ -1312,6 +1421,7 @@ class AiAssistantService
         $currentYear = now()->year;
 
         $totalAssets = $configuration->assets->sum(function ($asset) use ($currentYear) {
+            /** @var \App\Models\Asset $asset */
             // Try current year first, then fall back to most recent year
             $currentYearData = $asset->years->where('year', $currentYear);
             if ($currentYearData->isNotEmpty()) {
@@ -1324,6 +1434,7 @@ class AiAssistantService
         });
 
         $totalIncome = $configuration->assets->sum(function ($asset) use ($currentYear) {
+            /** @var \App\Models\Asset $asset */
             // Try current year first, then fall back to most recent year
             $currentYearData = $asset->years->where('year', $currentYear);
             if ($currentYearData->isNotEmpty()) {
@@ -1340,7 +1451,7 @@ class AiAssistantService
         $summary = "**{$configuration->name} Summary:**\n\n";
         $summary .= "👤 **Personal Info:**\n";
         $summary .= "- Born: {$configuration->birth_year}\n";
-        $summary .= "- Expected lifespan: {$configuration->death_age} years\n";
+        $summary .= "- Expected lifespan: {$configuration->expected_death_age} years\n";
         $summary .= "- Retirement age: {$configuration->pension_wish_age}\n";
         $summary .= "- Risk tolerance: {$configuration->risk_tolerance}\n\n";
 
@@ -1376,13 +1487,14 @@ class AiAssistantService
             'asset_owner' => [
                 'name' => $configuration->name,
                 'birth_year' => $configuration->birth_year,
-                'death_age' => $configuration->death_age,
+                'death_age' => $configuration->expected_death_age,
                 'pension_wish_age' => $configuration->pension_wish_age,
                 'risk_tolerance' => $configuration->risk_tolerance,
             ],
             'assets' => [],
         ];
 
+        /** @var \App\Models\Asset $asset */
         foreach ($configuration->assets as $asset) {
             $assetData = [
                 'asset_name' => $asset->name ?? $asset->assetType->name ?? 'Unknown Asset',
@@ -1408,6 +1520,9 @@ class AiAssistantService
         return json_encode($financialData, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getCompleteFinancialDataForDisplay(int $configurationId, User $user): array
     {
         $jsonData = $this->getCompleteFinancialData($configurationId, $user);
@@ -1430,6 +1545,9 @@ class AiAssistantService
         ];
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $conversation
+     */
     protected function callAiService(string $message, string $contextData, User $user, array $conversation = []): string
     {
         try {
@@ -1453,6 +1571,9 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $conversation
+     */
     protected function makeAiApiCall(string $systemPrompt, string $userMessage, array $conversation = []): ?string
     {
         $endpoint = $this->getApiEndpoint();
@@ -1485,6 +1606,9 @@ class AiAssistantService
         };
     }
 
+    /**
+     * @return array<string, string>
+     */
     protected function getApiHeaders(): array
     {
         return match ($this->aiProvider) {
@@ -1499,6 +1623,10 @@ class AiAssistantService
         };
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $conversation
+     * @return array<string, mixed>
+     */
     protected function buildApiPayload(string $systemPrompt, string $userMessage, array $conversation = []): array
     {
         $settings = config("ai.settings.{$this->aiModel}", [
@@ -1562,6 +1690,9 @@ class AiAssistantService
         return $payload;
     }
 
+    /**
+     * @param  array<string, mixed>  $responseData
+     */
     protected function extractResponseContent(array $responseData): ?string
     {
         return match ($this->aiProvider) {
@@ -1669,6 +1800,9 @@ class AiAssistantService
                '💡 **Tip**: I can help you with specific features even without AI - just ask!';
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function logAiInteraction(string $type, array $data): void
     {
         $logData = [
@@ -1688,6 +1822,9 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractAssetUpdateData(string $message): array
     {
         $data = [];
@@ -1835,6 +1972,9 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractMortgageUpdateData(string $message): array
     {
         $data = [];
@@ -1883,6 +2023,9 @@ class AiAssistantService
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $mortgageData
+     */
     protected function updateAssetYearMortgage(Asset $asset, array $mortgageData, User $user): void
     {
         $currentYear = (int) date('Y');
@@ -1946,6 +2089,9 @@ class AiAssistantService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $mortgageData
+     */
     protected function generateMortgageUpdateResponse(Asset $asset, array $mortgageData): string
     {
         $response = "✅ **{$asset->name}** mortgage updated:\n\n";

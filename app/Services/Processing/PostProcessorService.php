@@ -32,16 +32,16 @@ class PostProcessorService
     /**
      * Execute all post-processing steps on prognosis data.
      *
-     * @param  array  $dataH  Reference to the main data structure
-     * @param  array  $totalH  Reference to total group data
-     * @param  array  $companyH  Reference to company group data
-     * @param  array  $privateH  Reference to private group data
-     * @param  array  $groupH  Reference to group hierarchy data
-     * @param  array  $statisticsH  Reference to statistics data
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array<string, mixed>  $totalH  Reference to total group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array<string, mixed>  $groupH  Reference to group hierarchy data
+     * @param  array<string, mixed>  $statisticsH  Reference to statistics data
      * @param  int  $economyStartYear  Start year for economy calculations
      * @param  int  $deathYear  End year for calculations
      * @param  int  $thisYear  Current year
-     * @param  array  $assetTypeSavingMap  Map of asset types that count as savings
+     * @param  array<string, bool>  $assetTypeSavingMap  Map of asset types that count as savings
      * @param  callable  $isShownInStatistics  Callback to check if type should be shown in statistics
      */
     public function process(

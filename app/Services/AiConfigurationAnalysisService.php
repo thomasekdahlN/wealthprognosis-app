@@ -25,6 +25,8 @@ class AiConfigurationAnalysisService
 
     /**
      * Analyze economic situation description and generate asset configuration
+     *
+     * @return array<string, mixed>
      */
     public function analyzeEconomicSituation(string $description): array
     {
@@ -38,6 +40,8 @@ class AiConfigurationAnalysisService
 
     /**
      * Perform the actual AI analysis
+     *
+     * @return array<string, mixed>
      */
     protected function performAiAnalysis(string $description): array
     {
@@ -168,6 +172,9 @@ GUIDELINES:
 
     /**
      * Validate and sanitize the AI analysis result
+     *
+     * @param  array<string, mixed>  $result
+     * @return array<string, mixed>
      */
     protected function validateAndSanitizeResult(array $result): array
     {
@@ -235,6 +242,8 @@ GUIDELINES:
 
     /**
      * Get a fallback configuration when AI analysis fails
+     *
+     * @return array<string, mixed>
      */
     protected function getFallbackConfiguration(string $description): array
     {

@@ -63,6 +63,7 @@ class SimulationExportService
         $statistics = self::buildStatistics($assets);
 
         // Add one sheet per asset (matching PrognosisExport2 format)
+        /** @var \App\Models\SimulationAsset $simAsset */
         foreach ($assets as $simAsset) {
             $meta = [
                 'active' => (bool) $simAsset->is_active,
@@ -76,7 +77,7 @@ class SimulationExportService
 
             $assetSheet = new PrognosisAssetSheet2($spreadsheet, $config, $assetArray, $meta);
             $spreadsheet->addSheet($assetSheet->worksheet);
-            \App\Services\ExcelFormatting::applyCommonAssetSheetFormatting($assetSheet->worksheet, $config['meta'] ?? []);
+            \App\Services\ExcelFormatting::applyCommonAssetSheetFormatting($assetSheet->worksheet, $config['meta']);
         }
 
         // Add Statistics sheet last (same class as existing export)
@@ -112,10 +113,14 @@ class SimulationExportService
         return $min ? (int) $min : (int) now()->year - 1;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected static function buildAssetArray(SimulationAsset $simAsset): array
     {
         $arr = [];
 
+        /** @var \App\Models\SimulationAssetYear $year */
         foreach ($simAsset->simulationAssetYears as $year) {
             $y = (string) $year->year;
 
@@ -194,6 +199,9 @@ class SimulationExportService
         return $arr;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected static function buildStatistics($assets): array
     {
         $stats = [];
@@ -218,7 +226,7 @@ class SimulationExportService
 
                     continue;
                 }
-                $amt = (float) ($data['amount'] ?? 0);
+                $amt = (float) $data['amount'];
                 $stats[$y][$type]['decimal'] = $total > 0 ? $amt / $total : 0;
             }
         }

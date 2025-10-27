@@ -17,7 +17,6 @@
 namespace App\Services\Tax;
 
 use App\Support\Contracts\TaxCalculatorInterface;
-use App\Support\ValueObjects\TaxCalculationResult;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
@@ -71,7 +70,7 @@ class TaxSalaryService implements TaxCalculatorInterface
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
-     * @return array{0: float, 1: float, 2: string}|TaxCalculationResult Returns array for backward compatibility
+     * @return array{0: float, 1: float, 2: string} Returns array for backward compatibility
      */
     public function calculatesalarytax(bool $debug, int $year, int $amount): array
     {

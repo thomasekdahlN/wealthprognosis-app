@@ -44,6 +44,8 @@ class AssetExportService
 
     /**
      * Build the JSON structure from database data
+     *
+     * @return array<string, mixed>
      */
     protected function buildJsonStructure(): array
     {
@@ -58,6 +60,7 @@ class AssetExportService
             'pensionWishAge' => (string) $this->assetConfiguration->pension_wish_age,
             'deathAge' => (string) $this->assetConfiguration->expected_death_age,
             'exportStartYear' => (string) $this->assetConfiguration->export_start_age,
+            'country' => $this->assetConfiguration->country ?? 'no',
         ];
 
         // Add timestamps
@@ -72,6 +75,7 @@ class AssetExportService
         // Process each asset (ordered by sort_order to maintain JSON sequence)
         $assets = $this->assetConfiguration->assets()->with('years')->orderBy('sort_order')->get();
 
+        /** @var \App\Models\Asset $asset */
         foreach ($assets as $asset) {
             $assetData = [];
 
@@ -83,11 +87,13 @@ class AssetExportService
                 'description' => $asset->description ?? '',
                 'active' => $asset->is_active,
                 'taxProperty' => $asset->tax_property,
+                'debug' => $asset->debug,
             ];
 
             // Process asset years
             $years = $asset->years()->orderBy('year')->get();
 
+            /** @var \App\Models\AssetYear $assetYear */
             foreach ($years as $assetYear) {
                 $yearKey = $this->resolveYearKey($assetYear->year);
                 $assetData[$yearKey] = $this->buildYearData($assetYear);
@@ -102,6 +108,8 @@ class AssetExportService
 
     /**
      * Build year data from AssetYear model
+     *
+     * @return array<string, mixed>
      */
     protected function buildYearData($assetYear): array
     {
@@ -235,7 +243,7 @@ class AssetExportService
      */
     public static function export(AssetConfiguration $assetConfiguration, ?string $filePath = null): string
     {
-        $service = new static($assetConfiguration);
+        $service = new self($assetConfiguration);
 
         return $service->toFile($filePath);
     }
@@ -245,7 +253,7 @@ class AssetExportService
      */
     public static function toJsonString(AssetConfiguration $assetConfiguration): string
     {
-        $service = new static($assetConfiguration);
+        $service = new self($assetConfiguration);
 
         return $service->toJson();
     }

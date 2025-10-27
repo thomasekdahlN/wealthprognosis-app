@@ -54,17 +54,17 @@ class TaxConfigRepository
             ->orderByDesc('year')
             ->first();
 
-        $config = $record?->configuration ?? [];
+        $config = $record->configuration ?? [];
         $this->cache[$this->country][$taxType][$year] = $config;
 
         return $config;
     }
 
     /**
-     * Shortcut for property tax configs using tax_type like "property_{code}".
+     * Get the tax income rate for a given tax type and year.
      *
-     * @param  string  $propertyCode  Municipality/property code (e.g., 'holmestrand').
-     * @return array<string, mixed>
+     * @param  string  $taxType  The tax type.
+     * @param  int  $year  The year.
      */
     public function getTaxIncomeRate(string $taxType, int $year): float
     {
@@ -88,7 +88,7 @@ class TaxConfigRepository
      * Similar to salary tax brackets, supports dynamic number of tax levels.
      *
      * @param  int  $year  The year for which the tax is being calculated.
-     * @return array The fortune tax bracket configuration.
+     * @return array<string, mixed> The fortune tax bracket configuration.
      */
     public function getFortuneTaxBracketConfig(int $year): array
     {
@@ -168,6 +168,9 @@ class TaxConfigRepository
 
     // *****************************************************************************
     // Helper functions to retrieve correct salary tax config
+    /**
+     * @return array<string, mixed>
+     */
     private function getTaxSalaryConfig(string $TaxSubType, int $year): array
     {
         $configH = $this->getTaxConfig($year, 'salary');
@@ -182,20 +185,26 @@ class TaxConfigRepository
         return Arr::get($taxSalaryConfigH, 'percent', 0) / 100;
     }
 
-    public function getSalaryTaxDeductionConfig($year): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSalaryTaxDeductionConfig(int $year): array
     {
-        return $this->getTaxSalaryConfig('deduction', (int) $year);
+        return $this->getTaxSalaryConfig('deduction', $year);
     }
 
-    public function getSalaryTaxSocialSecurityRate($year): float
+    public function getSalaryTaxSocialSecurityRate(int $year): float
     {
-        $taxSalaryConfigH = $this->getTaxSalaryConfig('socialsecurity', (int) $year);
+        $taxSalaryConfigH = $this->getTaxSalaryConfig('socialsecurity', $year);
 
         return Arr::get($taxSalaryConfigH, 'percent', 0) / 100;
     }
 
-    public function getSalaryTaxBracketConfig($year): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSalaryTaxBracketConfig(int $year): array
     {
-        return $this->getTaxSalaryConfig('bracket', (int) $year);
+        return $this->getTaxSalaryConfig('bracket', $year);
     }
 }

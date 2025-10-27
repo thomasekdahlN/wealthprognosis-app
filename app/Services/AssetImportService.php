@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class AssetImportService
 {
+    /** @var array<string, mixed> */
     protected array $config;
 
     protected ?User $user;
@@ -189,6 +190,7 @@ class AssetImportService
             'icon' => $validatedIcon,
             'color' => Arr::get($meta, 'color'),
             'tags' => Arr::get($meta, 'tags', []),
+            'country' => Arr::get($meta, 'country', 'no'),
             'user_id' => $this->user->id,
             'team_id' => $this->teamId,
             'created_by' => $this->user->id,
@@ -224,6 +226,8 @@ class AssetImportService
 
     /**
      * Create Asset from a section in the JSON config
+     *
+     * @param  array<string, mixed>  $section
      */
     protected function createAssetFromSection(AssetConfiguration $assetConfiguration, string $sectionKey, array $section): ?Asset
     {
@@ -252,6 +256,7 @@ class AssetImportService
 
             'tax_property' => Arr::get($meta, 'taxProperty'),
             'tax_country' => 'no',
+            'debug' => Arr::get($meta, 'debug', false),
             'is_active' => Arr::get($meta, 'active', true),
             'sort_order' => $this->currentSortOrder++,
             'created_by' => $this->user->id,
@@ -297,6 +302,8 @@ class AssetImportService
 
     /**
      * Create AssetYear data from yearly section
+     *
+     * @param  array<string, mixed>  $yearData
      */
     protected function createAssetYearData(Asset $asset, string $yearKey, array $yearData): void
     {
@@ -372,13 +379,13 @@ class AssetImportService
         // Inherit default changerates from asset type if missing
         $assetType = \App\Models\AssetType::where('type', $asset->asset_type)->first();
         if ($assetType) {
-            if (! isset($data['income_changerate']) || $data['income_changerate'] === null) {
+            if (! isset($data['income_changerate'])) {
                 $data['income_changerate'] = $assetType->income_changerate;
             }
-            if (! isset($data['expence_changerate']) || $data['expence_changerate'] === null) {
+            if (! isset($data['expence_changerate'])) {
                 $data['expence_changerate'] = $assetType->expence_changerate;
             }
-            if (! isset($data['asset_changerate']) || $data['asset_changerate'] === null) {
+            if (! isset($data['asset_changerate'])) {
                 $data['asset_changerate'] = $assetType->asset_changerate;
             }
         }
@@ -455,7 +462,7 @@ class AssetImportService
      */
     public static function importFile(string $filePath, ?User $user = null, ?int $teamId = null): AssetConfiguration
     {
-        $service = new static($user, $teamId);
+        $service = new self($user, $teamId);
 
         return $service->importFromFile($filePath);
     }
@@ -465,7 +472,7 @@ class AssetImportService
      */
     public static function importJson(string $jsonContent, ?string $sourceName = null, ?User $user = null, ?int $teamId = null): AssetConfiguration
     {
-        $service = new static($user, $teamId);
+        $service = new self($user, $teamId);
         $jsonContent = $service->sanitizeJson($jsonContent);
 
         return $service->importFromJson($jsonContent, $sourceName);
@@ -490,6 +497,8 @@ class AssetImportService
 
     /**
      * List available test files
+     *
+     * @return array<int, string>
      */
     public static function listTestFiles(): array
     {

@@ -37,7 +37,7 @@ class YearlyProcessor
     /**
      * Process income for a specific year and asset path.
      *
-     * @param  array  $dataH  Reference to the main data structure
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     public function processIncomeYearly(array &$dataH, string $path): void
@@ -48,7 +48,7 @@ class YearlyProcessor
     /**
      * Process expenses for a specific year and asset path.
      *
-     * @param  array  $dataH  Reference to the main data structure
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     public function processExpenceYearly(array &$dataH, string $path): void
@@ -74,7 +74,7 @@ class YearlyProcessor
         $taxType = 'none';
         try {
             $assetTypeO = AssetType::where('type', $assetType)->with('taxType')->first();
-            $taxType = $assetTypeO?->taxType?->type ?? 'none';
+            $taxType = $assetTypeO->taxType->type ?? 'none';
         } catch (\Throwable $e) {
             $taxType = 'none';
         }
@@ -110,7 +110,7 @@ class YearlyProcessor
     public function processCashFlowYearly(array &$dataH, string $path, int $thisYear): void
     {
         [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
-        $prevYear = $year - 1;
+        $prevYear = (int) $year - 1;
 
         // Recalculating cashflow. Necessary if a mortgage is paid with extra amount.
         $cashflowBeforeTaxAmount =
@@ -139,13 +139,13 @@ class YearlyProcessor
     /**
      * Post-processes asset yearly data.
      *
-     * @param  array  $dataH  Reference to the main data structure
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     public function processAssetYearly(array &$dataH, string $path): void
     {
         [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
-        $prevYear = $year - 1;
+        $prevYear = (int) $year - 1;
 
         $marketAmount = $this->ArrGet($dataH, "$assetname.$year.asset.marketAmount");
         if ($marketAmount <= 0) {
@@ -190,7 +190,7 @@ class YearlyProcessor
         $taxType = 'none';
         try {
             $assetTypeO = AssetType::where('type', $assetType)->with('taxType')->first();
-            $taxType = $assetTypeO?->taxType?->type ?? 'none';
+            $taxType = $assetTypeO->taxType->type ?? 'none';
         } catch (\Throwable $e) {
             $taxType = 'none';
         }
@@ -208,7 +208,7 @@ class YearlyProcessor
     /**
      * Calculate yield percentages for a specific year and asset path.
      *
-     * @param  array  $dataH  Reference to the main data structure
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     public function processYieldYearly(array &$dataH, string $path): void
@@ -234,8 +234,8 @@ class YearlyProcessor
      * @param  array  $dataH  Reference to the main data structure
      * @param  string  $assetname  Asset name
      * @param  int  $year  Year to process
-     * @param  array  $meta  Asset metadata
-     * @param  array  $assetTypeSavingMap  Map of asset types that count as savings
+     * @param  array<string, mixed>  $meta  Asset metadata
+     * @param  array<string, bool>  $assetTypeSavingMap  Map of asset types that count as savings
      */
     public function processFireYearly(array &$dataH, string $assetname, int $year, array $meta, array $assetTypeSavingMap): void
     {
@@ -284,6 +284,9 @@ class YearlyProcessor
 
     /**
      * Helper method to get asset metadata from path.
+     *
+     * @param  array<string, mixed>  $dataH
+     * @return array{0: string|null, 1: string|null, 2: mixed}
      */
     private function getAssetMetaFromPath(array $dataH, string $path, string $field): array
     {
@@ -302,6 +305,8 @@ class YearlyProcessor
 
     /**
      * Helper to get values from dataH with defaults.
+     *
+     * @param  array<string, mixed>  $dataH
      */
     private function ArrGet(array $dataH, string $path, mixed $default = null): mixed
     {
@@ -316,6 +321,8 @@ class YearlyProcessor
 
     /**
      * Helper to set values in dataH.
+     *
+     * @param  array<string, mixed>  $dataH
      */
     private function ArrSet(array &$dataH, string $path, mixed $value): void
     {

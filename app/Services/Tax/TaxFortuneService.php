@@ -135,8 +135,8 @@ class TaxFortuneService implements TaxCalculatorInterface
         [$taxAmount, $taxPercent, $taxableFortuneAmount, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount, $mortgageBalanceAmount, false);
 
         if ($taxProperty) {
-            $propertyTax = app(\App\Models\Core\TaxProperty::class);
-            [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation2] = $propertyTax->calculatePropertyTax($year, $taxGroup, $taxProperty, (float) $taxablePropertyAmount);
+            $propertyTaxService = app(\App\Services\Tax\TaxPropertyService::class);
+            [$taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $explanation2] = $propertyTaxService->calculatePropertyTax($year, $taxGroup, $taxProperty, (float) $taxablePropertyAmount);
         }
         $explanation .= $explanation2.$explanation1;
 

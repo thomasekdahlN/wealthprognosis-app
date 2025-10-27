@@ -102,7 +102,7 @@ class TaxConfigPropertyRepository
                 ->orderByDesc('year')
                 ->first();
 
-            if ($taxPropertyModel && $taxPropertyModel->deduction !== null) {
+            if ($taxPropertyModel && $taxPropertyModel->deduction) {
                 $deduction = (float) $taxPropertyModel->deduction;
             } else {
                 $deduction = 0.0;
@@ -148,12 +148,12 @@ class TaxConfigPropertyRepository
 
             if ($taxPropertyModel) {
                 // Determine which rate to use based on tax group
-                if ($taxGroup === 'company' && $taxPropertyModel->tax_company_permill !== null) {
+                if ($taxGroup === 'company' && $taxPropertyModel->tax_company_permill) {
                     // Convert permille to decimal (e.g., 3.5 permille = 0.0035)
-                    $rate = (float) ($taxPropertyModel->tax_company_permill / 1000);
-                } elseif ($taxGroup === 'private' && $taxPropertyModel->tax_home_permill !== null) {
+                    $rate = (float) $taxPropertyModel->tax_company_permill / 1000;
+                } elseif ($taxGroup === 'private' && $taxPropertyModel->tax_home_permill) {
                     // Convert permille to decimal (e.g., 3.5 permille = 0.0035)
-                    $rate = (float) ($taxPropertyModel->tax_home_permill / 1000);
+                    $rate = (float) $taxPropertyModel->tax_home_permill / 1000;
                 } else {
                     $rate = 0.0;
                 }

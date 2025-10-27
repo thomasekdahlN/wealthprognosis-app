@@ -24,6 +24,8 @@ class AiEvaluationService
 
     /**
      * Evaluate an asset configuration using a specific AI instruction
+     *
+     * @return array<string, mixed>
      */
     public function evaluateAssetConfiguration(AssetConfiguration $assetConfiguration, AiInstruction $instruction): array
     {
@@ -39,7 +41,7 @@ class AiEvaluationService
             $userPrompt,
             $instruction->model,
             $instruction->max_tokens,
-            $instruction->temperature
+            (float) $instruction->temperature
         );
 
         return [
@@ -57,6 +59,9 @@ class AiEvaluationService
 
     /**
      * Evaluate an asset configuration using multiple AI instructions
+     *
+     * @param  array<int, int>  $instructionIds
+     * @return array<string, mixed>
      */
     public function evaluateWithMultipleInstructions(AssetConfiguration $assetConfiguration, array $instructionIds = []): array
     {
@@ -113,6 +118,8 @@ class AiEvaluationService
 
     /**
      * Call OpenAI API
+     *
+     * @return array<string, mixed>
      */
     protected function callOpenAI(
         string $systemPrompt,
@@ -182,6 +189,8 @@ class AiEvaluationService
 
     /**
      * Test the OpenAI API connection
+     *
+     * @return array<string, mixed>
      */
     public function testConnection(): array
     {
@@ -207,6 +216,8 @@ class AiEvaluationService
 
     /**
      * Get available models
+     *
+     * @return array<string, mixed>
      */
     public function getAvailableModels(): array
     {
@@ -247,20 +258,25 @@ class AiEvaluationService
 
     /**
      * Static method for easy usage
+     *
+     * @return array<string, mixed>
      */
     public static function evaluate(AssetConfiguration $assetConfiguration, AiInstruction $instruction): array
     {
-        $service = new static;
+        $service = new self;
 
         return $service->evaluateAssetConfiguration($assetConfiguration, $instruction);
     }
 
     /**
      * Static method for multiple evaluations
+     *
+     * @param  array<int, int>  $instructionIds
+     * @return array<string, mixed>
      */
     public static function evaluateMultiple(AssetConfiguration $assetConfiguration, array $instructionIds = []): array
     {
-        $service = new static;
+        $service = new self;
 
         return $service->evaluateWithMultipleInstructions($assetConfiguration, $instructionIds);
     }

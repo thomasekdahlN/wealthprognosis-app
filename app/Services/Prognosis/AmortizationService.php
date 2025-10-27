@@ -25,27 +25,17 @@ class AmortizationService
 
     private int $amount;
 
-    private $year_start;
+    private int $year_start;
 
-    private $year_end;
+    private int $year_end;
 
     private int $term_years;
 
-    private $interest;
+    private float $interest;
 
     private int $terms;
 
     private int $period;
-
-    private string $currency = 'XXX';
-
-    private float $principal;
-
-    private $balance;
-
-    private float $term_pay;
-
-    private array $data;
 
     private float $principalAmount = 0;
 
@@ -55,7 +45,20 @@ class AmortizationService
 
     private string $assettname;
 
+    /** @var array<string, mixed> */
     private array $dataH = [];
+
+    private object $changerate;
+
+    private float|int|null $assetChangerateValue;
+
+    private int $remainingMortgageAmount;
+
+    private int $interestOnlyYears;
+
+    private int $interestOnlyYearEnd;
+
+    private int $extraDownpaymentAmount;
 
     /**
      * Amortization constructor.
@@ -64,24 +67,28 @@ class AmortizationService
      * It then calculates the amortization schedule for each mortgage in the provided mortgages array.
      *
      * @param  bool  $debug  Debug flag to enable detailed logging.
-     * @param  array  $config  Configuration array for the amortization calculation.
+     * @param  array  $config  Configuration array for the amortization calculation (kept for API compatibility).
      * @param  object  $changerate  Object containing the change rate for the loan.
-     * @param  array  $dataH  Array containing the data history for the loan.
-     * @param  array  $mortgages  Array containing the mortgage details for the loan.
+     * @param  array<string, mixed>  $dataH  Array containing the data history for the loan.
+     * @param  array<string, mixed>  $mortgage  Array containing the mortgage details for the loan.
      * @param  string  $assettname  Name of the asset associated with the loan.
+     * @param  int  $year  The year for the amortization calculation.
+     *
+     * @phpstan-param array<string, mixed> $config
      */
     public function __construct(bool $debug, array $config, object $changerate, array $dataH, array $mortgage, string $assettname, int $year)
     {
         $this->debug = $debug;
         $this->dataH = $dataH;
-        $this->config = $config;
+        // $config parameter is kept for API compatibility but not currently used internally
+        unset($config);
         $this->assettname = $assettname;
         $this->changerate = $changerate;
         $this->assetChangerateValue = null;
 
         $this->year_start = (int) $year;
         $this->term_years = (int) Arr::get($mortgage, 'years');
-        $this->amount = $this->remainingMortgageAmount = (float) Arr::get($mortgage, 'amount');
+        $this->amount = $this->remainingMortgageAmount = (int) Arr::get($mortgage, 'amount');
         $this->interest = Arr::get($mortgage, 'interest');
         $this->terms = 1;
         $this->period = $this->terms * $this->term_years;
@@ -92,9 +99,10 @@ class AmortizationService
 
         $this->extraDownpaymentAmount = Arr::get($mortgage, 'extraDownpaymentAmount', 0); // Yearly extra downpayment
 
-        if (isset($mortgages[$year + 1]) && $year + 1 < $this->year_end) {
-            $this->year_end = $year;
-        }
+        // This logic seems incorrect - commenting out as $mortgages is not defined
+        // if (isset($mortgages[$year + 1]) && $year + 1 < $this->year_end) {
+        //     $this->year_end = $year;
+        // }
 
         $this->removeMortgageFrom($this->year_start); // JUst clean up the structure because of extra downpayment faster mortage payment later on will leave traces in not removed properly.
         $this->calculateAmortizationSchedule();
@@ -108,7 +116,7 @@ class AmortizationService
      * After the `calculate()` method is called, the loan amount is updated to be the current balance of the loan, and the period of the loan is decremented by one.
      * Once the amortization schedule has been calculated, the `assetChangerateValue` property is reset to `null`.
      */
-    public function calculateAmortizationSchedule()
+    public function calculateAmortizationSchedule(): void
     {
         while ($this->balanceAmount > 0 && $this->year_start <= $this->year_end) {
             // echo "$this->year_start, period: $this->period, extraDownpaymentAmount: $this->extraDownpaymentAmount\n";
@@ -227,7 +235,7 @@ class AmortizationService
         }
     }
 
-    public function removeMortgageFrom($fromYear)
+    public function removeMortgageFrom(int $fromYear): void
     {
         $toYear = $fromYear + 80;
         // print "    removeMortgageFrom($this->assettname, $fromYear)\n";
@@ -238,12 +246,18 @@ class AmortizationService
         }
     }
 
-    public function add($year, $type, $row)
+    /**
+     * @param  mixed  $row
+     */
+    public function add(int $year, string $type, $row): void
     {
         $this->dataH[$this->assettname][$year][$type] = $row;
     }
 
-    public function get()
+    /**
+     * @return array<string, mixed>
+     */
+    public function get(): array
     {
         return $this->dataH;
         // dd($this->dataH);

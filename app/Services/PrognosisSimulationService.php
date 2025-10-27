@@ -13,6 +13,9 @@ class PrognosisSimulationService
 {
     /**
      * Run a complete simulation based on parameters
+     *
+     * @param  array<string, mixed>  $simulationData
+     * @return array<string, mixed>
      */
     public function runSimulation(array $simulationData): array
     {
@@ -93,7 +96,7 @@ class PrognosisSimulationService
             'group' => $assetScope,
             'tags' => [$prognosisType, $assetScope, $taxCountry, 'simulation'],
             'user_id' => Auth::id() ?? $assetConfig->user_id,
-            'team_id' => Auth::user()?->currentTeam?->id ?? $assetConfig->team_id,
+            'team_id' => Auth::user()->currentTeam->id ?? $assetConfig->team_id,
             'created_by' => Auth::id() ?? $assetConfig->user_id,
             'updated_by' => Auth::id() ?? $assetConfig->user_id,
             'created_checksum' => hash('sha256', json_encode(compact('prognosisType', 'assetScope', 'taxCountry')).'_created'),
@@ -116,6 +119,7 @@ class PrognosisSimulationService
 
         $assets = $assetsQuery->with('years')->get();
 
+        /** @var \App\Models\Asset $asset */
         foreach ($assets as $asset) {
             // Create simulation asset
             $simulationAsset = SimulationAsset::create([
@@ -131,7 +135,7 @@ class PrognosisSimulationService
                 'is_active' => $asset->is_active,
                 'sort_order' => $asset->sort_order,
                 'user_id' => Auth::id() ?? $asset->user_id,
-                'team_id' => Auth::user()?->currentTeam?->id ?? $asset->team_id,
+                'team_id' => Auth::user()->currentTeam->id ?? $asset->team_id,
                 'created_by' => Auth::id() ?? $asset->user_id,
                 'updated_by' => Auth::id() ?? $asset->user_id,
                 'created_checksum' => hash('sha256', json_encode($asset->toArray()).'_created'),
@@ -139,11 +143,12 @@ class PrognosisSimulationService
             ]);
 
             // Copy asset years
+            /** @var \App\Models\AssetYear $assetYear */
             foreach ($asset->years as $assetYear) {
                 SimulationAssetYear::create([
                     'description' => $assetYear->description,
                     'user_id' => Auth::id() ?? $assetYear->user_id,
-                    'team_id' => Auth::user()?->currentTeam?->id ?? $assetYear->team_id,
+                    'team_id' => Auth::user()->currentTeam->id ?? $assetYear->team_id,
                     'year' => $assetYear->year,
                     'asset_id' => $simulationAsset->id,
                     'asset_configuration_id' => $simulationConfig->id,
@@ -242,6 +247,8 @@ class PrognosisSimulationService
 
     /**
      * Get simulation results by configuration ID
+     *
+     * @return array<string, mixed>
      */
     public function getSimulationResults(int $simulationConfigurationId): array
     {

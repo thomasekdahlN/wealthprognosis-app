@@ -10,6 +10,10 @@ use App\Models\User;
 
 class FinancialPlanningService
 {
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, string>
+     */
     public function createChildrenEvents(array $data, int $configurationId, User $user): array
     {
         $configuration = AssetConfiguration::find($configurationId);
@@ -36,6 +40,10 @@ class FinancialPlanningService
         return $events;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, string>
+     */
     public function createInheritanceEvent(array $data, int $configurationId, User $user): array
     {
         $year = $data['year'] ?? (now()->year + 10); // Default to 10 years from now
@@ -83,6 +91,10 @@ class FinancialPlanningService
         return ["Created inheritance event for {$amount} NOK in {$year}"];
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, string>
+     */
     public function createPropertyChangeEvent(array $data, int $configurationId, User $user): array
     {
         $year = $data['year'] ?? (now()->year + 5); // Default to 5 years from now
@@ -99,7 +111,7 @@ class FinancialPlanningService
             $currentValue = $house->assetYears()
                 ->where('year', '<=', $year)
                 ->orderBy('year', 'desc')
-                ->first()?->market_value ?? 0;
+                ->first()->market_value ?? 0;
 
             if ($currentValue > 0) {
                 AssetYear::create([
@@ -148,6 +160,9 @@ class FinancialPlanningService
         return $events;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function createRetirementPlan(AssetConfiguration $configuration, User $user): array
     {
         $retirementYear = now()->year + ($configuration->pension_wish_age - (now()->year - $configuration->birth_year));
@@ -182,6 +197,10 @@ class FinancialPlanningService
         return $events;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, array<string, mixed>>
+     */
     protected function extractChildrenInfo(array $data): array
     {
         // This would extract children information from the conversation
@@ -196,6 +215,9 @@ class FinancialPlanningService
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $child
+     */
     protected function createBarnetrygdIncome(array $child, int $configurationId, User $user): void
     {
         $assetType = AssetType::firstOrCreate(
@@ -239,6 +261,9 @@ class FinancialPlanningService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $child
+     */
     protected function createChildExpenses(array $child, int $configurationId, User $user): void
     {
         $assetType = AssetType::firstOrCreate(
@@ -340,7 +365,7 @@ class FinancialPlanningService
             $currentValue = $asset->assetYears()
                 ->where('year', '<=', $retirementYear)
                 ->orderBy('year', 'desc')
-                ->first()?->market_value ?? 0;
+                ->first()->market_value ?? 0;
 
             if ($currentValue > 0) {
                 $annualWithdrawal = $currentValue / 15; // Spread over 15 years

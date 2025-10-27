@@ -211,7 +211,7 @@ class TaxRealizationService implements TaxCalculatorInterface
 
             case 'otp':
                 // OTP skattes som pensjonsinntekt når den realiseres
-                [$realizationTaxAmount, $realizationTaxRate, $explanation] = $this->taxsalary->calculatesalarytax(false, $year, $amount);
+                [$realizationTaxAmount, $realizationTaxRate, $explanation] = $this->taxsalary->calculatesalarytax(false, $year, (int) $amount);
                 break;
 
             case 'ips':

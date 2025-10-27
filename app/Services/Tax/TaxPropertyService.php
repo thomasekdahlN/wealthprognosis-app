@@ -24,7 +24,7 @@ namespace App\Services\Tax;
  */
 class TaxPropertyService
 {
-    protected $country;
+    protected string $country;
 
     /**
      * Shared TaxConfigPropertyRepository instance.

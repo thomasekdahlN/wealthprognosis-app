@@ -8,6 +8,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class ExcelFormatting
 {
+    /**
+     * @param  array<string, mixed>  $meta
+     */
     public static function applyCommonAssetSheetFormatting(Worksheet $sheet, array $meta): void
     {
         $startRow = 6;
