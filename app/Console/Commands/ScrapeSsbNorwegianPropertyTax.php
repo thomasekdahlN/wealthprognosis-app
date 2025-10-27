@@ -169,11 +169,11 @@ class ScrapeSsbNorwegianPropertyTax extends Command
 
         // Apply business rule defaults
         foreach ($rows as $code => $data) {
-            if (! ($data['hasTaxOnCompanies'] ?? false)) {
+            if (! $data['hasTaxOnCompanies']) {
                 $rows[$code]['hasTaxOnCompanies'] = false;
                 $rows[$code]['taxCompanyPermill'] = 0.0;
             }
-            if (($data['taxHomePermill'] ?? 0) > 0 && ($data['hasTaxOnHomes'] ?? false) === false) {
+            if ($data['taxHomePermill'] > 0 && $data['hasTaxOnHomes'] === false) {
                 $rows[$code]['hasTaxOnHomes'] = true;
             }
         }

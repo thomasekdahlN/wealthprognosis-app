@@ -62,7 +62,7 @@ class ImportAssets extends Command
         try {
             $this->info("Starting import from: {$configFile}");
 
-            $importService = new AssetImportService($user, $teamId);
+            $importService = new AssetImportService($user, $teamId ? (int) $teamId : null);
             $assetConfiguration = $importService->importFromFile($configFile);
 
             $this->info('✅ Import completed successfully!');
@@ -73,6 +73,7 @@ class ImportAssets extends Command
             $assets = $assetConfiguration->assets()->get();
             if ($assets->count() > 0) {
                 $this->info("\nCreated assets:");
+                /** @var \App\Models\Asset $asset */
                 foreach ($assets as $asset) {
                     $yearsCount = $asset->years()->count();
                     $this->line("  - {$asset->name} ({$asset->asset_type}) - {$yearsCount} year entries");
@@ -85,7 +86,7 @@ class ImportAssets extends Command
             $this->error("Import failed: {$e->getMessage()}");
             Log::error('Asset import command failed', [
                 'config_file' => $configFile,
-                'user_id' => $user?->id,
+                'user_id' => $user->id,
                 'team_id' => $teamId,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

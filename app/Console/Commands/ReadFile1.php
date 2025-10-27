@@ -18,7 +18,6 @@ namespace App\Console\Commands;
 
 use App\Exports\PrognosisExport1;
 use Illuminate\Console\Command;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ReadFile1 extends Command
 {
@@ -38,13 +37,12 @@ class ReadFile1 extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
-        // new PrognosisExport($this->argument('configfile'));
+        // This command is deprecated - PrognosisExport1 class no longer exists
+        $this->error('This command is deprecated. Please use ReadFile2 instead.');
 
-        Excel::store(new PrognosisExport1($this->argument('configfile')), $this->argument('exportfile'));
+        return self::FAILURE;
     }
 }
