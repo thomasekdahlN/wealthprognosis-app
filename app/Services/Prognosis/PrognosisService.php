@@ -58,9 +58,6 @@ class PrognosisService
     /** @var array<string, mixed> */
     public array $statisticsH = [];
 
-    /** @var array<string, bool> */
-    private array $assetTypeShowStatisticsMap = [];
-
     public object $postProcessor;
 
     private AssetTypeService $assetTypeService;
@@ -87,9 +84,6 @@ class PrognosisService
         $this->thisYear = now()->year;
         $this->deathYear = (int) $this->birthYear + Arr::get($this->config, 'meta.deathAge');
         // dd($this->config);
-
-        // Preload asset type statistics visibility flags (now using AssetTypeService)
-        $this->assetTypeShowStatisticsMap = [];
 
         foreach ($this->config as $assetname => $assetconfig) {
 
@@ -377,7 +371,6 @@ class PrognosisService
                     - $assetTaxPropertyAmount // Minus eiendomsskatt
                     - $this->ArrGet("$path.mortgage.termAmount"); // Minus terminbetaling på lånet
 
-
                 Log::info('Cashflow calculation result', [
                     'asset' => $assetname,
                     'year' => $year,
@@ -660,7 +653,8 @@ class PrognosisService
 
     protected function isShownInStatistics(string $assetType): bool
     {
-        return (bool) ($this->assetTypeShowStatisticsMap[$assetType] ?? false);
+        // Use AssetTypeService to check if asset type should be shown in statistics
+        return $this->assetTypeService->isShownInStatistics($assetType);
     }
 
     // Transferes the amount to another asset. This actualle has to change variables like assetEquityAmount, assetPaidAmount, realizationShieldAmount etc. Others are only simulations, not happening.

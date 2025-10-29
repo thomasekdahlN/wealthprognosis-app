@@ -135,7 +135,7 @@ class PrognosisExport2
         }
 
         // Decode JSON
-        $this->config = json_decode($content, true);
+        $decodedConfig = json_decode($content, true);
 
         // Validate JSON
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -152,13 +152,16 @@ class PrognosisExport2
             throw new \InvalidArgumentException("Invalid JSON in file {$configfile}: ".json_last_error_msg());
         }
 
-        if (! is_array($this->config)) {
+        if (! is_array($decodedConfig)) {
             $errorMsg = "\n❌ ERROR: JSON content must be an object/array!\n";
             $errorMsg .= "   File: {$configfile}\n";
             $errorMsg .= "   The JSON file must contain a valid configuration object.\n\n";
             echo $errorMsg;
             throw new \InvalidArgumentException("JSON content must be an object/array in file: {$configfile}");
         }
+
+        // Only assign to typed property after validation
+        $this->config = $decodedConfig;
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->country = (int) Arr::get($this->config, 'meta.country');
