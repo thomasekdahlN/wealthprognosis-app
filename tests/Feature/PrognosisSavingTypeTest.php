@@ -32,16 +32,9 @@ beforeEach(function () {
 });
 
 it('uses asset_types.is_saving instead of hardcoded list', function () {
-    // Minimal config with only meta so constructor does not iterate assets
-    $config = [
-        'meta' => [
-            'birthYear' => 1990,
-            'deathYear' => 90,
-        ],
-    ];
-
-    // Prognosis gets all singletons (Tax, Changerate, Helper, Rules) from service container
-    $prognosis = new TestablePrognosis($config);
+    // Get AssetTypeService from service container
+    $assetTypeService = app(\App\Services\AssetTypeService::class);
+    $prognosis = new TestablePrognosis($assetTypeService);
 
     expect($prognosis->isSavingPublic('equityfund'))->toBeTrue();
     expect($prognosis->isSavingPublic('house'))->toBeFalse();

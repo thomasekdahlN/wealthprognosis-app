@@ -2,12 +2,16 @@
 
 namespace Tests\Helpers;
 
-use App\Services\Prognosis\PrognosisService;
+use App\Services\AssetTypeService;
 
-class TestablePrognosis extends PrognosisService
+class TestablePrognosis
 {
+    public function __construct(
+        private AssetTypeService $assetTypeService
+    ) {}
+
     public function isSavingPublic(string $assetType): bool
     {
-        return $this->isSavingType($assetType);
+        return $this->assetTypeService->isSavingType($assetType);
     }
 }

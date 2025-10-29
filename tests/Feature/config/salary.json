@@ -23,14 +23,22 @@
       "active": true,
       "debug": true
     },
-    "2025": {
+    "2024": {
       "income": {
         "name": "Income",
         "description": "Income",
         "amount": 1650000,
         "changerate": "changerates.kpi",
         "repeat": true
-      }
+      },
+        "expence": {
+            "name": "Expences",
+            "description": "Expences",
+            "amount": 10000,
+            "factor": "monthly",
+            "changerate": "changerates.kpi",
+            "repeat": true
+        }
     },
     "$pensionWishAge": {
       "income": {
