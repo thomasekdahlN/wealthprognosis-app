@@ -1,0 +1,164 @@
+{
+  "house": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 25
+  },
+  "none": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 0
+  },
+  "cabin": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 30
+  },
+  "airbnb": {
+    "standardDeduction": 10000,
+    "income": 22,
+    "realization": 0,
+    "fortune": 0
+  },
+  "rental": {
+    "income": 22,
+    "realization": 22,
+    "fortune": 100
+  },
+  "stock": {
+    "income": 0,
+    "realization": 37.84,
+    "fortune": 80
+  },
+  "soleproprietorship": {
+    "income": 0,
+    "realization": 37.84,
+    "fortune": 80
+  },
+  "loantocompany": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 0
+  },
+  "salary": {
+    "common": {
+      "percent": 22
+    },
+    "deduction": {
+      "min": 4000,
+      "max": 95700,
+      "percent": 44
+    },
+    "socialsecurity": {
+      "percent": 7.7
+    },
+    "bracket": [
+      {
+        "limit": 226100,
+        "percent": 0
+      },
+      {
+        "limit": 318300,
+        "percent": 1.7
+      },
+      {
+        "limit": 725050,
+        "percent": 4
+      },
+      {
+        "limit": 980100,
+        "percent": 13.7
+      },
+      {
+        "limit": 1467200,
+        "percent": 16.7
+      },
+      {
+        "percent": 17.7
+      }
+    ]
+  },
+  "ips": {
+    "income": 22,
+    "realization": 0,
+    "fortune": 0
+  },
+  "equityfund": {
+    "income": 0,
+    "realization": 37.84,
+    "fortune": 80
+  },
+  "bondfund": {
+    "income": 0,
+    "realization": 22,
+    "fortune": 80
+  },
+  "ask": {
+    "income": 0,
+    "realization": 37.84,
+    "fortune": 80
+  },
+  "gold": {
+    "income": 0,
+    "realization": 22,
+    "fortune": 100
+  },
+  "crypto": {
+    "income": 0,
+    "realization": 22,
+    "fortune": 100
+  },
+  "otp": {
+    "income": 0,
+    "realization": 22,
+    "fortune": 0
+  },
+  "income": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 100
+  },
+  "inheritance": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 100
+  },
+  "car": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 100
+  },
+  "boat": {
+    "income": 0,
+    "realization": 0,
+    "fortune": 100
+  },
+  "cash": {
+    "income": 22,
+    "realization": 0,
+    "fortune": 100
+  },
+  "bank": {
+    "income": 22,
+    "realization": 0,
+    "fortune": 100
+  },
+  "fortune": {
+    "bracket": [
+      {
+        "limit": 1900000,
+        "percent": 0
+      },
+      {
+        "limit": 21500000,
+        "percent": 1
+      },
+      {
+        "percent": 1.1
+      }
+    ]
+  },
+  "shareholdershield": {
+    "percent": 3.2
+  }
+}
