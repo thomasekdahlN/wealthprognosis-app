@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TaxConfigurations\Widgets;
 
 use App\Models\TaxConfiguration;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class TaxRateTrendWidget extends ChartWidget
@@ -15,8 +16,13 @@ class TaxRateTrendWidget extends ChartWidget
 
     public string $taxType = '';
 
+    public ?TaxConfiguration $record = null;
+
     public function mount(array $properties = []): void
     {
+        if (isset($properties['record'])) {
+            $this->record = $properties['record'];
+        }
         if (isset($properties['country'])) {
             $this->country = (string) $properties['country'];
         }
@@ -76,26 +82,9 @@ class TaxRateTrendWidget extends ChartWidget
         $datasets = [];
 
         // Check if we have any non-zero values for each rate type
-        $hasStandardDeduction = $rows->some(fn ($row) => isset($row->configuration['standardDeduction']) && (float) $row->configuration['standardDeduction'] > 0);
         $hasIncome = $rows->some(fn ($row) => isset($row->configuration['income']) && (float) $row->configuration['income'] > 0);
         $hasRealization = $rows->some(fn ($row) => isset($row->configuration['realization']) && (float) $row->configuration['realization'] > 0);
         $hasFortune = $rows->some(fn ($row) => isset($row->configuration['fortune']) && (float) $row->configuration['fortune'] > 0);
-
-        // Standard Deduction
-        if ($hasStandardDeduction) {
-            /** @var \Illuminate\Support\Collection<int, float> $dataCollection */
-            $dataCollection = $rows->pluck('configuration')->map(fn ($cfg) => (float) ($cfg['standardDeduction'] ?? 0))->values();
-            $datasets[] = [
-                'label' => 'Standard Deduction %',
-                'data' => $dataCollection->all(),
-                'borderColor' => '#8b5cf6', // Purple
-                'backgroundColor' => 'rgba(139, 92, 246, 0.1)',
-                'tension' => 0.2,
-                'fill' => false,
-                'pointRadius' => 3,
-                'pointHoverRadius' => 5,
-            ];
-        }
 
         // Income Tax
         if ($hasIncome) {
@@ -171,9 +160,19 @@ class TaxRateTrendWidget extends ChartWidget
      */
     private function resolveContext(): array
     {
+        // First, try to use the record passed to the widget
+        if ($this->record !== null) {
+            return [
+                (string) $this->record->country_code,
+                (string) $this->record->tax_type,
+            ];
+        }
+
+        // Fall back to properties
         $country = $this->country ?? (string) (request()->route('country') ?? '');
         $taxType = $this->taxType ?? '';
 
+        // Finally, try route parameters
         if ($taxType === '') {
             $recordParam = request()->route('record');
             if ($recordParam) {
@@ -196,43 +195,52 @@ class TaxRateTrendWidget extends ChartWidget
         return 'line';
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): RawJs
     {
-        return [
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'bottom',
-                ],
-                'tooltip' => [
-                    'mode' => 'index',
-                    'intersect' => false,
-                    'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y + "%"; }',
-                    ],
-                ],
-            ],
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Tax Rate %',
-                    ],
-                    'ticks' => [
-                        'callback' => 'function(value) { return value + "%"; }',
-                    ],
-                ],
-                'x' => [
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Year',
-                    ],
-                ],
-            ],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Tax Rate %'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    }
+                }
+            }
+        JS);
     }
 }
-

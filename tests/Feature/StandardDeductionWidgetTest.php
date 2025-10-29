@@ -169,4 +169,3 @@ it('generates correct heading with tax type and country', function () {
     expect($heading)->toContain('Airbnb')
         ->and($heading)->toContain('NO');
 });
-

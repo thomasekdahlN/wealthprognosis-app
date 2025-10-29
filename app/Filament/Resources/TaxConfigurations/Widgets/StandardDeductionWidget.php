@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TaxConfigurations\Widgets;
 
 use App\Models\TaxConfiguration;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class StandardDeductionWidget extends ChartWidget
@@ -80,7 +81,7 @@ class StandardDeductionWidget extends ChartWidget
         // Check if we have any non-zero values for standard deduction
         $hasStandardDeduction = $rows->some(fn ($row) => isset($row->configuration['standardDeduction']) && (float) $row->configuration['standardDeduction'] > 0);
 
-        if (!$hasStandardDeduction) {
+        if (! $hasStandardDeduction) {
             return [
                 'datasets' => [[
                     'label' => 'No standard deduction data available',
@@ -152,43 +153,52 @@ class StandardDeductionWidget extends ChartWidget
         return 'line';
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): RawJs
     {
-        return [
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'bottom',
-                ],
-                'tooltip' => [
-                    'mode' => 'index',
-                    'intersect' => false,
-                    'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y.toLocaleString("no-NO"); }',
-                    ],
-                ],
-            ],
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Amount',
-                    ],
-                    'ticks' => [
-                        'callback' => 'function(value) { return value.toLocaleString("no-NO"); }',
-                    ],
-                ],
-                'x' => [
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Year',
-                    ],
-                ],
-            ],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toLocaleString('nb-NO');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('nb-NO');
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    }
+                }
+            }
+        JS);
     }
 }
-

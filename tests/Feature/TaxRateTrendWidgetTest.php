@@ -2,11 +2,18 @@
 
 use App\Filament\Resources\TaxConfigurations\Widgets\TaxRateTrendWidget;
 use App\Models\TaxConfiguration;
+use App\Models\TaxType;
 use App\Models\User;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user);
+
+    // Create tax types that will be referenced by tax configurations
+    TaxType::create(['type' => 'salary', 'name' => 'Salary', 'is_active' => true, 'sort_order' => 1]);
+    TaxType::create(['type' => 'stock', 'name' => 'Stock', 'is_active' => true, 'sort_order' => 2]);
+    TaxType::create(['type' => 'equityfund', 'name' => 'Equity Fund', 'is_active' => true, 'sort_order' => 3]);
+    TaxType::create(['type' => 'bondfund', 'name' => 'Bond Fund', 'is_active' => true, 'sort_order' => 4]);
 });
 
 it('can instantiate the tax rate trend widget', function () {
@@ -65,7 +72,7 @@ it('displays tax rate trends for a specific country and tax type', function () {
     expect($data)->toHaveKey('datasets')
         ->and($data)->toHaveKey('labels')
         ->and($data['labels'])->toBe(['2023', '2024', '2025'])
-        ->and($data['datasets'])->toHaveCount(2); // standardDeduction and income
+        ->and($data['datasets'])->toHaveCount(1); // Only income (standardDeduction moved to separate widget)
 });
 
 it('shows only non-zero tax rate types', function () {
@@ -111,7 +118,7 @@ it('shows only non-zero tax rate types', function () {
         ->and($labels)->not->toContain('Realization Tax %');
 });
 
-it('displays all four tax rate types when present', function () {
+it('displays all three tax rate types when present', function () {
     TaxConfiguration::factory()->create([
         'country_code' => 'no',
         'year' => 2023,
@@ -144,13 +151,13 @@ it('displays all four tax rate types when present', function () {
     $method->setAccessible(true);
     $data = $method->invoke($widget);
 
-    expect($data['datasets'])->toHaveCount(4); // All four types
+    expect($data['datasets'])->toHaveCount(3); // Income, Realization, Fortune (standardDeduction moved to separate widget)
 
     $labels = array_column($data['datasets'], 'label');
-    expect($labels)->toContain('Standard Deduction %')
-        ->and($labels)->toContain('Income Tax %')
+    expect($labels)->toContain('Income Tax %')
         ->and($labels)->toContain('Realization Tax %')
-        ->and($labels)->toContain('Fortune Tax %');
+        ->and($labels)->toContain('Fortune Tax %')
+        ->and($labels)->not->toContain('Standard Deduction %');
 });
 
 it('handles missing context gracefully', function () {
@@ -198,7 +205,7 @@ it('resolves context from route parameters', function () {
     request()->setRouteResolver(function () use ($taxConfig) {
         $route = Mockery::mock(\Illuminate\Routing\Route::class);
         $route->shouldReceive('parameter')->with('country')->andReturn('no');
-        $route->shouldReceive('parameter')->with('record')->andReturn($taxConfig);
+        $route->shouldReceive('parameter')->with('record', null)->andReturn($taxConfig);
 
         return $route;
     });
@@ -219,4 +226,3 @@ it('generates correct heading with tax type and country', function () {
     expect($heading)->toContain('Equity fund')
         ->and($heading)->toContain('NO');
 });
-
