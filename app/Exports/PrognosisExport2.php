@@ -306,9 +306,22 @@ class PrognosisExport2
         ];
         \App\Services\ExcelFormatting::applyCommonAssetSheetFormatting($sheet, $meta);
 
+        // Set auto-size for all columns
         for ($column = 1; $column <= 34 + 6; $column++) {
             $sheet->getColumnDimensionByColumn($column)->setAutoSize(true);
         }
+
+        // Column AN (40) = FIRE Sparing
+        // Column AO (41) = FIRE Cashflow - should be same width as AN
+        // Column AQ (43) = Description - auto-sized
+
+        // First, let Excel calculate the auto-size width for column AN
+        $sheet->calculateColumnWidths();
+        $anWidth = $sheet->getColumnDimension('AN')->getWidth();
+
+        // Set AO to same width as AN
+        $sheet->getColumnDimension('AO')->setAutoSize(false);
+        $sheet->getColumnDimension('AO')->setWidth($anWidth);
 
         $verticaloffsett = 6;
 
