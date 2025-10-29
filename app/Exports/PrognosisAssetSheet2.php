@@ -237,9 +237,10 @@ class PrognosisAssetSheet2
 
             $this->worksheet->setCellValue("AN$this->rows", Arr::get($data, 'fire.savingAmount'));
 
-            $this->worksheet->setCellValue("AO$this->rows", Arr::get($data, 'fire.cashFlow'));
-            if (Arr::get($data, 'fire.savingRateDecimal') != 0) {
-                $this->worksheet->setCellValue("AP$this->rows", $this->percentToExcel(Arr::get($data, 'fire.savingRateDecimal')));
+            $this->worksheet->setCellValue("AO$this->rows", Arr::get($data, 'fire.cashFlowAmount'));
+            if (Arr::get($data, 'fire.savingRate') != 0) {
+                // fire.savingRate is already a decimal (e.g., 1.0 for 100%), so don't use percentToExcel()
+                $this->worksheet->setCellValue("AP$this->rows", Arr::get($data, 'fire.savingRate'));
             }
             $this->worksheet->setCellValue("AQ$this->rows", Arr::get($data, 'income.description').Arr::get($data, 'expence.description').Arr::get($data, 'cashflow.description').Arr::get($data, 'asset.description').Arr::get($data, 'realization.description').Arr::get($data, 'mortgage.description'));
 

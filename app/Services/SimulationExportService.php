@@ -187,9 +187,13 @@ class SimulationExportService
                     'mortgageAmount' => 0,
                 ],
                 'fire' => [
+                    'incomeAmount' => 0,
+                    'expenceAmount' => 0,
+                    'cashFlowAmount' => 0,
                     'savingAmount' => 0,
-                    'cashFlow' => 0,
-                    'savingRateDecimal' => 0,
+                    'rate' => 0,
+                    'percent' => 0,
+                    'savingRate' => 0,
                 ],
             ];
         }
