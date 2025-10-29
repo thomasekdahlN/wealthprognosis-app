@@ -86,8 +86,6 @@ class TaxTypeSeeder extends Seeder
             TaxType::updateOrCreate(
                 ['type' => $taxType['type']],
                 $taxType + [
-                    'user_id' => $user->id,
-                    'team_id' => $team->id,
                     'created_by' => $user->id,
                     'updated_by' => $user->id,
                     'created_checksum' => hash('sha256', 'tax_type_created_'.$taxType['type']),

@@ -107,8 +107,6 @@ class TaxConfigurationSeeder extends Seeder
                             'tax_type' => $taxTypeKey,
                         ],
                         [
-                            'user_id' => $user->id,
-                            'team_id' => $team->id,
                             'created_by' => $user->id,
                             'updated_by' => $user->id,
                             'created_checksum' => hash('sha256', 'tax_config_created_'.$countryCode.'_'.$year.'_'.$assetType.'_'.$municipality),
@@ -144,8 +142,6 @@ class TaxConfigurationSeeder extends Seeder
                     'tax_type' => $taxTypeKey,
                 ],
                 [
-                    'user_id' => $user->id,
-                    'team_id' => $team->id,
                     'created_by' => $user->id,
                     'updated_by' => $user->id,
                     'created_checksum' => hash('sha256', 'tax_config_created_'.$countryCode.'_'.$year.'_'.$assetType),

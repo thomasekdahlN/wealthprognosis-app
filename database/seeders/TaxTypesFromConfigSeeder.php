@@ -49,8 +49,6 @@ class TaxTypesFromConfigSeeder extends Seeder
             TaxType::updateOrCreate(
                 ['type' => $type],
                 [
-                    'user_id' => $user->id,
-                    'team_id' => $team->id,
                     'name' => $name === '' ? $type : $name,
                     'description' => $description,
                     'is_active' => true,
