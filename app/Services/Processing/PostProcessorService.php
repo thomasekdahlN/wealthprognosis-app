@@ -41,7 +41,6 @@ class PostProcessorService
      * @param  int  $economyStartYear  Start year for economy calculations
      * @param  int  $deathYear  End year for calculations
      * @param  int  $thisYear  Current year
-     * @param  array<string, bool>  $assetTypeSavingMap  Map of asset types that count as savings
      * @param  callable  $isShownInStatistics  Callback to check if type should be shown in statistics
      */
     public function process(
@@ -54,11 +53,10 @@ class PostProcessorService
         int $economyStartYear,
         int $deathYear,
         int $thisYear,
-        array $assetTypeSavingMap,
         callable $isShownInStatistics
     ): void {
         // Step 1: Process yearly data for each asset
-        $this->processYearlyData($dataH, $economyStartYear, $deathYear, $thisYear, $assetTypeSavingMap);
+        $this->processYearlyData($dataH, $economyStartYear, $deathYear, $thisYear);
 
         // Step 2: Group and aggregate data
         $this->processGroupData(
@@ -81,14 +79,12 @@ class PostProcessorService
      * @param  int  $economyStartYear  Start year for economy calculations
      * @param  int  $deathYear  End year for calculations
      * @param  int  $thisYear  Current year
-     * @param  array  $assetTypeSavingMap  Map of asset types that count as savings
      */
     private function processYearlyData(
         array &$dataH,
         int $economyStartYear,
         int $deathYear,
-        int $thisYear,
-        array $assetTypeSavingMap
+        int $thisYear
     ): void {
         foreach ($dataH as $assetname => $assetH) {
             $meta = $assetH['meta'];
@@ -99,15 +95,12 @@ class PostProcessorService
             for ($year = $economyStartYear; $year <= $deathYear; $year++) {
                 $datapath = "$assetname.$year";
 
-                $this->yearlyProcessor->processIncomeYearly($dataH, $datapath);
-                $this->yearlyProcessor->processExpenceYearly($dataH, $datapath);
-                $this->yearlyProcessor->processFortuneTaxYearly($dataH, $datapath, $thisYear);
+                $this->yearlyProcessor->processFortuneTaxYearly($dataH, $datapath, $thisYear); //Has to run before cashflow.
                 $this->yearlyProcessor->processCashFlowYearly($dataH, $datapath, $thisYear);
                 $this->yearlyProcessor->processAssetYearly($dataH, $datapath);
-                $this->yearlyProcessor->processRealizationYearly($dataH, $datapath);
                 $this->yearlyProcessor->processPotentialYearly($dataH, $datapath);
                 $this->yearlyProcessor->processYieldYearly($dataH, $datapath);
-                $this->yearlyProcessor->processFireYearly($dataH, $assetname, $year, $meta, $assetTypeSavingMap);
+                $this->yearlyProcessor->processFireYearly($dataH, $assetname, $year, $meta);
             }
         }
     }
