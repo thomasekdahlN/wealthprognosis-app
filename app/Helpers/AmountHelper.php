@@ -3,14 +3,29 @@
 namespace App\Helpers;
 
 use Filament\Support\RawJs;
+use NumberFormatter;
 
 class AmountHelper
 {
     /**
-     * Format amount using Norwegian number formatting
+     * Get the Norwegian locale string for NumberFormatter
+     */
+    public static function getNorwegianLocale(): string
+    {
+        return 'nb_NO';
+    }
+
+    /**
+     * Format amount using Norwegian number formatting via NumberFormatter
+     * - Uses PHP's NumberFormatter (same as Filament's money() method)
      * - Space as thousand separator
-     * - No decimals
+     * - Comma as decimal separator
+     * - Configurable decimal places
      * - Hide zero values
+     *
+     * @param  float|null  $amount  The amount to format
+     * @param  int  $decimals  Number of decimal places (default: 0)
+     * @return string Formatted amount or empty string for null/zero
      */
     public static function formatNorwegian(?float $amount, int $decimals = 0): string
     {
@@ -18,14 +33,21 @@ class AmountHelper
             return '';
         }
 
-        return number_format((float) $amount, $decimals, ',', ' ');
+        $formatter = new NumberFormatter(self::getNorwegianLocale(), NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $decimals);
+
+        return $formatter->format($amount);
     }
 
     /**
-     * Format integer using Norwegian number formatting
+     * Format integer using Norwegian number formatting via NumberFormatter
+     * - Uses PHP's NumberFormatter (same as Filament's money() method)
      * - Space as thousand separator
      * - No decimals for integers like years, counts
      * - Hide zero values
+     *
+     * @param  int|null  $amount  The integer to format
+     * @return string Formatted integer or empty string for null/zero
      */
     public static function formatNorwegianInteger(?int $amount): string
     {
@@ -33,7 +55,10 @@ class AmountHelper
             return '';
         }
 
-        return number_format((int) $amount, 0, ',', ' ');
+        $formatter = new NumberFormatter(self::getNorwegianLocale(), NumberFormatter::DECIMAL);
+        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
+
+        return $formatter->format($amount);
     }
 
     /**
@@ -101,13 +126,5 @@ class AmountHelper
         $numericValue = str_replace([' ', ','], ['', '.'], $formattedAmount);
 
         return is_numeric($numericValue) ? (float) $numericValue : null;
-    }
-
-    /**
-     * Get Norwegian locale for Filament numeric() method
-     */
-    public static function getNorwegianLocale(): string
-    {
-        return 'nb_NO';
     }
 }
