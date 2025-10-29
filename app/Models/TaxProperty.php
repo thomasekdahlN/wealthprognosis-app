@@ -31,8 +31,6 @@ class TaxProperty extends Model
         'deduction',
         'fortune_taxable_percent',
         'is_active',
-        'user_id',
-        'team_id',
         'created_by',
         'updated_by',
         'created_checksum',

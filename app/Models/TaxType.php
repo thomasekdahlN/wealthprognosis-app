@@ -19,8 +19,6 @@ class TaxType extends Model
     use Auditable, HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'team_id',
         'type',
         'name',
         'description',

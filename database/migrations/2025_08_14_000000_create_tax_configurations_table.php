@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::create('tax_configurations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('country_code', 2);
             $table->integer('year');
             $table->string('tax_type');
@@ -22,15 +20,14 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->json('configuration')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->string('created_checksum')->nullable();
             $table->string('updated_checksum')->nullable();
             $table->timestamps();
 
             $table->unique(['country_code', 'year', 'tax_type']);
             $table->index(['country_code', 'year']);
-            $table->index(['user_id', 'team_id']);
             $table->index(['tax_type', 'is_active']);
         });
     }

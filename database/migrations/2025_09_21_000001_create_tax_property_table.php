@@ -22,10 +22,8 @@ return new class extends Migration
             $table->decimal('fortune_taxable_percent', 5, 2)->nullable(); // percentage of property value taxable for wealth tax, e.g. 70.00 for 70%
 
             $table->boolean('is_active')->default(true);
-            $table->foreignId('user_id')->nullable()->constrained();
-            $table->foreignId('team_id')->nullable()->constrained();
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->string('created_checksum')->nullable();
             $table->string('updated_checksum')->nullable();
             $table->timestamps();

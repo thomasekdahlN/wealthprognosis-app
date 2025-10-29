@@ -46,8 +46,6 @@ class TaxConfiguration extends Model
         'description',
         'is_active',
         'configuration',
-        'user_id',
-        'team_id',
         'created_by',
         'updated_by',
         'created_checksum',
