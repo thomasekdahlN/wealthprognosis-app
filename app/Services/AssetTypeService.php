@@ -38,6 +38,12 @@ class AssetTypeService
     /** @var array<string, array<string, bool>> */
     private array $capabilityCache = [];
 
+    /** @var array<string, string> */
+    private array $taxTypeMap = [];
+
+    /** @var array<string, array<string, mixed>> */
+    private array $assetTypeCache = [];
+
     /**
      * Constructor - preloads commonly used maps to avoid repeated DB queries
      */
@@ -63,11 +69,16 @@ class AssetTypeService
             $this->showStatisticsMap = AssetType::query()
                 ->pluck('show_statistics', 'type')
                 ->toArray();
+
+            $this->taxTypeMap = AssetType::query()
+                ->pluck('tax_type', 'type')
+                ->toArray();
         } catch (\Throwable $e) {
             // Fallback for CLI/testing environments where DB might not be available
             $this->liquidMap = [];
             $this->savingMap = [];
             $this->showStatisticsMap = [];
+            $this->taxTypeMap = [];
         }
     }
 
@@ -170,6 +181,66 @@ class AssetTypeService
     }
 
     /**
+     * Get the tax type for an asset type
+     *
+     * @param  string  $assetType  The asset type code
+     * @return string The tax type code (defaults to 'none' if not found)
+     */
+    public function getTaxType(string $assetType): string
+    {
+        return $this->taxTypeMap[$assetType] ?? 'none';
+    }
+
+    /**
+     * Get full asset type model with relationships (cached)
+     *
+     * @param  string  $assetType  The asset type code
+     * @return AssetType|null The asset type model or null if not found
+     */
+    public function getAssetType(string $assetType): ?AssetType
+    {
+        // Return from cache if available
+        if (isset($this->assetTypeCache[$assetType])) {
+            return $this->assetTypeCache[$assetType];
+        }
+
+        // Fetch from database with relationships
+        $assetTypeModel = AssetType::where('type', $assetType)
+            ->with('taxType')
+            ->first();
+
+        // Cache the result (even if null)
+        $this->assetTypeCache[$assetType] = $assetTypeModel;
+
+        return $assetTypeModel;
+    }
+
+    /**
+     * Get default changerates for an asset type
+     *
+     * @param  string  $assetType  The asset type code
+     * @return array{income_changerate: string|null, expence_changerate: string|null, asset_changerate: string|null}
+     */
+    public function getDefaultChangerates(string $assetType): array
+    {
+        $assetTypeModel = $this->getAssetType($assetType);
+
+        if (! $assetTypeModel) {
+            return [
+                'income_changerate' => null,
+                'expence_changerate' => null,
+                'asset_changerate' => null,
+            ];
+        }
+
+        return [
+            'income_changerate' => $assetTypeModel->income_changerate,
+            'expence_changerate' => $assetTypeModel->expence_changerate,
+            'asset_changerate' => $assetTypeModel->asset_changerate,
+        ];
+    }
+
+    /**
      * Clear all caches (useful after seeding/migrations)
      */
     public function clearCache(): void
@@ -177,8 +248,9 @@ class AssetTypeService
         $this->liquidMap = [];
         $this->savingMap = [];
         $this->showStatisticsMap = [];
+        $this->taxTypeMap = [];
         $this->capabilityCache = [];
+        $this->assetTypeCache = [];
         $this->preloadMaps();
     }
 }
-

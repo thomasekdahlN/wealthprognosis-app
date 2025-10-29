@@ -32,11 +32,14 @@ class AssetImportService
 
     protected HelperService $helper;
 
+    protected AssetTypeService $assetTypeService;
+
     public function __construct(?User $user = null, ?int $teamId = null)
     {
         $this->user = $user ?? Auth::user();
         $this->teamId = $teamId ?? $this->user?->current_team_id;
         $this->helper = app(HelperService::class);
+        $this->assetTypeService = app(AssetTypeService::class);
     }
 
     /**
@@ -377,17 +380,15 @@ class AssetImportService
         ];
 
         // Inherit default changerates from asset type if missing
-        $assetType = \App\Models\AssetType::where('type', $asset->asset_type)->first();
-        if ($assetType) {
-            if (! isset($data['income_changerate'])) {
-                $data['income_changerate'] = $assetType->income_changerate;
-            }
-            if (! isset($data['expence_changerate'])) {
-                $data['expence_changerate'] = $assetType->expence_changerate;
-            }
-            if (! isset($data['asset_changerate'])) {
-                $data['asset_changerate'] = $assetType->asset_changerate;
-            }
+        $defaultChangerates = $this->assetTypeService->getDefaultChangerates($asset->asset_type);
+        if (! isset($data['income_changerate'])) {
+            $data['income_changerate'] = $defaultChangerates['income_changerate'];
+        }
+        if (! isset($data['expence_changerate'])) {
+            $data['expence_changerate'] = $defaultChangerates['expence_changerate'];
+        }
+        if (! isset($data['asset_changerate'])) {
+            $data['asset_changerate'] = $defaultChangerates['asset_changerate'];
         }
 
         // Create the asset year

@@ -137,6 +137,9 @@ class GroupProcessor
     /**
      * Calculate FIRE saving rate for groups.
      *
+     * Savings rate = savingAmount / incomeAmount
+     * This represents what percentage of income is being saved.
+     *
      * @param  array  $totalH  Reference to total group data
      * @param  array  $companyH  Reference to company group data
      * @param  array  $privateH  Reference to private group data
@@ -144,16 +147,19 @@ class GroupProcessor
      */
     public function calculateFireSaveRate(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
-        if (Arr::get($totalH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($totalH, "$year.fire.savingRate", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.savingAmount", 0));
+        $totalIncome = Arr::get($totalH, "$year.fire.incomeAmount", 0);
+        if ($totalIncome > 0) {
+            Arr::set($totalH, "$year.fire.savingRate", Arr::get($totalH, "$year.fire.savingAmount", 0) / $totalIncome);
         }
 
-        if (Arr::get($companyH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($companyH, "$year.fire.savingRate", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.savingAmount", 0));
+        $companyIncome = Arr::get($companyH, "$year.fire.incomeAmount", 0);
+        if ($companyIncome > 0) {
+            Arr::set($companyH, "$year.fire.savingRate", Arr::get($companyH, "$year.fire.savingAmount", 0) / $companyIncome);
         }
 
-        if (Arr::get($privateH, "$year.fire.savingAmount", 0) > 0) {
-            Arr::set($privateH, "$year.fire.savingRate", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.savingAmount", 0));
+        $privateIncome = Arr::get($privateH, "$year.fire.incomeAmount", 0);
+        if ($privateIncome > 0) {
+            Arr::set($privateH, "$year.fire.savingRate", Arr::get($privateH, "$year.fire.savingAmount", 0) / $privateIncome);
         }
     }
 

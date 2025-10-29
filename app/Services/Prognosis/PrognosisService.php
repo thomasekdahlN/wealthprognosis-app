@@ -16,7 +16,7 @@
 
 namespace App\Services\Prognosis;
 
-use App\Models\AssetType;
+use App\Services\AssetTypeService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -58,33 +58,12 @@ class PrognosisService
     /** @var array<string, mixed> */
     public array $statisticsH = [];
 
-    public bool $debug = false;
-
-    // FIX: Kanskje feil å regne inn otp her? Der kan man jo ikke velge.
-    // Assets som man kan selge deler av hvert år for å finansiere FIRE. Huset ditt kan du f.eks ikke selge deler av. Dette brukes for å beregne potensiell inntekt fra salg av disse assets.
-
-    // Dette er de asssett typene som regnes som inntekt i FIRE. Nedbetaling av lån regnes ikke som inntekt.
-    // Replaced hardcoded list with DB-backed lookup from asset_types.is_saving.
-    /** @var array<string, bool> */
-    private array $assetTypeSavingMap = [];
-
-    // Asset types visibility for statistics is loaded from DB (asset_types.show_statistics)
     /** @var array<string, bool> */
     private array $assetTypeShowStatisticsMap = [];
 
-    public object $helper;
-
-    public object $rules;
-
     public object $postProcessor;
 
-    public object $taxincome;
-
-    public object $taxfortune;
-
-    public object $taxrealization;
-
-    public int $birthYear;
+    private AssetTypeService $assetTypeService;
 
     /**
      * @param  array<string, mixed>  $config
@@ -101,6 +80,7 @@ class PrognosisService
         $this->helper = app(\App\Services\Utilities\HelperService::class);
         $this->rules = app(\App\Services\Utilities\RulesService::class);
         $this->postProcessor = app(\App\Services\Processing\PostProcessorService::class);
+        $this->assetTypeService = app(AssetTypeService::class);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
@@ -108,20 +88,8 @@ class PrognosisService
         $this->deathYear = (int) $this->birthYear + Arr::get($this->config, 'meta.deathAge');
         // dd($this->config);
 
-        // Preload asset type saving flags to avoid repeated DB lookups
-        try {
-            $this->assetTypeSavingMap = AssetType::query()->pluck('is_saving', 'type')->toArray();
-        } catch (\Throwable $e) {
-            // In case database is not available (e.g., during certain CLI runs), default to empty map
-            $this->assetTypeSavingMap = [];
-        }
-
-        // Preload asset type statistics visibility flags
-        try {
-            $this->assetTypeShowStatisticsMap = AssetType::query()->pluck('show_statistics', 'type')->toArray();
-        } catch (\Throwable $e) {
-            $this->assetTypeShowStatisticsMap = [];
-        }
+        // Preload asset type statistics visibility flags (now using AssetTypeService)
+        $this->assetTypeShowStatisticsMap = [];
 
         foreach ($this->config as $assetname => $assetconfig) {
 
@@ -395,18 +363,20 @@ class PrognosisService
 
                 $cashflowBeforeTaxAmount =
                     $incomeAmount
-                    - $expenceAmount
-                    + $this->ArrGet("$path.income.transferedAmount");
+                    + $this->ArrGet("$path.income.transferedAmount")
+                    - $expenceAmount // cashflow basis = inntekt - utgift.
+                    - $this->ArrGet("$path.mortgage.termAmount"); // Minus terminbetaling på lånet
 
                 $cashflowAfterTaxAmount =
                     $incomeAmount
+                    + $this->ArrGet("$path.mortgage.taxDeductableAmount") // Plus skattefradrag på renter
+                    + $this->ArrGet("$path.income.transferedAmount")
                     - $expenceAmount // cashflow basis = inntekt - utgift.
                     - $cashflowTaxAmount // Minus skatt på cashflow (Kan være både positiv og negativ)
                     - $assetTaxFortuneAmount // Minus formuesskatt
                     - $assetTaxPropertyAmount // Minus eiendomsskatt
-                    - $this->ArrGet("$path.mortgage.termAmount") // Minus terminbetaling på lånet
-                    + $this->ArrGet("$path.mortgage.taxDeductableAmount") // Plus skattefradrag på renter
-                    + $this->ArrGet("$path.income.transferedAmount");
+                    - $this->ArrGet("$path.mortgage.termAmount"); // Minus terminbetaling på lånet
+
 
                 Log::info('Cashflow calculation result', [
                     'asset' => $assetname,
@@ -419,9 +389,6 @@ class PrognosisService
                     'cashflow_after_tax_amount' => $cashflowAfterTaxAmount,
                     'transferred_amount' => $this->ArrGet("$path.income.transferedAmount"),
                 ]);
-                if (app()->runningInConsole()) {
-                    echo "$assetname.$year.income.incomeAmount:$incomeAmount,expenceAmount:$expenceAmount,interestAmount:$interestAmount, cashflowTaxAmount:$cashflowTaxAmount, cashflowBeforeTaxAmount:$cashflowBeforeTaxAmount, cashflowAfterTaxAmount: $cashflowAfterTaxAmount, transferedAmount; ".$this->ArrGet("$path.income.transferedAmount")."\n";
-                }
 
                 $cashflowNewRule = null;
                 if ($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
@@ -554,7 +521,6 @@ class PrognosisService
             $this->economyStartYear,
             $this->deathYear,
             $this->thisYear,
-            $this->assetTypeSavingMap,
             fn ($type) => $this->isShownInStatistics($type)
         );
         // print_r($this->dataH);
@@ -692,29 +658,6 @@ class PrognosisService
         return [$newAmount, $diffAmount, $taxShieldAmount, $rule, $explanation]; // Rule is adjusted if it is a divisor, it has to be remembered to the next round
     }
 
-    /**
-     * Check if an asset type is liquid (can be sold in parts for FIRE)
-     * Uses the is_liquid parameter from the asset_types table
-     *
-     * @param  string  $assetType  The asset type code to check
-     * @return bool True if the asset type is liquid, false otherwise
-     */
-    public function isLiquid(string $assetType): bool
-    {
-        try {
-            $assetTypeModel = \App\Models\AssetType::where('type', $assetType)->first();
-
-            return $assetTypeModel->is_liquid ?? false;
-        } catch (\Throwable $e) {
-            return false;
-        }
-    }
-
-    protected function isSavingType(string $assetType): bool
-    {
-        return (bool) ($this->assetTypeSavingMap[$assetType] ?? false);
-    }
-
     protected function isShownInStatistics(string $assetType): bool
     {
         return (bool) ($this->assetTypeShowStatisticsMap[$assetType] ?? false);
@@ -760,13 +703,7 @@ class PrognosisService
         // Derive origin tax type via asset_type instead of meta.tax
         [$taxAssetname, $taxYear, $taxOriginGroup] = $this->getAssetMetaFromPath($transferOrigin, 'group');
         [$originAssetnameMeta, $originYearMeta, $originAssetType] = $this->getAssetMetaFromPath($transferOrigin, 'type');
-        $taxOriginType = 'none';
-        try {
-            $assetTypeO = \App\Models\AssetType::where('type', $originAssetType)->with('taxType')->first();
-            $taxOriginType = $assetTypeO->taxType->type ?? 'none';
-        } catch (\Throwable $e) {
-            $taxOriginType = 'none';
-        }
+        $taxOriginType = $this->assetTypeService->getTaxType($originAssetType);
 
         [$taxToAssetname, $taxToYear, $taxToGroup] = $this->getAssetMetaFromPath($transferTo, 'group');
 
@@ -1064,25 +1001,12 @@ class PrognosisService
         if (Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
             $default = 0;
         }
-        // print "ArrGet: $path - default: $default\n";
 
         return Arr::get($this->dataH, $path, $default);
     }
 
     public function ArrSet(string $path, mixed $value): void
     {
-        $debug = false;
-        if (Str::contains($path, ['marketAmountX', 'afterTaxAmountX'])) {
-            $debug = true;
-        }
-
-        if ($debug) {
-            Log::debug('ArrSet', ['path' => $path, 'value' => $value]);
-            if (app()->runningInConsole()) {
-                echo "ArrSet: $path:$value\n";
-            }
-        }
-
         Arr::set($this->dataH, $path, $value);
     }
 

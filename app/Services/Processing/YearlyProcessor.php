@@ -16,49 +16,30 @@
 
 namespace App\Services\Processing;
 
-use App\Models\AssetType;
+use App\Services\AssetTypeService;
 use App\Services\Tax\TaxFortuneService;
 use App\Services\Utilities\HelperService;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * YearlyProcessor
  *
  * Handles yearly post-processing calculations for individual assets.
- * Processes income, expenses, cashflow, assets, realization, potential, yield, and FIRE metrics.
+ * Processes fortune tax, cashflow, assets, potential, yield, and FIRE metrics.
  */
 class YearlyProcessor
 {
     public function __construct(
         private TaxFortuneService $taxfortune,
-        private HelperService $helper
+        private HelperService $helper,
+        private AssetTypeService $assetTypeService
     ) {}
-
-    /**
-     * Process income for a specific year and asset path.
-     *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
-     * @param  string  $path  Asset path (e.g., "assetname.year")
-     */
-    public function processIncomeYearly(array &$dataH, string $path): void
-    {
-        // Currently empty - placeholder for future income processing logic
-    }
-
-    /**
-     * Process expenses for a specific year and asset path.
-     *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
-     * @param  string  $path  Asset path (e.g., "assetname.year")
-     */
-    public function processExpenceYearly(array &$dataH, string $path): void
-    {
-        // Currently empty - placeholder for future expense processing logic
-    }
 
     /**
      * Process fortune tax for a specific year and asset path.
      * Has to be done because a mortgage could potentially have extra downpayments making the fortune calculation wrong.
+     * Has to be run before cashflow calculations to be correct.
      *
      * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
@@ -66,37 +47,24 @@ class YearlyProcessor
      */
     public function processFortuneTaxYearly(array &$dataH, string $path, int $thisYear): void
     {
-        [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
-        [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($dataH, $path, 'group');
 
-        // derive tax type via asset_type
-        [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
-        $taxType = 'none';
-        try {
-            $assetTypeO = AssetType::where('type', $assetType)->with('taxType')->first();
-            $taxType = $assetTypeO->taxType->type ?? 'none';
-        } catch (\Throwable $e) {
-            $taxType = 'none';
-        }
+        if ($year >= $thisYear) { //For efficiensy, not neccessarry to calculate previous tax
+            [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($dataH, $path, 'group');
+            [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
+            $taxType = $this->assetTypeService->getTaxType($assetType);
 
-        $taxProperty = $this->ArrGet($dataH, "$path.meta.property");
+            $taxProperty = $this->ArrGet($dataH, "$path.meta.property"); //FIX - Check TaxProperty.
 
-        $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
-        $taxableAmount = $this->ArrGet($dataH, "$path.asset.taxableAmount");
-        $mortgageBalanceAmount = $this->ArrGet($dataH, "$path.mortgage.balanceAmount");
+            $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
+            $taxableAmount = $this->ArrGet($dataH, "$path.asset.taxableAmount");
+            $mortgageBalanceAmount = $this->ArrGet($dataH, "$path.mortgage.balanceAmount");
 
-        [$taxAmount, $taxPercent, $taxableFortuneAmount, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $taxFortuneAmount, $explanation] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $marketAmount, $taxableAmount, $mortgageBalanceAmount, false);
+            [$taxAmount, $taxPercent, $taxableFortuneAmount, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $taxFortuneAmount, $explanation] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $marketAmount, $taxableAmount, $mortgageBalanceAmount, false);
 
-        $this->ArrSet($dataH, "$path.asset.taxFortuneAmount", $taxFortuneAmount);
-        $this->ArrSet($dataH, "$path.asset.taxablePropertyAmount", $taxablePropertyAmount);
-        $this->ArrSet($dataH, "$path.asset.taxPropertyAmount", $taxPropertyAmount);
-
-        // Recalculate cashflow after tax
-        if ($year >= $thisYear) {
-            $cashflowBeforeTaxAmount = $this->ArrGet($dataH, "$path.cashflow.beforeTaxAmount");
-            $cashflowAfterTaxAmount = $cashflowBeforeTaxAmount - $taxFortuneAmount;
-            $this->ArrSet($dataH, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
-            $this->ArrSet($dataH, "$path.cashflow.taxAmount", $taxFortuneAmount);
+            $this->ArrSet($dataH, "$path.asset.taxableFortuneAmount", $taxableFortuneAmount);
+            $this->ArrSet($dataH, "$path.asset.taxablePropertyAmount", $taxablePropertyAmount);
+            $this->ArrSet($dataH, "$path.asset.taxFortuneAmount", $taxFortuneAmount);
+            $this->ArrSet($dataH, "$path.asset.taxPropertyAmount", $taxPropertyAmount);
         }
     }
 
@@ -115,8 +83,8 @@ class YearlyProcessor
         // Recalculating cashflow. Necessary if a mortgage is paid with extra amount.
         $cashflowBeforeTaxAmount =
             $this->ArrGet($dataH, "$path.income.amount")
-            - $this->ArrGet($dataH, "$path.expence.amount")
             + $this->ArrGet($dataH, "$path.income.transferedAmount")
+            - $this->ArrGet($dataH, "$path.expence.amount")
             - $this->ArrGet($dataH, "$path.expence.transferedAmount")
             - $this->ArrGet($dataH, "$path.mortgage.termAmount")
             - $this->ArrGet($dataH, "$path.mortgage.extraDownpaymentAmount")
@@ -124,6 +92,8 @@ class YearlyProcessor
 
         $cashflowAfterTaxAmount =
             $cashflowBeforeTaxAmount
+            + $this->ArrGet($dataH, "$path.mortgage.taxDeductableAmount")
+            - $this->ArrGet($dataH, "$path.cashflow.taxAmount")
             - $this->ArrGet($dataH, "$path.asset.taxFortuneAmount")
             - $this->ArrGet($dataH, "$path.asset.taxPropertyAmount");
 
@@ -145,7 +115,6 @@ class YearlyProcessor
     public function processAssetYearly(array &$dataH, string $path): void
     {
         [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
-        $prevYear = (int) $year - 1;
 
         $marketAmount = $this->ArrGet($dataH, "$assetname.$year.asset.marketAmount");
         if ($marketAmount <= 0) {
@@ -165,17 +134,6 @@ class YearlyProcessor
     }
 
     /**
-     * Process realization for a specific year and asset path.
-     *
-     * @param  array  $dataH  Reference to the main data structure
-     * @param  string  $path  Asset path (e.g., "assetname.year")
-     */
-    public function processRealizationYearly(array &$dataH, string $path): void
-    {
-        // Currently empty - placeholder for future realization processing logic
-    }
-
-    /**
      * Performs post-processing for the income potential as seen from a Bank.
      * This function calculates the potential maximum loan a user can handle based on their income.
      *
@@ -185,20 +143,13 @@ class YearlyProcessor
     public function processPotentialYearly(array &$dataH, string $path): void
     {
         // Retrieve the year and tax type from the asset metadata.
-        // derive tax type via asset_type
         [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
-        $taxType = 'none';
-        try {
-            $assetTypeO = AssetType::where('type', $assetType)->with('taxType')->first();
-            $taxType = $assetTypeO->taxType->type ?? 'none';
-        } catch (\Throwable $e) {
-            $taxType = 'none';
-        }
+        $taxType = $this->assetTypeService->getTaxType($assetType);
 
         // If the tax type is 'salary' or 'pension', calculate the potential income and mortgage amounts.
         if ($taxType == 'salary' || $taxType == 'pension') {
             $incomeAmount = $this->ArrGet($dataH, "$path.income.amount");
-            $mortgageAmount = $incomeAmount * 5;
+            $mortgageAmount = $incomeAmount * 5; // 5x rule for mortgage in norwegian banks.
 
             $this->ArrSet($dataH, "$path.potential.incomeAmount", $incomeAmount);
             $this->ArrSet($dataH, "$path.potential.mortgageAmount", $mortgageAmount);
@@ -235,50 +186,52 @@ class YearlyProcessor
      * @param  string  $assetname  Asset name
      * @param  int  $year  Year to process
      * @param  array<string, mixed>  $meta  Asset metadata
-     * @param  array<string, bool>  $assetTypeSavingMap  Map of asset types that count as savings
      */
-    public function processFireYearly(array &$dataH, string $assetname, int $year, array $meta, array $assetTypeSavingMap): void
+    public function processFireYearly(array &$dataH, string $assetname, int $year, array $meta): void
     {
-        $prevYear = $year - 1;
+        $fireIncomeAmount = 0;
+        $fireExpenceAmount = 0;
+        $fireSavingAmount = 0;
+        $fireRate = 0;
         $firePercent = 0;
-        $fireAssetIncomeAmount = 0; // Only asset value
-        $CashflowTaxableAmount = 0;
-
+        $fireSavingRate = 0;
         $path = "$assetname.$year";
+
         $assetMarketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
-        $incomeAmount = $this->ArrGet($dataH, "$path.income.amount");
-        $expenceAmount = $this->ArrGet($dataH, "$path.expence.amount");
+        $fireExpenceAmount = $this->ArrGet($dataH, "$path.expence.amount");
         $cashFlowAmount = $this->ArrGet($dataH, "$path.cashflow.afterTaxAmount");
 
         // Calculate FIRE income from sellable assets
         $assetType = Arr::get($meta, 'type');
-        if (isset($assetTypeSavingMap[$assetType]) && $assetTypeSavingMap[$assetType]) {
-            $fireAssetIncomeAmount = round($assetMarketAmount * 0.04);
+        if ($this->assetTypeService->isLiquid($assetType)) {
+            $fireIncomeAmount = round($assetMarketAmount * 0.04); // 4% rule mulig inntekt på likvide assets
         }
 
-        $fireExpenceAmount = $expenceAmount;
-        $fireCashFlowAmount = $cashFlowAmount;
-        $fireSavingAmount = $incomeAmount - $expenceAmount;
-        $fireSavingRateDecimal = 0;
+        if ($this->assetTypeService->isSavingType($assetType)) {
+            $fireSavingAmount = $cashFlowAmount; // Beløpet for assets som teller som FIRE sparing.
+        }
 
-        if ($incomeAmount > 0) {
-            $fireSavingRateDecimal = $fireSavingAmount / $incomeAmount;
+        $fireCashFlowAmount = $fireIncomeAmount - $fireExpenceAmount;
+
+        if ($fireIncomeAmount > 0) {
+            // Denne regner ikke med avdrag (ikke renter). Må sjekke matematikken bedre her. Må se hva som hensyntas i cashflow som den kommer fra.
+            $fireSavingRate = $fireSavingAmount / $fireIncomeAmount;
         }
 
         if ($fireExpenceAmount > 0) {
-            $firePercent = round(($fireAssetIncomeAmount / $fireExpenceAmount) * 100);
+            $fireRate = round(($fireIncomeAmount / $fireExpenceAmount));
+            $firePercent = $fireRate * 100;
         }
 
-        $fireRatePercent = 0.04;
-
         $dataH[$assetname][$year]['fire'] = [
-            'percent' => $firePercent,
-            'incomeAmount' => $fireAssetIncomeAmount,
+
+            'incomeAmount' => $fireIncomeAmount,
             'expenceAmount' => $fireExpenceAmount,
-            'rateDecimal' => $fireRatePercent,
             'cashFlowAmount' => $fireCashFlowAmount,
             'savingAmount' => $fireSavingAmount,
-            'savingRateDecimal' => $fireSavingRateDecimal,
+            'rate' => $fireRate,
+            'percent' => $firePercent,
+            'savingRate' => $fireSavingRate,
         ];
     }
 
@@ -304,15 +257,14 @@ class YearlyProcessor
     }
 
     /**
-     * Helper to get values from dataH with defaults.
+     * Helper to get values from dataH with defaults. Almost duplicate with same function in PrognosisService
      *
      * @param  array<string, mixed>  $dataH
      */
     private function ArrGet(array $dataH, string $path, mixed $default = null): mixed
     {
-        if (str_contains($path, 'Amount') || str_contains($path, 'Decimal') || str_contains($path, 'Percent') ||
-            str_contains($path, 'amount') || str_contains($path, 'decimal') || str_contains($path, 'percent') ||
-            str_contains($path, 'factor')) {
+        $default = null;
+        if (Str::contains($path, ['Amount', 'Decimal', 'Percent', 'amount', 'decimal', 'percent', 'factor'])) {
             $default = 0;
         }
 
@@ -320,7 +272,7 @@ class YearlyProcessor
     }
 
     /**
-     * Helper to set values in dataH.
+     * Helper to set values in dataH. Almost duplicate with same function in PrognosisService
      *
      * @param  array<string, mixed>  $dataH
      */
