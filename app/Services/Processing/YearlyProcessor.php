@@ -47,13 +47,13 @@ class YearlyProcessor
      */
     public function processFortuneTaxYearly(array &$dataH, string $path, int $thisYear): void
     {
+        [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($dataH, $path, 'group');
+        [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
 
-        if ($year >= $thisYear) { //For efficiensy, not neccessarry to calculate previous tax
-            [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($dataH, $path, 'group');
-            [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
+        if ($year >= $thisYear) { // For efficiensy, not neccessarry to calculate previous tax
             $taxType = $this->assetTypeService->getTaxType($assetType);
 
-            $taxProperty = $this->ArrGet($dataH, "$path.meta.property"); //FIX - Check TaxProperty.
+            $taxProperty = $this->ArrGet($dataH, "$path.meta.property"); // FIX - Check TaxProperty.
 
             $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
             $taxableAmount = $this->ArrGet($dataH, "$path.asset.taxableAmount");
