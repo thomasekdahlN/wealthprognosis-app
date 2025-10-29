@@ -220,7 +220,7 @@ class AssetYearForm
 
                                 return $asset?->assetType?->income_changerate;
                             })
-                            ->rules(['nullable', 'regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
+                            ->rules(['nullable|regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
                             ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         Toggle::make('income_repeat')->label('Repeat Income')->helperText('If on, this income setup repeats into future years.'),
                     ])
@@ -344,7 +344,7 @@ class AssetYearForm
 
                                 return $asset?->assetType?->expence_changerate;
                             })
-                            ->rules(['nullable', 'regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
+                            ->rules(['nullable|regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
                             ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         Toggle::make('expence_repeat')->label('Repeat Expense')->helperText('If on, this expense setup repeats into future years.'),
                     ])
@@ -384,7 +384,7 @@ class AssetYearForm
 
                                 return $asset?->assetType?->asset_changerate;
                             })
-                            ->rules(['nullable', 'regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
+                            ->rules(['nullable|regex:/^([-+]?\\d+(\\.\\d+)?|changerates\\.[a-z0-9_\\-]+)$/i'])
                             ->helperText('Type a decimal percent (e.g. 2.5) or pick a predefined rate like changerates.kpi'),
                         TextInput::make('asset_rule')
                             ->label('Asset Rule')
