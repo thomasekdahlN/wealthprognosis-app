@@ -88,3 +88,8 @@ On labels and sentences it should only be uppercase letters on the first word
 Do not commit code to Git unless explicitly asked for it. Use conventional commits when asked to check in code to Git.
 
 Do not create files, classes and methods based on a test that thinks it is missing. Just remove the test.
+
+Always show tooltips in graphs.
+Always use year as x axis in graphs.
+Do not redirect on save unless explicitely asked for it.
+Use filament Money cast for all database fields handling money/amount.
