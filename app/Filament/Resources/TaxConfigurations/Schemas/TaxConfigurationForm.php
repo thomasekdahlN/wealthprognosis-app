@@ -14,9 +14,6 @@ class TaxConfigurationForm
     {
         return $schema
             ->components([
-                TextInput::make('country_code')
-                    ->required()
-                    ->default(fn () => (string) request()->route('country')),
                 TextInput::make('year')
                     ->required()
                     ->numeric()

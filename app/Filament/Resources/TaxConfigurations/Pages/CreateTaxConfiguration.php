@@ -15,8 +15,8 @@ class CreateTaxConfiguration extends CreateRecord
     public function getRedirectUrl(): string
     {
         return static::getResource()::getUrl('list', [
-            'country' => request()->route('country'),
-            'year' => request()->route('year'),
+            'country' => $this->record->country_code ?? request()->route('country'),
+            'year' => $this->record->year ?? request()->route('year'),
         ]);
     }
 
