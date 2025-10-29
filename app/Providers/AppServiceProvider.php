@@ -89,7 +89,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Processing\YearlyProcessor::class, function ($app) {
             return new \App\Services\Processing\YearlyProcessor(
                 $app->make(\App\Services\Tax\TaxFortuneService::class),
-                $app->make(\App\Services\Utilities\HelperService::class)
+                $app->make(\App\Services\Utilities\HelperService::class),
+                $app->make(\App\Services\AssetTypeService::class)
             );
         });
 

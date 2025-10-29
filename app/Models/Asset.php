@@ -159,34 +159,40 @@ class Asset extends Model
         return $taxTypeName ?? '';
     }
 
+    /**
+     * Check if this asset type is liquid (can be sold in parts for FIRE)
+     * Delegates to AssetTypeService for cached lookup
+     */
     public function isLiquid(): bool
     {
-        $assetType = \App\Models\AssetType::where('type', $this->asset_type)->first();
-
-        return $assetType ? $assetType->is_liquid : false;
+        return app(\App\Services\AssetTypeService::class)->isLiquid($this->asset_type);
     }
 
+    /**
+     * Check if this asset type is FIRE eligible
+     * Delegates to AssetTypeService for cached lookup
+     */
     public function isFireSavingType(): bool
     {
-        $assetType = \App\Models\AssetType::where('type', $this->asset_type)->first();
-
-        return $assetType ? ($assetType->can_have_market_value || $assetType->can_generate_income) : false;
+        return app(\App\Services\AssetTypeService::class)->isFireEligible($this->asset_type);
     }
 
     /**
      * Check if this asset type supports a specific capability
+     * Delegates to AssetTypeService for cached lookup
      */
     public function supportsCapability(string $capability): bool
     {
-        return AssetTypeValidator::supportsCapability($this->asset_type, $capability);
+        return app(\App\Services\AssetTypeService::class)->getCapability($this->asset_type, $capability);
     }
 
     /**
      * Get all capabilities for this asset type
+     * Delegates to AssetTypeService for cached lookup
      */
     public function getCapabilities(): array
     {
-        return AssetTypeValidator::getAssetTypeCapabilities($this->asset_type);
+        return app(\App\Services\AssetTypeService::class)->getCapabilities($this->asset_type);
     }
 
     /**
