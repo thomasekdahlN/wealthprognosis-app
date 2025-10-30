@@ -36,23 +36,12 @@ it('uses asset_types.show_statistics to control visibility in statistics', funct
     $config = [
         'meta' => [
             'birthYear' => 1990,
-            'deathYear' => 90,
+            'deathAge' => 90,
         ],
     ];
 
-    // Create minimal stub objects for tax services not used in this test
-    $taxIncome = new class {};
-    $taxFortune = new class
-    {
-        public function calculatefortunetax(bool $debug, int $year, string $group, float $taxableAmount, float $mortgageAmount, bool $aggregate)
-        {
-            return [0, 0.0, $taxableAmount, 'stubbed'];
-        }
-    };
-    $taxRealization = new class {};
-    $changerate = new class {};
-
-    $prognosis = new TestablePrognosisShowStatistics($config, $taxIncome, $taxFortune, $taxRealization, $changerate);
+    // Test uses the real PrognosisService which gets services from container
+    $prognosis = new TestablePrognosisShowStatistics($config);
 
     expect($prognosis->isShownInStatisticsPublic('equityfund'))->toBeTrue();
     expect($prognosis->isShownInStatisticsPublic('spouse'))->toBeFalse();

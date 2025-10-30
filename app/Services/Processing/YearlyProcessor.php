@@ -59,12 +59,12 @@ class YearlyProcessor
             $taxableAmount = $this->ArrGet($dataH, "$path.asset.taxableAmount");
             $mortgageBalanceAmount = $this->ArrGet($dataH, "$path.mortgage.balanceAmount");
 
-            [$taxAmount, $taxPercent, $taxableFortuneAmount, $taxablePropertyAmount, $taxablePropertyPercent, $taxPropertyAmount, $taxPropertyPercent, $taxFortuneAmount, $explanation] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $marketAmount, $taxableAmount, $mortgageBalanceAmount, false);
+            $fortuneResult = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $marketAmount, $taxableAmount, $mortgageBalanceAmount, false);
 
-            $this->ArrSet($dataH, "$path.asset.taxableFortuneAmount", $taxableFortuneAmount);
-            $this->ArrSet($dataH, "$path.asset.taxablePropertyAmount", $taxablePropertyAmount);
-            $this->ArrSet($dataH, "$path.asset.taxFortuneAmount", $taxFortuneAmount);
-            $this->ArrSet($dataH, "$path.asset.taxPropertyAmount", $taxPropertyAmount);
+            $this->ArrSet($dataH, "$path.asset.taxableFortuneAmount", $fortuneResult->taxableAmount);
+            $this->ArrSet($dataH, "$path.asset.taxablePropertyAmount", $fortuneResult->taxablePropertyAmount);
+            $this->ArrSet($dataH, "$path.asset.taxFortuneAmount", $fortuneResult->taxAmount);
+            $this->ArrSet($dataH, "$path.asset.taxPropertyAmount", $fortuneResult->taxPropertyAmount);
         }
     }
 

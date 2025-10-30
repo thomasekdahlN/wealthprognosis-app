@@ -325,7 +325,15 @@ class PrognosisService
                     // echo "TaxFortuneBefore $assetname.$year, taxType:$taxType, taxProperty:$taxProperty, assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, balanceAmount:".$this->ArrGet("$assetname.$year.mortgage.balanceAmount")."\n";
                 }
                 // FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                [$assetTaxableAmount, $assetTaxableDecimal, $assetTaxFortuneAmount, $assetTaxFortuneDecimal, $assetTaxablePropertyAmount, $assetTaxablePropertyPercent, $assetTaxPropertyAmount, $assetTaxPropertyDecimal] = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, (int) $assetMarketAmount, (int) $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
+                $fortuneResult = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, (int) $assetMarketAmount, (int) $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
+                $assetTaxableAmount = $fortuneResult->taxableAmount;
+                $assetTaxableDecimal = $fortuneResult->taxablePercent;
+                $assetTaxFortuneAmount = $fortuneResult->taxAmount;
+                $assetTaxFortuneDecimal = $fortuneResult->taxPercent;
+                $assetTaxablePropertyAmount = $fortuneResult->taxablePropertyAmount;
+                $assetTaxablePropertyPercent = $fortuneResult->taxablePropertyPercent;
+                $assetTaxPropertyAmount = $fortuneResult->taxPropertyAmount;
+                $assetTaxPropertyDecimal = $fortuneResult->taxPropertyPercent;
                 if ($assetname == 'xxx') {
                     // echo "   TaxFortuneAfter: $assetname.$year assetTaxableInitialAmount:$assetTaxableInitialAmount, assetTaxableAmount:$assetTaxableAmount, assetTaxAmount:$assetTaxFortuneAmount,assetTaxAmount:$assetTaxFortuneAmount\n";
                 }

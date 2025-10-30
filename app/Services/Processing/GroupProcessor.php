@@ -197,17 +197,17 @@ class GroupProcessor
      */
     public function calculateFortuneTax(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
-        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($totalH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($totalH, "$year.asset.taxableAmount", $taxableAmount);
-        Arr::set($totalH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+        $totalResult = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($totalH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($totalH, "$year.asset.taxableAmount", $totalResult->taxableAmount);
+        Arr::set($totalH, "$year.asset.taxFortuneAmount", $totalResult->taxAmount);
 
-        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($companyH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($companyH, "$year.asset.taxableAmount", $taxableAmount);
-        Arr::set($companyH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+        $companyResult = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($companyH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($companyH, "$year.asset.taxableAmount", $companyResult->taxableAmount);
+        Arr::set($companyH, "$year.asset.taxFortuneAmount", $companyResult->taxAmount);
 
-        [$assetTaxFortuneAmount, $fortuneTaxDecimal, $taxableAmount, $explanation1] = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($privateH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($privateH, "$year.asset.taxableAmount", $taxableAmount);
-        Arr::set($privateH, "$year.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+        $privateResult = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($privateH, "$year.asset.taxableAmount", 0), 0, true);
+        Arr::set($privateH, "$year.asset.taxableAmount", $privateResult->taxableAmount);
+        Arr::set($privateH, "$year.asset.taxFortuneAmount", $privateResult->taxAmount);
     }
 
     /**

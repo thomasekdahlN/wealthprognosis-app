@@ -17,6 +17,8 @@
 namespace App\Services\Tax;
 
 use App\Support\Contracts\TaxCalculatorInterface;
+use App\Support\ValueObjects\FortuneCalculationResult;
+use App\Support\ValueObjects\FortuneTaxResult;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
@@ -81,7 +83,7 @@ class TaxFortuneService implements TaxCalculatorInterface
      * @param  int|null  $taxableInitialAmount  The taxable amount for the calculation. If null, it is considered as 0.
      * @param  int|null  $mortgageBalanceAmount  The mortgage balance amount.
      * @param  bool|null  $taxableAmountOverride  If true, the taxable amount is overridden. If null, it is considered as false.
-     * @return array{0: float, 1: float, 2: float, 3: float, 4: float, 5: float, 6: float, 7: float, 8: string} Returns array for backward compatibility
+     * @return FortuneCalculationResult Value object containing all calculation results
      */
     public function taxCalculationFortune(
         string $taxGroup,
@@ -92,7 +94,7 @@ class TaxFortuneService implements TaxCalculatorInterface
         ?int $taxableInitialAmount,
         ?int $mortgageBalanceAmount,
         ?bool $taxableAmountOverride = false
-    ): array {
+    ): FortuneCalculationResult {
         $explanation = '';
         $explanation1 = '';
         $explanation2 = '';
@@ -132,7 +134,11 @@ class TaxFortuneService implements TaxCalculatorInterface
             $explanation .= 'Market taxable. ';
         }
 
-        [$taxAmount, $taxPercent, $taxableFortuneAmount, $explanation1] = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount, $mortgageBalanceAmount, false);
+        $fortuneTaxResult = $this->calculatefortunetax(false, $year, $taxGroup, $taxableFortuneAmount, $mortgageBalanceAmount, false);
+        $taxAmount = $fortuneTaxResult->taxAmount;
+        $taxPercent = $fortuneTaxResult->taxPercent;
+        $taxableFortuneAmount = $fortuneTaxResult->taxableAmount;
+        $explanation1 = $fortuneTaxResult->explanation;
 
         if ($taxProperty) {
             $propertyTaxService = app(\App\Services\Tax\TaxPropertyService::class);
@@ -151,32 +157,17 @@ class TaxFortuneService implements TaxCalculatorInterface
             'tax_property_percent' => $taxPropertyPercent,
         ]);
 
-        // Return array for backward compatibility
-        return [
-            $taxableFortuneAmount,
-            $taxableFortuneRate,
-            $taxAmount,
-            $taxPercent,
-            $taxablePropertyAmount,
-            $taxablePropertyPercent,
-            $taxPropertyAmount,
-            $taxPropertyPercent,
-            $explanation,
-        ];
-    }
-
-    /**
-     * Proxy method to get property taxable rate from repository.
-     * This method exists for backwards compatibility with tests.
-     *
-     * @param  string  $taxGroup  The tax group (e.g., 'private', 'company').
-     * @param  string  $taxProperty  The type of property (municipality code).
-     * @param  int  $year  The year for which the tax is being calculated.
-     * @return float The taxable portion of the property as a decimal (e.g., 0.70 for 70%).
-     */
-    public function getPropertyTaxable(string $taxGroup, string $taxProperty, int $year): float
-    {
-        return $this->taxPropertyRepo->getPropertyTaxableRate($taxGroup, $taxProperty, $year);
+        return new FortuneCalculationResult(
+            taxableAmount: $taxableFortuneAmount,
+            taxablePercent: $taxableFortuneRate,
+            taxAmount: $taxAmount,
+            taxPercent: $taxPercent,
+            taxablePropertyAmount: $taxablePropertyAmount,
+            taxablePropertyPercent: $taxablePropertyPercent,
+            taxPropertyAmount: $taxPropertyAmount,
+            taxPropertyPercent: $taxPropertyPercent,
+            explanation: $explanation
+        );
     }
 
     /**
@@ -188,9 +179,9 @@ class TaxFortuneService implements TaxCalculatorInterface
      * @param  float  $amount  The amount of fortune for the calculation.
      * @param  float  $mortgage  The mortgage amount to deduct.
      * @param  bool  $deduct  Whether to apply deductions (currently unused).
-     * @return array{0: float, 1: float, 2: float, 3: string} [taxAmount, taxPercent, taxableAmount, explanation]
+     * @return FortuneTaxResult Value object containing tax calculation results
      */
-    public function calculatefortunetax(bool $debug, int $year, string $taxGroup, float $amount, float $mortgage, bool $deduct = false): array
+    public function calculatefortunetax(bool $debug, int $year, string $taxGroup, float $amount, float $mortgage, bool $deduct = false): FortuneTaxResult
     {
         $taxAmount = 0;
         $taxPercent = 0;
@@ -265,6 +256,11 @@ class TaxFortuneService implements TaxCalculatorInterface
             ]);
         }
 
-        return [$taxAmount, $taxPercent, $taxableAmount, $explanation];
+        return new FortuneTaxResult(
+            taxAmount: $taxAmount,
+            taxPercent: $taxPercent,
+            taxableAmount: $taxableAmount,
+            explanation: $explanation
+        );
     }
 }
