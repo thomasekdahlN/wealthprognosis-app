@@ -25,23 +25,33 @@ namespace App\Support\ValueObjects;
 readonly class FortuneTaxResult
 {
     public function __construct(
-        public float $taxAmount,
-        public float $taxPercent,
-        public float $taxableAmount,
+        public float $taxableFortuneAmount,
+        public float $taxableFortunePercent,
+        public float $taxableFortuneRate,
+        public float $taxFortuneAmount,
+        public float $taxFortunePercent,
+        public float $taxFortuneRate,
+        public float $taxFortuneAveragePercent,
+        public float $taxFortuneAverageRate,
         public string $explanation
     ) {}
 
     /**
      * Convert to array format for backward compatibility.
      *
-     * @return array{0: float, 1: float, 2: float, 3: string}
+     * @return array{0: float, 1: float, 2: float, 3: float, 4: float, 5: float, 6: float, 7: float, 8: string}
      */
     public function toArray(): array
     {
         return [
-            $this->taxAmount,
-            $this->taxPercent,
-            $this->taxableAmount,
+            $this->taxableFortuneAmount,
+            $this->taxableFortunePercent,
+            $this->taxableFortuneRate,
+            $this->taxFortuneAmount,
+            $this->taxFortunePercent,
+            $this->taxFortuneRate,
+            $this->taxFortuneAveragePercent,
+            $this->taxFortuneAverageRate,
             $this->explanation,
         ];
     }

@@ -257,16 +257,13 @@ Legend: 🟢 = Liquid, 🔴 = Non-liquid
 #### Not a priority, but have been thinking of it.
 - Support for factor on a rule like +1000
 - Support for changerates on rules, like adding 5% to the +1000 rule each year.
-- Support for monstertax on property/boat/airplane/helicopters
 -  Company fortune should be retrieved from the previous year not the current year (tax vise)
 - //https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/verdsettingsrabatt-ved-fastsetting-av-formue/
 - Calculate only 1 year of a mortgage at a time, to avoid this vertical processing problem.
 - All transfers to next year? (to avoid vertical processing problem)
 - Extra nedbetaling av lån skaper masse utfordringer (fordi det påvirker mange verdier som allerede er beregnet og må reberegnes)
-- Should support different tax types within the asset, like separate tax for income vs asset value
 - Catch 22. If calculating otp from salary we can not transfer to salary from otp because of sequenze problems. Have to add a "income" type at the end of the config to add all such transfers, to split between salary and income (from investements)
 - Når man betaler ned et lån og det blir penger igjen etter extraDownpayment så repeteres ikke det gjenværende beløpet på asset'en den kom fra. Både riktig og galt når repeat er false.... Men reglene skal ikke repeteres (eller må vi ha separat repeat på ulike deler)
-- Supporting tax prognosis, not just use this years taxes
 - Property tax should use the tax value of year-2 (Holmestrand at least))
 - Company fortune tax for private person should use the tax value of year-2
 - rename group => configuration [private|company]
@@ -277,7 +274,6 @@ Legend: 🟢 = Liquid, 🔴 = Non-liquid
 - Klassifisere F.I.R.E oppnåelse pr år
 - Showing all values compared to KPI index (relative value) and how we perform compared to kpi
 - Refactoring and cleanup of code
-- More TDD / tests
 - F.I.R.E - Use up 4% of partly liquid assets from wishPensionYear to DeathYear to see how it handles. Not needed anymore since using up a divisor of your assets (1/10) until you die is a better way to use up liquid assets.
 - Retrieving asset values from API, like Crypto/Fond/stocks
 

@@ -1,0 +1,236 @@
+Note: Using configuration file /Users/thomasek/Code/wealthprognosis-app/phpstan.neon.
+   0/213 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%[1G[2K 213/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/SimulationAssets.php                                                    
+ ------ --------------------------------------------------------------------------------------- 
+  84     Access to an undefined property Illuminate\Database\Eloquent\Model::$name.             
+         🪪  property.notFound                                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/SimulationDashboard.php                                                 
+ ------ --------------------------------------------------------------------------------------- 
+  229    Access to an undefined property Illuminate\Database\Eloquent\Model::$name.             
+         🪪  property.notFound                                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/AssetYears/Pages/EditAssetYear.php                                         
+ ------ ---------------------------------------------------------------------------------------------- 
+  19     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset_id.                
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  40     Access to an undefined property Illuminate\Database\Eloquent\Model::$assetConfiguration.      
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  41     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset.                   
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  45     Access to an undefined property Illuminate\Database\Eloquent\Model::$assetConfiguration.      
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  46     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset_configuration_id.  
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  48     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset.                   
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  68     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset_configuration_id.  
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+ ------ ---------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/AssetYears/Pages/ListAssetYears.php                                                                                                                                      
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  328    Method App\Filament\Resources\AssetYears\Pages\ListAssetYears::getTableBulkActions() should return array<Filament\Actions\BulkAction> but returns array{Filament\Actions\BulkActionGroup}.  
+         🪪  return.type                                                                                                                                                                             
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------- 
+  Line   Filament/Resources/AssetYears/Schemas/AssetYearForm.php  
+ ------ --------------------------------------------------------- 
+  148    Cannot call method label() on array<string, mixed>.      
+         🪪  method.nonObject                                     
+  272    Cannot call method label() on array<string, mixed>.      
+         🪪  method.nonObject                                     
+  414    Cannot call method label() on array<string, mixed>.      
+         🪪  method.nonObject                                     
+ ------ --------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/Assets/Pages/CreateAsset.php                                               
+ ------ ---------------------------------------------------------------------------------------------- 
+  30     Access to an undefined property Illuminate\Database\Eloquent\Model::$id.                      
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  34     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset_configuration_id.  
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+ ------ ---------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------ 
+  Line   Filament/Resources/Prognoses/PrognosisResource.php                            
+ ------ ------------------------------------------------------------------------------ 
+  38     Call to an undefined method App\Filament\Components\IconPicker::maxLength().  
+         🪪  method.notFound                                                           
+ ------ ------------------------------------------------------------------------------ 
+
+ ------ ---------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/SimulationConfigurations/Pages/ViewSimulationConfiguration.php             
+ ------ ---------------------------------------------------------------------------------------------- 
+  17     Access to an undefined property Illuminate\Database\Eloquent\Model::$name.                    
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  22     Access to an undefined property Illuminate\Database\Eloquent\Model::$description.             
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  36     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset_configuration_id.  
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  37     Access to an undefined property Illuminate\Database\Eloquent\Model::$id.                      
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  45     Access to an undefined property Illuminate\Database\Eloquent\Model::$asset_configuration_id.  
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  46     Access to an undefined property Illuminate\Database\Eloquent\Model::$id.                      
+         🪪  property.notFound                                                                         
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property         
+  52     Call to an undefined method Illuminate\Database\Eloquent\Model::simulationAssets().           
+         🪪  method.notFound                                                                           
+ ------ ---------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   Filament/Widgets/AssetAllocationByTaxType.php                                          
+ ------ --------------------------------------------------------------------------------------- 
+  65     Access to an undefined property Illuminate\Database\Eloquent\Model::$assetType.        
+         🪪  property.notFound                                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Models/User.php                                                                                                                                                                             
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  39     PHPDoc type array<int, string> of property App\Models\User::$fillable is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$fillable.  
+         🪪  property.phpDocType                                                                                                                                                                     
+         💡  You can fix 3rd party PHPDoc types with stub files:                                                                                                                                     
+         💡  https://phpstan.org/user-guide/stub-files                                                                                                                                               
+  50     PHPDoc type array<int, string> of property App\Models\User::$hidden is not covariant with PHPDoc type list<string> of overridden property Illuminate\Database\Eloquent\Model::$hidden.      
+         🪪  property.phpDocType                                                                                                                                                                     
+         💡  You can fix 3rd party PHPDoc types with stub files:                                                                                                                                     
+         💡  https://phpstan.org/user-guide/stub-files                                                                                                                                               
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   Providers/SimulationWidgetServiceProvider.php                         
+ ------ ---------------------------------------------------------------------- 
+  27     Class App\Filament\Widgets\SimulationNetWorthChartWidget not found.   
+         🪪  class.notFound                                                    
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols  
+  28     Class App\Filament\Widgets\SimulationCashFlowChartWidget not found.   
+         🪪  class.notFound                                                    
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols  
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------ 
+  Line   Services/AiEvaluationService.php                                                    
+ ------ ------------------------------------------------------------------------------------ 
+  253    Unsafe usage of new static().                                                       
+         🪪  new.static                                                                      
+         💡  See: https://phpstan.org/blog/solving-phpstan-error-unsafe-usage-of-new-static  
+  263    Unsafe usage of new static().                                                       
+         🪪  new.static                                                                      
+         💡  See: https://phpstan.org/blog/solving-phpstan-error-unsafe-usage-of-new-static  
+ ------ ------------------------------------------------------------------------------------ 
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   Services/AssetExportService.php                                                        
+ ------ --------------------------------------------------------------------------------------- 
+  93     Access to an undefined property Illuminate\Database\Eloquent\Model::$year.             
+         🪪  property.notFound                                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  239    Unsafe usage of new static().                                                          
+         🪪  new.static                                                                         
+         💡  See: https://phpstan.org/blog/solving-phpstan-error-unsafe-usage-of-new-static     
+  249    Unsafe usage of new static().                                                          
+         🪪  new.static                                                                         
+         💡  See: https://phpstan.org/blog/solving-phpstan-error-unsafe-usage-of-new-static     
+ ------ --------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------ 
+  Line   Services/AssetImportService.php                                                     
+ ------ ------------------------------------------------------------------------------------ 
+  458    Unsafe usage of new static().                                                       
+         🪪  new.static                                                                      
+         💡  See: https://phpstan.org/blog/solving-phpstan-error-unsafe-usage-of-new-static  
+  468    Unsafe usage of new static().                                                       
+         🪪  new.static                                                                      
+         💡  See: https://phpstan.org/blog/solving-phpstan-error-unsafe-usage-of-new-static  
+ ------ ------------------------------------------------------------------------------------ 
+
+ ------ ------------------------------------------------------------------------------------ 
+  Line   Services/Processing/GroupProcessor.php                                              
+ ------ ------------------------------------------------------------------------------------ 
+  148    Static method Illuminate\Support\Arr::set() invoked with 4 parameters, 3 required.  
+         🪪  arguments.count                                                                 
+  152    Static method Illuminate\Support\Arr::set() invoked with 4 parameters, 3 required.  
+         🪪  arguments.count                                                                 
+  156    Static method Illuminate\Support\Arr::set() invoked with 4 parameters, 3 required.  
+         🪪  arguments.count                                                                 
+ ------ ------------------------------------------------------------------------------------ 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   Services/Prognosis/AmortizationService.php                                                 
+ ------ ------------------------------------------------------------------------------------------- 
+  87     PHPDoc tag @param references unknown parameter: $mortgages                                 
+         🪪  parameter.notFound                                                                     
+  98     Property App\Services\Prognosis\AmortizationService::$amount (int) does not accept float.  
+         🪪  assign.propertyType                                                                    
+  109    Variable $mortgages in isset() is never defined.                                           
+         🪪  isset.variable                                                                         
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------- 
+  Line   Services/Prognosis/PrognosisService.php                                                              
+ ------ ----------------------------------------------------------------------------------------------------- 
+  882    Class App\Services\Prognosis\AmortizationService constructor invoked with 6 parameters, 7 required.  
+         🪪  arguments.count                                                                                  
+ ------ ----------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   Services/Tax/TaxConfigRepository.php                                                       
+ ------ ------------------------------------------------------------------------------------------- 
+  69     PHPDoc tag @param references unknown parameter: $propertyCode                              
+         🪪  parameter.notFound                                                                     
+  69     PHPDoc tag @return with type array<string, mixed> is incompatible with native type float.  
+         🪪  return.phpDocType                                                                      
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------- 
+  Line   Services/Tax/TaxFortuneService.php                                           
+ ------ ----------------------------------------------------------------------------- 
+  139    Call to an undefined method App\Models\TaxProperty::calculatePropertyTax().  
+         🪪  method.notFound                                                          
+ ------ ----------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------------ 
+  Line   Services/Tax/TaxSalaryService.php                                                                                                   
+ ------ ------------------------------------------------------------------------------------------------------------------------------------ 
+  76     PHPDoc tag @return with type App\Support\ValueObjects\TaxCalculationResult|list<float|string> is not subtype of native type array.  
+         🪪  return.phpDocType                                                                                                               
+ ------ ------------------------------------------------------------------------------------------------------------------------------------ 
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   Support/TaxTypeResolver.php                                                            
+ ------ --------------------------------------------------------------------------------------- 
+  33     Access to an undefined property Illuminate\Database\Eloquent\Model::$type.             
+         🪪  property.notFound                                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ [ERROR] Found 47 errors                                                                                                
+

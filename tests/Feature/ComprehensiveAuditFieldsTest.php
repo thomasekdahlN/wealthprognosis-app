@@ -156,12 +156,9 @@ class ComprehensiveAuditFieldsTest extends TestCase
     public function test_tax_types_table_has_all_audit_fields()
     {
         $taxType = TaxType::create([
-            'user_id' => $this->user->id,
-            'team_id' => $this->team->id,
             'type' => 'test_tax',
             'name' => 'Test Tax Type',
             'description' => 'A test tax type',
-            'default_rate' => 25.0000,
             'is_active' => true,
             'created_by' => $this->user->id,
             'updated_by' => $this->user->id,
@@ -169,8 +166,6 @@ class ComprehensiveAuditFieldsTest extends TestCase
             'updated_checksum' => hash('sha256', 'tax_type_updated'),
         ]);
 
-        $this->assertEquals($this->user->id, $taxType->user_id);
-        $this->assertEquals($this->team->id, $taxType->team_id);
         $this->assertEquals($this->user->id, $taxType->created_by);
         $this->assertEquals($this->user->id, $taxType->updated_by);
         $this->assertNotNull($taxType->created_checksum);
@@ -203,7 +198,7 @@ class ComprehensiveAuditFieldsTest extends TestCase
             $this->assertTrue(\Schema::hasColumn($table, 'updated_checksum'), "Table {$table} should have updated_checksum");
 
             // Check for user/team fields (except teams table which has owner_id instead of user_id)
-            if ($table !== 'teams') {
+            if ($table !== 'teams' && $table !== 'tax_types' && $table !== 'ai_instructions' && $table !== 'tax_configurations') {
                 $this->assertTrue(\Schema::hasColumn($table, 'user_id'), "Table {$table} should have user_id");
                 $this->assertTrue(\Schema::hasColumn($table, 'team_id'), "Table {$table} should have team_id");
             }

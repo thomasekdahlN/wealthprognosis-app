@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\TaxType;
-use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -52,13 +51,8 @@ class TaxTypeManagementTest extends TestCase
 
     public function test_tax_type_creation_via_resource()
     {
-        $user = User::factory()->create();
-        $team = Team::factory()->create();
-
         // Create TaxType directly since we're testing the model, not the HTTP endpoint
         $taxType = TaxType::factory()->create([
-            'user_id' => $user->id,
-            'team_id' => $team->id,
             'type' => 'test_tax',
             'name' => 'Test Tax',
             'description' => 'A test tax type',

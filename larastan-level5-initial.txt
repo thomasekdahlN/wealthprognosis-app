@@ -1,0 +1,92 @@
+Note: Using configuration file /Users/thomasek/Code/wealthprognosis-app/phpstan.neon.
+   0/213 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%[1G[2K  20/213 [▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░]   9%[1G[2K  40/213 [▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░]  18%[1G[2K  60/213 [▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░]  28%[1G[2K  80/213 [▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░]  37%[1G[2K 100/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░]  46%[1G[2K 120/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░]  56%[1G[2K 140/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░]  65%[1G[2K 160/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░]  75%[1G[2K 193/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░]  90%[1G[2K 213/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+ ------ ---------------------------------------------------------------------------------------------------------------- 
+  Line   Console/Commands/ImportAssets.php                                                                               
+ ------ ---------------------------------------------------------------------------------------------------------------- 
+  65     Parameter #2 $teamId of class App\Services\AssetImportService constructor expects int|null, string|null given.  
+         🪪  argument.type                                                                                               
+ ------ ---------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------ 
+  Line   Exports/PrognosisExport2.php                                                                          
+ ------ ------------------------------------------------------------------------------------------------------ 
+  204    Parameter #2 $replace of function str_replace expects array<string>|string, array<int, mixed> given.  
+         🪪  argument.type                                                                                     
+ ------ ------------------------------------------------------------------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Exports/PrognosisRealizationSheet2.php                                                                                             
+ ------ ----------------------------------------------------------------------------------------------------------------------------------- 
+  133    Parameter #1 $number of static method App\Exports\PrognosisRealizationSheet2::convertNumberToExcelCol() expects int, float given.  
+         🪪  argument.type                                                                                                                  
+ ------ ----------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/SimulationAssetYears.php                                                                 
+ ------ -------------------------------------------------------------------------------------------------------- 
+  32     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  41     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  50     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+ ------ -------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/SimulationAssets.php                                                                     
+ ------ -------------------------------------------------------------------------------------------------------- 
+  38     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  49     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  54     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+ ------ -------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/SimulationDashboard.php                                                                  
+ ------ -------------------------------------------------------------------------------------------------------- 
+  63     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  81     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  94     Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  103    Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  119    Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  139    Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  153    Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+  162    Parameter #1 $message of class Filament\Support\Exceptions\Halt constructor expects string, int given.  
+         🪪  argument.type                                                                                       
+ ------ -------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------------------- 
+  Line   Services/AiEvaluationService.php                                                                                 
+ ------ ----------------------------------------------------------------------------------------------------------------- 
+  42     Parameter #5 $temperature of method App\Services\AiEvaluationService::callOpenAI() expects float, string given.  
+         🪪  argument.type                                                                                                
+ ------ ----------------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Services/Prognosis/PrognosisService.php                                                                                                  
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------- 
+  352    Parameter #5 $marketAmount of method App\Services\Tax\TaxFortuneService::taxCalculationFortune() expects int|null, float given.          
+         🪪  argument.type                                                                                                                        
+  352    Parameter #6 $taxableInitialAmount of method App\Services\Tax\TaxFortuneService::taxCalculationFortune() expects int|null, float given.  
+         🪪  argument.type                                                                                                                        
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------------ 
+  Line   Services/Tax/TaxRealizationService.php                                                                            
+ ------ ------------------------------------------------------------------------------------------------------------------ 
+  214    Parameter #3 $amount of method App\Services\Tax\TaxSalaryService::calculatesalarytax() expects int, float given.  
+         🪪  argument.type                                                                                                 
+ ------ ------------------------------------------------------------------------------------------------------------------ 
+
+ [ERROR] Found 21 errors                                                                                                
+

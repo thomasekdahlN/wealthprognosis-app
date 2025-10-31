@@ -19,6 +19,7 @@ namespace App\Services\Processing;
 use App\Services\AssetTypeService;
 use App\Services\Tax\TaxFortuneService;
 use App\Services\Utilities\HelperService;
+use App\Support\ValueObjects\AssetMeta;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -47,24 +48,49 @@ class YearlyProcessor
      */
     public function processFortuneTaxYearly(array &$dataH, string $path, int $thisYear): void
     {
-        [$assetname, $year, $taxGroup] = $this->getAssetMetaFromPath($dataH, $path, 'group');
-        [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
+        $meta = $this->getAssetMetaFromPath($dataH, $path);
 
-        if ($year >= $thisYear) { // For efficiensy, not neccessarry to calculate previous tax
-            $taxType = $this->assetTypeService->getTaxType($assetType);
-
-            $taxProperty = $this->ArrGet($dataH, "$path.meta.property"); // FIX - Check TaxProperty.
+        if ($meta->year >= $thisYear) { // For efficiensy, not neccessarry to calculate previous tax
+            $taxType = $this->assetTypeService->getTaxType($meta->type);
 
             $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
             $taxableAmount = $this->ArrGet($dataH, "$path.asset.taxableAmount");
             $mortgageBalanceAmount = $this->ArrGet($dataH, "$path.mortgage.balanceAmount");
 
-            $fortuneResult = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, $marketAmount, $taxableAmount, $mortgageBalanceAmount, false);
+            // Calculate fortune tax
+            $fortuneTaxResult = $this->taxfortune->taxCalculationFortune($meta->group, $taxType, $meta->year, $marketAmount, $taxableAmount, $mortgageBalanceAmount, false);
+            $this->ArrSet($dataH, "$path.asset.taxableFortuneAmount", $fortuneTaxResult->taxableFortuneAmount);
+            $this->ArrSet($dataH, "$path.asset.taxableFortunePercent", $fortuneTaxResult->taxableFortunePercent);
+            $this->ArrSet($dataH, "$path.asset.taxableFortuneRate", $fortuneTaxResult->taxableFortuneRate);
+            $this->ArrSet($dataH, "$path.asset.taxFortuneAmount", $fortuneTaxResult->taxFortuneAmount);
+            $this->ArrSet($dataH, "$path.asset.taxFortunePercent", $fortuneTaxResult->taxFortunePercent);
+            $this->ArrSet($dataH, "$path.asset.taxFortuneRate", $fortuneTaxResult->taxFortuneRate);
+        }
+    }
 
-            $this->ArrSet($dataH, "$path.asset.taxableFortuneAmount", $fortuneResult->taxableAmount);
-            $this->ArrSet($dataH, "$path.asset.taxablePropertyAmount", $fortuneResult->taxablePropertyAmount);
-            $this->ArrSet($dataH, "$path.asset.taxFortuneAmount", $fortuneResult->taxAmount);
-            $this->ArrSet($dataH, "$path.asset.taxPropertyAmount", $fortuneResult->taxPropertyAmount);
+    /**
+     * Process property tax for a specific year and asset path.
+     * Has to be run before cashflow calculations to be correct.
+     *
+     * @param  array  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     * @param  int  $thisYear  Current year
+     */
+    public function processPropertyTaxYearly(array &$dataH, string $path, int $thisYear): void
+    {
+        $meta = $this->getAssetMetaFromPath($dataH, $path);
+
+        echo "@@@@@@ taxProperty: $meta->taxProperty\n";
+
+        if ($meta->year >= $thisYear && $meta->taxProperty) { // For efficiensy, not neccessarry to calculate previous tax
+            $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
+
+            // Calculate property tax
+            $propertyTaxService = app(\App\Services\Tax\TaxPropertyService::class);
+            $propertyTaxResult = $propertyTaxService->calculatePropertyTax($meta->year, $meta->group, $meta->taxProperty, (float) $marketAmount);
+            print_r($propertyTaxResult);
+            $this->ArrSet($dataH, "$path.asset.taxablePropertyAmount", $propertyTaxResult->taxablePropertyAmount);
+            $this->ArrSet($dataH, "$path.asset.taxPropertyAmount", $propertyTaxResult->taxPropertyAmount);
         }
     }
 
@@ -142,9 +168,9 @@ class YearlyProcessor
      */
     public function processPotentialYearly(array &$dataH, string $path): void
     {
-        // Retrieve the year and tax type from the asset metadata.
-        [$assetname, $year, $assetType] = $this->getAssetMetaFromPath($dataH, $path, 'type');
-        $taxType = $this->assetTypeService->getTaxType($assetType);
+        $meta = $this->getAssetMetaFromPath($dataH, $path);
+
+        $taxType = $this->assetTypeService->getTaxType($meta->type);
 
         // If the tax type is 'salary' or 'pension', calculate the potential income and mortgage amounts.
         if ($taxType == 'salary' || $taxType == 'pension') {
@@ -165,18 +191,25 @@ class YearlyProcessor
     public function processYieldYearly(array &$dataH, string $path): void
     {
         $bruttoPercent = 0;
+        $bruttoRate = 0;
         $nettoPercent = 0;
+        $nettoRate = 0;
 
         if ($this->ArrGet($dataH, "$path.asset.acquisitionAmount") > 1) {
             // Calculate the brutto yield percentage
-            $bruttoPercent = round(($this->ArrGet($dataH, "$path.income.amount") / $this->ArrGet($dataH, "$path.asset.acquisitionAmount")) * 100, 1);
+            $bruttoRate = round(($this->ArrGet($dataH, "$path.income.amount") / $this->ArrGet($dataH, "$path.asset.acquisitionAmount")), 1);
+            $bruttoPercent = $bruttoRate * 100;
 
             // Calculate the netto yield percentage
-            $nettoPercent = round((($this->ArrGet($dataH, "$path.income.amount") - $this->ArrGet($dataH, "$path.expence.amount")) / $this->ArrGet($dataH, "$path.asset.acquisitionAmount")) * 100, 1);
+            $nettoRate = round((($this->ArrGet($dataH, "$path.income.amount") - $this->ArrGet($dataH, "$path.expence.amount")) / $this->ArrGet($dataH, "$path.asset.acquisitionAmount")), 1);
+            $nettoPercent = $nettoRate * 100;
         }
 
         $this->ArrSet($dataH, "$path.yield.bruttoPercent", $bruttoPercent);
+        $this->ArrSet($dataH, "$path.yield.bruttoRate", $bruttoRate);
+
         $this->ArrSet($dataH, "$path.yield.nettoPercent", $nettoPercent);
+        $this->ArrSet($dataH, "$path.yield.nettoRate", $nettoRate);
     }
 
     /**
@@ -239,21 +272,11 @@ class YearlyProcessor
      * Helper method to get asset metadata from path.
      *
      * @param  array<string, mixed>  $dataH
-     * @return array{0: string|null, 1: string|null, 2: mixed}
+     * @return AssetMeta|null Returns null if path is invalid
      */
-    private function getAssetMetaFromPath(array $dataH, string $path, string $field): array
+    private function getAssetMetaFromPath(array $dataH, string $path): ?AssetMeta
     {
-        $value = null;
-        $year = null;
-        $assetname = null;
-
-        if (preg_match('/(\w+).(\d+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
-            $assetname = $matchesH[1][0];
-            $year = (int) $matchesH[2][0];
-            $value = Arr::get($dataH, "$assetname.meta.$field");
-        }
-
-        return [$assetname, $year, $value];
+        return AssetMeta::fromPath($dataH, $path);
     }
 
     /**

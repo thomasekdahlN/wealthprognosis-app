@@ -16,6 +16,9 @@
 
 namespace App\Services\Tax;
 
+use App\Support\ValueObjects\PropertyTaxResult;
+use Illuminate\Support\Facades\Log;
+
 /**
  * Class TaxPropertyService
  *
@@ -29,53 +32,87 @@ class TaxPropertyService
     /**
      * Shared TaxConfigPropertyRepository instance.
      */
-    private \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyRepo;
+    private \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyConfig;
 
     public function __construct(string $country = 'no')
     {
         $this->country = $country;
 
         // Use the singleton instance from the service container
-        $this->taxPropertyRepo = app(\App\Services\Tax\TaxConfigPropertyRepository::class);
+        $this->taxPropertyConfig = app(\App\Services\Tax\TaxConfigPropertyRepository::class);
     }
 
     /**
      * Calculates the property tax based on the given parameters.
      *
+     * Property tax (eiendomsskatt) is a municipal tax on real estate.
+     * Calculation steps (example for Ringerike 2025):
+     * 1. Market value: 3,000,000 kr
+     * 2. Reduction (70% of market value): 2,100,000 kr (taxable portion)
+     * 3. Deduction (bunnfradrag): -400,000 kr
+     * 4. Tax base (skattegrunnlag): 1,700,000 kr
+     * 5. Tax rate (skattesats): × 2.4‰ (× 0.0024)
+     * 6. Property tax: 4,080 kr
+     *
      * @param  int  $year  The year for which the tax is being calculated.
-     * @param  string  $taxGroup  The tax group for the calculation.
-     * @param  string  $taxProperty  The property type for the calculation.
-     * @param  float  $amount  The amount of property for the calculation.
-     * @return array{0: float, 1: float, 2: float, 3: float, 4: string}
+     * @param  string  $taxGroup  The tax group for the calculation ('private' or 'company').
+     * @param  string  $taxProperty  The municipality/property code for the calculation.
+     * @param  float  $amount  The property market value for the calculation.
      */
-    public function calculatePropertyTax(int $year, string $taxGroup, string $taxProperty, float $amount): array
+    public function calculatePropertyTax(int $year, string $taxGroup, string $taxPropertyArea, float $amount): PropertyTaxResult
     {
-        $taxablePropertyAmount = 0.0;
+        Log::info('PropertyTax METHOD ENTRY', [
+            'year' => $year,
+            'taxGroup' => $taxGroup,
+            'taxPropertyArea' => $taxPropertyArea,
+            'amount' => $amount,
+        ]);
+
         $taxPropertyAmount = 0.0;
+        $taxablePropertyAmount = 0.0;
         $explanation = '';
 
-        // Get the taxable property percent for the given tax group, property type and year
-        $taxablePropertyRate = $this->taxPropertyRepo->getPropertyTaxableRate($taxGroup, $taxProperty, $year);
+        // Get the property tax configuration (rate, deduction, and taxable percent) in one call
+        $config = $this->taxPropertyConfig->getPropertyTaxConfig($taxGroup, $taxPropertyArea, $year);
+        $taxPropertyRate = $config->taxRate;
+        $taxPropertyPercent = $taxPropertyRate * 100; // Rate to percent (e.g., 0.0024 -> 0.24%)
+        $taxPropertyDeductionAmount = $config->deductionAmount;
+        $taxablePropertyPercent = $config->taxablePercent; // e.g., 70.00 for 70%
+        $taxablePropertyRate = $taxablePropertyPercent / 100;
 
-        // Get the property tax percent for the given tax group, property type and year
-        $taxPropertyRate = $this->taxPropertyRepo->getPropertyTaxRate($taxGroup, $taxProperty, $year);
+        // Step 1: Apply the deduction (bunnfradrag) to the reduced value
+        $taxablePropertyAmount = max(0, ($amount * $taxablePropertyRate) - $taxPropertyDeductionAmount);
 
-        // Get the standard deduction for the given tax group, property type and year
-        $taxPropertyDeductionAmount = $this->taxPropertyRepo->getPropertyTaxStandardDeductionAmount($taxGroup, $taxProperty, $year);
-
-        // Calculate the taxable property amount after deduction
-        $taxablePropertyAmount = ($amount * $taxablePropertyRate) - $taxPropertyDeductionAmount;
-
-        // Calculate the tax property amount and provide explanation based on the taxable property amount and tax property percent
+        // Step 3: Calculate the property tax amount
         if ($taxablePropertyAmount > 0 && $taxPropertyRate > 0) {
             $taxPropertyAmount = round($taxablePropertyAmount * $taxPropertyRate);
-            $explanation = "Property tax $taxPropertyRate of $taxablePropertyAmount.";
+            $explanation = sprintf(
+                'Property tax: Market value %.0f kr × %.0f%% = %.0f kr (taxable), minus deduction %.0f kr × %.4f = %.0f kr',
+                $amount,
+                $taxablePropertyPercent,
+                $taxablePropertyAmount,
+                $taxPropertyDeductionAmount,
+                $taxPropertyRate,
+                $taxPropertyAmount
+            );
         } else {
-            $taxablePropertyAmount = 0.0; // Taxable property amount can not be zero
-            $taxablePropertyRate = 0.0;
-            $explanation = 'No property tax. ';
+            $explanation = 'No property tax (rate is 0 or amount below deduction).';
         }
 
-        return [$taxablePropertyAmount, $taxablePropertyRate, $taxPropertyAmount, $taxPropertyRate, $explanation];
+        $result = new PropertyTaxResult(
+            taxPropertyArea: $taxPropertyArea,
+            taxablePropertyAmount: $taxablePropertyAmount,
+            taxablePropertyPercent: $taxablePropertyPercent,
+            taxablePropertyRate: $taxablePropertyRate,
+            taxPropertyDeductionAmount: $taxPropertyDeductionAmount,
+            taxPropertyAmount: $taxPropertyAmount,
+            taxPropertyPercent: $taxPropertyPercent,
+            taxPropertyRate: $taxPropertyRate,
+            explanation: $explanation
+        );
+
+        Log::debug('PropertyTaxResult', ['result' => (array) $result]);
+
+        return $result;
     }
 }

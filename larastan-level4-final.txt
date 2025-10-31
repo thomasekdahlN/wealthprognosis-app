@@ -1,0 +1,64 @@
+Note: Using configuration file /Users/thomasek/Code/wealthprognosis-app/phpstan.neon.
+   0/213 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%[1G[2K 213/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Concerns/HasWideTable.php (in context of class App\Filament\Pages\SimulationAssets)                                   
+ ------ ------------------------------------------------------------------------------------------------------------------------------- 
+  10     Call to function method_exists() with $this(App\Filament\Pages\SimulationAssets) and 'dispatch' will always evaluate to true.  
+         🪪  function.alreadyNarrowedType                                                                                               
+ ------ ------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/SimulationDashboard.php                                                                                                       
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  67     Instanceof between Illuminate\Routing\Route and Illuminate\Routing\Route will always evaluate to true.                                       
+         🪪  instanceof.alwaysTrue                                                                                                                    
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  71     Instanceof between Illuminate\Routing\Route and Illuminate\Routing\Route will always evaluate to true.                                       
+         🪪  instanceof.alwaysTrue                                                                                                                    
+  125    Instanceof between Illuminate\Routing\Route and Illuminate\Routing\Route will always evaluate to true.                                       
+         🪪  instanceof.alwaysTrue                                                                                                                    
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  128    Instanceof between Illuminate\Routing\Route and Illuminate\Routing\Route will always evaluate to true.                                       
+         🪪  instanceof.alwaysTrue                                                                                                                    
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  132    Instanceof between Illuminate\Routing\Route and Illuminate\Routing\Route will always evaluate to true.                                       
+         🪪  instanceof.alwaysTrue                                                                                                                    
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------ 
+  Line   Filament/Resources/Assets/AssetResource.php                                   
+ ------ ------------------------------------------------------------------------------ 
+  65     Match arm comparison between 'edit' and 'edit' is always true.                
+         🪪  match.alwaysTrue                                                          
+         💡  Remove remaining cases below this one and this error will disappear too.  
+ ------ ------------------------------------------------------------------------------ 
+
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Services/AiAssistantService.php                                                                                                                   
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------- 
+  865    Offset 'brands' on array{patterns: array{'/\\b(?:tesla|bmw…', '/\\b(?:car|vehicle…', '/\\b(?:model\\s+[a-z0…'}, brands: array{'tesla', 'bmw',     
+         'mercedes', 'audi', 'volvo', 'toyota', 'honda', 'ford', ...}} in empty() always exists and is not falsy.                                          
+         🪪  empty.offset                                                                                                                                  
+  897    Offset 'brands' on array{patterns: array{'/\\b(?:boat|yacht…', '/\\b(?:princess…'}, brands: array{'princess', 'sunseeker', 'azimut', 'ferretti',  
+         'pershing', 'riva', 'chris craft', 'sea ray', ...}} in empty() always exists and is not falsy.                                                    
+         🪪  empty.offset                                                                                                                                  
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------ 
+  Line   Services/FireCalculationService.php             
+ ------ ------------------------------------------------ 
+  33     Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+ ------ ------------------------------------------------ 
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   Services/Prognosis/AmortizationService.php                                             
+ ------ --------------------------------------------------------------------------------------- 
+  80     Access to an undefined property App\Services\Prognosis\AmortizationService::$config.   
+         🪪  property.notFound                                                                  
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ [ERROR] Found 11 errors                                                                                                
+

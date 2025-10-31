@@ -89,15 +89,15 @@ class AmortizationService
         $this->year_start = (int) $year;
         $this->term_years = (int) Arr::get($mortgage, 'years');
         $this->amount = $this->remainingMortgageAmount = (int) Arr::get($mortgage, 'amount');
-        $this->interest = Arr::get($mortgage, 'interest');
+        $this->interest = (float) Arr::get($mortgage, 'interest');
         $this->terms = 1;
         $this->period = $this->terms * $this->term_years;
         $this->balanceAmount = $this->amount;
         $this->year_end = $year + $this->term_years;
-        $this->interestOnlyYears = Arr::get($mortgage, 'interestOnlyYears'); // Antall år med avdragsfrihet. Betaler da kun renter.
+        $this->interestOnlyYears = (int) Arr::get($mortgage, 'interestOnlyYears'); // Antall år med avdragsfrihet. Betaler da kun renter.
         $this->interestOnlyYearEnd = $year + $this->interestOnlyYears; // Antall år med avdragsfrihet. Betaler da kun renter.
 
-        $this->extraDownpaymentAmount = Arr::get($mortgage, 'extraDownpaymentAmount', 0); // Yearly extra downpayment
+        $this->extraDownpaymentAmount = (int) Arr::get($mortgage, 'extraDownpaymentAmount', 0); // Yearly extra downpayment
 
         // This logic seems incorrect - commenting out as $mortgages is not defined
         // if (isset($mortgages[$year + 1]) && $year + 1 < $this->year_end) {

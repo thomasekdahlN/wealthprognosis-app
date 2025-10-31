@@ -1,2602 +1,2927 @@
 {
-  "alstahaug": {
-    "municipality": "Alstahaug",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "alta": {
-    "municipality": "Alta",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "alvdal": {
-    "municipality": "Alvdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "alver": {
-    "municipality": "Alver",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "andoy": {
-    "municipality": "Andøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "aremark": {
-    "municipality": "Aremark",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "arendal": {
-    "municipality": "Arendal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4.7,
-    "deduction": 0
-  },
-  "askvoll": {
-    "municipality": "Askvoll",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "askoy": {
-    "municipality": "Askøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 1,
-    "deduction": 400000
-  },
-  "aukra": {
-    "municipality": "Aukra",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "aure": {
-    "municipality": "Aure",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "aurland": {
-    "municipality": "Aurland",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "aurskog-holand": {
-    "municipality": "Aurskog-Høland",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 0,
-    "deduction": 800000
-  },
-  "austrheim": {
-    "municipality": "Austrheim",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "averoy": {
-    "municipality": "Averøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "balsfjord": {
-    "municipality": "Balsfjord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bamble": {
-    "municipality": "Bamble",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 4,
-    "deduction": 400000
-  },
-  "bardu": {
-    "municipality": "Bardu",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "beiarn": {
-    "municipality": "Beiarn",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bergen": {
-    "municipality": "Bergen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.6,
-    "taxCompanyPermill": 5,
-    "deduction": 750000
-  },
-  "berlevag": {
-    "municipality": "Berlevåg",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bindal": {
-    "municipality": "Bindal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "birkenes": {
-    "municipality": "Birkenes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.9,
-    "taxCompanyPermill": 7,
-    "deduction": 50000
-  },
-  "bjerkreim": {
-    "municipality": "Bjerkreim",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bodo": {
-    "municipality": "Bodø",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6.2,
-    "deduction": 125000
-  },
-  "bokn": {
-    "municipality": "Bokn",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bremanger": {
-    "municipality": "Bremanger",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 250000
-  },
-  "bronnoy": {
-    "municipality": "Brønnøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bygland": {
-    "municipality": "Bygland",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bykle": {
-    "municipality": "Bykle",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "bo": {
-    "municipality": "Bø",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 2,
-    "deduction": 0
-  },
-  "bomlo": {
-    "municipality": "Bømlo",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.2,
-    "taxCompanyPermill": 4.5,
-    "deduction": 0
-  },
-  "batsfjord": {
-    "municipality": "Båtsfjord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 5,
-    "deduction": 0
-  },
-  "deatnu-tana": {
-    "municipality": "Deatnu - Tana",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 4.75,
-    "deduction": 50000
-  },
-  "dielddanuorri-tjeldsund": {
-    "municipality": "Dielddanuorri - Tjeldsund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1.5,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "dovre": {
-    "municipality": "Dovre",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.7,
-    "taxCompanyPermill": 2.3,
-    "deduction": 110000
-  },
-  "drangedal": {
-    "municipality": "Drangedal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "donna": {
-    "municipality": "Dønna",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "eidfjord": {
-    "municipality": "Eidfjord",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "eidskog": {
-    "municipality": "Eidskog",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "eidsvoll": {
-    "municipality": "Eidsvoll",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 0,
-    "deduction": 400000
-  },
-  "eigersund": {
-    "municipality": "Eigersund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.63,
-    "taxCompanyPermill": 5.9,
-    "deduction": 0
-  },
-  "elverum": {
-    "municipality": "Elverum",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "engerdal": {
-    "municipality": "Engerdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.8,
-    "taxCompanyPermill": 6,
-    "deduction": 0
-  },
-  "etne": {
-    "municipality": "Etne",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 175000
-  },
-  "etnedal": {
-    "municipality": "Etnedal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.9,
-    "taxCompanyPermill": 5,
-    "deduction": 0
-  },
-  "evenes-evenassi": {
-    "municipality": "Evenes - Evenássi",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "evje-og-hornnes": {
-    "municipality": "Evje og Hornnes",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "farsund": {
-    "municipality": "Farsund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 5.5,
-    "deduction": 450000
-  },
-  "fauske-fuossko": {
-    "municipality": "Fauske - Fuossko",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "fedje": {
-    "municipality": "Fedje",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "fitjar": {
-    "municipality": "Fitjar",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 6,
-    "deduction": 350000
-  },
-  "fjaler": {
-    "municipality": "Fjaler",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "fjord": {
-    "municipality": "Fjord",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "flakstad": {
-    "municipality": "Flakstad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "flatanger": {
-    "municipality": "Flatanger",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "flekkefjord": {
-    "municipality": "Flekkefjord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "flesberg": {
-    "municipality": "Flesberg",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "fla": {
-    "municipality": "Flå",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "folldal": {
-    "municipality": "Folldal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "fredrikstad": {
-    "municipality": "Fredrikstad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.2,
-    "taxCompanyPermill": 6.4,
-    "deduction": 1000000
-  },
-  "frogn": {
-    "municipality": "Frogn",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 3,
-    "deduction": 1000000
-  },
-  "froland": {
-    "municipality": "Froland",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 50000
-  },
-  "frosta": {
-    "municipality": "Frosta",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "froya": {
-    "municipality": "Frøya",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "fyresdal": {
-    "municipality": "Fyresdal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gaivuotna-kafjord-kaivuono": {
-    "municipality": "Gáivuotna - Kåfjord - Kaivuono",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gamvik": {
-    "municipality": "Gamvik",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 2,
-    "deduction": 0
-  },
-  "gausdal": {
-    "municipality": "Gausdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gildeskal": {
-    "municipality": "Gildeskål",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 335000
-  },
-  "giske": {
-    "municipality": "Giske",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "gjemnes": {
-    "municipality": "Gjemnes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gjerstad": {
-    "municipality": "Gjerstad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gjesdal": {
-    "municipality": "Gjesdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 5,
-    "deduction": 100000
-  },
-  "gjovik": {
-    "municipality": "Gjøvik",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 5,
-    "deduction": 200000
-  },
-  "gloppen": {
-    "municipality": "Gloppen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gol": {
-    "municipality": "Gol",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gran": {
-    "municipality": "Gran",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.5,
-    "taxCompanyPermill": 3.5,
-    "deduction": 50000
-  },
-  "grane": {
-    "municipality": "Grane",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gratangen": {
-    "municipality": "Gratangen",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "grimstad": {
-    "municipality": "Grimstad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.6,
-    "taxCompanyPermill": 3.9,
-    "deduction": 210000
-  },
-  "grong": {
-    "municipality": "Grong",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "grue": {
-    "municipality": "Grue",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "gulen": {
-    "municipality": "Gulen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 1
-  },
-  "guovdageaidnu-kautokeino": {
-    "municipality": "Guovdageaidnu - Kautokeino",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hadsel": {
-    "municipality": "Hadsel",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "halden": {
-    "municipality": "Halden",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 500000
-  },
-  "hamar": {
-    "municipality": "Hamar",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 5.7,
-    "deduction": 260000
-  },
-  "hamaroy-habmer": {
-    "municipality": "Hamarøy - Hábmer",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 420860
-  },
-  "hammerfest-hammerfeasta": {
-    "municipality": "Hammerfest - Hámmerfeasta",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 600000
-  },
-  "haram": {
-    "municipality": "Haram",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1.5,
-    "taxCompanyPermill": 1.5,
-    "deduction": 0
-  },
-  "hareid": {
-    "municipality": "Hareid",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "harstad-harsttak": {
-    "municipality": "Harstad - Hárstták",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6.5,
-    "deduction": 250000
-  },
-  "hattfjelldal-aarborte": {
-    "municipality": "Hattfjelldal - Aarborte",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "haugesund": {
-    "municipality": "Haugesund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 5.15,
-    "deduction": 600000
-  },
-  "heim": {
-    "municipality": "Heim",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.5,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hemnes": {
-    "municipality": "Hemnes",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hemsedal": {
-    "municipality": "Hemsedal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.5,
-    "taxCompanyPermill": 7,
-    "deduction": 1000000
-  },
-  "heroy-more-og-romsdal": {
-    "municipality": "Herøy (Møre og Romsdal)",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 1,
-    "deduction": 0
-  },
-  "heroy-nordland": {
-    "municipality": "Herøy (Nordland)",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 7,
-    "deduction": 100000
-  },
-  "hitra": {
-    "municipality": "Hitra",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hjartdal": {
-    "municipality": "Hjartdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.75,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hjelmeland": {
-    "municipality": "Hjelmeland",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hol": {
-    "municipality": "Hol",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "holmestrand": {
-    "municipality": "Holmestrand",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 0,
-    "deduction": 1000000
-  },
-  "holtalen": {
-    "municipality": "Holtålen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "horten": {
-    "municipality": "Horten",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "hurdal": {
-    "municipality": "Hurdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 2.5,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "hustadvika": {
-    "municipality": "Hustadvika",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 200000
-  },
-  "hvaler": {
-    "municipality": "Hvaler",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 2.1,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "hyllestad": {
-    "municipality": "Hyllestad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hoyanger": {
-    "municipality": "Høyanger",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "hoylandet": {
-    "municipality": "Høylandet",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "ibestad": {
-    "municipality": "Ibestad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 2,
-    "deduction": 0
-  },
-  "inderoy": {
-    "municipality": "Inderøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.5,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "indre-fosen": {
-    "municipality": "Indre Fosen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.5,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "indre-ostfold": {
-    "municipality": "Indre Østfold",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "iveland": {
-    "municipality": "Iveland",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 7,
-    "deduction": 750000
-  },
-  "jevnaker": {
-    "municipality": "Jevnaker",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.8,
-    "taxCompanyPermill": 2.8,
-    "deduction": 400000
-  },
-  "karlsoy": {
-    "municipality": "Karlsøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "karmoy": {
-    "municipality": "Karmøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.8,
-    "taxCompanyPermill": 7,
-    "deduction": 935000
-  },
-  "kinn": {
-    "municipality": "Kinn",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.3,
-    "taxCompanyPermill": 5,
-    "deduction": 0
-  },
-  "kongsberg": {
-    "municipality": "Kongsberg",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 700000
-  },
-  "kongsvinger": {
-    "municipality": "Kongsvinger",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "kragero": {
-    "municipality": "Kragerø",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 3,
-    "deduction": 200000
-  },
-  "kristiansand": {
-    "municipality": "Kristiansand",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.01,
-    "taxCompanyPermill": 2.01,
-    "deduction": 0
-  },
-  "kristiansund": {
-    "municipality": "Kristiansund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "krodsherad": {
-    "municipality": "Krødsherad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 3,
-    "deduction": 200000
-  },
-  "kvam": {
-    "municipality": "Kvam",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.3,
-    "taxCompanyPermill": 7,
-    "deduction": 350000
-  },
-  "kvinesdal": {
-    "municipality": "Kvinesdal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "kvinnherad": {
-    "municipality": "Kvinnherad",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "kviteseid": {
-    "municipality": "Kviteseid",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "kvitsoy": {
-    "municipality": "Kvitsøy",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "kvaefjord": {
-    "municipality": "Kvæfjord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "kvaenangen": {
-    "municipality": "Kvænangen",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "lebesby": {
-    "municipality": "Lebesby",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "leirfjord": {
-    "municipality": "Leirfjord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "leka": {
-    "municipality": "Leka",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.9,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "lesja": {
-    "municipality": "Lesja",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 500000
-  },
-  "levanger": {
-    "municipality": "Levanger",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.2,
-    "taxCompanyPermill": 4.4,
-    "deduction": 0
-  },
-  "lierne": {
-    "municipality": "Lierne",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "lillehammer": {
-    "municipality": "Lillehammer",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 185000
-  },
-  "lillesand": {
-    "municipality": "Lillesand",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 3,
-    "deduction": 300000
-  },
-  "lillestrom": {
-    "municipality": "Lillestrøm",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 2,
-    "deduction": 2200000
-  },
-  "lindesnes": {
-    "municipality": "Lindesnes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 5.5,
-    "deduction": 0
-  },
-  "loabak-lavangen": {
-    "municipality": "Loabák - Lavangen",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "lom": {
-    "municipality": "Lom",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 300000
-  },
-  "loppa": {
-    "municipality": "Loppa",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "lund": {
-    "municipality": "Lund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 400000
-  },
-  "lunner": {
-    "municipality": "Lunner",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6,
-    "deduction": 100000
-  },
-  "luroy": {
-    "municipality": "Lurøy",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "luster": {
-    "municipality": "Luster",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "lyngdal": {
-    "municipality": "Lyngdal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "lyngen": {
-    "municipality": "Lyngen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 5,
-    "deduction": 0
-  },
-  "laerdal": {
-    "municipality": "Lærdal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "lodingen": {
-    "municipality": "Lødingen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 50000
-  },
-  "lorenskog": {
-    "municipality": "Lørenskog",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "loten": {
-    "municipality": "Løten",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.3,
-    "taxCompanyPermill": 3.3,
-    "deduction": 0
-  },
-  "malvik": {
-    "municipality": "Malvik",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1.9,
-    "taxCompanyPermill": 4,
-    "deduction": 200000
-  },
-  "marker": {
-    "municipality": "Marker",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "masfjorden": {
-    "municipality": "Masfjorden",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "melhus": {
-    "municipality": "Melhus",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 3.8,
-    "deduction": 170000
-  },
-  "meloy": {
-    "municipality": "Meløy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "meraker": {
-    "municipality": "Meråker",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "midtre-gauldal": {
-    "municipality": "Midtre Gauldal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "midt-telemark": {
-    "municipality": "Midt-Telemark",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 5.6,
-    "deduction": 0
-  },
-  "modalen": {
-    "municipality": "Modalen",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "modum": {
-    "municipality": "Modum",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "molde": {
-    "municipality": "Molde",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.6,
-    "taxCompanyPermill": 3.6,
-    "deduction": 0
-  },
-  "moskenes": {
-    "municipality": "Moskenes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "moss": {
-    "municipality": "Moss",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.38,
-    "taxCompanyPermill": 2.38,
-    "deduction": 0
-  },
-  "malselv": {
-    "municipality": "Målselv",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "masoy": {
-    "municipality": "Måsøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "namsos-naavmesjenjaelmie": {
-    "municipality": "Namsos - Nåavmesjenjaelmie",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.9,
-    "taxCompanyPermill": 3.9,
-    "deduction": 0
-  },
-  "namsskogan": {
-    "municipality": "Namsskogan",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "narvik": {
-    "municipality": "Narvik",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.25,
-    "taxCompanyPermill": 7,
-    "deduction": 100000
-  },
-  "nes": {
-    "municipality": "Nes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1.88,
-    "taxCompanyPermill": 1.25,
-    "deduction": 200000
-  },
-  "nesbyen": {
-    "municipality": "Nesbyen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 200000
-  },
-  "nesna": {
-    "municipality": "Nesna",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1.65,
-    "taxCompanyPermill": 3.15,
-    "deduction": 0
-  },
-  "nesodden": {
-    "municipality": "Nesodden",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 6.5,
-    "deduction": 0
-  },
-  "nissedal": {
-    "municipality": "Nissedal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.86,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "nittedal": {
-    "municipality": "Nittedal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.1,
-    "taxCompanyPermill": 2.5,
-    "deduction": 1300000
-  },
-  "nome": {
-    "municipality": "Nome",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 250000
-  },
-  "nord-aurdal": {
-    "municipality": "Nord-Aurdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "nord-fron": {
-    "municipality": "Nord-Fron",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.5,
-    "taxCompanyPermill": 7,
-    "deduction": 300000
-  },
-  "nordkapp": {
-    "municipality": "Nordkapp",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "nord-odal": {
-    "municipality": "Nord-Odal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "nordre-land": {
-    "municipality": "Nordre Land",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.7,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "nordreisa-raisa-raisi": {
-    "municipality": "Nordreisa - Ráisa - Raisi",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 200000
-  },
-  "nore-og-uvdal": {
-    "municipality": "Nore og Uvdal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "notodden": {
-    "municipality": "Notodden",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.5,
-    "taxCompanyPermill": 6.4,
-    "deduction": 0
-  },
-  "naeroysund": {
-    "municipality": "Nærøysund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.1,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "oppdal": {
-    "municipality": "Oppdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.2,
-    "taxCompanyPermill": 5.55,
-    "deduction": 0
-  },
-  "orkland": {
-    "municipality": "Orkland",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "os": {
-    "municipality": "Os",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "osen": {
-    "municipality": "Osen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 200000
-  },
-  "oslo": {
-    "municipality": "Oslo",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.35,
-    "taxCompanyPermill": 3.7,
-    "deduction": 4700000
-  },
-  "osteroy": {
-    "municipality": "Osterøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "overhalla": {
-    "municipality": "Overhalla",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "porsanger-porsangu-porsanki": {
-    "municipality": "Porsanger - Porsángu - Porsanki",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6,
-    "deduction": 0
-  },
-  "porsgrunn": {
-    "municipality": "Porsgrunn",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6,
-    "deduction": 1200000
-  },
-  "rakkestad": {
-    "municipality": "Rakkestad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4.75,
-    "deduction": 0
-  },
-  "rana": {
-    "municipality": "Rana",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 300000
-  },
-  "randaberg": {
-    "municipality": "Randaberg",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 4.79,
-    "deduction": 245000
-  },
-  "rauma": {
-    "municipality": "Rauma",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 100000
-  },
-  "rendalen": {
-    "municipality": "Rendalen",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "rennebu": {
-    "municipality": "Rennebu",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "rindal": {
-    "municipality": "Rindal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "ringebu": {
-    "municipality": "Ringebu",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 3.6,
-    "deduction": 100000
-  },
-  "ringerike": {
-    "municipality": "Ringerike",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.4,
-    "taxCompanyPermill": 3.7,
-    "deduction": 400000
-  },
-  "ringsaker": {
-    "municipality": "Ringsaker",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "risor": {
-    "municipality": "Risør",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 3.8,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "rollag": {
-    "municipality": "Rollag",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "rodoy": {
-    "municipality": "Rødøy",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "roros-rosse": {
-    "municipality": "Røros - Rosse",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4.75,
-    "deduction": 0
-  },
-  "rost": {
-    "municipality": "Røst",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 10000
-  },
-  "rade": {
-    "municipality": "Råde",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 2,
-    "deduction": 0
-  },
-  "raarvihke-royrvik": {
-    "municipality": "Raarvihke - Røyrvik",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "salangen": {
-    "municipality": "Salangen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "saltdal": {
-    "municipality": "Saltdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "samnanger": {
-    "municipality": "Samnanger",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 7,
-    "deduction": 30000
-  },
-  "sandnes": {
-    "municipality": "Sandnes",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sarpsborg": {
-    "municipality": "Sarpsborg",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.6,
-    "taxCompanyPermill": 5.2,
-    "deduction": 300000
-  },
-  "sauda": {
-    "municipality": "Sauda",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sel": {
-    "municipality": "Sel",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "selbu": {
-    "municipality": "Selbu",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "seljord": {
-    "municipality": "Seljord",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "senja": {
-    "municipality": "Senja",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 6,
-    "deduction": 0
-  },
-  "sigdal": {
-    "municipality": "Sigdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 4,
-    "deduction": 100000
-  },
-  "siljan": {
-    "municipality": "Siljan",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sirdal": {
-    "municipality": "Sirdal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "skaun": {
-    "municipality": "Skaun",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.6,
-    "taxCompanyPermill": 7,
-    "deduction": 150000
-  },
-  "skien": {
-    "municipality": "Skien",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.9,
-    "taxCompanyPermill": 3.2,
-    "deduction": 650000
-  },
-  "skiptvet": {
-    "municipality": "Skiptvet",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "skjervoy": {
-    "municipality": "Skjervøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 5,
-    "deduction": 0
-  },
-  "skjak": {
-    "municipality": "Skjåk",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "smola": {
-    "municipality": "Smøla",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "snaase-snasa": {
-    "municipality": "Snåase - Snåsa",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sogndal": {
-    "municipality": "Sogndal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sokndal": {
-    "municipality": "Sokndal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "solund": {
-    "municipality": "Solund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "sortland-suorta": {
-    "municipality": "Sortland - Suortá",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 200000
-  },
-  "stad": {
-    "municipality": "Stad",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 3.5,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "stange": {
-    "municipality": "Stange",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.7,
-    "taxCompanyPermill": 5.9,
-    "deduction": 0
-  },
-  "stavanger": {
-    "municipality": "Stavanger",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 2.3,
-    "deduction": 0
-  },
-  "steigen": {
-    "municipality": "Steigen",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "steinkjer": {
-    "municipality": "Steinkjer",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.15,
-    "taxCompanyPermill": 4.8,
-    "deduction": 0
-  },
-  "stord": {
-    "municipality": "Stord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1.8,
-    "taxCompanyPermill": 7,
-    "deduction": 600000
-  },
-  "stor-elvdal": {
-    "municipality": "Stor-Elvdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 5,
-    "deduction": 0
-  },
-  "storfjord-omasvuotna-omasvuono": {
-    "municipality": "Storfjord - Omasvuotna - Omasvuono",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "strand": {
-    "municipality": "Strand",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "stranda": {
-    "municipality": "Stranda",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6,
-    "deduction": 0
-  },
-  "stryn": {
-    "municipality": "Stryn",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.4,
-    "taxCompanyPermill": 3.4,
-    "deduction": 0
-  },
-  "sula": {
-    "municipality": "Sula",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 1,
-    "deduction": 0
-  },
-  "suldal": {
-    "municipality": "Suldal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sunndal": {
-    "municipality": "Sunndal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 200000
-  },
-  "sunnfjord": {
-    "municipality": "Sunnfjord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.7,
-    "taxCompanyPermill": 6.8,
-    "deduction": 0
-  },
-  "surnadal": {
-    "municipality": "Surnadal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sykkylven": {
-    "municipality": "Sykkylven",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 2.1,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "somna": {
-    "municipality": "Sømna",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "sor-aurdal": {
-    "municipality": "Sør-Aurdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sorfold": {
-    "municipality": "Sørfold",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sor-fron": {
-    "municipality": "Sør-Fron",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.8,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "sor-odal": {
-    "municipality": "Sør-Odal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6.5,
-    "deduction": 0
-  },
-  "sor-varanger": {
-    "municipality": "Sør-Varanger",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "time": {
-    "municipality": "Time",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 5,
-    "deduction": 0
-  },
-  "tingvoll": {
-    "municipality": "Tingvoll",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "tinn": {
-    "municipality": "Tinn",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "tokke": {
-    "municipality": "Tokke",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "tolga": {
-    "municipality": "Tolga",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "tromso": {
-    "municipality": "Tromsø",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.9,
-    "taxCompanyPermill": 7,
-    "deduction": 145000
-  },
-  "trondheim-traante": {
-    "municipality": "Trondheim - Tråante",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.65,
-    "taxCompanyPermill": 3.37,
-    "deduction": 650000
-  },
-  "trysil": {
-    "municipality": "Trysil",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.3,
-    "taxCompanyPermill": 7,
-    "deduction": 250000
-  },
-  "tvedestrand": {
-    "municipality": "Tvedestrand",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "tydal": {
-    "municipality": "Tydal",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "tynset": {
-    "municipality": "Tynset",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "tysnes": {
-    "municipality": "Tysnes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "tysvaer": {
-    "municipality": "Tysvær",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "ullensaker": {
-    "municipality": "Ullensaker",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 2.75,
-    "deduction": 0
-  },
-  "ullensvang": {
-    "municipality": "Ullensvang",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "ulstein": {
-    "municipality": "Ulstein",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 1.5,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "ulvik": {
-    "municipality": "Ulvik",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "unjarga-nesseby": {
-    "municipality": "Unjárga - Nesseby",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "utsira": {
-    "municipality": "Utsira",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vadso": {
-    "municipality": "Vadsø",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "vaksdal": {
-    "municipality": "Vaksdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3.2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "valle": {
-    "municipality": "Valle",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vang": {
-    "municipality": "Vang",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vardo": {
-    "municipality": "Vardø",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 2,
-    "deduction": 100000
-  },
-  "vefsn": {
-    "municipality": "Vefsn",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 3.6,
-    "deduction": 200000
-  },
-  "vega": {
-    "municipality": "Vega",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "vegarshei": {
-    "municipality": "Vegårshei",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "vennesla": {
-    "municipality": "Vennesla",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 600000
-  },
-  "verdal": {
-    "municipality": "Verdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.5,
-    "taxCompanyPermill": 4.5,
-    "deduction": 0
-  },
-  "vestby": {
-    "municipality": "Vestby",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vestnes": {
-    "municipality": "Vestnes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6.7,
-    "deduction": 0
-  },
-  "vestre-slidre": {
-    "municipality": "Vestre Slidre",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vestre-toten": {
-    "municipality": "Vestre Toten",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6,
-    "deduction": 0
-  },
-  "vestvagoy": {
-    "municipality": "Vestvågøy",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 50000
-  },
-  "vevelstad": {
-    "municipality": "Vevelstad",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vik": {
-    "municipality": "Vik",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vindafjord": {
-    "municipality": "Vindafjord",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6.5,
-    "deduction": 0
-  },
-  "vinje": {
-    "municipality": "Vinje",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "volda": {
-    "municipality": "Volda",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "voss": {
-    "municipality": "Voss",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.1,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "vaeroy": {
-    "municipality": "Værøy",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 4,
-    "deduction": 0
-  },
-  "vagan": {
-    "municipality": "Vågan",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 6.7,
-    "deduction": 0
-  },
-  "vaga": {
-    "municipality": "Vågå",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "valer-innlandet": {
-    "municipality": "Våler (Innlandet)",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "valer-ostfold": {
-    "municipality": "Våler (Østfold)",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2.5,
-    "taxCompanyPermill": 2.5,
-    "deduction": 0
-  },
-  "orland": {
-    "municipality": "Ørland",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "orsta": {
-    "municipality": "Ørsta",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 3,
-    "taxCompanyPermill": 3,
-    "deduction": 0
-  },
-  "ostre-toten": {
-    "municipality": "Østre Toten",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": false,
-    "taxHomePermill": 3.27,
-    "taxCompanyPermill": 0,
-    "deduction": 0
-  },
-  "oyer": {
-    "municipality": "Øyer",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "oygarden": {
-    "municipality": "Øygarden",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "oystre-slidre": {
-    "municipality": "Øystre Slidre",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "afjord": {
-    "municipality": "Åfjord",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "al": {
-    "municipality": "Ål",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "alesund": {
-    "municipality": "Ålesund",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 2,
-    "taxCompanyPermill": 2,
-    "deduction": 0
-  },
-  "amli": {
-    "municipality": "Åmli",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "amot": {
-    "municipality": "Åmot",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "ardal": {
-    "municipality": "Årdal",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "as": {
-    "municipality": "Ås",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 1,
-    "taxCompanyPermill": 7,
-    "deduction": 1000000
-  },
-  "aseral": {
-    "municipality": "Åseral",
-    "hasTaxOnHomes": false,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 0,
-    "taxCompanyPermill": 7,
-    "deduction": 0
-  },
-  "asnes": {
-    "municipality": "Åsnes",
-    "hasTaxOnHomes": true,
-    "hasTaxOnCompanies": true,
-    "taxHomePermill": 4,
-    "taxCompanyPermill": 4,
-    "deduction": 25000
-  }
+    "alstahaug": {
+        "municipality": "Alstahaug",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "alta": {
+        "municipality": "Alta",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "alvdal": {
+        "municipality": "Alvdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "alver": {
+        "municipality": "Alver",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "andoy": {
+        "municipality": "Andøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "aremark": {
+        "municipality": "Aremark",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "arendal": {
+        "municipality": "Arendal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4.7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "askvoll": {
+        "municipality": "Askvoll",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "askoy": {
+        "municipality": "Askøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 1,
+        "deduction": 400000,
+        "taxablePercent": 70
+    },
+    "aukra": {
+        "municipality": "Aukra",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "aure": {
+        "municipality": "Aure",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "aurland": {
+        "municipality": "Aurland",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "aurskog-holand": {
+        "municipality": "Aurskog-Høland",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 0,
+        "deduction": 800000,
+        "taxablePercent": 70
+    },
+    "austrheim": {
+        "municipality": "Austrheim",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "averoy": {
+        "municipality": "Averøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "balsfjord": {
+        "municipality": "Balsfjord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bamble": {
+        "municipality": "Bamble",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 4,
+        "deduction": 400000,
+        "taxablePercent": 70
+    },
+    "bardu": {
+        "municipality": "Bardu",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "beiarn": {
+        "municipality": "Beiarn",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bergen": {
+        "municipality": "Bergen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.6,
+        "taxCompanyPermill": 5,
+        "deduction": 750000,
+        "taxablePercent": 70
+    },
+    "berlevag": {
+        "municipality": "Berlevåg",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bindal": {
+        "municipality": "Bindal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "birkenes": {
+        "municipality": "Birkenes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.9,
+        "taxCompanyPermill": 7,
+        "deduction": 50000,
+        "taxablePercent": 70
+    },
+    "bjerkreim": {
+        "municipality": "Bjerkreim",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bodo": {
+        "municipality": "Bodø",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6.2,
+        "deduction": 125000,
+        "taxablePercent": 70
+    },
+    "bokn": {
+        "municipality": "Bokn",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bremanger": {
+        "municipality": "Bremanger",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 250000,
+        "taxablePercent": 70
+    },
+    "bronnoy": {
+        "municipality": "Brønnøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bygland": {
+        "municipality": "Bygland",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bykle": {
+        "municipality": "Bykle",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bo": {
+        "municipality": "Bø",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 2,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "bomlo": {
+        "municipality": "Bømlo",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.2,
+        "taxCompanyPermill": 4.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "batsfjord": {
+        "municipality": "Båtsfjord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "deatnu-tana": {
+        "municipality": "Deatnu - Tana",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 4.75,
+        "deduction": 50000,
+        "taxablePercent": 70
+    },
+    "dielddanuorri-tjeldsund": {
+        "municipality": "Dielddanuorri - Tjeldsund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1.5,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "dovre": {
+        "municipality": "Dovre",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.7,
+        "taxCompanyPermill": 2.3,
+        "deduction": 110000,
+        "taxablePercent": 70
+    },
+    "drangedal": {
+        "municipality": "Drangedal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "donna": {
+        "municipality": "Dønna",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "eidfjord": {
+        "municipality": "Eidfjord",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "eidskog": {
+        "municipality": "Eidskog",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "eidsvoll": {
+        "municipality": "Eidsvoll",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 0,
+        "deduction": 400000,
+        "taxablePercent": 70
+    },
+    "eigersund": {
+        "municipality": "Eigersund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.63,
+        "taxCompanyPermill": 5.9,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "elverum": {
+        "municipality": "Elverum",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "engerdal": {
+        "municipality": "Engerdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.8,
+        "taxCompanyPermill": 6,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "etne": {
+        "municipality": "Etne",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 175000,
+        "taxablePercent": 70
+    },
+    "etnedal": {
+        "municipality": "Etnedal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.9,
+        "taxCompanyPermill": 5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "evenes-evenassi": {
+        "municipality": "Evenes - Evenássi",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "evje-og-hornnes": {
+        "municipality": "Evje og Hornnes",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "farsund": {
+        "municipality": "Farsund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 5.5,
+        "deduction": 450000,
+        "taxablePercent": 70
+    },
+    "fauske-fuossko": {
+        "municipality": "Fauske - Fuossko",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "fedje": {
+        "municipality": "Fedje",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "fitjar": {
+        "municipality": "Fitjar",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 6,
+        "deduction": 350000,
+        "taxablePercent": 70
+    },
+    "fjaler": {
+        "municipality": "Fjaler",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "fjord": {
+        "municipality": "Fjord",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "flakstad": {
+        "municipality": "Flakstad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "flatanger": {
+        "municipality": "Flatanger",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "flekkefjord": {
+        "municipality": "Flekkefjord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "flesberg": {
+        "municipality": "Flesberg",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "fla": {
+        "municipality": "Flå",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "folldal": {
+        "municipality": "Folldal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "fredrikstad": {
+        "municipality": "Fredrikstad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.2,
+        "taxCompanyPermill": 6.4,
+        "deduction": 1000000,
+        "taxablePercent": 70
+    },
+    "frogn": {
+        "municipality": "Frogn",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 3,
+        "deduction": 1000000,
+        "taxablePercent": 70
+    },
+    "froland": {
+        "municipality": "Froland",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 50000,
+        "taxablePercent": 70
+    },
+    "frosta": {
+        "municipality": "Frosta",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "froya": {
+        "municipality": "Frøya",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "fyresdal": {
+        "municipality": "Fyresdal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gaivuotna-kafjord-kaivuono": {
+        "municipality": "Gáivuotna - Kåfjord - Kaivuono",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gamvik": {
+        "municipality": "Gamvik",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 2,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gausdal": {
+        "municipality": "Gausdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gildeskal": {
+        "municipality": "Gildeskål",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 335000,
+        "taxablePercent": 70
+    },
+    "giske": {
+        "municipality": "Giske",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gjemnes": {
+        "municipality": "Gjemnes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gjerstad": {
+        "municipality": "Gjerstad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gjesdal": {
+        "municipality": "Gjesdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 5,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "gjovik": {
+        "municipality": "Gjøvik",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 5,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "gloppen": {
+        "municipality": "Gloppen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gol": {
+        "municipality": "Gol",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gran": {
+        "municipality": "Gran",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.5,
+        "taxCompanyPermill": 3.5,
+        "deduction": 50000,
+        "taxablePercent": 70
+    },
+    "grane": {
+        "municipality": "Grane",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gratangen": {
+        "municipality": "Gratangen",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "grimstad": {
+        "municipality": "Grimstad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.6,
+        "taxCompanyPermill": 3.9,
+        "deduction": 210000,
+        "taxablePercent": 70
+    },
+    "grong": {
+        "municipality": "Grong",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "grue": {
+        "municipality": "Grue",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "gulen": {
+        "municipality": "Gulen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 1,
+        "taxablePercent": 70
+    },
+    "guovdageaidnu-kautokeino": {
+        "municipality": "Guovdageaidnu - Kautokeino",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hadsel": {
+        "municipality": "Hadsel",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "halden": {
+        "municipality": "Halden",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 500000,
+        "taxablePercent": 70
+    },
+    "hamar": {
+        "municipality": "Hamar",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 5.7,
+        "deduction": 260000,
+        "taxablePercent": 70
+    },
+    "hamaroy-habmer": {
+        "municipality": "Hamarøy - Hábmer",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 420860,
+        "taxablePercent": 70
+    },
+    "hammerfest-hammerfeasta": {
+        "municipality": "Hammerfest - Hámmerfeasta",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 600000,
+        "taxablePercent": 70
+    },
+    "haram": {
+        "municipality": "Haram",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1.5,
+        "taxCompanyPermill": 1.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hareid": {
+        "municipality": "Hareid",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "harstad-harsttak": {
+        "municipality": "Harstad - Hárstták",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6.5,
+        "deduction": 250000,
+        "taxablePercent": 70
+    },
+    "hattfjelldal-aarborte": {
+        "municipality": "Hattfjelldal - Aarborte",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "haugesund": {
+        "municipality": "Haugesund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 5.15,
+        "deduction": 600000,
+        "taxablePercent": 70
+    },
+    "heim": {
+        "municipality": "Heim",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.5,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hemnes": {
+        "municipality": "Hemnes",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hemsedal": {
+        "municipality": "Hemsedal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.5,
+        "taxCompanyPermill": 7,
+        "deduction": 1000000,
+        "taxablePercent": 70
+    },
+    "heroy-more-og-romsdal": {
+        "municipality": "Herøy (Møre og Romsdal)",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 1,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "heroy-nordland": {
+        "municipality": "Herøy (Nordland)",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 7,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "hitra": {
+        "municipality": "Hitra",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hjartdal": {
+        "municipality": "Hjartdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.75,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hjelmeland": {
+        "municipality": "Hjelmeland",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hol": {
+        "municipality": "Hol",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "holmestrand": {
+        "municipality": "Holmestrand",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 0,
+        "deduction": 1000000,
+        "taxablePercent": 70
+    },
+    "holtalen": {
+        "municipality": "Holtålen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "horten": {
+        "municipality": "Horten",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hurdal": {
+        "municipality": "Hurdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 2.5,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hustadvika": {
+        "municipality": "Hustadvika",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "hvaler": {
+        "municipality": "Hvaler",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 2.1,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hyllestad": {
+        "municipality": "Hyllestad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hoyanger": {
+        "municipality": "Høyanger",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "hoylandet": {
+        "municipality": "Høylandet",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ibestad": {
+        "municipality": "Ibestad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 2,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "inderoy": {
+        "municipality": "Inderøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.5,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "indre-fosen": {
+        "municipality": "Indre Fosen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.5,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "indre-ostfold": {
+        "municipality": "Indre Østfold",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "iveland": {
+        "municipality": "Iveland",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 7,
+        "deduction": 750000,
+        "taxablePercent": 70
+    },
+    "jevnaker": {
+        "municipality": "Jevnaker",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.8,
+        "taxCompanyPermill": 2.8,
+        "deduction": 400000,
+        "taxablePercent": 70
+    },
+    "karlsoy": {
+        "municipality": "Karlsøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "karmoy": {
+        "municipality": "Karmøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.8,
+        "taxCompanyPermill": 7,
+        "deduction": 935000,
+        "taxablePercent": 70
+    },
+    "kinn": {
+        "municipality": "Kinn",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.3,
+        "taxCompanyPermill": 5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kongsberg": {
+        "municipality": "Kongsberg",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 700000,
+        "taxablePercent": 70
+    },
+    "kongsvinger": {
+        "municipality": "Kongsvinger",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kragero": {
+        "municipality": "Kragerø",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 3,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "kristiansand": {
+        "municipality": "Kristiansand",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.01,
+        "taxCompanyPermill": 2.01,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kristiansund": {
+        "municipality": "Kristiansund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "krodsherad": {
+        "municipality": "Krødsherad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 3,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "kvam": {
+        "municipality": "Kvam",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.3,
+        "taxCompanyPermill": 7,
+        "deduction": 350000,
+        "taxablePercent": 70
+    },
+    "kvinesdal": {
+        "municipality": "Kvinesdal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kvinnherad": {
+        "municipality": "Kvinnherad",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kviteseid": {
+        "municipality": "Kviteseid",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kvitsoy": {
+        "municipality": "Kvitsøy",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kvaefjord": {
+        "municipality": "Kvæfjord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "kvaenangen": {
+        "municipality": "Kvænangen",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lebesby": {
+        "municipality": "Lebesby",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "leirfjord": {
+        "municipality": "Leirfjord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "leka": {
+        "municipality": "Leka",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.9,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lesja": {
+        "municipality": "Lesja",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 500000,
+        "taxablePercent": 70
+    },
+    "levanger": {
+        "municipality": "Levanger",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.2,
+        "taxCompanyPermill": 4.4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lierne": {
+        "municipality": "Lierne",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lillehammer": {
+        "municipality": "Lillehammer",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 185000,
+        "taxablePercent": 70
+    },
+    "lillesand": {
+        "municipality": "Lillesand",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 3,
+        "deduction": 300000,
+        "taxablePercent": 70
+    },
+    "lillestrom": {
+        "municipality": "Lillestrøm",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 2,
+        "deduction": 2200000,
+        "taxablePercent": 70
+    },
+    "lindesnes": {
+        "municipality": "Lindesnes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 5.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "loabak-lavangen": {
+        "municipality": "Loabák - Lavangen",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lom": {
+        "municipality": "Lom",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 300000,
+        "taxablePercent": 70
+    },
+    "loppa": {
+        "municipality": "Loppa",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lund": {
+        "municipality": "Lund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 400000,
+        "taxablePercent": 70
+    },
+    "lunner": {
+        "municipality": "Lunner",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "luroy": {
+        "municipality": "Lurøy",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "luster": {
+        "municipality": "Luster",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lyngdal": {
+        "municipality": "Lyngdal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lyngen": {
+        "municipality": "Lyngen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "laerdal": {
+        "municipality": "Lærdal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "lodingen": {
+        "municipality": "Lødingen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 50000,
+        "taxablePercent": 70
+    },
+    "lorenskog": {
+        "municipality": "Lørenskog",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "loten": {
+        "municipality": "Løten",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.3,
+        "taxCompanyPermill": 3.3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "malvik": {
+        "municipality": "Malvik",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1.9,
+        "taxCompanyPermill": 4,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "marker": {
+        "municipality": "Marker",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "masfjorden": {
+        "municipality": "Masfjorden",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "melhus": {
+        "municipality": "Melhus",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 3.8,
+        "deduction": 170000,
+        "taxablePercent": 70
+    },
+    "meloy": {
+        "municipality": "Meløy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "meraker": {
+        "municipality": "Meråker",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "midtre-gauldal": {
+        "municipality": "Midtre Gauldal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "midt-telemark": {
+        "municipality": "Midt-Telemark",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 5.6,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "modalen": {
+        "municipality": "Modalen",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "modum": {
+        "municipality": "Modum",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "molde": {
+        "municipality": "Molde",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.6,
+        "taxCompanyPermill": 3.6,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "moskenes": {
+        "municipality": "Moskenes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "moss": {
+        "municipality": "Moss",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.38,
+        "taxCompanyPermill": 2.38,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "malselv": {
+        "municipality": "Målselv",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "masoy": {
+        "municipality": "Måsøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "namsos-naavmesjenjaelmie": {
+        "municipality": "Namsos - Nåavmesjenjaelmie",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.9,
+        "taxCompanyPermill": 3.9,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "namsskogan": {
+        "municipality": "Namsskogan",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "narvik": {
+        "municipality": "Narvik",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.25,
+        "taxCompanyPermill": 7,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "nes": {
+        "municipality": "Nes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1.88,
+        "taxCompanyPermill": 1.25,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "nesbyen": {
+        "municipality": "Nesbyen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "nesna": {
+        "municipality": "Nesna",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1.65,
+        "taxCompanyPermill": 3.15,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "nesodden": {
+        "municipality": "Nesodden",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 6.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "nissedal": {
+        "municipality": "Nissedal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.86,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "nittedal": {
+        "municipality": "Nittedal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.1,
+        "taxCompanyPermill": 2.5,
+        "deduction": 1300000,
+        "taxablePercent": 70
+    },
+    "nome": {
+        "municipality": "Nome",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 250000,
+        "taxablePercent": 70
+    },
+    "nord-aurdal": {
+        "municipality": "Nord-Aurdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "nord-fron": {
+        "municipality": "Nord-Fron",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.5,
+        "taxCompanyPermill": 7,
+        "deduction": 300000,
+        "taxablePercent": 70
+    },
+    "nordkapp": {
+        "municipality": "Nordkapp",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "nord-odal": {
+        "municipality": "Nord-Odal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "nordre-land": {
+        "municipality": "Nordre Land",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.7,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "nordreisa-raisa-raisi": {
+        "municipality": "Nordreisa - Ráisa - Raisi",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "nore-og-uvdal": {
+        "municipality": "Nore og Uvdal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "notodden": {
+        "municipality": "Notodden",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.5,
+        "taxCompanyPermill": 6.4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "naeroysund": {
+        "municipality": "Nærøysund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.1,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "oppdal": {
+        "municipality": "Oppdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.2,
+        "taxCompanyPermill": 5.55,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "orkland": {
+        "municipality": "Orkland",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "os": {
+        "municipality": "Os",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "osen": {
+        "municipality": "Osen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "oslo": {
+        "municipality": "Oslo",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.35,
+        "taxCompanyPermill": 3.7,
+        "deduction": 4700000,
+        "taxablePercent": 70
+    },
+    "osteroy": {
+        "municipality": "Osterøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "overhalla": {
+        "municipality": "Overhalla",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "porsanger-porsangu-porsanki": {
+        "municipality": "Porsanger - Porsángu - Porsanki",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "porsgrunn": {
+        "municipality": "Porsgrunn",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6,
+        "deduction": 1200000,
+        "taxablePercent": 70
+    },
+    "rakkestad": {
+        "municipality": "Rakkestad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4.75,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "rana": {
+        "municipality": "Rana",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 300000,
+        "taxablePercent": 70
+    },
+    "randaberg": {
+        "municipality": "Randaberg",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 4.79,
+        "deduction": 245000,
+        "taxablePercent": 70
+    },
+    "rauma": {
+        "municipality": "Rauma",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "rendalen": {
+        "municipality": "Rendalen",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "rennebu": {
+        "municipality": "Rennebu",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "rindal": {
+        "municipality": "Rindal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ringebu": {
+        "municipality": "Ringebu",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 3.6,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "ringerike": {
+        "municipality": "Ringerike",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.4,
+        "taxCompanyPermill": 3.7,
+        "deduction": 400000,
+        "taxablePercent": 70
+    },
+    "ringsaker": {
+        "municipality": "Ringsaker",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "risor": {
+        "municipality": "Risør",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 3.8,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "rollag": {
+        "municipality": "Rollag",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "rodoy": {
+        "municipality": "Rødøy",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "roros-rosse": {
+        "municipality": "Røros - Rosse",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4.75,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "rost": {
+        "municipality": "Røst",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 10000,
+        "taxablePercent": 70
+    },
+    "rade": {
+        "municipality": "Råde",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 2,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "raarvihke-royrvik": {
+        "municipality": "Raarvihke - Røyrvik",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "salangen": {
+        "municipality": "Salangen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "saltdal": {
+        "municipality": "Saltdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "samnanger": {
+        "municipality": "Samnanger",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 7,
+        "deduction": 30000,
+        "taxablePercent": 70
+    },
+    "sandnes": {
+        "municipality": "Sandnes",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sarpsborg": {
+        "municipality": "Sarpsborg",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.6,
+        "taxCompanyPermill": 5.2,
+        "deduction": 300000,
+        "taxablePercent": 70
+    },
+    "sauda": {
+        "municipality": "Sauda",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sel": {
+        "municipality": "Sel",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "selbu": {
+        "municipality": "Selbu",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "seljord": {
+        "municipality": "Seljord",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "senja": {
+        "municipality": "Senja",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 6,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sigdal": {
+        "municipality": "Sigdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 4,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "siljan": {
+        "municipality": "Siljan",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sirdal": {
+        "municipality": "Sirdal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "skaun": {
+        "municipality": "Skaun",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.6,
+        "taxCompanyPermill": 7,
+        "deduction": 150000,
+        "taxablePercent": 70
+    },
+    "skien": {
+        "municipality": "Skien",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.9,
+        "taxCompanyPermill": 3.2,
+        "deduction": 650000,
+        "taxablePercent": 70
+    },
+    "skiptvet": {
+        "municipality": "Skiptvet",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "skjervoy": {
+        "municipality": "Skjervøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "skjak": {
+        "municipality": "Skjåk",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "smola": {
+        "municipality": "Smøla",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "snaase-snasa": {
+        "municipality": "Snåase - Snåsa",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sogndal": {
+        "municipality": "Sogndal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sokndal": {
+        "municipality": "Sokndal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "solund": {
+        "municipality": "Solund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sortland-suorta": {
+        "municipality": "Sortland - Suortá",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "stad": {
+        "municipality": "Stad",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 3.5,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "stange": {
+        "municipality": "Stange",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.7,
+        "taxCompanyPermill": 5.9,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "stavanger": {
+        "municipality": "Stavanger",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 2.3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "steigen": {
+        "municipality": "Steigen",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "steinkjer": {
+        "municipality": "Steinkjer",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.15,
+        "taxCompanyPermill": 4.8,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "stord": {
+        "municipality": "Stord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1.8,
+        "taxCompanyPermill": 7,
+        "deduction": 600000,
+        "taxablePercent": 70
+    },
+    "stor-elvdal": {
+        "municipality": "Stor-Elvdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "storfjord-omasvuotna-omasvuono": {
+        "municipality": "Storfjord - Omasvuotna - Omasvuono",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "strand": {
+        "municipality": "Strand",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "stranda": {
+        "municipality": "Stranda",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "stryn": {
+        "municipality": "Stryn",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.4,
+        "taxCompanyPermill": 3.4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sula": {
+        "municipality": "Sula",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 1,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "suldal": {
+        "municipality": "Suldal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sunndal": {
+        "municipality": "Sunndal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "sunnfjord": {
+        "municipality": "Sunnfjord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.7,
+        "taxCompanyPermill": 6.8,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "surnadal": {
+        "municipality": "Surnadal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sykkylven": {
+        "municipality": "Sykkylven",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 2.1,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "somna": {
+        "municipality": "Sømna",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sor-aurdal": {
+        "municipality": "Sør-Aurdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sorfold": {
+        "municipality": "Sørfold",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sor-fron": {
+        "municipality": "Sør-Fron",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.8,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sor-odal": {
+        "municipality": "Sør-Odal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "sor-varanger": {
+        "municipality": "Sør-Varanger",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "time": {
+        "municipality": "Time",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tingvoll": {
+        "municipality": "Tingvoll",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tinn": {
+        "municipality": "Tinn",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tokke": {
+        "municipality": "Tokke",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tolga": {
+        "municipality": "Tolga",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tromso": {
+        "municipality": "Tromsø",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.9,
+        "taxCompanyPermill": 7,
+        "deduction": 145000,
+        "taxablePercent": 70
+    },
+    "trondheim-traante": {
+        "municipality": "Trondheim - Tråante",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.65,
+        "taxCompanyPermill": 3.37,
+        "deduction": 650000,
+        "taxablePercent": 70
+    },
+    "trysil": {
+        "municipality": "Trysil",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.3,
+        "taxCompanyPermill": 7,
+        "deduction": 250000,
+        "taxablePercent": 70
+    },
+    "tvedestrand": {
+        "municipality": "Tvedestrand",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tydal": {
+        "municipality": "Tydal",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tynset": {
+        "municipality": "Tynset",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tysnes": {
+        "municipality": "Tysnes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "tysvaer": {
+        "municipality": "Tysvær",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ullensaker": {
+        "municipality": "Ullensaker",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 2.75,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ullensvang": {
+        "municipality": "Ullensvang",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ulstein": {
+        "municipality": "Ulstein",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 1.5,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ulvik": {
+        "municipality": "Ulvik",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "unjarga-nesseby": {
+        "municipality": "Unjárga - Nesseby",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "utsira": {
+        "municipality": "Utsira",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vadso": {
+        "municipality": "Vadsø",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vaksdal": {
+        "municipality": "Vaksdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3.2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "valle": {
+        "municipality": "Valle",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vang": {
+        "municipality": "Vang",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vardo": {
+        "municipality": "Vardø",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 2,
+        "deduction": 100000,
+        "taxablePercent": 70
+    },
+    "vefsn": {
+        "municipality": "Vefsn",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 3.6,
+        "deduction": 200000,
+        "taxablePercent": 70
+    },
+    "vega": {
+        "municipality": "Vega",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vegarshei": {
+        "municipality": "Vegårshei",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vennesla": {
+        "municipality": "Vennesla",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 600000,
+        "taxablePercent": 70
+    },
+    "verdal": {
+        "municipality": "Verdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.5,
+        "taxCompanyPermill": 4.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vestby": {
+        "municipality": "Vestby",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vestnes": {
+        "municipality": "Vestnes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6.7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vestre-slidre": {
+        "municipality": "Vestre Slidre",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vestre-toten": {
+        "municipality": "Vestre Toten",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vestvagoy": {
+        "municipality": "Vestvågøy",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 50000,
+        "taxablePercent": 70
+    },
+    "vevelstad": {
+        "municipality": "Vevelstad",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vik": {
+        "municipality": "Vik",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vindafjord": {
+        "municipality": "Vindafjord",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vinje": {
+        "municipality": "Vinje",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "volda": {
+        "municipality": "Volda",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "voss": {
+        "municipality": "Voss",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.1,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vaeroy": {
+        "municipality": "Værøy",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 4,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vagan": {
+        "municipality": "Vågan",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 6.7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "vaga": {
+        "municipality": "Vågå",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "valer-innlandet": {
+        "municipality": "Våler (Innlandet)",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "valer-ostfold": {
+        "municipality": "Våler (Østfold)",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2.5,
+        "taxCompanyPermill": 2.5,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "orland": {
+        "municipality": "Ørland",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "orsta": {
+        "municipality": "Ørsta",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 3,
+        "taxCompanyPermill": 3,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ostre-toten": {
+        "municipality": "Østre Toten",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": false,
+        "taxHomePermill": 3.27,
+        "taxCompanyPermill": 0,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "oyer": {
+        "municipality": "Øyer",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "oygarden": {
+        "municipality": "Øygarden",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "oystre-slidre": {
+        "municipality": "Øystre Slidre",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "afjord": {
+        "municipality": "Åfjord",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "al": {
+        "municipality": "Ål",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "alesund": {
+        "municipality": "Ålesund",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 2,
+        "taxCompanyPermill": 2,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "amli": {
+        "municipality": "Åmli",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "amot": {
+        "municipality": "Åmot",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "ardal": {
+        "municipality": "Årdal",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "as": {
+        "municipality": "Ås",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 1,
+        "taxCompanyPermill": 7,
+        "deduction": 1000000,
+        "taxablePercent": 70
+    },
+    "aseral": {
+        "municipality": "Åseral",
+        "hasTaxOnHomes": false,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 0,
+        "taxCompanyPermill": 7,
+        "deduction": 0,
+        "taxablePercent": 70
+    },
+    "asnes": {
+        "municipality": "Åsnes",
+        "hasTaxOnHomes": true,
+        "hasTaxOnCompanies": true,
+        "taxHomePermill": 4,
+        "taxCompanyPermill": 4,
+        "deduction": 25000,
+        "taxablePercent": 70
+    }
 }

@@ -113,8 +113,8 @@ it('loads fortune bracket config from DB with fallback', function () {
     expect((float) ($brackets[2]['percent'] ?? null))->toBe(1.1);
 });
 
-it('loads property tax percent and deduction from DB with fallback and caches results', function () {
-    // Only insert 2025 for property_holmestrand
+it('loads tax configuration from DB with fallback and caches results', function () {
+    // Test that TaxConfiguration model can store and retrieve configuration data with caching
     TaxConfiguration::create([
         'country_code' => 'no',
         'year' => 2025,
@@ -124,7 +124,6 @@ it('loads property tax percent and deduction from DB with fallback and caches re
         'configuration' => [
             'income' => 0.2, // percent
             'standardDeduction' => 50000,
-            'fortune' => 70, // taxable portion percent
         ],
         'user_id' => $this->user->id,
         'team_id' => $this->team->id,
@@ -147,7 +146,6 @@ it('loads property tax percent and deduction from DB with fallback and caches re
     expect($cfg1['income'] ?? null)->toBe(0.2);
     expect($cfg2['income'] ?? null)->toBe(0.2);
     expect($cfg1['standardDeduction'] ?? null)->toBe(50000);
-    expect($cfg1['fortune'] ?? null)->toBe(70);
 
     // Expect at least one query, but not more than 2 for both calls combined due to caching
     $count = collect($queries)->filter(fn ($q) => str_contains(strtolower($q['query']), 'tax_configurations'))->count();

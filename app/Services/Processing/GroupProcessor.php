@@ -174,15 +174,15 @@ class GroupProcessor
     public function calculateFirediffPercent(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
         if (Arr::get($totalH, "$year.fire.expenceAmount", 0) > 0) {
-            Arr::set($totalH, "$year.fire.diffDecimal", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.expenceAmount", 0));
+            Arr::set($totalH, "$year.fire.diffRate", Arr::get($totalH, "$year.fire.incomeAmount", 0) / Arr::get($totalH, "$year.fire.expenceAmount", 0));
         }
 
         if (Arr::get($companyH, "$year.fire.expenceAmount", 0) > 0) {
-            Arr::set($companyH, "$year.fire.diffDecimal", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.expenceAmount", 0));
+            Arr::set($companyH, "$year.fire.diffRate", Arr::get($companyH, "$year.fire.incomeAmount", 0) / Arr::get($companyH, "$year.fire.expenceAmount", 0));
         }
 
         if (Arr::get($privateH, "$year.fire.expenceAmount", 0) > 0) {
-            Arr::set($privateH, "$year.fire.diffDecimal", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.expenceAmount", 0));
+            Arr::set($privateH, "$year.fire.diffRate", Arr::get($privateH, "$year.fire.incomeAmount", 0) / Arr::get($privateH, "$year.fire.expenceAmount", 0));
         }
     }
 
@@ -198,16 +198,28 @@ class GroupProcessor
     public function calculateFortuneTax(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
         $totalResult = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($totalH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($totalH, "$year.asset.taxableAmount", $totalResult->taxableAmount);
-        Arr::set($totalH, "$year.asset.taxFortuneAmount", $totalResult->taxAmount);
+        Arr::set($totalH, "$year.asset.taxableAmount", $totalResult->taxableFortuneAmount);
+        Arr::set($totalH, "$year.asset.taxablePercent", $totalResult->taxableFortunePercent);
+        Arr::set($totalH, "$year.asset.taxableRate", $totalResult->taxableFortuneRate);
+
+        Arr::set($totalH, "$year.asset.taxFortuneAmount", $totalResult->taxFortuneAmount);
+        Arr::set($totalH, "$year.asset.taxFortunePercent", $totalResult->taxFortunePercent); // Use Rate not Percent for Excel export
+        Arr::set($totalH, "$year.asset.taxFortuneRate", $totalResult->taxFortuneRate); // Use Rate not Percent for Excel export
 
         $companyResult = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($companyH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($companyH, "$year.asset.taxableAmount", $companyResult->taxableAmount);
-        Arr::set($companyH, "$year.asset.taxFortuneAmount", $companyResult->taxAmount);
+        Arr::set($companyH, "$year.asset.taxableAmount", $companyResult->taxableFortuneAmount);
+        Arr::set($companyH, "$year.asset.taxablePercent", $companyResult->taxableFortunePercent);
+        Arr::set($companyH, "$year.asset.taxableRate", $companyResult->taxableFortuneRate);
+
+        Arr::set($companyH, "$year.asset.taxFortuneAmount", $companyResult->taxFortuneAmount);
+        Arr::set($companyH, "$year.asset.taxFortunePercent", $companyResult->taxFortunePercent); // Use Rate not Percent for Excel export
+        Arr::set($companyH, "$year.asset.taxFortuneRate", $companyResult->taxFortuneRate); // Use Rate not Percent for Excel export
 
         $privateResult = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($privateH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($privateH, "$year.asset.taxableAmount", $privateResult->taxableAmount);
-        Arr::set($privateH, "$year.asset.taxFortuneAmount", $privateResult->taxAmount);
+        Arr::set($privateH, "$year.asset.taxableAmount", $privateResult->taxableFortuneAmount);
+        Arr::set($privateH, "$year.asset.taxFortuneAmount", $privateResult->taxFortuneAmount);
+        Arr::set($privateH, "$year.asset.taxFortunePercent", $privateResult->taxFortunePercent); // Use Rate (not Percent for Excel export
+        Arr::set($privateH, "$year.asset.taxFortuneRate", $privateResult->taxFortuneRate); // Use Rate not Percent for Excel export
     }
 
     /**
@@ -296,15 +308,15 @@ class GroupProcessor
      */
     public function calculateCompanyDividendTax(array &$companyH, int $year): void
     {
-        // The tax rate for transferring company assets to a private person.
-        $realizationTaxDecimal = 37.8 / 100;
+        // FIX:  The tax rate for transferring company assets to a private person. Something is missing here
+        $realizationTaxRate = 37.8 / 100;
 
         // Retrieve the amount after normal taxation from realization in the companyH array.
         $originalAmount = Arr::get($companyH, "$year.realization.amount");
         $originalTaxAmount = Arr::get($companyH, "$year.realization.taxAmount");
 
         if ($originalAmount > 0) {
-            $dividendTaxAmount = round($originalAmount * $realizationTaxDecimal);
+            $dividendTaxAmount = round($originalAmount * $realizationTaxRate);
 
             // Calculate the final amount by subtracting the dividend tax from the original amount.
             $amount = round($originalAmount - $dividendTaxAmount);
@@ -318,12 +330,12 @@ class GroupProcessor
             // Update the companyH array with the calculated values.
             Arr::set($companyH, "$year.realization.amount", $amount);
             Arr::set($companyH, "$year.realization.taxAmount", $taxAmount);
-            Arr::set($companyH, "$year.realization.taxDecimal", $realizationTaxDecimal);
+            Arr::set($companyH, "$year.realization.taxRate", $realizationTaxRate);
             Arr::set($companyH, "$year.realization.description", $description);
         }
 
         Arr::set($companyH, "$year.realization.taxShieldAmount", 0);
-        Arr::set($companyH, "$year.realization.taxShieldDecimal", 0);
+        Arr::set($companyH, "$year.realization.taxShieldRate", 0);
     }
 
     /**

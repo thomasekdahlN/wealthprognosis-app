@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('tax_home_permill', 6, 3)->nullable(); // permille, e.g. 3.500
             $table->decimal('tax_company_permill', 6, 3)->nullable(); // permille
             $table->decimal('deduction', 12, 2)->default(0); // bunnfradrag NOK
-            $table->decimal('fortune_taxable_percent', 5, 2)->nullable(); // percentage of property value taxable for wealth tax, e.g. 70.00 for 70%
+            $table->decimal('taxable_percent', 5, 2)->default(100.00); // taxable percentage of market value, e.g. 100.00 for 100%, 80.00 for 80%
 
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('created_by')->nullable();

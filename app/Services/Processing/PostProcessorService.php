@@ -16,6 +16,8 @@
 
 namespace App\Services\Processing;
 
+use Illuminate\Support\Facades\Log;
+
 /**
  * PostProcessorService
  *
@@ -92,10 +94,13 @@ class PostProcessorService
                 continue; // Skip inactive assets
             }
 
+            Log::debug('****** YearlyProcessingStarted');
+
             for ($year = $economyStartYear; $year <= $deathYear; $year++) {
                 $datapath = "$assetname.$year";
 
-                $this->yearlyProcessor->processFortuneTaxYearly($dataH, $datapath, $thisYear); //Has to run before cashflow.
+                $this->yearlyProcessor->processFortuneTaxYearly($dataH, $datapath, $thisYear); // Has to run before cashflow.
+                $this->yearlyProcessor->processPropertyTaxYearly($dataH, $datapath, $thisYear); // Has to run before cashflow.
                 $this->yearlyProcessor->processCashFlowYearly($dataH, $datapath, $thisYear);
                 $this->yearlyProcessor->processAssetYearly($dataH, $datapath);
                 $this->yearlyProcessor->processPotentialYearly($dataH, $datapath);
@@ -130,6 +135,8 @@ class PostProcessorService
         callable $isShownInStatistics
     ): void {
         // Initialize group structures
+
+        Log::debug('****** GroupProcessingStarted');
         $this->groupProcessor->initGroups($privateH, $companyH, $economyStartYear, $deathYear);
 
         // Aggregate data from individual assets to groups

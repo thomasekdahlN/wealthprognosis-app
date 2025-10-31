@@ -17,6 +17,7 @@
 namespace App\Services\Tax;
 
 use App\Support\Contracts\TaxCalculatorInterface;
+use App\Support\ValueObjects\IncomeTaxResult;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -80,7 +81,6 @@ class TaxIncomeService implements TaxCalculatorInterface
      * @param  float|null  $income  The income for the tax calculation.
      * @param  float|null  $expence  The expense for the tax calculation.
      * @param  float|null  $interestAmount  The interest amount for the tax calculation.
-     * @return array{0: float, 1: float, 2: string} Returns array for backward compatibility
      */
     public function taxCalculationIncome(
         bool $debug,
@@ -90,7 +90,7 @@ class TaxIncomeService implements TaxCalculatorInterface
         ?float $income,
         ?float $expence,
         ?float $interestAmount
-    ): array {
+    ): IncomeTaxResult {
         // Initialize explanation and income tax percent
         $explanation = '';
         $incomeTaxRate = $this->taxConfigRepo->getTaxIncomeRate($taxType, $year);
@@ -112,11 +112,17 @@ class TaxIncomeService implements TaxCalculatorInterface
         switch ($taxType) {
             // For 'salary' and 'pension' tax types, calculate salary tax
             case 'salary':
-                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
+                $salaryTaxResult = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
+                $incomeTaxAmount = $salaryTaxResult->taxAmount;
+                $incomeTaxRate = $salaryTaxResult->taxPercent;
+                $explanation = $salaryTaxResult->explanation;
                 break;
 
             case 'pension':
-                [$incomeTaxAmount, $incomeTaxRate, $explanation] = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
+                $salaryTaxResult = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
+                $incomeTaxAmount = $salaryTaxResult->taxAmount;
+                $incomeTaxRate = $salaryTaxResult->taxPercent;
+                $explanation = $salaryTaxResult->explanation;
                 break;
 
                 // For 'income' tax type, calculate income tax after transfer to this category
@@ -166,19 +172,14 @@ class TaxIncomeService implements TaxCalculatorInterface
                 break;
         }
 
-        // Log debug information if debug is true
-        if ($debug) {
-            Log::debug('Income tax calculation output', [
-                'tax_type' => $taxType,
-                'year' => $year,
-                'income' => $income,
-                'income_tax_amount' => $incomeTaxAmount,
-                'income_tax_rate' => $incomeTaxRate,
-                'explanation' => $explanation,
-            ]);
-        }
+        $result = new IncomeTaxResult(
+            taxAmount: $incomeTaxAmount,
+            taxRate: $incomeTaxRate,
+            explanation: $explanation
+        );
 
-        // Return the calculated income tax amount, income tax percent, and explanation (array for backward compatibility)
-        return [$incomeTaxAmount, $incomeTaxRate, $explanation];
+        Log::debug('Income tax calculation output', ['taxType' => $taxType, 'year' => $year, 'income' => $income, 'result' => (array) $result]);
+
+        return $result;
     }
 }

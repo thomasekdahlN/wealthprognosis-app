@@ -29,7 +29,7 @@ class TaxProperty extends Model
         'tax_home_permill',
         'tax_company_permill',
         'deduction',
-        'fortune_taxable_percent',
+        'taxable_percent',
         'is_active',
         'created_by',
         'updated_by',
@@ -42,7 +42,7 @@ class TaxProperty extends Model
         'tax_home_permill' => 'decimal:3',
         'tax_company_permill' => 'decimal:3',
         'deduction' => 'decimal:2',
-        'fortune_taxable_percent' => 'decimal:2',
+        'taxable_percent' => 'decimal:2',
         'has_tax_on_homes' => 'boolean',
         'has_tax_on_companies' => 'boolean',
         'is_active' => 'boolean',
@@ -110,6 +110,24 @@ class TaxProperty extends Model
                 }
 
                 return ['tax_company_permill' => round((float) $value, 3)];
+            },
+        );
+    }
+
+    protected function taxablePercent(): Attribute
+    {
+        return Attribute::make(
+            get: function (): float {
+                $raw = $this->attributes['taxable_percent'] ?? 100.00;
+
+                return (float) $raw;
+            },
+            set: function ($value): array {
+                if ($value === null || $value === '') {
+                    return ['taxable_percent' => 100.00];
+                }
+
+                return ['taxable_percent' => round((float) $value, 2)];
             },
         );
     }

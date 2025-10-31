@@ -156,7 +156,7 @@ it('taxCalculationRealization uses tax shield for stock asset type', function ()
     $taxRealization = new TaxRealizationService('no');
 
     // Test with stock which has tax shield
-    [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(
+    $result = $taxRealization->taxCalculationRealization(
         debug: false,
         transfer: false,
         taxGroup: 'private',
@@ -170,15 +170,15 @@ it('taxCalculationRealization uses tax shield for stock asset type', function ()
     );
 
     // Should have tax shield amount calculated
-    expect($realizationTaxShieldAmount)->toBeGreaterThan(0);
-    expect($realizationTaxShieldPercent)->toBeGreaterThan(0);
+    expect($result->taxShieldAmount)->toBeGreaterThan(0);
+    expect($result->taxShieldPercent)->toBeGreaterThan(0);
 });
 
 it('taxCalculationRealization does not use tax shield for house asset type', function () {
     $taxRealization = new TaxRealizationService('no');
 
     // Test with house which does not have tax shield
-    [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(
+    $result = $taxRealization->taxCalculationRealization(
         debug: false,
         transfer: false,
         taxGroup: 'private',
@@ -192,8 +192,8 @@ it('taxCalculationRealization does not use tax shield for house asset type', fun
     );
 
     // Should not have tax shield
-    expect($realizationTaxShieldAmount)->toEqual(0);
-    expect($realizationTaxShieldPercent)->toEqual(0);
+    expect($result->taxShieldAmount)->toEqual(0);
+    expect($result->taxShieldPercent)->toEqual(0);
 });
 
 it('taxCalculationRealization applies tax shield only for eligible asset types', function () {
@@ -221,7 +221,7 @@ it('taxCalculationRealization applies tax shield only for eligible asset types',
     $taxShieldTypes = ['stock', 'equityfund', 'bondfund', 'ask', 'loantocompany', 'soleproprietorship'];
 
     foreach ($taxShieldTypes as $assetType) {
-        [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmount, $realizationTaxShieldPercent, $explanation] = $taxRealization->taxCalculationRealization(
+        $result = $taxRealization->taxCalculationRealization(
             debug: false,
             transfer: false,
             taxGroup: 'private',
@@ -236,11 +236,11 @@ it('taxCalculationRealization applies tax shield only for eligible asset types',
 
         $eligible = $repo->hasTaxShield($assetType);
         if ($eligible) {
-            expect($realizationTaxShieldAmount)->toBeGreaterThan(0, "Asset type $assetType should have tax shield amount");
-            expect($realizationTaxShieldPercent)->toBeGreaterThan(0, "Asset type $assetType should have tax shield percent");
+            expect($result->taxShieldAmount)->toBeGreaterThan(0, "Asset type $assetType should have tax shield amount");
+            expect($result->taxShieldPercent)->toBeGreaterThan(0, "Asset type $assetType should have tax shield percent");
         } else {
-            expect($realizationTaxShieldAmount)->toEqual(0, "Asset type $assetType should not have tax shield amount");
-            expect($realizationTaxShieldPercent)->toEqual(0, "Asset type $assetType should not have tax shield percent");
+            expect($result->taxShieldAmount)->toEqual(0, "Asset type $assetType should not have tax shield amount");
+            expect($result->taxShieldPercent)->toEqual(0, "Asset type $assetType should not have tax shield percent");
         }
     }
 });

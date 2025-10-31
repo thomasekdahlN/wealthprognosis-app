@@ -17,6 +17,7 @@
 namespace App\Services\Prognosis;
 
 use App\Services\AssetTypeService;
+use App\Support\ValueObjects\AssetMeta;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -325,15 +326,32 @@ class PrognosisService
                     // echo "TaxFortuneBefore $assetname.$year, taxType:$taxType, taxProperty:$taxProperty, assetMarketAmount:$assetMarketAmount, assetTaxableInitialAmount:$assetTaxableInitialAmount, balanceAmount:".$this->ArrGet("$assetname.$year.mortgage.balanceAmount")."\n";
                 }
                 // FIXXXX?????  $assetTaxableAmount = round($assetTaxableAmount * $assetChangerateDecimal); //We have to increase the taxable amount, but maybe it should follow another index than the asset market value. Anyway, this is quite good for now.
-                $fortuneResult = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $taxProperty, $year, (int) $assetMarketAmount, (int) $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
-                $assetTaxableAmount = $fortuneResult->taxableAmount;
-                $assetTaxableDecimal = $fortuneResult->taxablePercent;
-                $assetTaxFortuneAmount = $fortuneResult->taxAmount;
-                $assetTaxFortuneDecimal = $fortuneResult->taxPercent;
-                $assetTaxablePropertyAmount = $fortuneResult->taxablePropertyAmount;
-                $assetTaxablePropertyPercent = $fortuneResult->taxablePropertyPercent;
-                $assetTaxPropertyAmount = $fortuneResult->taxPropertyAmount;
-                $assetTaxPropertyDecimal = $fortuneResult->taxPropertyPercent;
+                $fortuneResult = $this->taxfortune->taxCalculationFortune($taxGroup, $taxType, $year, (int) $assetMarketAmount, (int) $assetTaxableInitialAmount, $this->ArrGet("$assetname.$year.mortgage.balanceAmount"), $assetTaxableAmountOverride);
+                $assetTaxableAmount = $fortuneResult->taxableFortuneAmount;
+                $assetTaxableFortunePercent = $fortuneResult->taxableFortunePercent;
+                $assetTaxableFortuneRate = $fortuneResult->taxableFortuneRate;
+
+                $assetTaxFortuneAmount = $fortuneResult->taxFortuneAmount;
+                $assetTaxFortunePercent = $fortuneResult->taxFortunePercent;
+                $assetTaxFortuneRate = $fortuneResult->taxFortuneRate; // Use Rate (decimal) not Percent for Excel export
+
+                // Calculate property tax separately if taxProperty is set
+                if ($taxProperty) {
+                    $propertyTaxService = app(\App\Services\Tax\TaxPropertyService::class);
+                    $propertyResult = $propertyTaxService->calculatePropertyTax($year, $taxGroup, $taxProperty, (float) $assetMarketAmount);
+                    $assetTaxablePropertyAmount = $propertyResult->taxablePropertyAmount;
+                    $assetTaxablePropertyPercent = $propertyResult->taxablePropertyPercent;
+                    $assetTaxPropertyAmount = $propertyResult->taxPropertyAmount;
+                    $assetTaxPropertyDecimal = $propertyResult->taxPropertyRate; // Use Rate (decimal) not Percent for Excel export
+                } else {
+                    $assetTaxablePropertyAmount = 0;
+                    $assetTaxablePropertyPercent = 0;
+                    $assetTaxablePropertyRate = 0;
+                    $assetTaxPropertyAmount = 0;
+                    $assetTaxPropertyPercent = 0;
+                    $assetTaxPropertyRate = 0;
+                }
+
                 if ($assetname == 'xxx') {
                     // echo "   TaxFortuneAfter: $assetname.$year assetTaxableInitialAmount:$assetTaxableInitialAmount, assetTaxableAmount:$assetTaxableAmount, assetTaxAmount:$assetTaxFortuneAmount,assetTaxAmount:$assetTaxFortuneAmount\n";
                 }
@@ -361,7 +379,11 @@ class PrognosisService
                     echo "***********taxCalculationIncome taxGroup:$taxGroup, taxType:$taxType, year:$year, incomeAmount:$incomeAmount, expenceAmount:$expenceAmount, interestAmount:$interestAmount\n";
                 }
 
-                [$cashflowTaxAmount, $cashflowTaxPercent, $cashflowDescription] = $this->taxincome->taxCalculationIncome($debug, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
+                // FIX: Not neccessarry with cashflow things here, when we do it yearly?
+                $incomeTaxResult = $this->taxincome->taxCalculationIncome($debug, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
+                $cashflowTaxAmount = $incomeTaxResult->taxAmount;
+                $cashflowTaxPercent = $incomeTaxResult->taxRate;
+                $cashflowDescription = $incomeTaxResult->explanation;
 
                 $cashflowBeforeTaxAmount =
                     $incomeAmount
@@ -410,8 +432,22 @@ class PrognosisService
 
                 // print "   TaxRealization1: $assetname.$year .assetMarketAmount:$assetMarketAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
-                [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $realizationTaxShieldAmountSimulation, $realizationTaxShieldDecimal] = $this->taxrealization->taxCalculationRealization($debug, false, $taxGroup, $taxType, $year, $assetMarketAmount, $assetInitialAcquisitionAmount, $assetDiffAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
+                $realizationResult = $this->taxrealization->taxCalculationRealization($debug, false, $taxGroup, $taxType, $year, $assetMarketAmount, $assetInitialAcquisitionAmount, $assetDiffAmount, $realizationPrevTaxShieldAmount, $assetFirstYear);
+                $acquisitionAmount = $realizationResult->acquisitionAmount;
+
+                $realizationTaxableAmount = $realizationResult->taxableAmount;
+                $realizationTaxablePercent = $realizationResult->taxablePercent;
+                $realizationTaxableRate = $realizationResult->taxableRate;
+
+                $realizationTaxAmount = $realizationResult->taxAmount;
+                $realizationTaxPercent = $realizationResult->taxPercent;
+                $realizationTaxRate = $realizationResult->taxRate;
+
+                $realizationTaxShieldAmountSimulation = $realizationResult->taxShieldAmount;
+
                 $realizationAmount = $assetMarketAmount - $realizationTaxAmount; // Markedspris minus skatt ved salg.
+                $realizationTaxShieldPercent = $realizationResult->taxShieldPercent;
+                $realizationTaxShieldRate = $realizationResult->taxShieldRate;
 
                 // print "   TaxRealization2: $assetname.$year .assetMarketAmount:$assetMarketAmount, transferedAmount:$transferedAmount, transferedChangerateAmount:$transferedChangerateAmount, assetTaxableAmount:$assetTaxableAmount, assetAcquisitionAmount:$assetInitialAcquisitionAmount, assetEquityAmount:$assetInitialEquityAmount, assetPaidAmount: $assetInitialPaidAmount, assetTaxableAmount:$assetTaxableAmount, termAmount: " . $this->ArrGet("$assetname.$year.mortgage.termAmount") . "\n";
 
@@ -454,23 +490,33 @@ class PrognosisService
 
                 // print_r($this->dataH[$assetname][$year]['income']);
                 // Fix before and after tax cashflow calculations.
-
+                // Fix - is it neccessarry to do this here, when we do it in yearly processing?
                 if ($assetMarketAmount > 0) {
                     $this->ArrSet("$path.asset.marketAmount", $assetMarketAmount);
 
-                    $this->ArrSet("$path.asset.taxableDecimal", $assetTaxableDecimal);
                     $this->ArrSet("$path.asset.taxableAmount", $assetTaxableAmount);
+                    $this->ArrSet("$path.asset.taxablePercent", $assetTaxablePercent);
+                    $this->ArrSet("$path.asset.taxableRate", $assetTaxableRate);
+
                     $this->ArrSet("$path.asset.taxableInitialAmount", $assetTaxableInitialAmount);
                     $this->ArrSet("$path.asset.taxableAmountOverride", $assetTaxableAmountOverride);
 
                     if ($assetTaxFortuneAmount > 0) {
-                        $this->ArrSet("$path.asset.taxFortuneDecimal", $assetTaxFortuneDecimal);
                         $this->ArrSet("$path.asset.taxFortuneAmount", $assetTaxFortuneAmount);
+                        $this->ArrSet("$path.asset.taxFortunePercent", $assetTaxFortunePercent);
+                        $this->ArrSet("$path.asset.taxFortuneRate", $assetTaxFortuneRate);
                     }
 
                     if ($assetTaxablePropertyAmount > 0) {
-                        $this->ArrSet("$path.asset.taxablePropertyDecimal", $assetTaxablePropertyPercent);
                         $this->ArrSet("$path.asset.taxablePropertyAmount", $assetTaxablePropertyAmount);
+                        $this->ArrSet("$path.asset.taxablePropertyPercent", $assetTaxablePropertyPercent);
+                        $this->ArrSet("$path.asset.taxablePropertyRate", $assetTaxablePropertyRate);
+                    }
+
+                    if ($assetTaxPropertyAmount > 0) {
+                        $this->ArrSet("$path.asset.taxPropertyAmount", $assetTaxPropertyAmount);
+                        $this->ArrSet("$path.asset.taxPropertyPercent", $assetTaxPropertyPercent);
+                        $this->ArrSet("$path.asset.taxPropertyRate", $assetTaxPropertyRate);
                     }
 
                     $this->ArrSet("$path.asset.changerate", $assetChangerate);
@@ -486,12 +532,16 @@ class PrognosisService
                     }
                     $this->ArrSet("$path.asset.repeat", $assetRepeat);
 
-                    $this->ArrSet("$path.realization.taxShieldDecimal", $realizationTaxShieldDecimal);
                     $this->ArrSet("$path.realization.taxShieldAmount", $realizationTaxShieldAmount);
+                    $this->ArrSet("$path.realization.taxShieldPercent", $realizationTaxShieldPercent);
+                    $this->ArrSet("$path.realization.taxShieldRate", $realizationTaxShieldRate);
+
                     $this->ArrSet("$path.realization.amount", $realizationAmount);
                     $this->ArrSet("$path.realization.taxableAmount", $realizationTaxableAmount);
                     $this->ArrSet("$path.realization.taxAmount", $realizationTaxAmount);
-                    $this->ArrSet("$path.realization.taxDecimal", $realizationTaxPercent);
+                    $this->ArrSet("$path.realization.taxPercent", $realizationTaxPercent);
+                    $this->ArrSet("$path.realization.taxRate", $realizationTaxRate);
+
                     $this->ArrSet("$path.asset.description", $this->ArrGetConfig("$path.asset.description").$this->ArrGet("$path.asset.description").' Asset rule:'.$assetRule.' '.$assetExplanation1.$assetExplanation2);
                     // print_r($this->dataH[$assetname][$year]['realization']);
                 }
@@ -500,7 +550,9 @@ class PrognosisService
                 $this->ArrSet("$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
                 $this->ArrSet("$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
                 $this->ArrSet("$path.cashflow.taxAmount", $this->ArrGet("$path.cashflow.taxAmount") + $cashflowTaxAmount);
-                $this->ArrSet("$path.cashflow.taxDecimal", $cashflowTaxPercent);
+                $this->ArrSet("$path.cashflow.taxPercent", $cashflowTaxPercent);
+                $this->ArrSet("$path.cashflow.taxRate", $cashflowTaxRate);
+
                 $this->ArrSet("$path.cashflow.rule", $cashflowNewRule);
                 $this->ArrSet("$path.cashflow.transfer", $cashflowTransfer);
                 $this->ArrSet("$path.cashflow.source", $cashflowSource);
@@ -703,17 +755,26 @@ class PrognosisService
 
         // Realisation tax calculations here, because we have to realize a transfered asset.
         // Derive origin tax type via asset_type instead of meta.tax
-        [$taxAssetname, $taxYear, $taxOriginGroup] = $this->getAssetMetaFromPath($transferOrigin, 'group');
-        [$originAssetnameMeta, $originYearMeta, $originAssetType] = $this->getAssetMetaFromPath($transferOrigin, 'type');
-        $taxOriginType = $this->assetTypeService->getTaxType($originAssetType);
+        $originMeta = $this->getAssetMetaFromPath($transferOrigin);
+        $toMeta = $this->getAssetMetaFromPath($transferTo);
 
-        [$taxToAssetname, $taxToYear, $taxToGroup] = $this->getAssetMetaFromPath($transferTo, 'group');
+        if (! $originMeta || ! $toMeta) {
+            return [0, 0, 0, ''];
+        }
 
-        // print "    Tax asset: $taxAssetname, year: $taxYear, type: $taxType\n";
+        $taxOriginType = $this->assetTypeService->getTaxType($originMeta->type);
+
+        // print "    Tax asset: {$originMeta->assetname}, year: {$originMeta->year}, type: $taxOriginType\n";
 
         if ($originType == 'asset') {
             // It is only calculated tax when realizing assets, not when transfering to an asset (buying)
-            [$realizationTaxableAmount, $realizationTaxAmount, $acquisitionAmount, $realizationTaxPercent, $taxShieldAmount, $realizationTaxShieldPercent] = $this->taxrealization->taxCalculationRealization($debug, true, $taxOriginGroup, $taxOriginType, $originYear, $amount, $acquisitionAmount, $amount, $taxShieldAmount, $originYear);
+            $realizationResult = $this->taxrealization->taxCalculationRealization($debug, true, $originMeta->group, $taxOriginType, $originYear, $amount, $acquisitionAmount, $amount, $taxShieldAmount, $originYear);
+            $realizationTaxableAmount = $realizationResult->taxableAmount;
+            $realizationTaxAmount = $realizationResult->taxAmount;
+            $acquisitionAmount = $realizationResult->acquisitionAmount;
+            $realizationTaxPercent = $realizationResult->taxRate;
+            $taxShieldAmount = $realizationResult->taxShieldAmount;
+            $realizationTaxShieldPercent = $realizationResult->taxShieldPercent;
 
             // print "@@@@ Asset transfer - taxOriginGroup:$taxOriginGroup, taxToGroup:$taxToGroup\n";
 
@@ -1025,29 +1086,44 @@ class PrognosisService
     }
 
     /**
-     * @return array{0: string|null, 1: string|null, 2: mixed}
+     * Get asset metadata from path using the config structure.
+     *
+     * @return AssetMeta|null Returns null if path is invalid
      */
-    public function getAssetMetaFromPath(string $path, string $field): array
+    public function getAssetMetaFromPath(string $path): ?AssetMeta
     {
-        $value = null;
-        $year = null;
-        $assetname = null;
-
-        if (preg_match('/(\w+).(\d+)/i', $path, $matchesH, PREG_OFFSET_CAPTURE)) {
-            // print "$path\n";
-            // print_r($matchesH);
-            $year = $matchesH[2][0];
-            $assetname = $matchesH[1][0];
-            $value = $this->ArrGetConfig("$assetname.meta.$field");
-            // print_r($this->ArrGetConfig("$assetname.meta"));
-        } else {
+        if (! preg_match('/(\w+)\.(\d+)/i', $path, $matches)) {
             Log::error('Invalid path format', ['path' => $path]);
             if (app()->runningInConsole()) {
                 echo "ERROR with path: $path\n";
             }
+
+            return null;
         }
 
-        return [$assetname, $year, $value];
+        $assetname = $matches[1];
+        $year = (int) $matches[2];
+
+        $meta = $this->ArrGetConfig("$assetname.meta");
+        if (! $meta) {
+            return null;
+        }
+
+        return new AssetMeta(
+            assetname: $assetname,
+            year: $year,
+            type: $meta['type'] ?? '',
+            group: $meta['group'] ?? 'private',
+            name: $meta['name'] ?? null,
+            description: $meta['description'] ?? null,
+            active: $meta['active'] ?? true,
+            taxProperty: $meta['taxProperty'] ?? null,
+            taxCountry: $meta['taxCountry'] ?? null,
+            taxType: $meta['tax_type'] ?? null,
+            debug: $meta['debug'] ?? false,
+            icon: $meta['icon'] ?? null,
+            color: $meta['color'] ?? null,
+        );
     }
 
     // Calculates an amount based on the value of another asset

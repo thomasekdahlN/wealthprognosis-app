@@ -17,6 +17,8 @@
 namespace App\Services\Tax;
 
 use App\Support\Contracts\TaxCalculatorInterface;
+use App\Support\ValueObjects\BracketTaxResult;
+use App\Support\ValueObjects\SalaryTaxResult;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
@@ -70,21 +72,21 @@ class TaxSalaryService implements TaxCalculatorInterface
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
-     * @return array{0: float, 1: float, 2: string} Returns array for backward compatibility
      */
-    public function calculatesalarytax(bool $debug, int $year, int $amount): array
+    public function calculatesalarytax(bool $debug, int $year, int $amount): SalaryTaxResult
     {
         $explanation = '';
         $commonTaxAmount = 0; // Fellesskatt
         $bracketTaxAmount = 0; // Trinnskatt
         $socialSecurityTaxAmount = 0; // Trygdeavgift
         $totalTaxAmount = 0; // Utregnet hva skatten faktisk er basert på de faktiske skattebeløpene.
+        $taxAveragePercent = 0; // Utregnet hva skatten faktisak er i prosent
+        $taxAverageRate = 0; // Utregnet hva skatten faktisak er i rate
 
         $commonTaxRate = $this->taxConfigRepo->getSalaryTaxCommonRate($year);
         $commonTaxDeductionAmount = $this->commonDeduction($year, $amount);
 
         $socialSecurityTaxRate = $this->taxConfigRepo->getSalaryTaxSocialSecurityRate($year);
-        $totalTaxPercent = 0; // Utregnet hva skatten faktisak er i kroner basert på de faktiske skattebeløpene.
 
         $socialSecurityTaxableAmount = $amount; // Man betaler trygdeavgift av hele lønnen uten fradrag
         if ($socialSecurityTaxableAmount > 0) {
@@ -94,37 +96,29 @@ class TaxSalaryService implements TaxCalculatorInterface
         $commonTaxableAmount = $amount - $socialSecurityTaxAmount - $commonTaxDeductionAmount; // Man betaler fellesskatt av lønnen etter at trygdeavgidt og minstefradraget er trukket fra
         $commonTaxAmount = round($commonTaxableAmount * $commonTaxRate);
 
-        [$bracketTaxAmount, $bracketTaxPercent, $explanation] = $this->calculateBracketTax($debug, $year, $amount); // Man betaler trinnskatt av hele lønnen uten fradrag
+        $bracketTaxResult = $this->calculateBracketTax($debug, $year, $amount); // Man betaler trinnskatt av hele lønnen uten fradrag
+        $bracketTaxAmount = $bracketTaxResult->taxAmount;
+        $explanation = $bracketTaxResult->explanation;
 
         $explanation = ' Fellesskatt: '.$commonTaxRate * 100 ."% gir $commonTaxAmount skatt, Trygdeavgift ".$socialSecurityTaxRate * 100 ."% gir $socialSecurityTaxAmount skatt ".$explanation;
 
         $totalTaxAmount = $bracketTaxAmount + $commonTaxAmount + $socialSecurityTaxAmount;
 
         if ($amount > 0) {
-            $totalTaxPercent = round(($totalTaxAmount / $amount), 2); // We calculate a total percentage using the amounts
+            $taxAverageRate = round(($totalTaxAmount / $amount), 2); // We calculate a total percentage using the amounts
+            $taxAveragePercent = $taxAverageRate * 100;
         }
 
-        // Log debug information if debug is true
-        if ($debug) {
-            $debugData = [
-                'year' => $year,
-                'amount' => $amount,
-                'common_tax_deduction_amount' => $commonTaxDeductionAmount,
-                'common_taxable_amount' => $commonTaxableAmount,
-                'total_tax_amount' => $totalTaxAmount,
-                'total_tax_percent' => $totalTaxPercent * 100,
-                'explanation' => $explanation,
-            ];
-            Log::debug('Salary tax calculation', $debugData);
+        $result = new SalaryTaxResult(
+            taxAmount: $totalTaxAmount,
+            taxAveragePercent: $taxAveragePercent,
+            taxAverageRate: $taxAverageRate,
+            explanation: $explanation
+        );
 
-            // Also output to console for CLI commands
-            if (app()->runningInConsole()) {
-                echo "Salary tax: year=$year, amount=$amount, tax=$totalTaxAmount (".($totalTaxPercent * 100)."%), $explanation\n";
-            }
-        }
+        Log::debug('SalaryTaxResult', ['result' => (array) $result]);
 
-        // Return array for backward compatibility
-        return [$totalTaxAmount, $totalTaxPercent, $explanation];
+        return $result;
     }
 
     /**
@@ -136,107 +130,94 @@ class TaxSalaryService implements TaxCalculatorInterface
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
-     * @return array{0: float, 1: float, 2: string} Returns array for backward compatibility
      */
-    public function calculateBracketTax(bool $debug, int $year, int $amount): array
+    public function calculateBracketTax(bool $debug, int $year, int $amount): BracketTaxResult
     {
-        $count = 0;
-        $explanation = '';
         $brackets = $this->taxConfigRepo->getSalaryTaxBracketConfig($year);
-
-        $bracketTaxAmount = 0;
-        $bracketTotalTaxAmount = 0;
-        $bracketTaxPercent = 0;
-        $bracketTotalTaxPercent = 0;
-
+        $totalTaxAmount = 0;
         $prevLimitAmount = 0;
-        foreach ($brackets as $bracket) {
+        $explanationParts = [];
 
-            $bracketTaxPercent = ($bracket['percent'] ?? 0) / 100;
+        foreach ($brackets as $index => $bracket) {
+            $bracketPercent = $bracket['percent'] ?? 0;
+            $bracketRate = $bracketPercent / 100; // Convert percent to decimal rate (e.g., 1.7% -> 0.00017)
+            $bracketLimit = $bracket['limit'] ?? null;
 
-            if (isset($bracket['limit']) && $amount > $bracket['limit']) {
-                $bracketTaxableAmount = $bracket['limit'] - $prevLimitAmount;
-                $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
-                $bracketTotalTaxAmount += $bracketTaxAmount;
+            // Determine taxable amount for this bracket
+            if ($bracketLimit !== null && $amount > $bracketLimit) {
+                // Income exceeds this bracket's limit - tax the full bracket range
+                $taxableAmount = $bracketLimit - $prevLimitAmount;
+                $taxAmount = round($taxableAmount * $bracketRate);
+                $totalTaxAmount += $taxAmount;
 
-                $explanation .= " Bracket$count ($bracket[limit])$bracket[percent]%=$bracketTaxAmount,";
+                $explanationParts[] = "Bracket$index ({$bracketLimit}){$bracketPercent}%={$taxAmount}";
 
-                if ($debug) {
-                    $debugData = [
-                        'bracket' => $count,
-                        'limit' => $bracket['limit'],
-                        'amount' => $amount,
-                        'taxable_amount' => $bracketTaxableAmount,
-                        'percent' => $bracket['percent'],
-                        'tax' => $bracketTaxAmount,
-                    ];
-                    Log::debug('Bracket tax calculation - within limit', $debugData);
+                Log::debug('Bracket tax - within limit', [
+                    'bracket' => $index,
+                    'bracketLimit' => $bracketLimit,
+                    'amount' => $amount,
+                    'taxableAmount' => $taxableAmount,
+                    'bracketPercent' => $bracketPercent,
+                    'taxAmount' => $taxAmount,
+                ]);
 
-                    if (app()->runningInConsole()) {
-                        echo "  Bracket $count: limit={$bracket['limit']}, taxable=$bracketTaxableAmount, rate={$bracket['percent']}%, tax=$bracketTaxAmount\n";
-                    }
-                }
+                $prevLimitAmount = $bracketLimit;
+            } elseif ($bracketLimit !== null) {
+                // Income is below this bracket's limit - tax remaining amount and stop
+                $taxableAmount = $amount - $prevLimitAmount;
+                $taxAmount = round($taxableAmount * $bracketRate);
+                $totalTaxAmount += $taxAmount;
 
-            } elseif (isset($bracket['limit'])) {
-                // Amount is lower than limit, we are at the end and calculate the rest of the amount.
-                $bracketTaxableAmount = $amount - $prevLimitAmount;
-                $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
-                $bracketTotalTaxAmount += $bracketTaxAmount;
-                $explanation .= " Bracket$count ($amount<)".$bracket['limit'].")$bracket[percent]%=$bracketTaxAmount";
+                $explanationParts[] = "Bracket$index ({$amount}<{$bracketLimit}){$bracketPercent}%={$taxAmount}";
 
-                if ($debug) {
-                    $debugData = [
-                        'bracket' => $count,
-                        'amount' => $amount,
-                        'limit' => $bracket['limit'],
-                        'taxable_amount' => $bracketTaxableAmount,
-                        'percent' => $bracket['percent'],
-                        'tax' => $bracketTaxAmount,
-                    ];
-                    Log::debug('Bracket tax calculation - below limit', $debugData);
-
-                    if (app()->runningInConsole()) {
-                        echo "  Bracket $count: amount=$amount < limit={$bracket['limit']}, taxable=$bracketTaxableAmount, rate={$bracket['percent']}%, tax=$bracketTaxAmount\n";
-                    }
-                }
+                Log::debug('Bracket tax - below limit', [
+                    'bracket' => $index,
+                    'amount' => $amount,
+                    'limit' => $bracketLimit,
+                    'taxable_amount' => $taxableAmount,
+                    'percent' => $bracketPercent,
+                    'rate' => $bracketRate,
+                    'tax' => $taxAmount,
+                ]);
 
                 break;
             } else {
-                // Not set, then all tax after this is on bigger than logic, we are at the end of the calculation
-                $bracketTaxableAmount = $amount - $prevLimitAmount;
-                $bracketTaxAmount = round($bracketTaxableAmount * $bracketTaxPercent);
-                $bracketTotalTaxAmount += $bracketTaxAmount;
-                $explanation .= " Bracket$count (>$prevLimitAmount)$bracket[percent]%=$bracketTaxAmount";
+                // No limit - this is the final bracket for all remaining income
+                $taxableAmount = $amount - $prevLimitAmount;
+                $taxAmount = round($taxableAmount * $bracketRate);
+                $totalTaxAmount += $taxAmount;
 
-                if ($debug) {
-                    $debugData = [
-                        'bracket' => $count,
-                        'prev_limit' => $prevLimitAmount,
-                        'taxable_amount' => $bracketTaxableAmount,
-                        'percent' => $bracket['percent'],
-                        'tax' => $bracketTaxAmount,
-                    ];
-                    Log::debug('Bracket tax calculation - above all limits', $debugData);
+                $explanationParts[] = "Bracket$index (>{$prevLimitAmount}){$bracketPercent}%={$taxAmount}";
 
-                    if (app()->runningInConsole()) {
-                        echo "  Bracket $count: amount > $prevLimitAmount, taxable=$bracketTaxableAmount, rate={$bracket['percent']}%, tax=$bracketTaxAmount\n";
-                    }
-                }
+                Log::debug('Bracket tax - above all limits', [
+                    'bracket' => $index,
+                    'prev_limit' => $prevLimitAmount,
+                    'taxable_amount' => $taxableAmount,
+                    'percent' => $bracketPercent,
+                    'rate' => $bracketRate,
+                    'tax' => $taxAmount,
+                ]);
 
                 break;
             }
-            $prevLimitAmount = $bracket['limit'] ?? $prevLimitAmount;
-            $count++;
         }
 
-        if ($amount > 0) {
-            $bracketTotalTaxPercent = round(($bracketTaxAmount / $amount), 2); // We calculate a total percentage using the amounts
-        }
+        // Calculate average tax rate and percent
+        $averageRate = $amount > 0 ? $totalTaxAmount / $amount : 0;
+        $averagePercent = $averageRate * 100;
 
-        $explanation = " Trinnskatt:$bracketTotalTaxAmount snitt ".$bracketTotalTaxPercent * 100 .'%, '.$explanation;
+        $explanation = ' Trinnskatt: '.$totalTaxAmount.' snitt '.round($averagePercent, 2).'%, '.implode(', ', $explanationParts);
 
-        // Return array for backward compatibility
-        return [$bracketTotalTaxAmount, $bracketTotalTaxPercent, $explanation];
+        $result = new BracketTaxResult(
+            taxAmount: $totalTaxAmount,
+            taxAveragePercent: $averagePercent,
+            taxAverageRate: $averageRate,
+            explanation: $explanation
+        );
+
+        Log::debug('BracketTaxResult', ['result' => (array) $result]);
+
+        return $result;
     }
 
     /**
@@ -255,8 +236,9 @@ class TaxSalaryService implements TaxCalculatorInterface
         $minAmount = Arr::get($deductionConfig, 'deduction.min');
         $maxAmount = Arr::get($deductionConfig, 'deduction.max');
         $percent = Arr::get($deductionConfig, 'deduction.percent');
+        $rate = $percent / 100;
 
-        $deduction = $amount * $percent;
+        $deduction = $amount * rate; // FIX: Er dette riktig da?
         if ($deduction > $maxAmount) {
             $deduction = $maxAmount;
         }
@@ -264,7 +246,7 @@ class TaxSalaryService implements TaxCalculatorInterface
             $deduction = $minAmount;
         }
 
-        Log::debug('Common deduction calculation', [
+        Log::debug('commonDeduction', [
             'amount' => $amount,
             'min' => $minAmount,
             'max' => $maxAmount,

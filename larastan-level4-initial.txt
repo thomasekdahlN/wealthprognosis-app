@@ -1,0 +1,425 @@
+Note: Using configuration file /Users/thomasek/Code/wealthprognosis-app/phpstan.neon.
+   0/213 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%[1G[2K  20/213 [▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░]   9%[1G[2K  40/213 [▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░]  18%[1G[2K  60/213 [▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░]  28%[1G[2K  80/213 [▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░]  37%[1G[2K 100/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░]  46%[1G[2K 120/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░]  56%[1G[2K 140/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░]  65%[1G[2K 160/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░]  75%[1G[2K 180/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░]  84%[1G[2K 193/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░]  90%[1G[2K 213/213 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+ ------ -------------------------------------------------------------------------------------- 
+  Line   Console/Commands/ImportAssets.php                                                     
+ ------ -------------------------------------------------------------------------------------- 
+  89     Using nullsafe property access on non-nullable type App\Models\User. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                
+ ------ -------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Console/Commands/ScrapeSsbNorwegianPropertyTax.php                                                                                                                                                                                          
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  172    Offset 'hasTaxOnCompanies' on array{municipality: non-falsy-string, hasTaxOnHomes: bool, hasTaxOnCompanies: bool, taxHomePermill: float, taxCompanyPermill: float, deduction: float} on left side of ?? always exists and is not nullable.  
+         🪪  nullCoalesce.offset                                                                                                                                                                                                                     
+  176    Offset 'hasTaxOnHomes' on array{municipality: non-falsy-string, hasTaxOnHomes: bool, hasTaxOnCompanies: bool, taxHomePermill: float, taxCompanyPermill: float, deduction: float} on left side of ?? always exists and is not nullable.      
+         🪪  nullCoalesce.offset                                                                                                                                                                                                                     
+  176    Offset 'taxHomePermill' on array{municipality: non-falsy-string, hasTaxOnHomes: bool, hasTaxOnCompanies: bool, taxHomePermill: float, taxCompanyPermill: float, deduction: float} on left side of ?? always exists and is not nullable.     
+         🪪  nullCoalesce.offset                                                                                                                                                                                                                     
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------- 
+  Line   Exports/AssetSpreadSheet.php                                                       
+ ------ ----------------------------------------------------------------------------------- 
+  23     Property App\Exports\AssetSpreadSheet::$name is unused.                            
+         🪪  property.unused                                                                
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties  
+  25     Property App\Exports\AssetSpreadSheet::$asset is unused.                           
+         🪪  property.unused                                                                
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties  
+  27     Property App\Exports\AssetSpreadSheet::$meta is unused.                            
+         🪪  property.unused                                                                
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties  
+ ------ ----------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------- 
+  Line   Exports/PrognosisAssetSheet2.php                                                   
+ ------ ----------------------------------------------------------------------------------- 
+  23     Property App\Exports\PrognosisAssetSheet2::$name is unused.                        
+         🪪  property.unused                                                                
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties  
+  27     Property App\Exports\PrognosisAssetSheet2::$meta is unused.                        
+         🪪  property.unused                                                                
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties  
+ ------ ----------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Exports/PrognosisRealizationSheet2.php                                                                                                       
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  27     Property App\Exports\PrognosisRealizationSheet2::$companyH is unused.                                                                        
+         🪪  property.unused                                                                                                                          
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties                                                            
+  109    Call to function is_numeric() with int will always evaluate to true.                                                                         
+         🪪  function.alreadyNarrowedType                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Concerns/HasWideTable.php (in context of class App\Filament\Pages\SimulationAssets)                                   
+ ------ ------------------------------------------------------------------------------------------------------------------------------- 
+  10     Call to function method_exists() with $this(App\Filament\Pages\SimulationAssets) and 'dispatch' will always evaluate to true.  
+         🪪  function.alreadyNarrowedType                                                                                               
+ ------ ------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------- 
+  Line   Filament/Pages/AssetConfigurationUpload.php                                       
+ ------ ---------------------------------------------------------------------------------- 
+  118    Call to function is_string() with non-empty-string will always evaluate to true.  
+         🪪  function.alreadyNarrowedType                                                  
+ ------ ---------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/ChangeRateScenarios.php                                                        
+ ------ ---------------------------------------------------------------------------------------------- 
+  71     Using nullsafe property access "?->label" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                        
+  190    Method App\Filament\Pages\ChangeRateScenarios::getScenarioColor() is unused.                  
+         🪪  method.unused                                                                             
+ ------ ---------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/ChangeRateTable.php                                                           
+ ------ --------------------------------------------------------------------------------------------- 
+  127    Using nullsafe property access "?->name" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                       
+ ------ --------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/ConfigAssetYears.php                                                                      
+ ------ --------------------------------------------------------------------------------------------------------- 
+  63     Call to function method_exists() with App\Models\Asset and 'getTypeLabel' will always evaluate to true.  
+         🪪  function.alreadyNarrowedType                                                                         
+  159    Using nullsafe property access "?->name" on left side of ?? is unnecessary. Use -> instead.              
+         🪪  nullsafe.neverNull                                                                                   
+  164    Using nullsafe property access "?->name" on left side of ?? is unnecessary. Use -> instead.              
+         🪪  nullsafe.neverNull                                                                                   
+ ------ --------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/ConfigAssets.php                                                                                                              
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  48     Negated boolean expression is always false.                                                                                                  
+         🪪  booleanNot.alwaysFalse                                                                                                                   
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------- 
+  Line   Filament/Pages/SimulationAssets.php         
+ ------ -------------------------------------------- 
+  124    Ternary operator condition is always true.  
+         🪪  ternary.alwaysTrue                      
+ ------ -------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Pages/SimulationDashboard.php                                                                                                       
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  67     Call to function method_exists() with Illuminate\Routing\Route and 'parameter' will always evaluate to true.                                 
+         🪪  function.alreadyNarrowedType                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  71     Call to function method_exists() with Illuminate\Routing\Route and 'uri' will always evaluate to true.                                       
+         🪪  function.alreadyNarrowedType                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  73     Offset 1 on array{non-falsy-string, numeric-string} on left side of ?? always exists and is not nullable.                                    
+         🪪  nullCoalesce.offset                                                                                                                      
+  125    Instanceof between Illuminate\Routing\Route and Illuminate\Routing\Route will always evaluate to true.                                       
+         🪪  instanceof.alwaysTrue                                                                                                                    
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  128    Call to function method_exists() with Illuminate\Routing\Route and 'parameter' will always evaluate to true.                                 
+         🪪  function.alreadyNarrowedType                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  132    Call to function method_exists() with Illuminate\Routing\Route and 'uri' will always evaluate to true.                                       
+         🪪  function.alreadyNarrowedType                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  134    Offset 1 on array{non-falsy-string, numeric-string} on left side of ?? always exists and is not nullable.                                    
+         🪪  nullCoalesce.offset                                                                                                                      
+  176    Call to function method_exists() with Illuminate\Routing\Route and 'parameter' will always evaluate to true.                                 
+         🪪  function.alreadyNarrowedType                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  178    Call to function method_exists() with Illuminate\Routing\Route and 'uri' will always evaluate to true.                                       
+         🪪  function.alreadyNarrowedType                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  180    Offset 1 on array{non-falsy-string, numeric-string} on left side of ?? always exists and is not nullable.                                    
+         🪪  nullCoalesce.offset                                                                                                                      
+  269    Using nullsafe property access "?->asset_configuration_id" on left side of ?? is unnecessary. Use -> instead.                                
+         🪪  nullsafe.neverNull                                                                                                                       
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------- 
+  Line   Filament/Resources/AssetConfigurations/Tables/AssetConfigurationsTable.php        
+ ------ ---------------------------------------------------------------------------------- 
+  24     Anonymous function never returns null so it can be removed from the return type.  
+         🪪  return.unusedType                                                             
+ ------ ---------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/AssetYears/Pages/EditAssetYear.php                                      
+ ------ ------------------------------------------------------------------------------------------- 
+  71     Using nullsafe property access on non-nullable type App\Models\AssetYear. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                     
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/AssetYears/Pages/ListAssetYears.php                                              
+ ------ ---------------------------------------------------------------------------------------------------- 
+  265    Using nullsafe property access "?->group" on left side of ?? is unnecessary. Use -> instead.        
+         🪪  nullsafe.neverNull                                                                              
+  292    Using nullsafe property access "?->tax_country" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                              
+  299    Using nullsafe property access "?->is_active" on left side of ?? is unnecessary. Use -> instead.    
+         🪪  nullsafe.neverNull                                                                              
+  364    Using nullsafe property access "?->name" on left side of ?? is unnecessary. Use -> instead.         
+         🪪  nullsafe.neverNull                                                                              
+  369    Using nullsafe property access "?->name" on left side of ?? is unnecessary. Use -> instead.         
+         🪪  nullsafe.neverNull                                                                              
+ ------ ---------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/AssetYears/Schemas/AssetYearForm.php                                                       
+ ------ -------------------------------------------------------------------------------------------------------------- 
+  234    Using nullsafe property access "?->can_generate_income" on left side of ?? is unnecessary. Use -> instead.    
+         🪪  nullsafe.neverNull                                                                                        
+  358    Using nullsafe property access "?->can_generate_expenses" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                                        
+  483    Using nullsafe property access "?->can_have_market_value" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                                        
+  505    Using nullsafe property access "?->can_have_mortgage" on left side of ?? is unnecessary. Use -> instead.      
+         🪪  nullsafe.neverNull                                                                                        
+ ------ -------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------ 
+  Line   Filament/Resources/Assets/AssetResource.php                                   
+ ------ ------------------------------------------------------------------------------ 
+  65     Match arm comparison between 'edit' and 'edit' is always true.                
+         🪪  match.alwaysTrue                                                          
+         💡  Remove remaining cases below this one and this error will disappear too.  
+ ------ ------------------------------------------------------------------------------ 
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/Assets/Pages/ListAssets.php                                                                                                         
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  50     Call to function property_exists() with $this(App\Filament\Resources\Assets\Pages\ListAssets) and 'tableSearch' will always evaluate to true.          
+         🪪  function.alreadyNarrowedType                                                                                                                       
+  53     Call to function property_exists() with $this(App\Filament\Resources\Assets\Pages\ListAssets) and 'tableColumnSearches' will always evaluate to true.  
+         🪪  function.alreadyNarrowedType                                                                                                                       
+  56     Call to function property_exists() with $this(App\Filament\Resources\Assets\Pages\ListAssets) and 'tableFilters' will always evaluate to true.         
+         🪪  function.alreadyNarrowedType                                                                                                                       
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/ChangeRateConfigurations/Tables/ChangeRateConfigurationsTable.php          
+ ------ ---------------------------------------------------------------------------------------------- 
+  29     Using nullsafe property access "?->label" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                        
+ ------ ---------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------- 
+  Line   Filament/Resources/Events/Tables/EventsTable.php                                  
+ ------ ---------------------------------------------------------------------------------- 
+  144    Anonymous function never returns null so it can be removed from the return type.  
+         🪪  return.unusedType                                                             
+ ------ ---------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------- 
+  Line   Filament/Resources/SimulationConfigurations/Tables/SimulationConfigurationsTable.php  
+ ------ -------------------------------------------------------------------------------------- 
+  25     Anonymous function never returns null so it can be removed from the return type.      
+         🪪  return.unusedType                                                                 
+ ------ -------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------ 
+  Line   Filament/Widgets/ActualTaxRateOverTime.php      
+ ------ ------------------------------------------------ 
+  67     Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+ ------ ------------------------------------------------ 
+
+ ------ ------------------------------------------------ 
+  Line   Filament/Widgets/FireMetricsOverview.php        
+ ------ ------------------------------------------------ 
+  133    Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+  149    Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+ ------ ------------------------------------------------ 
+
+ ------ ------------------------------------------------ 
+  Line   Filament/Widgets/FireProgressAndCrossover.php   
+ ------ ------------------------------------------------ 
+  33     Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+  40     Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+ ------ ------------------------------------------------ 
+
+ ------ ------------------------------------------------ 
+  Line   Filament/Widgets/RetirementReadinessChart.php   
+ ------ ------------------------------------------------ 
+  175    Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+  188    Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+ ------ ------------------------------------------------ 
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+  Line   Models/AssetConfiguration.php                                                                                                                                                                                                                                           
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+  48     Call to function is_null() with int will always evaluate to false.                                                                                                                                                                                                      
+         🪪  function.impossibleType                                                                                                                                                                                                                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.                                                                                                                             
+  48     Result of && is always false.                                                                                                                                                                                                                                           
+         🪪  booleanAnd.alwaysFalse                                                                                                                                                                                                                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.                                                                                                                             
+  111    Offset 'aggressive'|'conservative'|'moderate'|'moderate_aggressive'|'moderate…' on array{conservative: 'Conservative', moderate_conservative: 'Moderate…', moderate: 'Moderate', moderate_aggressive: 'Moderate Aggressive', aggressive: 'Aggressive'} on left side of  
+         ?? always exists and is not nullable.                                                                                                                                                                                                                                   
+         🪪  nullCoalesce.offset                                                                                                                                                                                                                                                 
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+  Line   Models/SimulationConfiguration.php                                                                                                                                                                                                                                      
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+  191    Offset 'aggressive'|'conservative'|'moderate'|'moderate_aggressive'|'moderate…' on array{conservative: 'Conservative', moderate_conservative: 'Moderate…', moderate: 'Moderate', moderate_aggressive: 'Moderate Aggressive', aggressive: 'Aggressive'} on left side of  
+         ?? always exists and is not nullable.                                                                                                                                                                                                                                   
+         🪪  nullCoalesce.offset                                                                                                                                                                                                                                                 
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+ ------ --------------------------------------------------------------------------------- 
+  Line   Models/TaxProperty.php                                                           
+ ------ --------------------------------------------------------------------------------- 
+  78     Anonymous function never returns int so it can be removed from the return type.  
+         🪪  return.unusedType                                                            
+  100    Anonymous function never returns int so it can be removed from the return type.  
+         🪪  return.unusedType                                                            
+ ------ --------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Services/AiAssistantService.php                                                                                                                                                                                                                            
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  865    Offset 'brands' on array{patterns: array{'/\\b(?:tesla|bmw…', '/\\b(?:car|vehicle…', '/\\b(?:model\\s+[a-z0…'}, brands: array{'tesla', 'bmw', 'mercedes', 'audi', 'volvo', 'toyota', 'honda', 'ford', ...}} in isset() always exists and is not nullable.  
+         🪪  isset.offset                                                                                                                                                                                                                                           
+  897    Offset 'brands' on array{patterns: array{'/\\b(?:boat|yacht…', '/\\b(?:princess…'}, brands: array{'princess', 'sunseeker', 'azimut', 'ferretti', 'pershing', 'riva', 'chris craft', 'sea ray', ...}} in isset() always exists and is not nullable.         
+         🪪  isset.offset                                                                                                                                                                                                                                           
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------- 
+  Line   Services/AssetImportService.php                                                    
+ ------ ----------------------------------------------------------------------------------- 
+  375    Strict comparison using === between mixed and null will always evaluate to false.  
+         🪪  identical.alwaysFalse                                                          
+         💡  Type null has already been eliminated from mixed.                              
+  378    Strict comparison using === between mixed and null will always evaluate to false.  
+         🪪  identical.alwaysFalse                                                          
+         💡  Type null has already been eliminated from mixed.                              
+  381    Strict comparison using === between mixed and null will always evaluate to false.  
+         🪪  identical.alwaysFalse                                                          
+         💡  Type null has already been eliminated from mixed.                              
+ ------ ----------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------- 
+  Line   Services/FinancialPlanningService.php                                                                
+ ------ ----------------------------------------------------------------------------------------------------- 
+  99     Using nullsafe property access "?->market_value" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                               
+  340    Using nullsafe property access "?->market_value" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                               
+ ------ ----------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------ 
+  Line   Services/FireCalculationService.php             
+ ------ ------------------------------------------------ 
+  33     Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+  49     Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+  61     Expression on left side of ?? is not nullable.  
+         🪪  nullCoalesce.expr                           
+ ------ ------------------------------------------------ 
+
+ ------ --------------------------------------------------------------------------------------------- 
+  Line   Services/Processing/YearlyProcessor.php                                                      
+ ------ --------------------------------------------------------------------------------------------- 
+  77     Using nullsafe property access "?->type" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                       
+  193    Using nullsafe property access "?->type" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                       
+ ------ --------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------- 
+  Line   Services/Prognosis/AmortizationService.php                                                   
+ ------ --------------------------------------------------------------------------------------------- 
+  40     Property App\Services\Prognosis\AmortizationService::$currency is never read, only written.  
+         🪪  property.onlyWritten                                                                     
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties            
+  42     Property App\Services\Prognosis\AmortizationService::$principal is unused.                   
+         🪪  property.unused                                                                          
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties            
+  44     Property App\Services\Prognosis\AmortizationService::$balance is unused.                     
+         🪪  property.unused                                                                          
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties            
+  46     Property App\Services\Prognosis\AmortizationService::$term_pay is unused.                    
+         🪪  property.unused                                                                          
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties            
+  48     Property App\Services\Prognosis\AmortizationService::$data is unused.                        
+         🪪  property.unused                                                                          
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties            
+  60     Property App\Services\Prognosis\AmortizationService::$config is never read, only written.    
+         🪪  property.onlyWritten                                                                     
+         💡  See: https://phpstan.org/developing-extensions/always-read-written-properties            
+ ------ --------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------- 
+  Line   Services/Prognosis/PrognosisService.php                                                           
+ ------ -------------------------------------------------------------------------------------------------- 
+  592    Call to function is_numeric() with float will always evaluate to true.                            
+         🪪  function.alreadyNarrowedType                                                                  
+  691    Using nullsafe property access "?->is_liquid" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                            
+  747    Using nullsafe property access "?->type" on left side of ?? is unnecessary. Use -> instead.       
+         🪪  nullsafe.neverNull                                                                            
+  882    If condition is always true.                                                                      
+         🪪  if.alwaysTrue                                                                                 
+ ------ -------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   Services/PrognosisSimulationService.php                                                    
+ ------ ------------------------------------------------------------------------------------------- 
+  96     Using nullsafe property access "?->id" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                     
+  135    Using nullsafe property access "?->id" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                     
+  148    Using nullsafe property access "?->id" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                     
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+  Line   Services/SimulationExportService.php                                                                                                                                                                                                                  
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+  80     Offset 'meta' on array{meta: array{name: string, birthYear: int, exportStartYear: int, prognoseYear: int, pensionOfficialYear: int, pensionWishYear: int, deathYear: int, thisYear: int, ...}} on left side of ?? always exists and is not nullable.  
+         🪪  nullCoalesce.offset                                                                                                                                                                                                                               
+  223    Offset 'amount' on array{amount: float} on left side of ?? always exists and is not nullable.                                                                                                                                                         
+         🪪  nullCoalesce.offset                                                                                                                                                                                                                               
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   Services/Tax/TaxConfigPropertyRepository.php                                                                                                 
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  105    Strict comparison using !== between numeric-string and null will always evaluate to true.                                                    
+         🪪  notIdentical.alwaysTrue                                                                                                                  
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  151    Strict comparison using !== between string and null will always evaluate to true.                                                            
+         🪪  notIdentical.alwaysTrue                                                                                                                  
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+  154    Strict comparison using !== between string and null will always evaluate to true.                                                            
+         🪪  notIdentical.alwaysTrue                                                                                                                  
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treatPhpDocTypesAsCertain: false in your phpstan.neon.  
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------ 
+  Line   Services/Tax/TaxConfigRepository.php                                                                  
+ ------ ------------------------------------------------------------------------------------------------------ 
+  57     Using nullsafe property access "?->configuration" on left side of ?? is unnecessary. Use -> instead.  
+         🪪  nullsafe.neverNull                                                                                
+ ------ ------------------------------------------------------------------------------------------------------ 
+
+ [ERROR] Found 94 errors                                                                                                
+
