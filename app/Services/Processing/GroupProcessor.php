@@ -38,6 +38,9 @@ class GroupProcessor
      * @param  array<string, mixed>  $companyH  Reference to company group data
      * @param  int  $economyStartYear  Start year for economy calculations
      * @param  int  $deathYear  End year for calculations
+     *
+     * @param-out array<string, mixed> $privateH
+     * @param-out array<string, mixed> $companyH
      */
     public function initGroups(array &$privateH, array &$companyH, int $economyStartYear, int $deathYear): void
     {
@@ -59,6 +62,11 @@ class GroupProcessor
      * @param  array<string, mixed>  $meta  Asset metadata
      * @param  array<string, mixed>  $data  Year data for the asset
      * @param  string  $dotpath  Dot-notation path to the value
+     *
+     * @param-out array<string, mixed> $totalH
+     * @param-out array<string, mixed> $companyH
+     * @param-out array<string, mixed> $privateH
+     * @param-out array<string, mixed> $groupH
      */
     public function additionToGroup(
         array &$totalH,
@@ -101,6 +109,11 @@ class GroupProcessor
      * @param  array<string, mixed>  $meta  Asset metadata
      * @param  array<string, mixed>  $data  Year data for the asset
      * @param  string  $dotpath  Dot-notation path to the value
+     *
+     * @param-out array<string, mixed> $totalH
+     * @param-out array<string, mixed> $companyH
+     * @param-out array<string, mixed> $privateH
+     * @param-out array<string, mixed> $groupH
      */
     public function setToGroup(
         array &$totalH,
@@ -194,6 +207,10 @@ class GroupProcessor
      * @param  array<string, mixed>  $companyH  Reference to company group data
      * @param  array<string, mixed>  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
+     *
+     * @param-out array<string, mixed> $totalH
+     * @param-out array<string, mixed> $companyH
+     * @param-out array<string, mixed> $privateH
      */
     public function calculateFortuneTax(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
@@ -223,12 +240,232 @@ class GroupProcessor
     }
 
     /**
+     * Calculate group-level financial metrics aggregation.
+     * Aggregates metrics from individual assets to group totals (total, company, private).
+     *
+     * @param  array<string, mixed>  $totalH  Reference to total group data
+     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  int  $year  Year to calculate for
+     *
+     * @param-out array<string, mixed> $totalH
+     * @param-out array<string, mixed> $companyH
+     * @param-out array<string, mixed> $privateH
+     */
+    public function calculateGroupFinancialMetrics(array &$totalH, array &$companyH, array &$privateH, int $year): void
+    {
+        $this->calculateGroupInvestmentReturns($totalH, $year);
+        $this->calculateGroupInvestmentReturns($companyH, $year);
+        $this->calculateGroupInvestmentReturns($privateH, $year);
+
+        $this->calculateGroupPropertyMetrics($totalH, $year);
+        $this->calculateGroupPropertyMetrics($companyH, $year);
+        $this->calculateGroupPropertyMetrics($privateH, $year);
+
+        $this->calculateGroupLeverageMetrics($totalH, $year);
+        $this->calculateGroupLeverageMetrics($companyH, $year);
+        $this->calculateGroupLeverageMetrics($privateH, $year);
+
+        $this->calculateGroupProfitabilityRatios($totalH, $year);
+        $this->calculateGroupProfitabilityRatios($companyH, $year);
+        $this->calculateGroupProfitabilityRatios($privateH, $year);
+
+        $this->calculateGroupValuationMetrics($totalH, $year);
+        $this->calculateGroupValuationMetrics($companyH, $year);
+        $this->calculateGroupValuationMetrics($privateH, $year);
+
+        $this->calculateGroupLiquidityMetrics($totalH, $year);
+        $this->calculateGroupLiquidityMetrics($companyH, $year);
+        $this->calculateGroupLiquidityMetrics($privateH, $year);
+    }
+
+    /**
+     * Calculate group-level investment return metrics.
+     *
+     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  int  $year  Year to calculate for
+     */
+    private function calculateGroupInvestmentReturns(array &$groupH, int $year): void
+    {
+        $acquisitionAmount = Arr::get($groupH, "$year.asset.acquisitionAmount", 0);
+        $marketAmount = Arr::get($groupH, "$year.asset.marketAmount", 0);
+        $paidAmount = Arr::get($groupH, "$year.asset.paidAmount", 0);
+        $cashflowAfterTax = Arr::get($groupH, "$year.cashflow.afterTaxAmount", 0);
+
+        // ROI (Return on Investment)
+        if ($acquisitionAmount > 0) {
+            $totalGain = ($marketAmount - $acquisitionAmount) + $cashflowAfterTax;
+            $roiRate = round($totalGain / $acquisitionAmount, 4);
+            $roiPercent = round($roiRate * 100, 2);
+            Arr::set($groupH, "$year.metrics.roiRate", $roiRate);
+            Arr::set($groupH, "$year.metrics.roiPercent", $roiPercent);
+        }
+
+        // Total Return
+        $totalReturnAmount = ($marketAmount - $acquisitionAmount) + $cashflowAfterTax;
+        if ($acquisitionAmount > 0) {
+            $totalReturnRate = round($totalReturnAmount / $acquisitionAmount, 4);
+            $totalReturnPercent = round($totalReturnRate * 100, 2);
+            Arr::set($groupH, "$year.metrics.totalReturnAmount", round($totalReturnAmount, 2));
+            Arr::set($groupH, "$year.metrics.totalReturnRate", $totalReturnRate);
+            Arr::set($groupH, "$year.metrics.totalReturnPercent", $totalReturnPercent);
+        }
+
+        // Cash-on-Cash Return (CoC)
+        if ($paidAmount > 0) {
+            $cocRate = round($cashflowAfterTax / $paidAmount, 4);
+            $cocPercent = round($cocRate * 100, 2);
+            Arr::set($groupH, "$year.metrics.cocRate", $cocRate);
+            Arr::set($groupH, "$year.metrics.cocPercent", $cocPercent);
+        }
+    }
+
+    /**
+     * Calculate group-level property metrics.
+     *
+     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  int  $year  Year to calculate for
+     */
+    private function calculateGroupPropertyMetrics(array &$groupH, int $year): void
+    {
+        $marketAmount = Arr::get($groupH, "$year.asset.marketAmount", 0);
+        $incomeAmount = Arr::get($groupH, "$year.income.amount", 0);
+        $expenceAmount = Arr::get($groupH, "$year.expence.amount", 0);
+        $propertyTaxAmount = Arr::get($groupH, "$year.asset.taxPropertyAmount", 0);
+
+        // Net Operating Income (NOI)
+        $noi = $incomeAmount - $expenceAmount - $propertyTaxAmount;
+        Arr::set($groupH, "$year.metrics.noi", round($noi, 2));
+
+        // Gross Rent Multiplier (GRM)
+        if ($incomeAmount > 0) {
+            $grm = round($marketAmount / $incomeAmount, 2);
+            Arr::set($groupH, "$year.metrics.grm", $grm);
+        }
+    }
+
+    /**
+     * Calculate group-level leverage metrics.
+     *
+     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  int  $year  Year to calculate for
+     */
+    private function calculateGroupLeverageMetrics(array &$groupH, int $year): void
+    {
+        $marketAmount = Arr::get($groupH, "$year.asset.marketAmount", 0);
+        $equityAmount = Arr::get($groupH, "$year.asset.equityAmount", 0);
+        $mortgageBalance = Arr::get($groupH, "$year.mortgage.balanceAmount", 0);
+        $mortgageTerm = Arr::get($groupH, "$year.mortgage.termAmount", 0);
+        $noi = Arr::get($groupH, "$year.metrics.noi", 0);
+
+        // Debt Service Coverage Ratio (DSCR)
+        if ($mortgageTerm > 0) {
+            $dscr = round($noi / $mortgageTerm, 2);
+            Arr::set($groupH, "$year.metrics.dscr", $dscr);
+        }
+
+        // Loan-to-Value (LTV) Ratio
+        if ($marketAmount > 0) {
+            $ltvRate = round($mortgageBalance / $marketAmount, 4);
+            $ltvPercent = round($ltvRate * 100, 2);
+            Arr::set($groupH, "$year.metrics.ltvRate", $ltvRate);
+            Arr::set($groupH, "$year.metrics.ltvPercent", $ltvPercent);
+        }
+
+        // Debt-to-Equity (D/E) Ratio
+        if ($equityAmount > 0) {
+            $deRatio = round($mortgageBalance / $equityAmount, 2);
+            Arr::set($groupH, "$year.metrics.deRatio", $deRatio);
+        }
+    }
+
+    /**
+     * Calculate group-level profitability ratios.
+     *
+     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  int  $year  Year to calculate for
+     */
+    private function calculateGroupProfitabilityRatios(array &$groupH, int $year): void
+    {
+        $marketAmount = Arr::get($groupH, "$year.asset.marketAmount", 0);
+        $equityAmount = Arr::get($groupH, "$year.asset.equityAmount", 0);
+        $cashflowAfterTax = Arr::get($groupH, "$year.cashflow.afterTaxAmount", 0);
+
+        // Return on Equity (ROE)
+        if ($equityAmount > 0) {
+            $roeRate = round($cashflowAfterTax / $equityAmount, 4);
+            $roePercent = round($roeRate * 100, 2);
+            Arr::set($groupH, "$year.metrics.roeRate", $roeRate);
+            Arr::set($groupH, "$year.metrics.roePercent", $roePercent);
+        }
+
+        // Return on Assets (ROA)
+        if ($marketAmount > 0) {
+            $roaRate = round($cashflowAfterTax / $marketAmount, 4);
+            $roaPercent = round($roaRate * 100, 2);
+            Arr::set($groupH, "$year.metrics.roaRate", $roaRate);
+            Arr::set($groupH, "$year.metrics.roaPercent", $roaPercent);
+        }
+    }
+
+    /**
+     * Calculate group-level valuation metrics.
+     *
+     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  int  $year  Year to calculate for
+     */
+    private function calculateGroupValuationMetrics(array &$groupH, int $year): void
+    {
+        $marketAmount = Arr::get($groupH, "$year.asset.marketAmount", 0);
+        $equityAmount = Arr::get($groupH, "$year.asset.equityAmount", 0);
+        $mortgageBalance = Arr::get($groupH, "$year.mortgage.balanceAmount", 0);
+        $noi = Arr::get($groupH, "$year.metrics.noi", 0);
+
+        // Price-to-Book (P/B) Ratio
+        if ($equityAmount > 0) {
+            $pbRatio = round($marketAmount / $equityAmount, 2);
+            Arr::set($groupH, "$year.metrics.pbRatio", $pbRatio);
+        }
+
+        // Enterprise Value/EBITDA (EV/EBITDA)
+        if ($noi > 0) {
+            $enterpriseValue = $marketAmount + $mortgageBalance;
+            $evEbitda = round($enterpriseValue / $noi, 2);
+            Arr::set($groupH, "$year.metrics.evEbitda", $evEbitda);
+        }
+    }
+
+    /**
+     * Calculate group-level liquidity metrics.
+     *
+     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  int  $year  Year to calculate for
+     */
+    private function calculateGroupLiquidityMetrics(array &$groupH, int $year): void
+    {
+        $equityAmount = Arr::get($groupH, "$year.asset.equityAmount", 0);
+        $cashflowAfterTax = Arr::get($groupH, "$year.cashflow.afterTaxAmount", 0);
+        $mortgageTerm = Arr::get($groupH, "$year.mortgage.termAmount", 0);
+
+        // Current Ratio
+        if ($mortgageTerm > 0) {
+            $currentAssets = abs($cashflowAfterTax) + $equityAmount;
+            $currentRatio = round($currentAssets / $mortgageTerm, 2);
+            Arr::set($groupH, "$year.metrics.currentRatio", $currentRatio);
+        }
+    }
+
+    /**
      * Calculate actual change rates of income, expense and assets - not the prognosed one.
      *
      * @param  array<string, mixed>  $totalH  Reference to total group data
      * @param  array<string, mixed>  $companyH  Reference to company group data
      * @param  array<string, mixed>  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
+     *
+     * @param-out array<string, mixed> $totalH
+     * @param-out array<string, mixed> $companyH
+     * @param-out array<string, mixed> $privateH
      */
     public function calculateChangerates(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
@@ -345,6 +582,10 @@ class GroupProcessor
      * @param  array<string, mixed>  $companyH  Reference to company group data
      * @param  array<string, mixed>  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
+     *
+     * @param-out array<string, mixed> $totalH
+     * @param-out array<string, mixed> $companyH
+     * @param-out array<string, mixed> $privateH
      */
     public function calculateYield(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {

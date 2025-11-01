@@ -44,6 +44,13 @@ class PostProcessorService
      * @param  int  $deathYear  End year for calculations
      * @param  int  $thisYear  Current year
      * @param  callable  $isShownInStatistics  Callback to check if type should be shown in statistics
+     *
+     * @param-out array<string, mixed> $dataH
+     * @param-out array<string, mixed> $totalH
+     * @param-out array<string, mixed> $companyH
+     * @param-out array<string, mixed> $privateH
+     * @param-out array<string, mixed> $groupH
+     * @param-out array<string, mixed> $statisticsH
      */
     public function process(
         array &$dataH,
@@ -105,6 +112,7 @@ class PostProcessorService
                 $this->yearlyProcessor->processAssetYearly($dataH, $datapath);
                 $this->yearlyProcessor->processPotentialYearly($dataH, $datapath);
                 $this->yearlyProcessor->processYieldYearly($dataH, $datapath);
+                $this->yearlyProcessor->processFinancialMetricsYearly($dataH, $datapath);
                 $this->yearlyProcessor->processFireYearly($dataH, $assetname, $year, $meta);
             }
         }
@@ -160,6 +168,7 @@ class PostProcessorService
             $this->groupProcessor->calculateChangerates($totalH, $companyH, $privateH, $year);
             $this->groupProcessor->calculateCompanyDividendTax($companyH, $year);
             $this->groupProcessor->calculateYield($totalH, $companyH, $privateH, $year);
+            $this->groupProcessor->calculateGroupFinancialMetrics($totalH, $companyH, $privateH, $year);
         }
 
         // Calculate asset type spread for statistics
