@@ -17,6 +17,7 @@
 namespace App\Services\Processing;
 
 use App\Services\AssetTypeService;
+use App\Services\Tax\TaxCashflowService;
 use App\Services\Tax\TaxFortuneService;
 use App\Services\Utilities\HelperService;
 use App\Support\ValueObjects\AssetMeta;
@@ -33,6 +34,7 @@ class YearlyProcessor
 {
     public function __construct(
         private TaxFortuneService $taxfortune,
+        private TaxCashflowService $taxCashflow,
         private HelperService $helper,
         private AssetTypeService $assetTypeService
     ) {}
@@ -103,33 +105,8 @@ class YearlyProcessor
      */
     public function processCashFlowYearly(array &$dataH, string $path, int $thisYear): void
     {
-        [$assetname, $year, $type, $field] = $this->helper->pathToElements("$path.cashflow.beforeTaxAmount");
-        $prevYear = (int) $year - 1;
-
-        // Recalculating cashflow. Necessary if a mortgage is paid with extra amount.
-        $cashflowBeforeTaxAmount =
-            $this->ArrGet($dataH, "$path.income.amount")
-            + $this->ArrGet($dataH, "$path.income.transferedAmount")
-            - $this->ArrGet($dataH, "$path.expence.amount")
-            - $this->ArrGet($dataH, "$path.expence.transferedAmount")
-            - $this->ArrGet($dataH, "$path.mortgage.termAmount")
-            - $this->ArrGet($dataH, "$path.mortgage.extraDownpaymentAmount")
-            - $this->ArrGet($dataH, "$path.mortgage.gebyrAmount");
-
-        $cashflowAfterTaxAmount =
-            $cashflowBeforeTaxAmount
-            + $this->ArrGet($dataH, "$path.mortgage.taxDeductableAmount")
-            - $this->ArrGet($dataH, "$path.cashflow.taxAmount")
-            - $this->ArrGet($dataH, "$path.asset.taxFortuneAmount")
-            - $this->ArrGet($dataH, "$path.asset.taxPropertyAmount");
-
-        $this->ArrSet($dataH, "$path.cashflow.beforeTaxAmount", $cashflowBeforeTaxAmount);
-        $this->ArrSet($dataH, "$path.cashflow.afterTaxAmount", $cashflowAfterTaxAmount);
-
-        if ($year >= $thisYear) {
-            $this->ArrSet($dataH, "$path.cashflow.beforeTaxAggregatedAmount", $cashflowBeforeTaxAmount + $this->ArrGet($dataH, "$assetname.$prevYear.cashflow.beforeTaxAggregatedAmount"));
-            $this->ArrSet($dataH, "$path.cashflow.afterTaxAggregatedAmount", $cashflowAfterTaxAmount + $this->ArrGet($dataH, "$assetname.$prevYear.cashflow.afterTaxAggregatedAmount"));
-        }
+        // Use the dedicated service to recalculate cashflow
+        $this->taxCashflow->recalculateCashflow($dataH, $path, $thisYear);
     }
 
     /**
@@ -190,26 +167,271 @@ class YearlyProcessor
      */
     public function processYieldYearly(array &$dataH, string $path): void
     {
-        $bruttoPercent = 0;
-        $bruttoRate = 0;
-        $nettoPercent = 0;
-        $nettoRate = 0;
+        $netPercent = 0;
+        $netRate = 0;
 
-        if ($this->ArrGet($dataH, "$path.asset.acquisitionAmount") > 1) {
-            // Calculate the brutto yield percentage
-            $bruttoRate = round(($this->ArrGet($dataH, "$path.income.amount") / $this->ArrGet($dataH, "$path.asset.acquisitionAmount")), 1);
-            $bruttoPercent = $bruttoRate * 100;
+        $grossPercent = 0;
+        $grossRate = 0;
 
-            // Calculate the netto yield percentage
-            $nettoRate = round((($this->ArrGet($dataH, "$path.income.amount") - $this->ArrGet($dataH, "$path.expence.amount")) / $this->ArrGet($dataH, "$path.asset.acquisitionAmount")), 1);
-            $nettoPercent = $nettoRate * 100;
+        $capPercent = 0;
+        $capRate = 0;
+
+        $acquisitionAmount = $this->ArrGet($dataH, "$path.asset.acquisitionAmount");
+        if (! $acquisitionAmount) {
+            $acquisitionAmount = $this->ArrGet($dataH, "$path.asset.marketAmount"); // FIX: Is this an assumption that will make problems?
         }
 
-        $this->ArrSet($dataH, "$path.yield.bruttoPercent", $bruttoPercent);
-        $this->ArrSet($dataH, "$path.yield.bruttoRate", $bruttoRate);
+        if ($acquisitionAmount > 1) {
+            // Gross Rental Yield (GRY)
+            // This provides a fast preliminary measure of the potential return on investment.
+            $grossRate = round(($this->ArrGet($dataH, "$path.income.amount") / $acquisitionAmount), 2);
+            $grossPercent = $grossRate * 100;
 
-        $this->ArrSet($dataH, "$path.yield.nettoPercent", $nettoPercent);
-        $this->ArrSet($dataH, "$path.yield.nettoRate", $nettoRate);
+            // Net Rental Yield (NRY)
+            // This offers a more accurate reflection of the property's profitability by factoring in operating expenses, propertyTax and Mortgage.termAmount (FIX?: Some may say it is only the interestAmount that should be used.
+            $expence = $this->ArrGet($dataH, "$path.expence.amount") + $this->ArrGet($dataH, "$path.asset.propertyTaxAmount") + $this->ArrGet($dataH, "$path.mortgage.termAmount");
+            $netRate = round((($this->ArrGet($dataH, "$path.income.amount") - $expence) / $acquisitionAmount), 2);
+            $netPercent = $netRate * 100;
+
+            // Capitalization (CAP) Rate (Cap Rate), which is closely related to the Net Rental Yield but uses a different measure of income:
+            // Net Operating Income (NOI) is the Annual Rental Income minus Operating Expenses (same as NRY expenses, but explicitly excludes mortgage interest, principal payments, and depreciation).
+            // The Cap Rate is used to evaluate the property's performance independent of the financing method.
+            $netOperatingIncome = $this->ArrGet($dataH, "$path.income.amount") - $this->ArrGet($dataH, "$path.expence.amount") - $this->ArrGet($dataH, "$path.asset.propertyTaxAmount");
+            $capRate = round(($netOperatingIncome / $acquisitionAmount), 2);
+            $capPercent = $capRate * 100;
+
+        }
+        $this->ArrSet($dataH, "$path.yield.grossPercent", $grossPercent);
+        $this->ArrSet($dataH, "$path.yield.grossRate", $grossRate);
+
+        $this->ArrSet($dataH, "$path.yield.netPercent", $netPercent);
+        $this->ArrSet($dataH, "$path.yield.netRate", $netRate);
+
+        $this->ArrSet($dataH, "$path.yield.capPercent", $capPercent);
+        $this->ArrSet($dataH, "$path.yield.capRate", $capRate);
+    }
+
+    /**
+     * Calculate financial metrics for a specific year and asset path.
+     * Orchestrates all metric calculations by calling specialized methods.
+     *
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     */
+    public function processFinancialMetricsYearly(array &$dataH, string $path): void
+    {
+        $this->processInvestmentReturns($dataH, $path);
+        $this->processPropertyMetrics($dataH, $path);
+        $this->processLeverageMetrics($dataH, $path);
+        $this->processProfitabilityRatios($dataH, $path);
+        $this->processValuationMetrics($dataH, $path);
+        $this->processLiquidityMetrics($dataH, $path);
+    }
+
+    /**
+     * Calculate investment return metrics (ROI, Total Return, CoC).
+     *
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     */
+    private function processInvestmentReturns(array &$dataH, string $path): void
+    {
+        $acquisitionAmount = $this->ArrGet($dataH, "$path.asset.acquisitionAmount");
+        $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
+        $paidAmount = $this->ArrGet($dataH, "$path.asset.paidAmount");
+        $cashflowAfterTax = $this->ArrGet($dataH, "$path.cashflow.afterTaxAmount");
+
+        // ROI (Return on Investment) - Total gain/loss relative to acquisition cost
+        $roiPercent = 0;
+        $roiRate = 0;
+        if ($acquisitionAmount > 0) {
+            $totalGain = ($marketAmount - $acquisitionAmount) + $cashflowAfterTax;
+            $roiRate = round($totalGain / $acquisitionAmount, 4);
+            $roiPercent = round($roiRate * 100, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.roiRate", $roiRate);
+        $this->ArrSet($dataH, "$path.metrics.roiPercent", $roiPercent);
+
+        // Total Return - Market value change + income received
+        $totalReturnAmount = ($marketAmount - $acquisitionAmount) + $cashflowAfterTax;
+        $totalReturnPercent = 0;
+        $totalReturnRate = 0;
+        if ($acquisitionAmount > 0) {
+            $totalReturnRate = round($totalReturnAmount / $acquisitionAmount, 4);
+            $totalReturnPercent = round($totalReturnRate * 100, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.totalReturnAmount", round($totalReturnAmount, 2));
+        $this->ArrSet($dataH, "$path.metrics.totalReturnRate", $totalReturnRate);
+        $this->ArrSet($dataH, "$path.metrics.totalReturnPercent", $totalReturnPercent);
+
+        // Cash-on-Cash Return (CoC) - Annual cash flow relative to cash invested
+        $cocPercent = 0;
+        $cocRate = 0;
+        if ($paidAmount > 0) {
+            $cocRate = round($cashflowAfterTax / $paidAmount, 4);
+            $cocPercent = round($cocRate * 100, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.cocRate", $cocRate);
+        $this->ArrSet($dataH, "$path.metrics.cocPercent", $cocPercent);
+    }
+
+    /**
+     * Calculate property-specific metrics (NOI, GRM).
+     *
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     */
+    private function processPropertyMetrics(array &$dataH, string $path): void
+    {
+        $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
+        $incomeAmount = $this->ArrGet($dataH, "$path.income.amount");
+        $expenceAmount = $this->ArrGet($dataH, "$path.expence.amount");
+        $propertyTaxAmount = $this->ArrGet($dataH, "$path.asset.taxPropertyAmount");
+
+        // Calculate Net Operating Income (NOI)
+        $noi = $incomeAmount - $expenceAmount - $propertyTaxAmount;
+        $this->ArrSet($dataH, "$path.metrics.noi", round($noi, 2));
+
+        // Gross Rent Multiplier (GRM) - Market value / Annual rental income
+        $grm = 0;
+        if ($incomeAmount > 0) {
+            $grm = round($marketAmount / $incomeAmount, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.grm", $grm);
+    }
+
+    /**
+     * Calculate leverage metrics (DSCR, LTV, D/E).
+     *
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     */
+    private function processLeverageMetrics(array &$dataH, string $path): void
+    {
+        $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
+        $equityAmount = $this->ArrGet($dataH, "$path.asset.equityAmount");
+        $incomeAmount = $this->ArrGet($dataH, "$path.income.amount");
+        $expenceAmount = $this->ArrGet($dataH, "$path.expence.amount");
+        $propertyTaxAmount = $this->ArrGet($dataH, "$path.asset.taxPropertyAmount");
+        $mortgageBalance = $this->ArrGet($dataH, "$path.mortgage.balanceAmount");
+        $mortgageTerm = $this->ArrGet($dataH, "$path.mortgage.termAmount");
+
+        // Calculate NOI for DSCR
+        $noi = $incomeAmount - $expenceAmount - $propertyTaxAmount;
+
+        // Debt Service Coverage Ratio (DSCR) - NOI / Total debt service
+        $dscr = 0;
+        if ($mortgageTerm > 0) {
+            $dscr = round($noi / $mortgageTerm, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.dscr", $dscr);
+
+        // Loan-to-Value (LTV) Ratio - Mortgage balance / Market value
+        $ltvPercent = 0;
+        $ltvRate = 0;
+        if ($marketAmount > 0) {
+            $ltvRate = round($mortgageBalance / $marketAmount, 4);
+            $ltvPercent = round($ltvRate * 100, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.ltvRate", $ltvRate);
+        $this->ArrSet($dataH, "$path.metrics.ltvPercent", $ltvPercent);
+
+        // Debt-to-Equity (D/E) Ratio - Total debt / Total equity
+        $deRatio = 0;
+        if ($equityAmount > 0) {
+            $deRatio = round($mortgageBalance / $equityAmount, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.deRatio", $deRatio);
+    }
+
+    /**
+     * Calculate profitability ratios (ROE, ROA).
+     *
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     */
+    private function processProfitabilityRatios(array &$dataH, string $path): void
+    {
+        $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
+        $equityAmount = $this->ArrGet($dataH, "$path.asset.equityAmount");
+        $cashflowAfterTax = $this->ArrGet($dataH, "$path.cashflow.afterTaxAmount");
+
+        // Return on Equity (ROE) - Net income / Equity
+        $roePercent = 0;
+        $roeRate = 0;
+        if ($equityAmount > 0) {
+            $roeRate = round($cashflowAfterTax / $equityAmount, 4);
+            $roePercent = round($roeRate * 100, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.roeRate", $roeRate);
+        $this->ArrSet($dataH, "$path.metrics.roePercent", $roePercent);
+
+        // Return on Assets (ROA) - Net income / Total assets
+        $roaPercent = 0;
+        $roaRate = 0;
+        if ($marketAmount > 0) {
+            $roaRate = round($cashflowAfterTax / $marketAmount, 4);
+            $roaPercent = round($roaRate * 100, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.roaRate", $roaRate);
+        $this->ArrSet($dataH, "$path.metrics.roaPercent", $roaPercent);
+    }
+
+    /**
+     * Calculate valuation metrics (P/B, EV/EBITDA).
+     *
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     */
+    private function processValuationMetrics(array &$dataH, string $path): void
+    {
+        $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
+        $equityAmount = $this->ArrGet($dataH, "$path.asset.equityAmount");
+        $incomeAmount = $this->ArrGet($dataH, "$path.income.amount");
+        $expenceAmount = $this->ArrGet($dataH, "$path.expence.amount");
+        $propertyTaxAmount = $this->ArrGet($dataH, "$path.asset.taxPropertyAmount");
+        $mortgageBalance = $this->ArrGet($dataH, "$path.mortgage.balanceAmount");
+
+        // Calculate NOI for EV/EBITDA
+        $noi = $incomeAmount - $expenceAmount - $propertyTaxAmount;
+
+        // Price-to-Book (P/B) Ratio - Market value / Equity (book value)
+        $pbRatio = 0;
+        if ($equityAmount > 0) {
+            $pbRatio = round($marketAmount / $equityAmount, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.pbRatio", $pbRatio);
+
+        // Enterprise Value/EBITDA (EV/EBITDA) - (Market value + Debt) / EBITDA
+        // For real estate, we use NOI as a proxy for EBITDA
+        $evEbitda = 0;
+        if ($noi > 0) {
+            $enterpriseValue = $marketAmount + $mortgageBalance;
+            $evEbitda = round($enterpriseValue / $noi, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.evEbitda", $evEbitda);
+    }
+
+    /**
+     * Calculate liquidity metrics (Current Ratio).
+     *
+     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  string  $path  Asset path (e.g., "assetname.year")
+     */
+    private function processLiquidityMetrics(array &$dataH, string $path): void
+    {
+        $equityAmount = $this->ArrGet($dataH, "$path.asset.equityAmount");
+        $cashflowAfterTax = $this->ArrGet($dataH, "$path.cashflow.afterTaxAmount");
+        $mortgageTerm = $this->ArrGet($dataH, "$path.mortgage.termAmount");
+
+        // Current Ratio - Current assets / Current liabilities
+        // For real estate: (Cash flow + Equity) / Annual debt service
+        $currentRatio = 0;
+        if ($mortgageTerm > 0) {
+            $currentAssets = abs($cashflowAfterTax) + $equityAmount;
+            $currentRatio = round($currentAssets / $mortgageTerm, 2);
+        }
+        $this->ArrSet($dataH, "$path.metrics.currentRatio", $currentRatio);
     }
 
     /**
