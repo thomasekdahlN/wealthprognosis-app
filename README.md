@@ -478,11 +478,66 @@ The following tables describe the calculated output structure for each asset per
 | `realization.description` | string | Description | Generated description |
 
 #### Yield Output
+If asset.acquisitionAmount is empty, we use asset.marketAmount instead.
+| Field             | Type | Description   | Calculation                                                                                                                                                                                   |
+|-------------------|------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `yield.grossRate` | decimal | Gross yield % | (income.amount / asset.acquisitionAmount) × 100                                                                                                                                               |
+| `yield.netRate`   | decimal | Net yield %   | ((income.amount - expence.amount - asset.propertyTaxAmount - mortgage.termAmount) / asset.acquisitionAmount) × 100   - calculated with fiancing cost. FortunTax and IncomeTax is not included |
+| `yield.capRate`   | decimal | Cap yield %     | ((income.amount - expence.amount - asset.propertyTaxAmount) / asset.acquisitionAmount) × 100 - calculated without looking at financing cost. FortunTax and IncomeTax is not included                                                 |
+
+#### Financial Metrics Output
+
+Comprehensive financial analysis metrics calculated for each asset and year.
+
+##### Investment Returns
 
 | Field | Type | Description | Calculation |
 |-------|------|-------------|-------------|
-| `yield.bruttoPercent` | decimal | Gross yield % | (income / acquisition) × 100 |
-| `yield.nettoPercent` | decimal | Net yield % | ((income - expence) / acquisition) × 100 |
+| `metrics.noi` | decimal | Net Operating Income | income.amount - expence.amount - asset.propertyTaxAmount |
+| `metrics.roiRate` | decimal | Return on Investment (rate) | ((asset.marketAmount - asset.acquisitionAmount) + cashflow.afterTaxAmount) / asset.acquisitionAmount |
+| `metrics.roiPercent` | decimal | Return on Investment (%) | metrics.roiRate × 100 |
+| `metrics.totalReturnAmount` | decimal | Total Return (amount) | (asset.marketAmount - asset.acquisitionAmount) + cashflow.afterTaxAmount |
+| `metrics.totalReturnRate` | decimal | Total Return (rate) | metrics.totalReturnAmount / asset.acquisitionAmount |
+| `metrics.totalReturnPercent` | decimal | Total Return (%) | metrics.totalReturnRate × 100 |
+| `metrics.cocRate` | decimal | Cash-on-Cash Return (rate) | cashflow.afterTaxAmount / asset.paidAmount |
+| `metrics.cocPercent` | decimal | Cash-on-Cash Return (%) | metrics.cocRate × 100 |
+
+##### Property Metrics
+
+| Field | Type | Description | Calculation |
+|-------|------|-------------|-------------|
+| `metrics.grm` | decimal | Gross Rent Multiplier | asset.marketAmount / income.amount |
+
+##### Leverage Metrics
+
+| Field | Type | Description | Calculation |
+|-------|------|-------------|-------------|
+| `metrics.dscr` | decimal | Debt Service Coverage Ratio | metrics.noi / mortgage.termAmount |
+| `metrics.ltvRate` | decimal | Loan-to-Value Ratio (rate) | mortgage.balanceAmount / asset.marketAmount |
+| `metrics.ltvPercent` | decimal | Loan-to-Value Ratio (%) | metrics.ltvRate × 100 |
+| `metrics.deRatio` | decimal | Debt-to-Equity Ratio | mortgage.balanceAmount / asset.equityAmount |
+
+##### Profitability Ratios
+
+| Field | Type | Description | Calculation |
+|-------|------|-------------|-------------|
+| `metrics.roeRate` | decimal | Return on Equity (rate) | cashflow.afterTaxAmount / asset.equityAmount |
+| `metrics.roePercent` | decimal | Return on Equity (%) | metrics.roeRate × 100 |
+| `metrics.roaRate` | decimal | Return on Assets (rate) | cashflow.afterTaxAmount / asset.marketAmount |
+| `metrics.roaPercent` | decimal | Return on Assets (%) | metrics.roaRate × 100 |
+
+##### Valuation Metrics
+
+| Field | Type | Description | Calculation |
+|-------|------|-------------|-------------|
+| `metrics.pbRatio` | decimal | Price-to-Book Ratio | asset.marketAmount / asset.equityAmount |
+| `metrics.evEbitda` | decimal | Enterprise Value/EBITDA | (asset.marketAmount + mortgage.balanceAmount) / metrics.noi |
+
+##### Liquidity Metrics
+
+| Field | Type | Description | Calculation |
+|-------|------|-------------|-------------|
+| `metrics.currentRatio` | decimal | Current Ratio | (abs(cashflow.afterTaxAmount) + asset.equityAmount) / mortgage.termAmount |
 
 #### Potential Output (Bank Perspective)
 
