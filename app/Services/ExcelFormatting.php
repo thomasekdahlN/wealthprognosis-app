@@ -16,16 +16,17 @@ class ExcelFormatting
         $startRow = 6;
         $endRow = max($sheet->getHighestRow(), $startRow);
 
-        // Header: bold + gray
-        $sheet->getStyle('A5:AQ5')->getFont()->setBold(true);
-        $sheet->getStyle('A5:AQ5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('CCCCCC');
+        // Header: bold + gray (extended to AR for new columns)
+        $sheet->getStyle('A5:AR5')->getFont()->setBold(true);
+        $sheet->getStyle('A5:AR5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('CCCCCC');
 
-        // Amounts: Norwegian spacing + red negatives, right-aligned
-        $sheet->getStyle("B{$startRow}:AQ{$endRow}")->getNumberFormat()->setFormatCode('# ##0;[Red]-# ##0');
-        $sheet->getStyle("B{$startRow}:AQ{$endRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        // Amounts: Norwegian spacing + red negatives, right-aligned (extended to AR)
+        $sheet->getStyle("B{$startRow}:AR{$endRow}")->getNumberFormat()->setFormatCode('# ##0;[Red]-# ##0');
+        $sheet->getStyle("B{$startRow}:AR{$endRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-        // Percent columns
-        foreach (['D', 'F', 'H', 'J', 'O', 'Q', 'V', 'X', 'AD', 'AF', 'AG', 'AH', 'AK', 'AP'] as $col) {
+        // Percent columns (updated after adding AI capRate column)
+        // D=Income%, F=Expense%, H=Tax%, J=Interest%, O=Deductable%, Q=Asset%, V=Fortune%, X=Fortune%, Z=Property%, AD=Realization%, AF=Shield%, AG=GrossYield%, AH=NetYield%, AI=CapRate%, AL=Mortgage%, AQ=SaveRate%
+        foreach (['D', 'F', 'H', 'J', 'O', 'Q', 'V', 'X', 'AD', 'AF', 'AG', 'AH', 'AI', 'AL', 'AQ'] as $col) {
             $sheet->getStyle("{$col}{$startRow}:{$col}{$endRow}")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%');
         }
         $sheet->getStyle("Z{$startRow}:Z{$endRow}")->getNumberFormat()->setFormatCode('0.00%;[Red]-0.00%');
@@ -37,9 +38,9 @@ class ExcelFormatting
         $sheet->getStyle("W{$startRow}:W{$endRow}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCB');
         $sheet->getStyle("Y{$startRow}:Y{$endRow}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCB');
         $sheet->getStyle("AC{$startRow}:AC{$endRow}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCB');
-        $sheet->getStyle("AI{$startRow}:AI{$endRow}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('ADD8E6');
+        $sheet->getStyle("AJ{$startRow}:AJ{$endRow}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('ADD8E6');
 
-        // Horizontal highlights
+        // Horizontal highlights (extended to AR for new columns)
         $prevYear = (int) ($meta['prevYear'] ?? (int) date('Y') - 1);
         $rows = [
             (int) ($meta['thisYear'] ?? date('Y')) => '32CD32',
@@ -55,7 +56,7 @@ class ExcelFormatting
             }
             $row = $year - $prevYear + $offset;
             if ($row >= $startRow && $row <= $endRow) {
-                $sheet->getStyle("A{$row}:AQ{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color);
+                $sheet->getStyle("A{$row}:AR{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color);
             }
         }
     }
