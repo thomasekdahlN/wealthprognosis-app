@@ -7,16 +7,25 @@ namespace App\Support\ValueObjects;
  *
  * Represents the result of calculating tax shield for an asset,
  * including the adjusted tax amount after shield application.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class TaxShieldResult
 {
+    public int $taxAmount;
+
+    public int $taxShieldAmount;
+
     public function __construct(
-        public float $taxAmount,
-        public float $taxShieldAmount,
+        float $taxAmount,
+        float $taxShieldAmount,
         public float $taxShieldPercent,
         public float $taxShieldRate,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxAmount = (int) round($taxAmount);
+        $this->taxShieldAmount = (int) round($taxShieldAmount);
+    }
 
     /**
      * Convert to array for backward compatibility.

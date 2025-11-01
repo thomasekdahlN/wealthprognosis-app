@@ -6,14 +6,20 @@ namespace App\Support\ValueObjects;
  * Value object for income tax calculation results.
  *
  * Represents the result of calculating income tax for various asset and income types.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class IncomeTaxResult
 {
+    public int $taxAmount;
+
     public function __construct(
-        public float $taxAmount,
+        float $taxAmount,
         public float $taxRate,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxAmount = (int) round($taxAmount);
+    }
 
     /**
      * Convert to array for backward compatibility.

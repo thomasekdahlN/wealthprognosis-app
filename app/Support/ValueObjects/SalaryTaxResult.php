@@ -7,15 +7,21 @@ namespace App\Support\ValueObjects;
  *
  * Represents the result of calculating total salary tax including
  * common tax, bracket tax, and social security tax.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class SalaryTaxResult
 {
+    public int $taxAmount;
+
     public function __construct(
-        public float $taxAmount,
+        float $taxAmount,
         public float $taxAveragePercent,
         public float $taxAverageRate,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxAmount = (int) round($taxAmount);
+    }
 
     /**
      * Convert to array for backward compatibility.

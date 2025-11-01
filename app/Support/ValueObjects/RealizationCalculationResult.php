@@ -18,18 +18,33 @@ namespace App\Support\ValueObjects;
 
 /**
  * Value object representing the result of a realization tax calculation.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class RealizationCalculationResult
 {
+    public int $taxableAmount;
+
+    public int $taxAmount;
+
+    public int $acquisitionAmount;
+
+    public int $taxShieldAmount;
+
     public function __construct(
-        public float $taxableAmount,
-        public float $taxAmount,
-        public float $acquisitionAmount,
+        float $taxableAmount,
+        float $taxAmount,
+        float $acquisitionAmount,
         public float $taxPercent,
-        public float $taxShieldAmount,
+        float $taxShieldAmount,
         public float $taxShieldPercent,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxableAmount = (int) round($taxableAmount);
+        $this->taxAmount = (int) round($taxAmount);
+        $this->acquisitionAmount = (int) round($acquisitionAmount);
+        $this->taxShieldAmount = (int) round($taxShieldAmount);
+    }
 
     /**
      * Convert to array format for backward compatibility.

@@ -18,20 +18,29 @@ namespace App\Support\ValueObjects;
 
 /**
  * Value object representing the result of a fortune tax calculation.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class FortuneCalculationResult
 {
+    public int $taxableFortuneAmount;
+
+    public int $taxFortuneAmount;
+
     public function __construct(
-        public float $taxableFortuneAmount,
+        float $taxableFortuneAmount,
         public float $taxableFortunePercent,
         public float $taxableFortuneRate,
-        public float $taxFortuneAmount,
+        float $taxFortuneAmount,
         public float $taxFortunePercent,
         public float $taxFortuneRate,
         public float $taxFortuneAveragePercent,
         public float $taxFortuneAverageRate,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxableFortuneAmount = (int) round($taxableFortuneAmount);
+        $this->taxFortuneAmount = (int) round($taxFortuneAmount);
+    }
 
     /**
      * Convert to array format for backward compatibility.

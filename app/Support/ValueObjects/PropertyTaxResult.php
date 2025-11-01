@@ -6,20 +6,32 @@ namespace App\Support\ValueObjects;
  * Value object for property tax calculation results.
  *
  * Represents the result of calculating property tax for real estate assets.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class PropertyTaxResult
 {
+    public int $taxablePropertyAmount;
+
+    public int $taxPropertyDeductionAmount;
+
+    public int $taxPropertyAmount;
+
     public function __construct(
         public string $taxPropertyArea,
-        public float $taxablePropertyAmount,
+        float $taxablePropertyAmount,
         public float $taxablePropertyPercent,
         public float $taxablePropertyRate,
-        public float $taxPropertyDeductionAmount,
-        public float $taxPropertyAmount,
+        float $taxPropertyDeductionAmount,
+        float $taxPropertyAmount,
         public float $taxPropertyPercent,
         public float $taxPropertyRate,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxablePropertyAmount = (int) round($taxablePropertyAmount);
+        $this->taxPropertyDeductionAmount = (int) round($taxPropertyDeductionAmount);
+        $this->taxPropertyAmount = (int) round($taxPropertyAmount);
+    }
 
     /**
      * Convert to array for backward compatibility.

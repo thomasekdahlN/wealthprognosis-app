@@ -21,20 +21,29 @@ namespace App\Support\ValueObjects;
  *
  * This is returned by TaxFortuneService::calculatefortunetax() and provides
  * a type-safe, self-documenting alternative to array destructuring.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class FortuneTaxResult
 {
+    public int $taxableFortuneAmount;
+
+    public int $taxFortuneAmount;
+
     public function __construct(
-        public float $taxableFortuneAmount,
+        float $taxableFortuneAmount,
         public float $taxableFortunePercent,
         public float $taxableFortuneRate,
-        public float $taxFortuneAmount,
+        float $taxFortuneAmount,
         public float $taxFortunePercent,
         public float $taxFortuneRate,
         public float $taxFortuneAveragePercent,
         public float $taxFortuneAverageRate,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxableFortuneAmount = (int) round($taxableFortuneAmount);
+        $this->taxFortuneAmount = (int) round($taxFortuneAmount);
+    }
 
     /**
      * Convert to array format for backward compatibility.

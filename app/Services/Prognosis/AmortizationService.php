@@ -16,95 +16,165 @@
 
 namespace App\Services\Prognosis;
 
+use App\Services\Tax\TaxConfigRepository;
+use App\Services\Utilities\HelperService;
+use App\Support\ValueObjects\MortgageCalculation;
+use App\Support\ValueObjects\MortgageData;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * AmortizationService
+ *
+ * Service for calculating mortgage amortization schedules.
+ * Handles both regular amortization and interest-only periods.
+ *
+ * @property bool $debug Enable debug logging
+ * @property int $amount Original loan amount
+ * @property int $year_start Starting year for amortization
+ * @property int $year_end Ending year for amortization
+ * @property int $term_years Total loan term in years
+ * @property float $interest Interest rate (can be a reference to changerate)
+ * @property int $terms Number of payment terms per year (always 1 for annual)
+ * @property int $period Remaining periods on the loan
+ * @property float $principalAmount Current period's principal payment
+ * @property float $balanceAmount Current remaining balance
+ * @property float $termAmount Current period's total payment
+ * @property string $assettname Name of the asset
+ * @property array<string, mixed> $dataH Data history array
+ * @property object $changerate Changerate service for interest rate lookup
+ * @property float|int|null $assetChangerateValue Cached changerate value
+ * @property float $remainingMortgageAmount Remaining mortgage amount for current calculation
+ * @property int $interestOnlyYears Remaining interest-only years
+ * @property int $interestOnlyYearEnd Year when interest-only period ends
+ * @property int $extraDownpaymentAmount Annual extra downpayment amount
+ */
 class AmortizationService
 {
+    /** @var bool Enable debug logging */
     private bool $debug;
 
+    /** @var int Original loan amount */
     private int $amount;
 
+    /** @var int Starting year for amortization */
     private int $year_start;
 
+    /** @var int Ending year for amortization */
     private int $year_end;
 
+    /** @var int Total loan term in years */
     private int $term_years;
 
+    /** @var float Interest rate (can be a reference to changerate) */
     private float $interest;
 
+    /** @var int Number of payment terms per year (always 1 for annual) */
     private int $terms;
 
-    private int $period;
+    /** @var int Remaining years on the loan */
+    private int $remainingYears;
 
+    /** @var float Current period's principal payment */
     private float $principalAmount = 0;
 
+    /** @var float Current remaining balance */
     private float $balanceAmount = 0;
 
+    /** @var float Current period's total payment */
     private float $termAmount = 0;
 
+    /** @var string Name of the asset */
     private string $assettname;
 
-    /** @var array<string, mixed> */
+    /** @var array<string, mixed> Data history array */
     private array $dataH = [];
 
+    /** @var object Changerate service for interest rate lookup */
     private object $changerate;
 
+    /** @var float|int|null Cached changerate value */
     private float|int|null $assetChangerateValue;
 
-    private int $remainingMortgageAmount;
+    /** @var float Remaining mortgage amount for current calculation */
+    private float $remainingMortgageAmount;
 
+    /** @var int Remaining interest-only years */
     private int $interestOnlyYears;
 
+    /** @var int Year when interest-only period ends */
     private int $interestOnlyYearEnd;
 
+    /** @var int Annual extra downpayment amount */
     private int $extraDownpaymentAmount;
 
+    /** @var string Tax type for the asset */
+    private string $taxType;
+
+    /** @var string Country code for tax calculations */
+    private string $taxCountry;
+
+    /** @var TaxConfigRepository Tax configuration repository */
+    private TaxConfigRepository $taxConfigRepo;
+
     /**
-     * Amortization constructor.
+     * Create a new AmortizationService instance and calculate the amortization schedule.
      *
-     * This constructor initializes the Amortization object with the provided configuration, change rate, data history, mortgages, and asset name.
-     * It then calculates the amortization schedule for each mortgage in the provided mortgages array.
+     * Initializes the service with mortgage details and immediately calculates
+     * the complete amortization schedule from the starting year to loan maturity.
      *
-     * @param  bool  $debug  Debug flag to enable detailed logging.
-     * @param  array  $config  Configuration array for the amortization calculation (kept for API compatibility).
-     * @param  object  $changerate  Object containing the change rate for the loan.
-     * @param  array<string, mixed>  $dataH  Array containing the data history for the loan.
-     * @param  array<string, mixed>  $mortgage  Array containing the mortgage details for the loan.
-     * @param  string  $assettname  Name of the asset associated with the loan.
-     * @param  int  $year  The year for the amortization calculation.
-     *
-     * @phpstan-param array<string, mixed> $config
+     * @param  bool  $debug  Enable detailed debug logging
+     * @param  array<string, mixed>  $config  Configuration array (kept for API compatibility, not used)
+     * @param  object  $changerate  Changerate service for interest rate lookup
+     * @param  array<string, mixed>  $dataH  Data history array to store results
+     * @param  array<string, mixed>  $mortgage  Mortgage configuration with keys:
+     *                                          - amount: Original loan amount
+     *                                          - years: Loan term in years
+     *                                          - interest: Interest rate or changerate reference
+     *                                          - interestOnlyYears: Number of interest-only years (optional)
+     *                                          - extraDownpaymentAmount: Annual extra payment (optional)
+     * @param  string  $assettname  Name of the asset associated with the mortgage
+     * @param  int  $year  Starting year for the amortization schedule
+     * @param  HelperService  $helperService  Helper service for utility functions
      */
-    public function __construct(bool $debug, array $config, object $changerate, array $dataH, array $mortgage, string $assettname, int $year)
-    {
+    public function __construct(
+        bool $debug,
+        array $config,
+        object $changerate,
+        array $dataH,
+        array $mortgage,
+        string $assettname,
+        int $year,
+        private HelperService $helperService = new HelperService
+    ) {
         $this->debug = $debug;
         $this->dataH = $dataH;
-        // $config parameter is kept for API compatibility but not currently used internally
-        unset($config);
         $this->assettname = $assettname;
         $this->changerate = $changerate;
         $this->assetChangerateValue = null;
 
+        // Extract tax information from config
+        $this->taxType = Arr::get($config, "$assettname.meta.tax_type", 'none');
+        $this->taxCountry = Arr::get($config, "$assettname.meta.taxCountry", 'no');
+
+        // Initialize tax config repository
+        $this->taxConfigRepo = new TaxConfigRepository($this->taxCountry, $this->helperService);
+
+        // Initialize loan parameters
         $this->year_start = (int) $year;
         $this->term_years = (int) Arr::get($mortgage, 'years');
         $this->amount = $this->remainingMortgageAmount = (int) Arr::get($mortgage, 'amount');
         $this->interest = (float) Arr::get($mortgage, 'interest');
-        $this->terms = 1;
-        $this->period = $this->terms * $this->term_years;
+        $this->terms = 1; // Annual payments
+        $this->remainingYears = $this->terms * $this->term_years;
         $this->balanceAmount = $this->amount;
         $this->year_end = $year + $this->term_years;
-        $this->interestOnlyYears = (int) Arr::get($mortgage, 'interestOnlyYears'); // Antall år med avdragsfrihet. Betaler da kun renter.
-        $this->interestOnlyYearEnd = $year + $this->interestOnlyYears; // Antall år med avdragsfrihet. Betaler da kun renter.
+        $this->interestOnlyYears = (int) Arr::get($mortgage, 'interestOnlyYears', 0);
+        $this->interestOnlyYearEnd = $year + $this->interestOnlyYears;
+        $this->extraDownpaymentAmount = (int) Arr::get($mortgage, 'extraDownpaymentAmount', 0);
 
-        $this->extraDownpaymentAmount = (int) Arr::get($mortgage, 'extraDownpaymentAmount', 0); // Yearly extra downpayment
-
-        // This logic seems incorrect - commenting out as $mortgages is not defined
-        // if (isset($mortgages[$year + 1]) && $year + 1 < $this->year_end) {
-        //     $this->year_end = $year;
-        // }
-
-        $this->removeMortgageFrom($this->year_start); // JUst clean up the structure because of extra downpayment faster mortage payment later on will leave traces in not removed properly.
+        // Clean up any existing mortgage data and calculate schedule
+        $this->removeMortgageFrom($this->year_start);
         $this->calculateAmortizationSchedule();
     }
 
@@ -119,10 +189,10 @@ class AmortizationService
     public function calculateAmortizationSchedule(): void
     {
         while ($this->balanceAmount > 0 && $this->year_start <= $this->year_end) {
-            // echo "$this->year_start, period: $this->period, extraDownpaymentAmount: $this->extraDownpaymentAmount\n";
+            // echo "$this->year_start, period: $this->remainingYears, extraDownpaymentAmount: $this->extraDownpaymentAmount\n";
             $this->calculate(false, $this->year_start++, $this->extraDownpaymentAmount);
             $this->remainingMortgageAmount = $this->balanceAmount;
-            $this->period--; // Teller ned på antall år i lånet.
+            $this->remainingYears--; // Teller ned på antall år i lånet.
             if ($this->interestOnlyYears > 0) {
                 $this->interestOnlyYears--; // Teller ned på antall rentefrie år
             }
@@ -130,136 +200,250 @@ class AmortizationService
         $this->assetChangerateValue = null;
     }
 
-    private function calculate(bool $debug, int $year, float $extraDownpaymentAmount = 0)
+    /**
+     * Calculate the amortization denominator.
+     *
+     * @param  float  $interestRate  Interest rate as decimal
+     * @param  int  $remainingYears  Number of remaining years
+     */
+    private function calculateDenominator(float $interestRate, int $remainingYears): float
+    {
+        return 1 - (1 / pow((1 + $interestRate), $remainingYears));
+    }
+
+    /**
+     * Calculate interest amount for the period.
+     *
+     * @param  int  $remainingBalanceAmount  Remaining mortgage balance
+     * @param  float  $interestRate  Interest rate as decimal
+     */
+    private function calculateInterestAmount(int $remainingBalanceAmount, float $interestRate): float
+    {
+        return $remainingBalanceAmount * $interestRate;
+    }
+
+    /**
+     * Calculate term amount (total payment) for the period.
+     *
+     * @param  int  $remainingBalanceAmount  Remaining mortgage balance
+     * @param  float  $interestRate  Interest rate as decimal
+     * @param  float  $denominator  Amortization denominator
+     */
+    private function calculateTermAmount(int $remainingBalanceAmount, float $interestRate, float $denominator): float
+    {
+        return ($remainingBalanceAmount * $interestRate) / $denominator;
+    }
+
+    /**
+     * Perform mortgage calculation for a specific year.
+     *
+     * @param  int  $year  Year to calculate
+     * @param  float  $interestPercent  Interest rate as percentage
+     * @param  float  $interestRate  Interest rate as decimal
+     * @param  float  $extraDownpaymentAmount  Extra downpayment amount
+     */
+    private function performCalculation(
+        int $year,
+        float $interestPercent,
+        float $interestRate,
+        float $extraDownpaymentAmount
+    ): MortgageCalculation {
+        $denominator = $this->calculateDenominator($interestRate, $this->remainingYears);
+
+        if ($denominator <= 0) {
+            // Fallback for invalid denominator
+            $interestAmount = $this->calculateInterestAmount($this->remainingMortgageAmount, $interestRate);
+
+            return MortgageCalculation::fallback(
+                interestPercent: $interestPercent,
+                interestRate: $interestRate,
+                interestAmount: $interestAmount,
+                extraDownpaymentAmount: $extraDownpaymentAmount,
+                remainingBalanceAmount: $this->remainingMortgageAmount
+            );
+        }
+
+        $interestAmount = $this->calculateInterestAmount($this->remainingMortgageAmount, $interestRate);
+
+        if ($year < $this->interestOnlyYearEnd) {
+            // Interest-only period
+            return MortgageCalculation::interestOnly(
+                interestPercent: $interestPercent,
+                interestRate: $interestRate,
+                interestAmount: $interestAmount,
+                remainingBalanceAmount: $this->remainingMortgageAmount,
+                extraDownpaymentAmount: $extraDownpaymentAmount,
+                denominator: $denominator
+            );
+        }
+
+        // Regular amortization period
+        $termAmount = $this->calculateTermAmount($this->remainingMortgageAmount, $interestRate, $denominator);
+
+        return MortgageCalculation::regular(
+            interestPercent: $interestPercent,
+            interestRate: $interestRate,
+            interestAmount: $interestAmount,
+            termAmount: $termAmount,
+            extraDownpaymentAmount: $extraDownpaymentAmount,
+            remainingBalanceAmount: $this->remainingMortgageAmount,
+            denominator: $denominator
+        );
+    }
+
+    /**
+     * Create MortgageData from calculation result.
+     *
+     * @param  MortgageCalculation  $calculation  Calculation result
+     * @param  float  $extraDownpaymentAmount  Extra downpayment amount
+     * @param  int  $year  Year for tax rate lookup
+     */
+    private function createMortgageData(MortgageCalculation $calculation, float $extraDownpaymentAmount, int $year): MortgageData
     {
         $description = null;
-        // Retrieving interest pr year.
-        [$interestPercent, $interestDecimal, $this->assetChangerateValue, $explanation] = $this->changerate->getChangerate(false, $this->interest, $year, $this->assetChangerateValue);
-        $interestDecimal = $interestPercent / 100;
+        if ($extraDownpaymentAmount > 0) {
+            $description = "extraDownpaymentAmount: $extraDownpaymentAmount";
+        }
+        if ($calculation->explanation) {
+            $description = $description ? "$description\n{$calculation->explanation}" : $calculation->explanation;
+        }
 
-        $deno = 1 - (1 / pow((1 + $interestDecimal), $this->period));
-        // print "      ##year: $year deno: $deno = 1 - (1 / pow((1+ $interestDecimal), $this->period))\n";
+        // Get tax deduction rate from tax configuration
+        $taxDeductableRate = $this->taxConfigRepo->getTaxIncomeRate($this->taxType, $year);
+        $taxDeductablePercent = $taxDeductableRate * 100;
+        $taxDeductableAmount = $calculation->interestAmount * $taxDeductableRate;
 
-        if ($deno > 0) {
+        return new MortgageData(
+            amount: $this->amount,
+            termAmount: $calculation->termAmount,
+            interestAmount: $calculation->interestAmount,
+            interestPercent: $calculation->interestPercent,
+            interestRate: $calculation->interestRate,
+            principalAmount: $calculation->principalAmount,
+            balanceAmount: $calculation->balanceAmount,
+            extraDownpaymentAmount: $extraDownpaymentAmount,
+            years: $this->remainingYears,
+            interestOnlyYears: $this->interestOnlyYears,
+            gebyrAmount: 0,
+            taxDeductableAmount: $taxDeductableAmount,
+            taxDeductablePercent: $taxDeductablePercent,
+            taxDeductableRate: $taxDeductableRate,
+            description: $description
+        );
+    }
 
-            $interestAmount = $this->remainingMortgageAmount * $interestDecimal;
+    /**
+     * Calculate mortgage for a specific year.
+     *
+     * @param  bool  $debug  Enable debug logging
+     * @param  int  $year  Year to calculate
+     * @param  float  $extraDownpaymentAmount  Extra downpayment amount
+     */
+    private function calculate(bool $debug, int $year, float $extraDownpaymentAmount = 0): void
+    {
+        // Retrieve interest rate for the year
+        [$interestPercent, $interestDecimal, $this->assetChangerateValue, $explanation] = $this->changerate->getChangerate(
+            false,
+            $this->interest,
+            $year,
+            $this->assetChangerateValue
+        );
+        $interestRate = $this->helperService->percentToRate($interestPercent);
 
-            if ($year < $this->interestOnlyYearEnd) {
-                // Avdragsfritt lån
-                $this->termAmount = $interestAmount; // Terminkostnadene er bare renter
-                $this->principalAmount += $extraDownpaymentAmount; // Ingen normale avdrag denne terminen, men ekstra nedbetalign teller som avdrag.
-                $this->balanceAmount = $this->remainingMortgageAmount; // Gjenværende lånebeløp er det samme som før terminen siden vi bare har betalt renter
-                // echo "    Interest only year: $year: termAmount: $this->termAmount, balanceAmount: $this->balanceAmount \n";
-            } else {
-                // Avdrag
-                $this->termAmount = ($this->remainingMortgageAmount * $interestDecimal) / $deno; // This makes the downpaymet go faster in years (instead of streatching it on the configured years), since we do not take into accoutn extra downpayments. Thats great.
-                $this->principalAmount = $this->termAmount - $interestAmount + $extraDownpaymentAmount; // Beregn avdrag denne terminen, extra nedbetalign teller som avdrag.
-                $this->balanceAmount = $this->remainingMortgageAmount - $this->principalAmount; // Beregn gjenværende lånebeløp denne terminen
-            }
+        // Perform calculation
+        $calculation = $this->performCalculation($year, $interestPercent, $interestRate, $extraDownpaymentAmount);
 
-            if ($this->balanceAmount > 0) {
+        // Update instance state
+        $this->termAmount = $calculation->termAmount;
+        $this->principalAmount = $calculation->principalAmount;
+        $this->balanceAmount = $calculation->balanceAmount;
 
-                if ($this->debug) {
-                    Log::debug('Mortgage amortization calculation', [
-                        'year' => $year,
-                        'period' => $this->period,
-                        'interest_only_years' => $this->interestOnlyYears,
-                        'deno' => $deno,
-                        'interest_percent' => $interestPercent,
-                        'interest_decimal' => $interestDecimal,
-                        'remaining_mortgage_amount' => round($this->remainingMortgageAmount),
-                        'term_amount' => round($this->termAmount),
-                        'interest_amount' => round($interestAmount),
-                        'principal_amount' => round($this->principalAmount),
-                        'balance_amount' => round($this->balanceAmount),
-                    ]);
-                    if (app()->runningInConsole()) {
-                        echo "      $year: years: $this->period, interestOnlyYears: $this->interestOnlyYears, deno: $deno : $interestPercent% = $interestDecimal : remainingMortgageAmount: ".round($this->remainingMortgageAmount).' termAmount: '.round($this->termAmount).' : interestAmount '.round($interestAmount).' : principalAmount: '.round($this->principalAmount).' : balanceAmount: '.round($this->balanceAmount)."\n";
-                    }
-                }
-                if ($extraDownpaymentAmount > 0) {
-                    $description .= " extraDownpaymentAmount: $extraDownpaymentAmount\n";
-                }
+        // Debug logging
+        if ($this->debug) {
+            $this->logCalculation($year, $calculation, $interestPercent, $interestRate);
+        }
 
-                $this->dataH[$this->assettname][$year]['mortgage'] = [
-                    'amount' => round($this->amount), // Opprinnelig lånebeløp
-                    'termAmount' => round($this->termAmount), // Terminbeløp (pr år)
-                    'interest' => $this->assetChangerateValue, // We want the reference to changerates, to be dynamic, not a number.
-                    'interestDecimal' => $interestPercent / 100,
-                    'interestAmount' => round($interestAmount), // Renter
-                    'principalAmount' => round($this->principalAmount), // Avdrag
-                    'balanceAmount' => round($this->balanceAmount), // Gjenværende lånebeløpm mappes til amount på reberegning av lån.
-                    'extraDownpaymentAmount' => $extraDownpaymentAmount, // Extra innebtaling som er gjort dette året.
-                    'years' => $this->period, // Remaining years, if we need to recalculate
-                    'interestOnlyYears' => $this->interestOnlyYears, // Remaining years to only pay interest.
-                    'gebyrAmount' => 0,
-                    'description' => $description,
-                    'taxDeductableAmount' => round($interestAmount) * 0.22, // FIX - Should be read from tax config yearly
-                    'taxDeductableDecimal' => 0.22, // FIX - Should be read from tax config yearly
-                ];
-            } else {
-                $this->balanceAmount = 0;
-                // echo "Lucky you. Mortgage downpayment $this->period years faster that configured\n";
-                $this->dataH[$this->assettname][$year]['mortgage'] = [
-                    'description' => "Mortgage payed $this->period years faster due to extraDownpayments",
-                ];
-            }
-
-            // print_r($this->dataH[$this->assettname][$year]['mortgage']);
-            // print "$year: " . $this->dataH[$this->assettname][$year]['fire']['savingAmount'] . "\n";
-            // }
+        // Store mortgage data
+        if ($this->balanceAmount > 0) {
+            $mortgageData = $this->createMortgageData($calculation, $extraDownpaymentAmount, $year);
+            $this->dataH[$this->assettname][$year]['mortgage'] = $mortgageData->toArray();
         } else {
-            // Fallback: handle zero or invalid denominator gracefully (e.g., zero/negative interest)
-            $interestAmount = max(0.0, $this->remainingMortgageAmount * $interestDecimal);
-            // In a fallback scenario, treat as interest-only year; principal only from extra downpayment
-            $this->termAmount = $interestAmount;
-            $this->principalAmount = max(0.0, $extraDownpaymentAmount);
-            $this->balanceAmount = max(0.0, $this->remainingMortgageAmount - $this->principalAmount);
-
-            $this->dataH[$this->assettname][$year]['mortgage'] = [
-                'amount' => round($this->amount),
-                'termAmount' => round($this->termAmount),
-                'interest' => $this->assetChangerateValue,
-                'interestDecimal' => $interestPercent / 100,
-                'interestAmount' => round($interestAmount),
-                'principalAmount' => round($this->principalAmount),
-                'balanceAmount' => round($this->balanceAmount),
-                'extraDownpaymentAmount' => $extraDownpaymentAmount,
-                'years' => $this->period,
-                'interestOnlyYears' => $this->interestOnlyYears,
-                'gebyrAmount' => 0,
-                'description' => 'Fallback calculation used due to invalid denominator.',
-                'taxDeductableAmount' => round($interestAmount) * 0.22,
-                'taxDeductableDecimal' => 0.22,
-            ];
+            // Mortgage paid off early
+            $this->balanceAmount = 0;
+            $mortgageData = MortgageData::paidOff($this->remainingYears);
+            $this->dataH[$this->assettname][$year]['mortgage'] = $mortgageData->toArray();
         }
     }
 
+    /**
+     * Log calculation details for debugging.
+     *
+     * @param  int  $year  Year being calculated
+     * @param  MortgageCalculation  $calculation  Calculation result
+     * @param  float  $interestPercent  Interest rate as percentage
+     * @param  float  $interestRate  Interest rate as decimal
+     */
+    private function logCalculation(
+        int $year,
+        MortgageCalculation $calculation,
+        float $interestPercent,
+        float $interestRate
+    ): void {
+        Log::debug('Mortgage amortization calculation', [
+            'year' => $year,
+            'remaining_years' => $this->remainingYears,
+            'interest_only_years' => $this->interestOnlyYears,
+            'denominator' => $calculation->denominator,
+            'interest_percent' => $interestPercent,
+            'interest_rate' => $interestRate,
+            'remaining_mortgage_amount' => $this->remainingMortgageAmount,
+            'term_amount' => $calculation->termAmount,
+            'interest_amount' => $calculation->interestAmount,
+            'principal_amount' => $calculation->principalAmount,
+            'balance_amount' => $calculation->balanceAmount,
+        ]);
+
+        if (app()->runningInConsole()) {
+            echo "      $year: years: $this->remainingYears, interestOnlyYears: $this->interestOnlyYears, deno: {$calculation->denominator} : $interestPercent% = $interestRate : remainingMortgageAmount: {$this->remainingMortgageAmount} termAmount: {$calculation->termAmount} : interestAmount {$calculation->interestAmount} : principalAmount: {$calculation->principalAmount} : balanceAmount: {$calculation->balanceAmount}\n";
+        }
+    }
+
+    /**
+     * Remove mortgage data from the data history for a range of years.
+     *
+     * Cleans up existing mortgage data to prevent conflicts when recalculating
+     * amortization schedules (e.g., when extra downpayments change the schedule).
+     *
+     * @param  int  $fromYear  Starting year to remove mortgage data
+     */
     public function removeMortgageFrom(int $fromYear): void
     {
-        $toYear = $fromYear + 80;
-        // print "    removeMortgageFrom($this->assettname, $fromYear)\n";
+        $toYear = $fromYear + 80; // Remove up to 80 years ahead
 
         for ($year = $fromYear; $year <= $toYear; $year++) {
-            // print "    Removing mortgage from dataH[$year]\n";
             unset($this->dataH[$this->assettname][$year]['mortgage']);
         }
     }
 
     /**
-     * @param  mixed  $row
+     * Add data to the data history for a specific year and type.
+     *
+     * @param  int  $year  Year to add data for
+     * @param  string  $type  Type of data (e.g., 'mortgage', 'income', 'expense')
+     * @param  mixed  $row  Data to add
      */
-    public function add(int $year, string $type, $row): void
+    public function add(int $year, string $type, mixed $row): void
     {
         $this->dataH[$this->assettname][$year][$type] = $row;
     }
 
     /**
-     * @return array<string, mixed>
+     * Get the complete data history with calculated mortgage data.
+     *
+     * @return array<string, mixed> Data history array with mortgage calculations
      */
     public function get(): array
     {
         return $this->dataH;
-        // dd($this->dataH);
     }
 }

@@ -6,15 +6,21 @@ namespace App\Support\ValueObjects;
  * Value object for bracket tax calculation results.
  *
  * Represents the result of calculating progressive bracket tax (trinnskatt).
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class BracketTaxResult
 {
+    public int $taxAmount;
+
     public function __construct(
-        public float $taxAmount,
+        float $taxAmount,
         public float $taxAveragePercent,
         public float $taxAverageRate,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxAmount = (int) round($taxAmount);
+    }
 
     /**
      * Convert to array for backward compatibility.

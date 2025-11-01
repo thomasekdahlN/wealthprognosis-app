@@ -20,14 +20,20 @@ namespace App\Support\ValueObjects;
  * Value object representing the result of a tax calculation.
  *
  * Provides a structured, type-safe alternative to returning arrays.
+ *
+ * All amount fields are automatically cast to integers in the constructor.
  */
 readonly class TaxCalculationResult
 {
+    public int $taxAmount;
+
     public function __construct(
-        public float $taxAmount,
+        float $taxAmount,
         public float $taxPercent,
         public string $explanation
-    ) {}
+    ) {
+        $this->taxAmount = (int) round($taxAmount);
+    }
 
     /**
      * Convert to array format for backward compatibility.
