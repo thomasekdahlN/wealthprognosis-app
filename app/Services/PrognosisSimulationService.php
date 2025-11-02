@@ -106,6 +106,8 @@ class PrognosisSimulationService
 
     /**
      * Copy assets from asset configuration to simulation tables
+     * NOTE: This only copies the asset metadata, NOT the year data.
+     * Year data should be populated by storePrognosisDataH() after running PrognosisService.
      */
     protected function copyAssetsToSimulation(AssetConfiguration $assetConfig, SimulationConfiguration $simulationConfig, string $assetScope): void
     {
@@ -117,19 +119,18 @@ class PrognosisSimulationService
             $assetsQuery->where('group', 'business');
         }
 
-        $assets = $assetsQuery->with('years')->get();
+        $assets = $assetsQuery->get();
 
         /** @var \App\Models\Asset $asset */
         foreach ($assets as $asset) {
-            // Create simulation asset
-            $simulationAsset = SimulationAsset::create([
+            // Create simulation asset (metadata only, no year data)
+            SimulationAsset::create([
                 'asset_configuration_id' => $simulationConfig->id,
                 'name' => $asset->name,
                 'code' => $asset->code,
                 'description' => $asset->description,
                 'asset_type' => $asset->asset_type,
                 'group' => $asset->group,
-                'tax_type' => optional($asset->assetType?->taxType)->type ?? 'none',
                 'tax_property' => $asset->tax_property,
                 'tax_country' => $asset->tax_country,
                 'is_active' => $asset->is_active,
@@ -142,65 +143,14 @@ class PrognosisSimulationService
                 'updated_checksum' => hash('sha256', json_encode($asset->toArray()).'_updated'),
             ]);
 
-            // Copy asset years
-            /** @var \App\Models\AssetYear $assetYear */
-            foreach ($asset->years as $assetYear) {
-                SimulationAssetYear::create([
-                    'description' => $assetYear->description,
-                    'user_id' => Auth::id() ?? $assetYear->user_id,
-                    'team_id' => Auth::user()->currentTeam->id ?? $assetYear->team_id,
-                    'year' => $assetYear->year,
-                    'asset_id' => $simulationAsset->id,
-                    'asset_configuration_id' => $simulationConfig->id,
-
-                    // Income data
-
-                    'income_amount' => $assetYear->income_amount,
-                    'income_factor' => $assetYear->income_factor,
-                    'income_rule' => 'standard',
-                    'income_transfer' => 'none',
-                    'income_source' => $asset->asset_type,
-                    'income_changerate' => $assetYear->income_changerate,
-                    'income_repeat' => true,
-
-                    // Expense data
-                    'expence_amount' => $assetYear->expence_amount,
-                    'expence_factor' => $assetYear->expence_factor,
-                    'expence_rule' => 'standard',
-                    'expence_transfer' => 'none',
-                    'expence_source' => $asset->asset_type,
-                    'expence_changerate' => $assetYear->expence_changerate,
-                    'expence_repeat' => true,
-
-                    // Asset data
-                    'asset_market_amount' => $assetYear->asset_market_amount,
-                    'asset_acquisition_amount' => $assetYear->asset_acquisition_amount,
-                    'asset_equity_amount' => $assetYear->asset_equity_amount,
-                    'asset_taxable_initial_amount' => $assetYear->asset_taxable_initial_amount,
-                    'asset_paid_amount' => $assetYear->asset_paid_amount,
-                    'asset_changerate' => $assetYear->asset_changerate,
-                    'asset_rule' => 'standard',
-                    'asset_transfer' => 'none',
-                    'asset_source' => $asset->asset_type,
-                    'asset_repeat' => true,
-
-                    // Mortgage data (if applicable)
-                    'mortgage_amount' => 0,
-                    'mortgage_years' => null,
-                    'mortgage_interest_percent' => null,
-                    'mortgage_interest_only_years' => null,
-                    'mortgage_extra_downpayment_amount' => null,
-                    'mortgage_gebyr_amount' => 0,
-                    'mortgage_tax_deductable_amount' => 0,
-
-                    // Audit fields
-                    'created_by' => Auth::id() ?? $assetYear->user_id,
-                    'updated_by' => Auth::id() ?? $assetYear->user_id,
-                    'created_checksum' => hash('sha256', json_encode($assetYear->toArray()).'_created'),
-                    'updated_checksum' => hash('sha256', json_encode($assetYear->toArray()).'_updated'),
-                ]);
-            }
+            // NOTE: We do NOT copy asset_years here!
+            // The year data will be populated by storePrognosisDataH() after running PrognosisService
         }
+
+        Log::info('Copied assets to simulation (metadata only)', [
+            'simulation_configuration_id' => $simulationConfig->id,
+            'assets_copied' => $assets->count(),
+        ]);
     }
 
     /**
@@ -409,20 +359,26 @@ class PrognosisSimulationService
         // In a more advanced implementation, you might want to create additional tables
         // to store the detailed yearly results
 
+        $tags = [
+            'simulation_completed',
+            'total_years_'.count($results['yearly_data'] ?? []),
+        ];
+
+        // Add FIRE status if available
+        if (isset($results['summary']['fire_achieved'])) {
+            $tags[] = 'fire_'.($results['summary']['fire_achieved'] ? 'achieved' : 'not_achieved');
+        }
+
         $simulationConfig->update([
-            'tags' => array_merge($simulationConfig->tags ?? [], [
-                'simulation_completed',
-                'total_years_'.count($results['yearly_data']),
-                'fire_'.($results['summary']['fire_achieved'] ? 'achieved' : 'not_achieved'),
-            ]),
+            'tags' => array_merge($simulationConfig->tags ?? [], $tags),
             'updated_by' => Auth::id(),
-            'updated_checksum' => hash('sha256', json_encode($results['summary']).'_results'),
+            'updated_checksum' => hash('sha256', json_encode($results['summary'] ?? []).'_results'),
         ]);
 
         Log::info('Simulation results stored', [
             'simulation_configuration_id' => $simulationConfig->id,
-            'fire_achieved' => $results['summary']['fire_achieved'],
-            'total_assets_end' => $results['summary']['total_assets_end'],
+            'fire_achieved' => $results['summary']['fire_achieved'] ?? null,
+            'total_assets_end' => $results['summary']['total_assets_end'] ?? null,
         ]);
     }
 

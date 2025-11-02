@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('simulation_assets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations');
+            $table->foreignId('asset_configuration_id')->nullable()->constrained('simulation_configurations');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
