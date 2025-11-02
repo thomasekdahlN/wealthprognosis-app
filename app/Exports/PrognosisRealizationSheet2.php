@@ -132,7 +132,7 @@ class PrognosisRealizationSheet2
                     $second = $number % 26;
                 }
 
-                $column = self::$letters[$first].self::$letters[$second];
+                $column = self::$letters[(int) $first].self::$letters[(int) $second];
             } else {
 
                 if ($number % 676 < 27) {

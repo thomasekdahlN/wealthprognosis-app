@@ -7,6 +7,8 @@ use App\Models\AssetConfiguration;
 use App\Models\SimulationConfiguration;
 use App\Services\CurrentAssetConfiguration;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
 use Filament\Panel;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -89,5 +91,51 @@ class ConfigSimulations extends Page implements HasTable
     public function getHeading(): string
     {
         return $this->getTitle();
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('compare_simulations')
+                ->label('Compare Simulations')
+                ->icon('heroicon-o-arrows-right-left')
+                ->color('primary')
+                ->form([
+                    Select::make('simulationA')
+                        ->label('Simulation A (Baseline)')
+                        ->options(function () {
+                            if (! $this->record) {
+                                return [];
+                            }
+
+                            return SimulationConfiguration::where('user_id', auth()->id())
+                                ->where('asset_configuration_id', $this->record->id)
+                                ->pluck('name', 'id');
+                        })
+                        ->searchable()
+                        ->required(),
+
+                    Select::make('simulationB')
+                        ->label('Simulation B (Scenario)')
+                        ->options(function () {
+                            if (! $this->record) {
+                                return [];
+                            }
+
+                            return SimulationConfiguration::where('user_id', auth()->id())
+                                ->where('asset_configuration_id', $this->record->id)
+                                ->pluck('name', 'id');
+                        })
+                        ->searchable()
+                        ->required(),
+                ])
+                ->action(function (array $data): void {
+                    $this->redirect(route('filament.admin.pages.compare-dashboard', [
+                        'configuration' => $this->record->id,
+                        'simulationA' => $data['simulationA'],
+                        'simulationB' => $data['simulationB'],
+                    ]));
+                }),
+        ];
     }
 }

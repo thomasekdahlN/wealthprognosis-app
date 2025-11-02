@@ -164,7 +164,7 @@ class PrognosisExport2
         $this->config = $decodedConfig;
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
-        $this->country = (int) Arr::get($this->config, 'meta.country');
+        $this->country = (string) Arr::get($this->config, 'meta.country', 'no');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age
         $this->thisYear = now()->year;
         $this->prevYear = $this->thisYear - 1;

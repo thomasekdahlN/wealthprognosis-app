@@ -45,6 +45,15 @@ class AssetSpreadSheet
     public function __construct(Spreadsheet $spreadsheet, array $statistics)
     {
         $this->spreadsheet = $spreadsheet;
+
+        // Skip if statistics is empty - don't create worksheet
+        if (empty($statistics)) {
+            // Create a minimal empty worksheet to avoid errors
+            $this->worksheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, 'Statistics');
+
+            return;
+        }
+
         $this->worksheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, 'Statistics');
 
         $start_letter = 1;
@@ -57,9 +66,8 @@ class AssetSpreadSheet
             foreach ($typeH as $typename => $data) {
 
                 if ($this->rows == 6) {
-                    // Lag header
-                    // echo $this->alphabet[$this->letter];
-                    // $this->worksheet->setCellValue($this->alphabet[$this->letter].'5', $typename);
+                    // Create header row with type names
+                    $this->worksheet->setCellValue($this->alphabet[$this->letter].'5', $typename);
                 }
 
                 if ($typeH['total']['amount'] > 0) {
