@@ -18,29 +18,29 @@
     "meta": {
       "type": "house",
       "group": "private",
-      "name": "Bergen Family Home",
-      "description": "4-bedroom family home in desirable Bergen neighborhood with mountain views",
+      "name": "Huset",
+      "description": "Huset mitt der jeg bor",
+        "taxProperty": "ringerike",
       "active": true,
       "debug": true
     },
     "2025": {
-      "description": "Income:  | Expense: Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd | Asset:  | Mortgage: interest changerates.interest, years 20",
+      "description": "Expense: Kommunale/Forsikring/Strøm 2500 mnd og 2 mill i lån",
       "asset": {
-        "marketAmount": "3000000",
+          "marketAmount": 3000000,
+          "acquisitionAmount": 2000000,
         "changerate": "changerates.house",
-        "description": "",
         "repeat": true
       },
       "expence": {
         "name": "Utgifter",
-        "description": "Kommunale/Forsikring/Strøm/Eiendomsskatt 7300 mnd",
-        "amount": 7300,
+        "amount": 2500,
         "factor": "monthly",
         "changerate": "changerates.kpi",
         "repeat": true
       },
       "mortgage": {
-        "amount": 1000000,
+        "amount": 2000000,
         "interest": "changerates.interest",
         "years": 20
       }

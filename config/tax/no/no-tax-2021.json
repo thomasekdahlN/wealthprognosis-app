@@ -47,10 +47,48 @@
     "deduction": {
       "min": 4000,
       "max": 109950,
-      "percent": 45
+      "percent": 46
     },
     "socialsecurity": {
       "percent": 8.2
+    },
+    "bracket": [
+      {
+        "limit": 184800,
+        "percent": 0
+      },
+      {
+        "limit": 260100,
+        "percent": 1.7
+      },
+      {
+        "limit": 651250,
+        "percent": 4
+      },
+      {
+        "limit": 1021550,
+        "percent": 13.2
+      },
+      {
+        "limit": 2000000,
+        "percent": 16.2
+      },
+      {
+        "percent": 17.2
+      }
+    ]
+  },
+  "pension": {
+    "common": {
+      "percent": 22
+    },
+    "deduction": {
+      "min": 4000,
+      "max": 88700,
+      "percent": 32
+    },
+    "socialsecurity": {
+      "percent": 5.1
     },
     "bracket": [
       {

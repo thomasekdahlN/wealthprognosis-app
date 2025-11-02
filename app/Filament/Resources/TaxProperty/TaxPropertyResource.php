@@ -9,6 +9,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Icons\Heroicon;
@@ -57,25 +58,79 @@ class TaxPropertyResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('country_code')->label('Country')->options([
-                'no' => 'Norway',
-                'se' => 'Sweden',
-                'ch' => 'Switzerland',
-                'dk' => 'Denmark',
-                'us' => 'United States',
-                'en' => 'United Kingdom',
-            ])->required(),
-            TextInput::make('year')->numeric()->required(),
-            TextInput::make('code')->required(),
-            // Norway (per user spec)
-            TextInput::make('municipality')->label('Municipality')->maxLength(128),
-            Toggle::make('has_tax_on_homes')->label('Has tax on homes')->default(false),
-            Toggle::make('has_tax_on_companies')->label('Has tax on companies')->default(false),
-            TextInput::make('taxHomePermill')->numeric()->label('Home rate (permille)')->helperText('Permille value, e.g. 3.500 for 0.35%'),
-            TextInput::make('taxCompanyPermill')->numeric()->label('Company rate (permille)')->helperText('Permille value, e.g. 3.500 for 0.35%'),
-            TextInput::make('deduction')->numeric()->label('Deduction (NOK)'),
-            TextInput::make('taxablePercent')->numeric()->label('Taxable percent')->helperText('Percentage of market value that is taxable, e.g. 100.00 for 100%, 80.00 for 80%')->default(100.00),
-            Toggle::make('is_active')->default(true)->required(),
+            Section::make('Basic Information')
+                ->schema([
+                    Select::make('country_code')->label('Country')->options([
+                        'no' => 'Norway',
+                        'se' => 'Sweden',
+                        'ch' => 'Switzerland',
+                        'dk' => 'Denmark',
+                        'us' => 'United States',
+                        'en' => 'United Kingdom',
+                    ])->required(),
+                    TextInput::make('year')->numeric()->required(),
+                    TextInput::make('code')->required(),
+                    TextInput::make('municipality')->label('Municipality')->maxLength(128),
+                    Toggle::make('has_tax_on_homes')->label('Has tax on homes')->default(false),
+                    Toggle::make('has_tax_on_companies')->label('Has tax on companies')->default(false),
+                    Toggle::make('is_active')->default(true)->required(),
+                ])->columns(2),
+
+            Section::make('Tax Configuration')
+                ->schema([
+                    TextInput::make('tax_home_permill')->numeric()->label('Home rate (permille)')->helperText('Permille value, e.g. 3.500 for 0.35%')->step(0.001),
+                    TextInput::make('tax_company_permill')->numeric()->label('Company rate (permille)')->helperText('Permille value, e.g. 3.500 for 0.35%')->step(0.001),
+                    TextInput::make('deduction')->numeric()->label('Deduction (NOK)'),
+                    TextInput::make('taxable_percent')->numeric()->label('Taxable percent')->helperText('Percentage of market value that is taxable, e.g. 100.00 for 100%, 80.00 for 80%')->default(100.00)->step(0.01),
+                ])->columns(2),
+
+            Section::make('Property Tax Calculation Example')
+                ->schema([
+                    TextInput::make('dummy_field')
+                        ->label('How Property Tax is Calculated')
+                        ->helperText(function ($record) {
+                            if (! $record) {
+                                return 'Save the record to see calculation example.';
+                            }
+
+                            $municipality = $record->municipality ?? 'This municipality';
+                            $homeRate = $record->tax_home_permill ?? 0;
+                            $companyRate = $record->tax_company_permill ?? 0;
+                            $deduction = $record->deduction ?? 0;
+                            $taxablePercent = $record->taxable_percent ?? 100;
+
+                            $exampleValue = 3000000; // 3 million NOK example
+                            $result = "Property tax calculation for {$municipality} (3M NOK property): ";
+
+                            if ($homeRate > 0) {
+                                $taxableAmount = ($exampleValue * $taxablePercent / 100);
+                                $afterDeduction = max(0, $taxableAmount - $deduction);
+                                $tax = $afterDeduction * ($homeRate / 1000);
+
+                                $result .= 'Home tax: '.number_format($tax, 0, ',', ' ')." NOK (Rate: {$homeRate}‰). ";
+                            }
+
+                            if ($companyRate > 0) {
+                                $taxableAmount = ($exampleValue * $taxablePercent / 100);
+                                $afterDeduction = max(0, $taxableAmount - $deduction);
+                                $tax = $afterDeduction * ($companyRate / 1000);
+
+                                $result .= 'Company tax: '.number_format($tax, 0, ',', ' ')." NOK (Rate: {$companyRate}‰). ";
+                            }
+
+                            if ($homeRate == 0 && $companyRate == 0) {
+                                $result .= 'No property tax is levied (rates are 0‰). ';
+                            }
+
+                            $result .= "Formula: (Market Value × {$taxablePercent}% - ".number_format($deduction, 0, ',', ' ').' NOK) × Rate‰ ÷ 1000';
+
+                            return $result;
+                        })
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->hiddenLabel()
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 

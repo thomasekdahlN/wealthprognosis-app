@@ -19,7 +19,7 @@ class TaxConfigurationSeeder extends Seeder
 
         // Load tax configurations for all countries
         $countries = ['no', 'se', 'ch'];
-        $years = [2020, 2021, 2022, 2023, 2024, 2025];
+        $years = range(2007, 2026);
 
         foreach ($countries as $countryCode) {
             foreach ($years as $year) {

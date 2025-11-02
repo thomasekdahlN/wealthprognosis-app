@@ -1,0 +1,31 @@
+{
+    "meta": {
+        "name": "Test Null Tax Type",
+        "birth_year": 1980,
+        "death_age": 90,
+        "country": "norway"
+    },
+    "assets": {
+        "test_asset": {
+            "meta": {
+                "type": "cash",
+                "tax_type": null,
+                "group": "private",
+                "name": "Test Asset with Null Tax Type"
+            },
+            "years": {
+                "2024": {
+                    "amount": 1000000,
+                    "income": 50000,
+                    "expence": 10000
+                },
+                "2025": {
+                    "amount": 1100000,
+                    "income": 55000,
+                    "expence": 11000
+                }
+            }
+        }
+    }
+}
+

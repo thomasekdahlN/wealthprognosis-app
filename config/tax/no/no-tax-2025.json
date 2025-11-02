@@ -20,6 +20,11 @@
     "realization": 0,
     "fortune": 0
   },
+  "property": {
+    "income": 22,
+    "realization": 22,
+    "fortune": 100
+  },
   "rental": {
     "income": 22,
     "realization": 22,
@@ -47,10 +52,48 @@
     "deduction": {
       "min": 4000,
       "max": 92000,
-      "percent": 44
+      "percent": 46
     },
     "socialsecurity": {
       "percent": 7.7
+    },
+    "bracket": [
+      {
+        "limit": 217400,
+        "percent": 0
+      },
+      {
+        "limit": 306050,
+        "percent": 1.7
+      },
+      {
+        "limit": 697150,
+        "percent": 4
+      },
+      {
+        "limit": 942400,
+        "percent": 13.7
+      },
+      {
+        "limit": 1410750,
+        "percent": 16.7
+      },
+      {
+        "percent": 17.7
+      }
+    ]
+  },
+  "pension": {
+    "common": {
+      "percent": 22
+    },
+    "deduction": {
+      "min": 4000,
+      "max": 73150,
+      "percent": 40
+    },
+    "socialsecurity": {
+      "percent": 5.1
     },
     "bracket": [
       {

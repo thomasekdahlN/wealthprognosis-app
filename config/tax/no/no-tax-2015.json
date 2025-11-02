@@ -74,6 +74,40 @@
       }
     ]
   },
+  "pension": {
+    "common": {
+      "percent": 27
+    },
+    "deduction": {
+      "min": 4000,
+      "max": 71300,
+      "percent": 31
+    },
+    "socialsecurity": {
+      "percent": 5.1
+    },
+    "bracket": [
+      {
+        "limit": 156400,
+        "percent": 0
+      },
+      {
+        "limit": 220550,
+        "percent": 0.24
+      },
+      {
+        "limit": 552850,
+        "percent": 1.2
+      },
+      {
+        "limit": 885600,
+        "percent": 10.2
+      },
+      {
+        "percent": 13.2
+      }
+    ]
+  },
   "ips": {
     "income": 27,
     "realization": 0,

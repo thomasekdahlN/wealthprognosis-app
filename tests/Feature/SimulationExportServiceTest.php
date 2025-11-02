@@ -81,9 +81,9 @@ class SimulationExportServiceTest extends TestCase
         $incomeFill = strtoupper($sheet->getStyle('C6')->getFill()->getStartColor()->getARGB());
         $this->assertStringEndsWith('90EE90', $incomeFill, 'Income column should be light green');
 
-        // Number format: Norwegian spacing, red negatives for amounts (column C)
+        // Number format: Norwegian spacing (space every 3 digits), red negatives for amounts (column C)
         $formatC6 = $sheet->getStyle('C6')->getNumberFormat()->getFormatCode();
-        $this->assertSame('# ##0;[Red]-# ##0', $formatC6, 'Amount format should use space thousand sep and red negatives');
+        $this->assertSame('# ### ##0;[Red]-# ### ##0', $formatC6, 'Amount format should use space every 3 digits and red negatives');
 
         // Alignment: right-aligned numbers
         $this->assertSame(
