@@ -363,7 +363,7 @@ The following tables describe the JSON configuration structure for asset configu
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
 | `mortgage.amount` | decimal | ✅ | Original loan amount | 1500000 |
-| `mortgage.interest` | string/decimal | ✅ | Interest rate % or reference | "changerates.interest" or 4.5 |
+| `mortgage.interest` | string/decimal | ✅ | Interest rate % or reference | "changerates.interest" or 5.5 |
 | `mortgage.years` | integer | ✅ | Loan duration in years | 25 |
 | `mortgage.interestOnlyYears` | integer | ❌ | Interest-only period | 5 |
 | `mortgage.gebyr` | decimal | ❌ | Annual fee | 600 |
@@ -427,12 +427,13 @@ The following tables describe the calculated output structure for each asset per
 | `mortgage.balanceAmount`          | decimal | Remaining balance | Previous balance - principal |
 | `mortgage.extraDownpaymentAmount` | decimal | Extra payment | From config/transfer |
 | `mortgage.transferedAmount`       | decimal | Transferred amount | From transfer/source/rule |
-| `mortgage.interest`               | decimal | Interest rate % | From config/changerate |
-| `mortgage.interesRate`             | decimal | Interest rate (decimal) | interest / 100 |
+| `mortgage.interestPercent`        | decimal | Interest rate % | From config/changerate (e.g., 5.5 for 5.5%) |
+| `mortgage.interestRate`           | decimal | Interest rate (decimal) | interestPercent / 100 (e.g., 0.055) |
 | `mortgage.years`                  | integer | Remaining years | Decreases annually |
 | `mortgage.gebyrAmount`            | decimal | Annual fee | From config |
 | `mortgage.taxDeductableAmount`    | decimal | Tax deduction amount | interest × tax rate |
-| `mortgage.taxDeductableRate`      | decimal | Tax deduction rate | From config |
+| `mortgage.taxDeductablePercent`   | decimal | Tax deduction % | From config (e.g., 22 for 22%) |
+| `mortgage.taxDeductableRate`      | decimal | Tax deduction rate (decimal) | taxDeductablePercent / 100 (e.g., 0.22) |
 | `mortgage.description`            | string | Description | Generated description |
 
 #### Asset Output
@@ -628,15 +629,15 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 | expence.name | Optional | Navn på utgiften |
 #### mortgage - Lån
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| mortgage.amount | Required | The original mortgage amount |
-| mortgage.interest | Required | rente i prosent. Recommended to use "changerates.interest" to get the interst prediction pr year and not hardcode it. |
-| mortgage.years | Required | Hvor mange år skal lånet være |
-| mortgage.interestOnlyYears | Optional | Hvor mange år lånet skal være avdragsfritt og man bare betaler renter. Må være mindre enn mortgage.years. Hvis ikke angitt, betales renter og avdrag for mortgage.years |
-| mortgage.gebyr | Optional | gebyr pr år |
+| Field                         | Required | Description |
+|-------------------------------|----------|-------------|
+| mortgage.amount               | Required | The original mortgage amount |
+| mortgage.interest             | Required | rente i prosent. Recommended to use "changerates.interest" to get the interest prediction pr year and not hardcode it. |
+| mortgage.years                | Required | Hvor mange år skal lånet være |
+| mortgage.interestOnlyYears    | Optional | Hvor mange år lånet skal være avdragsfritt og man bare betaler renter. Må være mindre enn mortgage.years. Hvis ikke angitt, betales renter og avdrag for mortgage.years |
+| mortgage.gebyr                | Optional | gebyr pr år |
 | mortgage.extraDownpaymentAmount | Optional | årlig ekstra nedbetaling på lån hele lånets løpetid. Forkorter lånets løpetid om beløpet er stort nok. |
-| mortgage.tax | Optional | Skatteprosent for lån. Defaults to 22%. |
+| mortgage.tax                  | Optional | Skatteprosent for lån. Defaults to 22%. |
 #### asset
 
 | Field | Required | Description |
@@ -678,77 +679,78 @@ NOTE: Asset name has to be unique, and is used to identify the asset in all calc
 | expence.transferedAmount | Hva du har overført til/fra expence (fra transfer, source eller rule). Ikke changerate endringer. |
 #### Cashflow
 
-| Field | Description                                                                                                                                                                                                                                   |
-|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| cashflow.beforeTaxAmount | (income.amount + income.transferedAmount) - (expence.amount - mortgage.termAmount) //Tax not calculated                                                                                                                                       |
-| cashflow.afterTaxAmount | (income.amount + income.transferedAmount + mortgage.taxDeductableAmount) - (expence.amount - mortgage.termAmount - expence.transferedAmount - cashflow.taxAmount - asset.taxFortuneAmount - asset.taxPropertyAmount) //tax taken into account |
+| Field                              | Description                                                                                                                                                                                                                                   |
+|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| cashflow.beforeTaxAmount           | (income.amount + income.transferedAmount) - (expence.amount - mortgage.termAmount) //Tax not calculated                                                                                                                                       |
+| cashflow.afterTaxAmount            | (income.amount + income.transferedAmount + mortgage.taxDeductableAmount) - (expence.amount - mortgage.termAmount - expence.transferedAmount - cashflow.taxAmount - asset.taxFortuneAmount - asset.taxPropertyAmount) //tax taken into account |
 | cashflow.beforeTaxAggregatedAmount | += cashflow.beforeTaxAggregatedAmount                                                                                                                                                                                                         |
-| cashflow.afterTaxAggregatedAmount | += cashflow.afterTaxAggregatedAmount                                                                                                                                                                                                          |
-| cashflow.taxAmount | skatten som skal betales av inntekt etter utgifter fratrukket income.amount - expence.amount.                                                                                                                                                 |
-| cashflow.taxRate | skatt i desimal                                                                                                                                                                                                                               |
-| cashflow.transferedAmount | Beløp du har overført til/fra. (fra transfer, source eller rule). Ikke changerate.                                                                                                                                                            |
-| cashflow.rule | regler for hvordan beløpet skal beregnes                                                                                                                                                                                                      |
-| cashflow.transfer | overføring av positiv cashflow til en annen asset                                                                                                                                                                                             |
-| cashflow.repeat | gjenta konfigurasjonen [cashflow.rule, cashflow.transfer, cashflow.repeat]for kommende år                                                                                                                                                     |
-| cashflow.description | beskrivelse av cashflow                                                                                                                                                                                                                       |
+| cashflow.afterTaxAggregatedAmount  | += cashflow.afterTaxAggregatedAmount                                                                                                                                                                                                          |
+| cashflow.taxAmount                 | skatten som skal betales av inntekt etter utgifter fratrukket income.amount - expence.amount.                                                                                                                                                 |
+| cashflow.taxRate                   | skatt i desimal                                                                                                                                                                                                                               |
+| cashflow.transferedAmount          | Beløp du har overført til/fra. (fra transfer, source eller rule). Ikke changerate.                                                                                                                                                            |
+| cashflow.rule                      | regler for hvordan beløpet skal beregnes                                                                                                                                                                                                      |
+| cashflow.transfer                  | overføring av positiv cashflow til en annen asset                                                                                                                                                                                             |
+| cashflow.repeat                    | gjenta konfigurasjonen [cashflow.rule, cashflow.transfer, cashflow.repeat]for kommende år                                                                                                                                                     |
+| cashflow.explanation               | beskrivelse av cashflow                                                                                                                                                                                                                       |
 #### mortgage - Lån
 
-| Field | Description |
-|-------|-------------|
-| mortgage.amount | The original mortgage amount (the same for every year, for reference and easy calculation) |
-| mortgage.termAmount | Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount |
-| mortgage.interestAmount | renter - i kroner pr år |
-| mortgage.principalAmount | Avdrag - i kroner pr år (det er dette som nedbetaler lånet) |
-| mortgage.balanceAmount | gjenstående lån i kroner |
-| mortgage.extraDownpaymentAmount | ekstra nedbetaling av lån pr år (Utgår nå som vi har: transferedAmount?) |
-| mortgage.transferedAmount | Hva du har overført til/fra mortgage |
-| mortgage.interest | rente i prosent (Brukes i reberegning ved ekstra nedbetaling av lån) |
-| mortgage.interestDecimal | rente i desimal |
-| mortgage.years | Gjenværende atnall år løpetid på lånet, basert på første konfigurasjon av lånet. Med ekstra nedbetalign vil lånet kunne bli betalt ned på færre antall år om ekstra innbetalingsbeløpene er store nok |
-| mortgage.gebyrAmount | gebyr pr år |
-| mortgage.taxDeductableAmount | fradrag |
-| mortgage.taxDeductableDecimal | fradrag i prosent |
-| mortgage.description | beskrivelse av ektsra hendelser i låneberegningen. |
+| Field                           | Description                                                                                                                                                                                          |
+|---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| mortgage.amount                 | The original mortgage amount (the same for every year, for reference and easy calculation)                                                                                                           |
+| mortgage.termAmount             | Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount                                                                                |
+| mortgage.interestAmount         | renter - i kroner pr år                                                                                                                                                                              |
+| mortgage.principalAmount        | Avdrag - i kroner pr år (det er dette som nedbetaler lånet)                                                                                                                                          |
+| mortgage.balanceAmount          | gjenstående lån i kroner                                                                                                                                                                             |
+| mortgage.extraDownpaymentAmount | ekstra nedbetaling av lån pr år (Utgår nå som vi har: transferedAmount?)                                                                                                                             |
+| mortgage.transferedAmount       | Hva du har overført til/fra mortgage                                                                                                                                                                 |
+| mortgage.interestPercent        | rente i prosent (Brukes i reberegning ved ekstra nedbetaling av lån)                                                                                                                                 |
+| mortgage.interestRate           | rente i desimal                                                                                                                                                                                      |
+| mortgage.years                  | Gjenværende atnall år løpetid på lånet, basert på første konfigurasjon av lånet. Med ekstra nedbetalign vil lånet kunne bli betalt ned på færre antall år om ekstra innbetalingsbeløpene er store nok |
+| mortgage.gebyrAmount            | gebyr pr år                                                                                                                                                                                          |
+| mortgage.taxDeductableAmount    | fradrag                                                                                                                                                                                              |
+| mortgage.taxDeductableRate      | fradrag i decimal                                                                                                                                                                                    |
+| mortgage.taxDeductablePercent   | fradrag i prosent                                                                                                                                                                                    |
+| mortgage.explanation            | beskrivelse av  i låneberegningen.                                                                                                                                                    |
 #### asset
 
-| Field | Description |
-|-------|-------------|
-| asset.marketAmount | Markedsverdien på en asset |
-| asset.marketMortgageDeductedAmount | Markedsverdien ved salg hensyntatt restlån men ikke skatt : asset.amount - mortgage.balanceAmount |
-| asset.acquisitionAmount | Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp. |
-| asset.acquisitionInitialAmount | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere |
-| asset.equityAmount | Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital. |
-| asset.equityInitialAmount | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere |
-| asset.paidAmount | Finanskostnader. Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp. |
-| asset.paidInitialAmount | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere |
-| asset.transferedAmount | Hva du har overført til/fra denne asset. Kan være både positivt og negativt beløp.  (fra transfer, source eller rule). Ikke changerate. |
-| asset.mortageRate | Hvor mye i % av en asset som er lånt. Belåningsgrad. |
-| asset.taxableRate | Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av |
-| asset.taxableAmount | Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av minus lån. Denne er dynamisk og regnes ut fra asset.taxableInitialAmount - mortgage.balanceAmount. Kan ikke overstyres direkte. |
-| asset.taxableInitialAmount | Skattbart beløp før lånet er trukket fra. Dvs det er det samme som asset.taxableAmount hvis det ikke er lån, men vi må holde det tilgjengelig og justere det for å kunne finne det igjen når et lån er nedbetaøt. Trenger aldri vises. Kun for beregninger. Blir justert årlig. |
-| asset.taxableAmountOverride | Auto: Set to true for all coming years if it finds a asset.taxableAmount the first year. |
-| asset.taxFortuneRate | Formuesskatt. Prosent skatt på asset op en assets skattbare verdi |
-| asset.taxFortuneAmount | Formuesskatt. Kroner skatt på asset |
-| asset.changerate | Hvor mye en asset endrer seg i verdi pr år |
-| asset.rule | regler for hvordan beløpet skal beregnes |
-| asset.transfer | overføring til en annen asset |
-| asset.repeat | gjenta konfigurasjonen for kommende år |
-| asset.taxablePropertyRate | Skattbar prosent - Antall prosent av markedsverdien til en asset det skal beregnes eiendomsskatt av |
-| asset.taxablePropertyAmount | Skattbart beløp - Antall kroner av markedsverdien til en asset det skal betales eiendomsskatt av (både % og bunnfradrad hensyntatt) |
-| asset.taxPropertyAmount | Eiendomsskatt i kroner. Beregnes av asset.marketAmount. |
-| asset.taxPropertyRate | Eiendomsskatt i rate = prosent/100 |
-| asset.description | Beskrivelse av asset/liability |
+| Field                              | Description                                                                                                                                                                                                                                                                     |
+|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| asset.marketAmount                 | Markedsverdien på en asset                                                                                                                                                                                                                                                      |
+| asset.marketMortgageDeductedAmount | Markedsverdien ved salg hensyntatt restlån men ikke skatt : asset.amount - mortgage.balanceAmount                                                                                                                                                                               |
+| asset.acquisitionAmount            | Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.                                                                                                                                 |
+| asset.acquisitionInitialAmount     | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere                                                                                                                                                               |
+| asset.equityAmount                 | Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.                                                                         |
+| asset.equityInitialAmount          | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere                                                                                                                                                               |
+| asset.paidAmount                   | Finanskostnader. Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.                                                                                                                                                               |
+| asset.paidInitialAmount            | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere                                                                                                                                                               |
+| asset.transferedAmount             | Hva du har overført til/fra denne asset. Kan være både positivt og negativt beløp.  (fra transfer, source eller rule). Ikke changerate.                                                                                                                                         |
+| asset.mortageRate                  | Hvor mye i % av en asset som er lånt. Belåningsgrad.                                                                                                                                                                                                                            |
+| asset.taxableRate                  | Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av                                                                                                                                                                                            |
+| asset.taxableAmount                | Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av minus lån. Denne er dynamisk og regnes ut fra asset.taxableInitialAmount - mortgage.balanceAmount. Kan ikke overstyres direkte.                                                              |
+| asset.taxableInitialAmount         | Skattbart beløp før lånet er trukket fra. Dvs det er det samme som asset.taxableAmount hvis det ikke er lån, men vi må holde det tilgjengelig og justere det for å kunne finne det igjen når et lån er nedbetaøt. Trenger aldri vises. Kun for beregninger. Blir justert årlig. |
+| asset.taxableAmountOverride        | Auto: Set to true for all coming years if it finds a asset.taxableAmount the first year.                                                                                                                                                                                        |
+| asset.taxFortuneRate               | Formuesskatt. Prosent skatt på asset op en assets skattbare verdi                                                                                                                                                                                                               |
+| asset.taxFortuneAmount             | Formuesskatt. Kroner skatt på asset                                                                                                                                                                                                                                             |
+| asset.changerate                   | Hvor mye en asset endrer seg i verdi pr år                                                                                                                                                                                                                                      |
+| asset.rule                         | regler for hvordan beløpet skal beregnes                                                                                                                                                                                                                                        |
+| asset.transfer                     | overføring til en annen asset                                                                                                                                                                                                                                                   |
+| asset.repeat                       | gjenta konfigurasjonen for kommende år inntil det kommer et nytt oppsett og overstyrer det                                                                                                                                                                                      |
+| asset.taxablePropertyRate          | Skattbar prosent - Antall prosent av markedsverdien til en asset det skal beregnes eiendomsskatt av                                                                                                                                                                             |
+| asset.taxablePropertyAmount        | Skattbart beløp - Antall kroner av markedsverdien til en asset det skal betales eiendomsskatt av (både % og bunnfradrad hensyntatt)                                                                                                                                             |
+| asset.taxPropertyAmount            | Eiendomsskatt i kroner. Beregnes av asset.marketAmount.                                                                                                                                                                                                                         |
+| asset.taxPropertyRate              | Eiendomsskatt i rate = prosent/100                                                                                                                                                                                                                                              |
+| asset.explanation                        | Beskrivelse av asset/liability                                                                                                                                                                                                                                                  |
 #### realization (Really a part of asset, but we keep the structure simpler by having it separate). This is what happens if we sell the asset. It does not meen we have sold it, sale is done with a transfer to another asset.
 
-| Field | Description |
-|-------|-------------|
-| realization.amount | Beløpet man sitter igjen med etter et salg = asset.marketAmount - asset.realizationTaxAmount |
-| realization.taxableAmount | Skattbart beløp ved realisering av asset = asset.marketAmount - asset.acquisitionAmount * (FIX: skattbar %) |
-| realization.taxAmount | Skattbart beløp ved realisering av asset = asset.realizationTaxableAmount * asset.realizationTaxRate - realization.taxShieldAmount |
-| realization.taxRate | Skattbar prosent ved realisering av asset. Lest fra tax.json |
-| realization.taxShieldAmount | Skjermingsfradrag beløp (Akkumuleres hvis ubenyttet, reduseres automatisak hvis benyttet) |
-| realization.taxShieldRate | Skjermingsfradrag prosent |
-| realization.description | Beskrivelse av salg/realisasjon av asset |
+| Field                       | Description |
+|-----------------------------|-------------|
+| realization.amount          | Beløpet man sitter igjen med etter et salg = asset.marketAmount - asset.realizationTaxAmount |
+| realization.taxableAmount   | Skattbart beløp ved realisering av asset = asset.marketAmount - asset.acquisitionAmount * (FIX: skattbar %) |
+| realization.taxAmount       | Skattbart beløp ved realisering av asset = asset.realizationTaxableAmount * asset.realizationTaxRate - realization.taxShieldAmount |
+| realization.taxRate         | Skattbar prosent ved realisering av asset. Lest fra tax.json |
+| realization.taxShieldAmount | Skjermingsfradrag beløp (Akkumuleres hvis ubenyttet, reduseres automatisk hvis benyttet) |
+| realization.taxShieldRate   | Skjermingsfradrag prosent |
+| realization.explanation     | Beskrivelse av salg/realisasjon av asset |
 #### Yield
 
 | Field | Description |
