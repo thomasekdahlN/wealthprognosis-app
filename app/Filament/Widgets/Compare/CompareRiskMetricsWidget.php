@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class CompareRiskMetricsWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Portfolio Risk Metrics Comparison (Average LTV)';
+    protected ?string $heading = 'Portfolio Risk Metrics Comparison (Average LTV)';
 
     protected static ?int $sort = 7;
 

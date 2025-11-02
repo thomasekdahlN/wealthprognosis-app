@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class CompareNetWorthTrajectoryWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Net Worth Trajectory Comparison';
+    protected ?string $heading = 'Net Worth Trajectory Comparison';
 
     protected static ?int $sort = 3;
 

@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationFireProgressionWidget extends ChartWidget
 {
-    protected static ?string $heading = 'FIRE Progression Over Time';
+    protected ?string $heading = 'FIRE Progression Over Time';
 
     protected static bool $isLazy = false;
 

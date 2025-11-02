@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class CompareCashFlowTrajectoryWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Annual Cash Flow Trajectory Comparison';
+    protected ?string $heading = 'Annual Cash Flow Trajectory Comparison';
 
     protected static ?int $sort = 4;
 

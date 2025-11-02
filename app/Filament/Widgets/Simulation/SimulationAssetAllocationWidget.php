@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationAssetAllocationWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Asset Allocation (Current Year)';
+    protected ?string $heading = 'Asset Allocation (Current Year)';
 
     protected static bool $isLazy = false;
 

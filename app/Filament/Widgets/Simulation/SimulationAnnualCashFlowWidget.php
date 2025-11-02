@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationAnnualCashFlowWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Annual Cash Flow (After Tax)';
+    protected ?string $heading = 'Annual Cash Flow (After Tax)';
 
     protected static bool $isLazy = false;
 

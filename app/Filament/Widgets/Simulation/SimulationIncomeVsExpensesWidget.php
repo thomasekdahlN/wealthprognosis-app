@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationIncomeVsExpensesWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Income vs Expenses Over Time';
+    protected ?string $heading = 'Income vs Expenses Over Time';
 
     protected static bool $isLazy = false;
 

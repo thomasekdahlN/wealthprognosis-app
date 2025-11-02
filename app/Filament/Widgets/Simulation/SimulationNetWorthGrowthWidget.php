@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationNetWorthGrowthWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Net Worth Growth Over Time';
+    protected ?string $heading = 'Net Worth Growth Over Time';
 
     protected static bool $isLazy = false;
 

@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationTaxReportWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Total Tax Breakdown by Year';
+    protected ?string $heading = 'Total Tax Breakdown by Year';
 
     protected static bool $isLazy = false;
 

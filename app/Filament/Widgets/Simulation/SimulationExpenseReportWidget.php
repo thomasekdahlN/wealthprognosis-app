@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class SimulationExpenseReportWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Expense Report by Year';
+    protected ?string $heading = 'Expense Report by Year';
 
     protected static bool $isLazy = false;
 

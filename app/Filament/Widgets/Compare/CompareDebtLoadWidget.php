@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class CompareDebtLoadWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Total Debt Load Comparison';
+    protected ?string $heading = 'Total Debt Load Comparison';
 
     protected static ?int $sort = 6;
 

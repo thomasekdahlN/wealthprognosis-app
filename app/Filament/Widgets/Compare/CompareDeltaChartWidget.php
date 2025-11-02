@@ -16,7 +16,7 @@ use Filament\Widgets\ChartWidget;
 
 class CompareDeltaChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Net Worth Delta (Simulation B - Simulation A)';
+    protected ?string $heading = 'Net Worth Delta (Simulation B - Simulation A)';
 
     protected static ?int $sort = 5;
 
