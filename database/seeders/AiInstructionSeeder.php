@@ -94,6 +94,63 @@ Provide specific tax optimization recommendations.',
                 'is_active' => true,
                 'sort_order' => 3,
             ],
+            [
+                'name' => 'Simulation Comparison Analysis',
+                'description' => 'Compare two financial simulations and provide recommendations',
+                'type' => 'simulation_comparison',
+                'system_prompt' => 'You are an expert financial advisor specializing in scenario analysis and financial planning. You excel at comparing different financial strategies, identifying trade-offs, and providing clear, actionable recommendations. You understand concepts like FIRE (Financial Independence, Retire Early), LTV (Loan-to-Value), DSCR (Debt Service Coverage Ratio), cash flow analysis, and long-term wealth building. Your analysis is thorough, balanced, and considers both quantitative metrics and qualitative factors like risk tolerance and life goals.',
+                'user_prompt_template' => 'I need you to compare two financial simulation scenarios and provide a comprehensive analysis with recommendations.
+
+**Simulation A (Baseline):**
+{simulation_a_json}
+
+**Simulation B (Alternative Scenario):**
+{simulation_b_json}
+
+Please provide a detailed comparison analysis in **markdown format** covering:
+
+## Executive Summary
+- Brief overview of both scenarios
+- Key differences between the scenarios
+- Your primary recommendation (which scenario is better and why)
+
+## Financial Outcomes Comparison
+- Final net worth comparison
+- FIRE achievement timeline (if applicable)
+- Debt-free timeline
+- Cash flow analysis over time
+- Total taxes paid
+
+## Risk Analysis
+- Leverage and LTV comparison
+- Cash flow stability
+- Debt service coverage
+- Risk-adjusted returns
+
+## Trade-offs and Considerations
+- Short-term vs long-term impacts
+- Liquidity considerations
+- Flexibility and optionality
+- Life goals alignment
+
+## Detailed Recommendation
+- Which scenario do you recommend and why?
+- What are the key success factors?
+- What risks should be monitored?
+- Any suggested modifications or hybrid approaches?
+
+## Action Items
+- Specific next steps to implement the recommended scenario
+- Key milestones to track
+- Warning signs to watch for
+
+Please format your response with clear headings, bullet points, and emphasis on key insights. Use Norwegian number formatting where appropriate (space as thousand separator).',
+                'model' => 'gpt-4',
+                'max_tokens' => 3000,
+                'temperature' => 0.7,
+                'is_active' => true,
+                'sort_order' => 4,
+            ],
         ];
 
         foreach ($instructions as $instruction) {

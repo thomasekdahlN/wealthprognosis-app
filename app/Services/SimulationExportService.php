@@ -7,14 +7,20 @@ use App\Exports\PrognosisAssetSheet2;
 use App\Models\SimulationAsset;
 use App\Models\SimulationAssetYear;
 use App\Models\SimulationConfiguration;
+use App\Services\Utilities\HelperService;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class SimulationExportService
 {
+    private static HelperService $helperService;
+
     public static function export(SimulationConfiguration $simulation, ?string $filePath = null): string
     {
+        // Initialize helper service
+        self::$helperService = new HelperService;
+
         // Prepare spreadsheet
         $spreadsheet = new Spreadsheet;
         $spreadsheet->getProperties()
@@ -141,17 +147,17 @@ class SimulationExportService
                     'afterTaxAmount' => self::toNum($year->cashflow_after_taxamount),
                     'afterTaxAggregatedAmount' => self::toNum($year->cashflow_after_tax_aggregatedamount),
                     'taxAmount' => self::toNum($year->cashflow_tax_amount),
-                    'taxDecimal' => self::percentToDecimal($year->cashflow_tax_percent),
+                    'taxDecimal' => self::$helperService->percentToRate($year->cashflow_tax_percent ?? 0),
                     'description' => $year->cashflow_description,
                 ],
                 'mortgage' => [
                     'termAmount' => self::toNum($year->mortgage_term_amount),
-                    'interestDecimal' => self::percentToDecimal($year->mortgage_interest_percent),
+                    'interestDecimal' => self::$helperService->percentToRate($year->mortgage_interest_percent ?? 0),
                     'interestAmount' => self::toNum($year->mortgage_interest_amount),
                     'principalAmount' => self::toNum($year->mortgage_principal_amount),
                     'balanceAmount' => self::toNum($year->mortgage_balance_amount),
                     'taxDeductableAmount' => self::toNum($year->mortgage_tax_deductable_amount),
-                    'taxDeductableDecimal' => self::percentToDecimal($year->mortgage_tax_deductable_percent),
+                    'taxDeductableDecimal' => self::$helperService->percentToRate($year->mortgage_tax_deductable_percent ?? 0),
                     'description' => $year->description,
                 ],
                 'asset' => [
@@ -161,21 +167,21 @@ class SimulationExportService
                     'acquisitionAmount' => self::toNum($year->asset_acquisition_amount),
                     'paidAmount' => self::toNum($year->asset_paid_amount),
                     'taxableAmount' => self::toNum($year->asset_taxable_amount),
-                    'taxableDecimal' => self::toNum($year->asset_taxable_percent) > 0 ? self::percentToDecimal($year->asset_taxable_percent) : 0,
+                    'taxableDecimal' => self::toNum($year->asset_taxable_percent) > 0 ? self::$helperService->percentToRate($year->asset_taxable_percent) : 0,
                     'taxFortuneAmount' => self::toNum($year->asset_tax_amount),
-                    'taxFortuneDecimal' => self::percentToDecimal($year->asset_tax_percent),
+                    'taxFortuneDecimal' => self::$helperService->percentToRate($year->asset_tax_percent ?? 0),
                     'taxPropertyAmount' => self::toNum($year->asset_taxable_property_amount),
-                    'taxPropertyDecimal' => self::percentToDecimal($year->asset_taxable_property_percent),
-                    'mortageRateDecimal' => self::percentToDecimal($year->asset_mortgage_rate_percent ?? 0),
+                    'taxPropertyDecimal' => self::$helperService->percentToRate($year->asset_taxable_property_percent ?? 0),
+                    'mortageRateDecimal' => self::$helperService->percentToRate($year->asset_mortgage_rate_percent ?? 0),
                     'description' => $year->description,
                 ],
                 'realization' => [
                     'amount' => self::toNum($year->realization_amount),
                     'taxableAmount' => self::toNum($year->realization_taxable_amount),
                     'taxAmount' => self::toNum($year->realization_tax_amount),
-                    'taxDecimal' => self::percentToDecimal($year->realization_tax_percent),
+                    'taxDecimal' => self::$helperService->percentToRate($year->realization_tax_percent ?? 0),
                     'taxShieldAmount' => self::toNum($year->realization_tax_shield_amount),
-                    'taxShieldDecimal' => self::percentToDecimal($year->realization_tax_shield_percent),
+                    'taxShieldDecimal' => self::$helperService->percentToRate($year->realization_tax_shield_percent ?? 0),
                     'description' => $year->realization_description,
                 ],
                 'yield' => [
@@ -204,7 +210,7 @@ class SimulationExportService
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, array<string, float|int>>>
      */
     protected static function buildStatistics($assets): array
     {
@@ -240,18 +246,198 @@ class SimulationExportService
         return $stats;
     }
 
-    protected static function percentToDecimal($percent): float
-    {
-        if ($percent === null) {
-            return 0.0;
-        }
-        $p = (float) $percent;
-
-        return $p > 1 ? $p / 100.0 : $p; // Support both 12 and 0.12 inputs
-    }
-
     protected static function toNum($value): float
     {
         return $value !== null ? (float) $value : 0.0;
+    }
+
+    /**
+     * Export SimulationConfiguration to JSON format
+     */
+    public static function toJson(SimulationConfiguration $simulation): string
+    {
+        $data = self::buildJsonStructure($simulation);
+
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Build the JSON structure from simulation data
+     *
+     * @return array<string, mixed>
+     */
+    protected static function buildJsonStructure(SimulationConfiguration $simulation): array
+    {
+        $data = [];
+
+        // Add meta section from SimulationConfiguration
+        $data['meta'] = [
+            'name' => $simulation->name,
+            'description' => $simulation->description ?? '',
+            'birthYear' => (string) $simulation->birth_year,
+            'prognoseAge' => (string) $simulation->prognose_age,
+            'pensionOfficialAge' => (string) $simulation->pension_official_age,
+            'pensionWishAge' => (string) $simulation->pension_wish_age,
+            'deathAge' => (string) $simulation->expected_death_age,
+            'exportStartAge' => (string) $simulation->export_start_age,
+            'prognosisType' => $simulation->prognosis_type ?? 'realistic',
+            'group' => $simulation->group ?? 'both',
+            'taxCountry' => $simulation->tax_country ?? 'no',
+            'riskTolerance' => $simulation->risk_tolerance ?? 'moderate',
+        ];
+
+        // Add timestamps
+        if ($simulation->created_at) {
+            $data['meta']['createdAt'] = $simulation->created_at->toISOString();
+        }
+        if ($simulation->updated_at) {
+            $data['meta']['updatedAt'] = $simulation->updated_at->toISOString();
+        }
+        $data['meta']['exportedAt'] = now()->toISOString();
+
+        // Process each simulation asset (ordered by sort_order to maintain JSON sequence)
+        $assets = $simulation->simulationAssets()
+            ->with('simulationAssetYears')
+            ->orderBy('sort_order')
+            ->get();
+
+        /** @var \App\Models\SimulationAsset $asset */
+        foreach ($assets as $asset) {
+            $assetData = [];
+
+            // Add asset meta section
+            $assetData['meta'] = [
+                'type' => $asset->asset_type,
+                'group' => $asset->group,
+                'name' => $asset->name,
+                'description' => $asset->description ?? '',
+                'active' => $asset->is_active,
+            ];
+
+            // Process simulation asset years
+            $years = $asset->simulationAssetYears()->orderBy('year')->get();
+
+            /** @var \App\Models\SimulationAssetYear $assetYear */
+            foreach ($years as $assetYear) {
+                $yearKey = (string) $assetYear->year;
+                $assetData[$yearKey] = self::buildSimulationYearData($assetYear);
+            }
+
+            // Use the asset code as the key
+            $data[$asset->code] = $assetData;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Build year data for simulation asset year
+     *
+     * @return array<string, mixed>
+     */
+    protected static function buildSimulationYearData(SimulationAssetYear $assetYear): array
+    {
+        $yearData = [];
+
+        // Income data
+        $yearData['income'] = [
+            'amount' => self::toNum($assetYear->income_amount),
+            'description' => $assetYear->income_description ?? '',
+        ];
+
+        // Expense data
+        $yearData['expence'] = [
+            'amount' => self::toNum($assetYear->expence_amount),
+            'description' => $assetYear->expence_description ?? '',
+        ];
+
+        // Asset data
+        $yearData['asset'] = [
+            'marketAmount' => self::toNum($assetYear->asset_market_amount),
+            'changeratePercent' => (float) ($assetYear->asset_changerate_percent ?? 0),
+            'marketMortgageDeductedAmount' => self::toNum($assetYear->asset_market_mortgage_deducted_amount),
+            'acquisitionAmount' => self::toNum($assetYear->asset_acquisition_amount),
+            'paidAmount' => self::toNum($assetYear->asset_paid_amount),
+            'taxableAmount' => self::toNum($assetYear->asset_taxable_amount),
+            'taxablePercent' => (float) ($assetYear->asset_taxable_percent ?? 0),
+            'taxAmount' => self::toNum($assetYear->asset_tax_amount),
+            'taxPercent' => (float) ($assetYear->asset_tax_percent ?? 0),
+            'taxFortuneAmount' => self::toNum($assetYear->asset_tax_fortune_amount),
+            'taxPropertyAmount' => self::toNum($assetYear->asset_tax_property_amount),
+            'taxablePropertyAmount' => self::toNum($assetYear->asset_taxable_property_amount),
+            'taxablePropertyPercent' => (float) ($assetYear->asset_taxable_property_percent ?? 0),
+            'mortgageRatePercent' => (float) ($assetYear->asset_mortgage_rate_percent ?? 0),
+            'description' => $assetYear->asset_description ?? '',
+        ];
+
+        // Mortgage data
+        $yearData['mortgage'] = [
+            'termAmount' => self::toNum($assetYear->mortgage_term_amount),
+            'interestPercent' => (float) ($assetYear->mortgage_interest_percent ?? 0),
+            'interestAmount' => self::toNum($assetYear->mortgage_interest_amount),
+            'principalAmount' => self::toNum($assetYear->mortgage_principal_amount),
+            'balanceAmount' => self::toNum($assetYear->mortgage_balance_amount),
+            'taxDeductableAmount' => self::toNum($assetYear->mortgage_tax_deductable_amount),
+            'taxDeductablePercent' => (float) ($assetYear->mortgage_tax_deductable_percent ?? 0),
+            'description' => $assetYear->mortgage_description ?? '',
+        ];
+
+        // Cashflow data
+        $yearData['cashflow'] = [
+            'beforeTaxAmount' => self::toNum($assetYear->cashflow_before_tax_amount),
+            'beforeTaxAggregatedAmount' => self::toNum($assetYear->cashflow_before_tax_aggregated_amount),
+            'afterTaxAmount' => self::toNum($assetYear->cashflow_after_tax_amount),
+            'afterTaxAggregatedAmount' => self::toNum($assetYear->cashflow_after_tax_aggregated_amount),
+            'taxAmount' => self::toNum($assetYear->cashflow_tax_amount),
+            'taxPercent' => (float) ($assetYear->cashflow_tax_percent ?? 0),
+            'description' => $assetYear->cashflow_description ?? '',
+        ];
+
+        // Realization data
+        $yearData['realization'] = [
+            'amount' => self::toNum($assetYear->realization_amount),
+            'taxableAmount' => self::toNum($assetYear->realization_taxable_amount),
+            'taxAmount' => self::toNum($assetYear->realization_tax_amount),
+            'taxPercent' => (float) ($assetYear->realization_tax_percent ?? 0),
+            'taxShieldAmount' => self::toNum($assetYear->realization_tax_shield_amount),
+            'taxShieldPercent' => (float) ($assetYear->realization_tax_shield_percent ?? 0),
+            'description' => $assetYear->realization_description ?? '',
+        ];
+
+        // Yield data
+        $yearData['yield'] = [
+            'bruttoPercent' => (float) ($assetYear->yield_brutto_percent ?? 0),
+            'nettoPercent' => (float) ($assetYear->yield_netto_percent ?? 0),
+        ];
+
+        // FIRE metrics
+        $yearData['fire'] = [
+            'incomeAmount' => self::toNum($assetYear->fire_income_amount),
+            'expenceAmount' => self::toNum($assetYear->fire_expence_amount),
+            'cashFlowAmount' => self::toNum($assetYear->fire_cashflow_amount),
+            'savingAmount' => self::toNum($assetYear->fire_saving_amount),
+            'rate' => (float) ($assetYear->fire_rate ?? 0),
+            'percent' => (float) ($assetYear->fire_percent ?? 0),
+            'savingRate' => (float) ($assetYear->fire_saving_rate ?? 0),
+        ];
+
+        // Financial metrics
+        $yearData['metrics'] = [
+            'ltvPercent' => (float) ($assetYear->metrics_ltv_percent ?? 0),
+            'dscr' => (float) ($assetYear->metrics_dscr ?? 0),
+            'roiPercent' => (float) ($assetYear->metrics_roi_percent ?? 0),
+            'roePercent' => (float) ($assetYear->metrics_roe_percent ?? 0),
+            'cocPercent' => (float) ($assetYear->metrics_coc_percent ?? 0),
+        ];
+
+        return $yearData;
+    }
+
+    /**
+     * Static method to get JSON string
+     */
+    public static function toJsonString(SimulationConfiguration $simulation): string
+    {
+        return self::toJson($simulation);
     }
 }
