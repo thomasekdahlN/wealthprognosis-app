@@ -123,4 +123,29 @@ class HelperService
 
         return $multiplier === 12 ? 'monthly' : 'yearly';
     }
+
+    /**
+     * Convert percentage to decimal rate.
+     *
+     * Converts percentage values to their decimal equivalent for calculations.
+     * Handles positive, negative, and zero percentages.
+     *
+     * Examples:
+     * - 10 -> 0.10
+     * - -5 -> -0.05
+     * - 0 -> 0.0
+     *
+     * @param  int|float  $percent  The percentage value to convert
+     * @return float The decimal rate equivalent
+     */
+    public function percentToRate(int|float $percent): float
+    {
+        if ($percent > 0) {
+            return (float) $percent / 100;
+        } elseif ($percent < 0) {
+            return -(float) abs($percent) / 100;
+        } else {
+            return 0.0;
+        }
+    }
 }

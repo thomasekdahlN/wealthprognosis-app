@@ -85,12 +85,21 @@ class TaxIncomeService implements TaxCalculatorInterface
     public function taxCalculationIncome(
         bool $debug,
         string $taxGroup,
-        string $taxType,
+        ?string $taxType,
         int $year,
         ?float $income,
         ?float $expence,
         ?float $interestAmount
     ): IncomeTaxResult {
+        // Skip tax calculation if tax_type is null
+        if ($taxType === null) {
+            return new IncomeTaxResult(
+                taxAmount: 0,
+                taxRate: 0,
+                explanation: 'Tax type is null, no tax calculation performed'
+            );
+        }
+
         // Initialize explanation and income tax percent
         $explanation = '';
         $incomeTaxRate = $this->taxConfigRepo->getTaxIncomeRate($taxType, $year);
@@ -110,18 +119,19 @@ class TaxIncomeService implements TaxCalculatorInterface
 
         // Calculate income tax amount based on tax type
         switch ($taxType) {
-            // For 'salary' and 'pension' tax types, calculate salary tax
+            // For 'salary' tax type, calculate salary tax
             case 'salary':
-                $salaryTaxResult = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
+                $salaryTaxResult = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income, 'salary');
                 $incomeTaxAmount = $salaryTaxResult->taxAmount;
-                $incomeTaxRate = $salaryTaxResult->taxPercent;
+                $incomeTaxRate = $salaryTaxResult->taxAveragePercent;
                 $explanation = $salaryTaxResult->explanation;
                 break;
 
+                // For 'pension' tax type, calculate pension tax
             case 'pension':
-                $salaryTaxResult = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income);
+                $salaryTaxResult = $this->taxsalary->calculatesalarytax($debug, $year, (int) $income, 'pension');
                 $incomeTaxAmount = $salaryTaxResult->taxAmount;
-                $incomeTaxRate = $salaryTaxResult->taxPercent;
+                $incomeTaxRate = $salaryTaxResult->taxAveragePercent;
                 $explanation = $salaryTaxResult->explanation;
                 break;
 

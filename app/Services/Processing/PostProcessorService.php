@@ -229,7 +229,9 @@ class PostProcessorService
         $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.paidAmount');
         $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.transferedAmount');
         $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.taxableAmount');
+        $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.taxableFortuneAmount');
         $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.taxFortuneAmount');
+        $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.gjeldsfradragAmount');
         $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.taxablePropertyAmount');
         $this->groupProcessor->additionToGroup($totalH, $companyH, $privateH, $groupH, $year, $meta, $data, 'asset.taxPropertyAmount');
 

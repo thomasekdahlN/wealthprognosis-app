@@ -44,6 +44,9 @@ class YearlyProcessor
      * Has to be done because a mortgage could potentially have extra downpayments making the fortune calculation wrong.
      * Has to be run before cashflow calculations to be correct.
      *
+     * Individual assets calculate fortune tax WITHOUT the standard deduction (deduct=false) to show
+     * the full fortune tax cost of each asset. The group-level calculation will apply the deduction.
+     *
      * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      * @param  int  $thisYear  Current year
@@ -55,18 +58,32 @@ class YearlyProcessor
         if ($meta->year >= $thisYear) { // For efficiensy, not neccessarry to calculate previous tax
             $taxType = $this->assetTypeService->getTaxType($meta->type);
 
+            // Skip tax calculation if tax_type is null
+            if ($taxType === null) {
+                return;
+            }
+
             $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
             $taxableAmount = $this->ArrGet($dataH, "$path.asset.taxableAmount");
             $mortgageBalanceAmount = $this->ArrGet($dataH, "$path.mortgage.balanceAmount");
 
-            // Calculate fortune tax
+            // Calculate fortune tax for individual asset
+            // Note: We pass the mortgage balance here so it's deducted from the taxable base
+            // The taxableFortuneAmount will be (marketAmount * taxableRate) - mortgageBalance
             $fortuneTaxResult = $this->taxfortune->taxCalculationFortune($meta->group, $taxType, $meta->year, $marketAmount, $taxableAmount, $mortgageBalanceAmount, false);
+
+            // Store the taxable fortune amount (after mortgage deduction)
             $this->ArrSet($dataH, "$path.asset.taxableFortuneAmount", $fortuneTaxResult->taxableFortuneAmount);
             $this->ArrSet($dataH, "$path.asset.taxableFortunePercent", $fortuneTaxResult->taxableFortunePercent);
             $this->ArrSet($dataH, "$path.asset.taxableFortuneRate", $fortuneTaxResult->taxableFortuneRate);
+
+            // Store the fortune tax amount (calculated without standard deduction for individual assets)
             $this->ArrSet($dataH, "$path.asset.taxFortuneAmount", $fortuneTaxResult->taxFortuneAmount);
             $this->ArrSet($dataH, "$path.asset.taxFortunePercent", $fortuneTaxResult->taxFortunePercent);
             $this->ArrSet($dataH, "$path.asset.taxFortuneRate", $fortuneTaxResult->taxFortuneRate);
+
+            // Store gjeldsfradrag (mortgage balance used for fortune tax deduction)
+            $this->ArrSet($dataH, "$path.asset.gjeldsfradragAmount", $mortgageBalanceAmount);
         }
     }
 
@@ -82,15 +99,12 @@ class YearlyProcessor
     {
         $meta = $this->getAssetMetaFromPath($dataH, $path);
 
-        echo "@@@@@@ taxProperty: $meta->taxProperty\n";
-
         if ($meta->year >= $thisYear && $meta->taxProperty) { // For efficiensy, not neccessarry to calculate previous tax
             $marketAmount = $this->ArrGet($dataH, "$path.asset.marketAmount");
 
             // Calculate property tax
             $propertyTaxService = app(\App\Services\Tax\TaxPropertyService::class);
             $propertyTaxResult = $propertyTaxService->calculatePropertyTax($meta->year, $meta->group, $meta->taxProperty, (float) $marketAmount);
-            print_r($propertyTaxResult);
             $this->ArrSet($dataH, "$path.asset.taxablePropertyAmount", $propertyTaxResult->taxablePropertyAmount);
             $this->ArrSet($dataH, "$path.asset.taxPropertyAmount", $propertyTaxResult->taxPropertyAmount);
         }

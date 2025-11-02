@@ -41,7 +41,7 @@ class AssetTypeService
     /** @var array<string, string> */
     private array $taxTypeMap = [];
 
-    /** @var array<string, array<string, mixed>> */
+    /** @var array<string, AssetType|null> */
     private array $assetTypeCache = [];
 
     /**

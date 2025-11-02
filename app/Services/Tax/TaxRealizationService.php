@@ -91,7 +91,7 @@ class TaxRealizationService implements TaxCalculatorInterface
         bool $debug,
         bool $transfer,
         string $taxGroup,
-        string $taxType,
+        ?string $taxType,
         int $year,
         float $amount,
         float $acquisitionAmount,
@@ -99,6 +99,21 @@ class TaxRealizationService implements TaxCalculatorInterface
         float $taxShieldPrevAmount = 0,
         ?int $acquisitionYear = 0
     ): RealizationTaxResult {
+        // Skip tax calculation if tax_type is null
+        if ($taxType === null) {
+            return new RealizationTaxResult(
+                acquisitionAmount: $acquisitionAmount,
+                taxableAmount: 0,
+                taxAmount: 0,
+                taxPercent: 0,
+                taxRate: 0,
+                taxShieldAmount: 0,
+                taxShieldPercent: 0,
+                taxShieldRate: 0,
+                explanation: 'Tax type is null, no tax calculation performed'
+            );
+        }
+
         $this->logCalculationStart($debug, $amount, $taxGroup, $taxType, $year, $acquisitionAmount, $taxShieldPrevAmount, $acquisitionYear);
 
         $taxRates = $this->calculateTaxRates($taxType, $year);
@@ -124,15 +139,19 @@ class TaxRealizationService implements TaxCalculatorInterface
     /**
      * Calculate the tax shield (skjermingsfradrag) for an asset.
      *
-     * Tax shield accumulates annually based on the asset value and shield rate,
+     * Tax shield accumulates annually based on the acquisition cost (inngangsverdi) and shield rate,
      * and is used to reduce realization tax when assets are transferred or sold.
      * Only applies to private assets, not company assets.
+     *
+     * According to Norwegian law (Skatteetaten), the shield is calculated as:
+     * inngangsverdi (acquisition cost) × skjermingsrente (shield rate) + previous unused shield
      *
      * @param  int  $year  The tax year
      * @param  string  $taxGroup  The tax group ('private' or 'company')
      * @param  string  $taxType  The type of asset
      * @param  bool  $transfer  Whether this is an actual transfer (uses shield) or simulation (accumulates shield)
-     * @param  float  $amount  The asset value
+     * @param  float  $amount  The asset market value (not used for shield calculation)
+     * @param  float  $acquisitionAmount  The acquisition cost (inngangsverdi) - used for shield calculation
      * @param  float  $realizationTaxAmount  The calculated realization tax before shield
      * @param  float  $taxShieldPrevAmount  The accumulated tax shield from previous years
      */
@@ -142,6 +161,7 @@ class TaxRealizationService implements TaxCalculatorInterface
         string $taxType,
         bool $transfer,
         float $amount,
+        float $acquisitionAmount,
         float $realizationTaxAmount,
         float $taxShieldPrevAmount
     ): TaxShieldResult {
@@ -152,22 +172,14 @@ class TaxRealizationService implements TaxCalculatorInterface
         $realizationTaxShieldRate = $this->taxConfigRepo->getTaxRealizationRate($taxType, $year);
 
         // Skjermingsfradrag
-        if ($realizationTaxShieldPercent > 0) {
-            // TaxShield is calculated on an assets value from 1/1 each year, and accumulated until used.
-            $realizationTaxShieldAmount = round(($amount * $realizationTaxShieldPercent) + $taxShieldPrevAmount); // Tax shield accumulates over time, until you actually transfer an amount, then it is reduced accordigly until zero.
-            $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. ';
-        } else {
-            $realizationTaxShieldAmount = $taxShieldPrevAmount;
-            $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. ';
-        }
-        if ($realizationTaxShieldAmount < 0) { // Tax shield can not go below zero.
-            $realizationTaxShieldAmount = 0;
-        }
-
+        // Shield accumulation logic depends on whether this is a transfer or simulation
         if ($transfer) {
+            // During actual transfer: Use accumulated shield from previous years, do NOT add new shield for current year
+            $realizationTaxShieldAmount = $taxShieldPrevAmount;
+            $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. Transfer mode: using accumulated shield. ';
+
             if ($taxGroup == 'private') {
-                // tax shield is only used when tansfering between private assets or from company to private asset - never between company assets.
-                // We run simulations for every year that should not change the Shield, only a real transfer reduces the shield, all other activity increases the shield
+                // tax shield is only used when transferring between private assets or from company to private asset - never between company assets.
                 if ($realizationTaxAmount >= $realizationTaxShieldAmount) {
                     $explanation .= "Taxshield ($realizationTaxShieldAmount) lower than tax ($realizationTaxAmount), using entire shield. ";
 
@@ -177,13 +189,27 @@ class TaxRealizationService implements TaxCalculatorInterface
                     $explanation .= "Taxshield ($realizationTaxShieldAmount) bigger than tax ($realizationTaxAmount), using part of the shield. ";
 
                     $realizationTaxShieldAmount -= $realizationTaxAmount; // We reduce it by the amount we used
-                    $realizationTaxAmount = 0; // Then taxAmount is zero, since the entire emount was taxShielded.
+                    $realizationTaxAmount = 0; // Then taxAmount is zero, since the entire amount was taxShielded.
                 }
             } else {
                 $explanation .= "Only taxshield on private group assets, found #$taxGroup#. ";
             }
         } else {
-            $explanation .= 'Taxshield simulation, not an actual transfer. ';
+            // During simulation: Accumulate shield based on acquisition cost (inngangsverdi) + previous shield
+            if ($realizationTaxShieldPercent > 0) {
+                // TaxShield is calculated on acquisition cost (inngangsverdi) from 1/1 each year, and accumulated until used.
+                // According to Skatteetaten: inngangsverdi × skjermingsrente + previous unused shield
+                $realizationTaxShieldAmount = round(($acquisitionAmount * $realizationTaxShieldPercent) + $taxShieldPrevAmount);
+                $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. Simulation mode: accumulating shield on acquisition cost. ';
+            } else {
+                $realizationTaxShieldAmount = $taxShieldPrevAmount;
+                $explanation = 'TaxShieldPercent:'.$realizationTaxShieldPercent * 100 .'. No shield rate. ';
+            }
+        }
+
+        // Shield cannot go below zero
+        if ($realizationTaxShieldAmount < 0) {
+            $realizationTaxShieldAmount = 0;
         }
 
         $result = new TaxShieldResult(
@@ -324,9 +350,9 @@ class TaxRealizationService implements TaxCalculatorInterface
 
             case 'otp':
                 // OTP is taxed as pension income when realized
-                $salaryTaxResult = $this->taxsalary->calculatesalarytax(false, $year, (int) $amount);
+                $salaryTaxResult = $this->taxsalary->calculatesalarytax(false, $year, (int) $amount, 'pension');
                 $taxAmount = $salaryTaxResult->taxAmount;
-                $taxRates['rate'] = $salaryTaxResult->taxRate;
+                $taxRates['rate'] = $salaryTaxResult->taxAverageRate;
                 $explanation = $salaryTaxResult->explanation;
                 break;
 
@@ -381,6 +407,7 @@ class TaxRealizationService implements TaxCalculatorInterface
                 $taxType,
                 $transfer,
                 $amount,
+                $acquisitionAmount,
                 $realizationTaxAmount,
                 $taxShieldPrevAmount
             );

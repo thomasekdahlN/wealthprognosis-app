@@ -61,7 +61,7 @@ class AiEvaluationService
      * Evaluate an asset configuration using multiple AI instructions
      *
      * @param  array<int, int>  $instructionIds
-     * @return array<string, mixed>
+     * @return list<array<string, mixed>>
      */
     public function evaluateWithMultipleInstructions(AssetConfiguration $assetConfiguration, array $instructionIds = []): array
     {
@@ -272,7 +272,7 @@ class AiEvaluationService
      * Static method for multiple evaluations
      *
      * @param  array<int, int>  $instructionIds
-     * @return array<string, mixed>
+     * @return list<array<string, mixed>>
      */
     public static function evaluateMultiple(AssetConfiguration $assetConfiguration, array $instructionIds = []): array
     {

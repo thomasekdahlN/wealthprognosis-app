@@ -20,12 +20,12 @@ class ExcelFormatting
         $sheet->getStyle('A5:AR5')->getFont()->setBold(true);
         $sheet->getStyle('A5:AR5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('CCCCCC');
 
-        // Amounts: Norwegian spacing + red negatives, right-aligned (extended to AR)
-        $sheet->getStyle("B{$startRow}:AR{$endRow}")->getNumberFormat()->setFormatCode('# ##0;[Red]-# ##0');
+        // Amounts: Norwegian spacing (space every 3 digits) + red negatives, right-aligned (extended to AR)
+        $sheet->getStyle("B{$startRow}:AR{$endRow}")->getNumberFormat()->setFormatCode('# ### ##0;[Red]-# ### ##0');
         $sheet->getStyle("B{$startRow}:AR{$endRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-        // Percent columns (updated after adding AI capRate column)
-        // D=Income%, F=Expense%, H=Tax%, J=Interest%, O=Deductable%, Q=Asset%, V=Fortune%, X=Fortune%, Z=Property%, AD=Realization%, AF=Shield%, AG=GrossYield%, AH=NetYield%, AI=CapRate%, AL=Mortgage%, AQ=SaveRate%
+        // Percent columns (rates as decimals, formatted as percentages)
+        // D=Income%, F=Expense%, H=Tax%, J=Interest%, O=TaxDeductable%, Q=Asset%, V=Fortune%, X=Fortune%, AD=Realization%, AF=Shield%, AG=GrossYield%, AH=NetYield%, AI=CapRate%, AL=Mortgage%, AQ=SaveRate%
         foreach (['D', 'F', 'H', 'J', 'O', 'Q', 'V', 'X', 'AD', 'AF', 'AG', 'AH', 'AI', 'AL', 'AQ'] as $col) {
             $sheet->getStyle("{$col}{$startRow}:{$col}{$endRow}")->getNumberFormat()->setFormatCode('0.0%;[Red]-0.0%');
         }

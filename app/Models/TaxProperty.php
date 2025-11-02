@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property string $tax_home_permill
  * @property string $tax_company_permill
+ * @property float $taxable_percent
  */
 class TaxProperty extends Model
 {

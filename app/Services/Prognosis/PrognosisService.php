@@ -17,6 +17,7 @@
 namespace App\Services\Prognosis;
 
 use App\Services\AssetTypeService;
+use App\Services\Tax\TaxCashflowService;
 use App\Support\ValueObjects\AssetMeta;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -63,6 +64,22 @@ class PrognosisService
 
     private AssetTypeService $assetTypeService;
 
+    public \App\Services\Tax\TaxIncomeService $taxincome;
+
+    public \App\Services\Tax\TaxFortuneService $taxfortune;
+
+    public \App\Services\Tax\TaxRealizationService $taxrealization;
+
+    public \App\Services\Utilities\HelperService $helper;
+
+    public \App\Services\Utilities\RulesService $rules;
+
+    public TaxCashflowService $taxCashflow;
+
+    public int $birthYear;
+
+    public bool $debug = false;
+
     /**
      * @param  array<string, mixed>  $config
      */
@@ -77,6 +94,7 @@ class PrognosisService
         $this->changerate = app(\App\Services\Prognosis\ChangerateService::class);
         $this->helper = app(\App\Services\Utilities\HelperService::class);
         $this->rules = app(\App\Services\Utilities\RulesService::class);
+        $this->taxCashflow = app(TaxCashflowService::class);
         $this->postProcessor = app(\App\Services\Processing\PostProcessorService::class);
         $this->assetTypeService = app(AssetTypeService::class);
 
@@ -114,8 +132,11 @@ class PrognosisService
             $this->dataH[$assetname]['meta'] = $this->ArrGetConfig("$assetname.meta"); // Copy metadata into dataH
             $assetType = $this->ArrGetConfig("$assetname.meta.type");
 
-            // Resolve tax type from asset type using centralized helper
-            $this->config[$assetname]['meta']['tax_type'] = \App\Support\TaxTypeResolver::resolve($assetType);
+            // Only resolve tax type from asset type if not explicitly set in config
+            // This allows config to override with null to skip tax calculations
+            if (! array_key_exists('tax_type', $this->config[$assetname]['meta'] ?? [])) {
+                $this->config[$assetname]['meta']['tax_type'] = \App\Support\TaxTypeResolver::resolve($assetType);
+            }
 
             $taxGroup = $this->ArrGetConfig("$assetname.meta.group"); // How tax is to be calculated for this asset
             $taxProperty = $this->ArrGetConfig("$assetname.meta.taxProperty"); // How tax is to be calculated for this asset
@@ -341,7 +362,10 @@ class PrognosisService
                     $propertyResult = $propertyTaxService->calculatePropertyTax($year, $taxGroup, $taxProperty, (float) $assetMarketAmount);
                     $assetTaxablePropertyAmount = $propertyResult->taxablePropertyAmount;
                     $assetTaxablePropertyPercent = $propertyResult->taxablePropertyPercent;
+                    $assetTaxablePropertyRate = $propertyResult->taxablePropertyRate ?? 0;
                     $assetTaxPropertyAmount = $propertyResult->taxPropertyAmount;
+                    $assetTaxPropertyPercent = $propertyResult->taxPropertyPercent;
+                    $assetTaxPropertyRate = $propertyResult->taxPropertyRate;
                     $assetTaxPropertyDecimal = $propertyResult->taxPropertyRate; // Use Rate (decimal) not Percent for Excel export
                 } else {
                     $assetTaxablePropertyAmount = 0;
@@ -379,39 +403,27 @@ class PrognosisService
                     echo "***********taxCalculationIncome taxGroup:$taxGroup, taxType:$taxType, year:$year, incomeAmount:$incomeAmount, expenceAmount:$expenceAmount, interestAmount:$interestAmount\n";
                 }
 
-                // FIX: Not neccessarry with cashflow things here, when we do it yearly?
-                $incomeTaxResult = $this->taxincome->taxCalculationIncome($debug, $taxGroup, $taxType, $year, $incomeAmount, $expenceAmount, $interestAmount);
-                $cashflowTaxAmount = $incomeTaxResult->taxAmount;
-                $cashflowTaxPercent = $incomeTaxResult->taxRate;
-                $cashflowDescription = $incomeTaxResult->explanation;
+                // Calculate initial cashflow using the dedicated service
+                $cashflowResult = $this->taxCashflow->calculateInitialCashflow(
+                    $debug,
+                    $this->dataH,
+                    $path,
+                    $taxGroup,
+                    $taxType,
+                    $year,
+                    $incomeAmount,
+                    $expenceAmount,
+                    $interestAmount,
+                    $assetTaxFortuneAmount,
+                    $assetTaxPropertyAmount
+                );
 
-                $cashflowBeforeTaxAmount =
-                    $incomeAmount
-                    + $this->ArrGet("$path.income.transferedAmount")
-                    - $expenceAmount // cashflow basis = inntekt - utgift.
-                    - $this->ArrGet("$path.mortgage.termAmount"); // Minus terminbetaling på lånet
-
-                $cashflowAfterTaxAmount =
-                    $incomeAmount
-                    + $this->ArrGet("$path.mortgage.taxDeductableAmount") // Plus skattefradrag på renter
-                    + $this->ArrGet("$path.income.transferedAmount")
-                    - $expenceAmount // cashflow basis = inntekt - utgift.
-                    - $cashflowTaxAmount // Minus skatt på cashflow (Kan være både positiv og negativ)
-                    - $assetTaxFortuneAmount // Minus formuesskatt
-                    - $assetTaxPropertyAmount // Minus eiendomsskatt
-                    - $this->ArrGet("$path.mortgage.termAmount"); // Minus terminbetaling på lånet
-
-                Log::info('Cashflow calculation result', [
-                    'asset' => $assetname,
-                    'year' => $year,
-                    'income_amount' => $incomeAmount,
-                    'expence_amount' => $expenceAmount,
-                    'interest_amount' => $interestAmount,
-                    'cashflow_tax_amount' => $cashflowTaxAmount,
-                    'cashflow_before_tax_amount' => $cashflowBeforeTaxAmount,
-                    'cashflow_after_tax_amount' => $cashflowAfterTaxAmount,
-                    'transferred_amount' => $this->ArrGet("$path.income.transferedAmount"),
-                ]);
+                $cashflowTaxAmount = $cashflowResult->taxAmount;
+                $cashflowTaxPercent = $cashflowResult->taxPercent;
+                $cashflowTaxRate = $cashflowResult->taxRate;
+                $cashflowDescription = $cashflowResult->description;
+                $cashflowBeforeTaxAmount = $cashflowResult->beforeTaxAmount;
+                $cashflowAfterTaxAmount = $cashflowResult->afterTaxAmount;
 
                 $cashflowNewRule = null;
                 if ($cashflowTransfer && $cashflowRule && $cashflowBeforeTaxAmount > 0) {
@@ -436,8 +448,12 @@ class PrognosisService
                 $acquisitionAmount = $realizationResult->acquisitionAmount;
 
                 $realizationTaxableAmount = $realizationResult->taxableAmount;
-                $realizationTaxablePercent = $realizationResult->taxablePercent;
-                $realizationTaxableRate = $realizationResult->taxableRate;
+                $realizationTaxablePercent = $realizationResult->taxPercent;
+                $realizationTaxableRate = $realizationResult->taxRate;
+
+                // Asset taxable values for storage
+                $assetTaxablePercent = $realizationTaxablePercent;
+                $assetTaxableRate = $realizationTaxableRate;
 
                 $realizationTaxAmount = $realizationResult->taxAmount;
                 $realizationTaxPercent = $realizationResult->taxPercent;
@@ -500,6 +516,14 @@ class PrognosisService
 
                     $this->ArrSet("$path.asset.taxableInitialAmount", $assetTaxableInitialAmount);
                     $this->ArrSet("$path.asset.taxableAmountOverride", $assetTaxableAmountOverride);
+
+                    // Store acquisition and paid amounts for Excel export
+                    if ($assetInitialAcquisitionAmount > 0) {
+                        $this->ArrSet("$path.asset.acquisitionAmount", $assetInitialAcquisitionAmount);
+                    }
+                    if ($assetInitialPaidAmount > 0) {
+                        $this->ArrSet("$path.asset.paidAmount", $assetInitialPaidAmount);
+                    }
 
                     if ($assetTaxFortuneAmount > 0) {
                         $this->ArrSet("$path.asset.taxFortuneAmount", $assetTaxFortuneAmount);
@@ -763,6 +787,8 @@ class PrognosisService
         }
 
         $taxOriginType = $this->assetTypeService->getTaxType($originMeta->type);
+        $taxOriginGroup = $originMeta->group;
+        $taxToGroup = $toMeta->group;
 
         // print "    Tax asset: {$originMeta->assetname}, year: {$originMeta->year}, type: $taxOriginType\n";
 
@@ -901,7 +927,7 @@ class PrognosisService
 
             $this->removeMortgageFrom($assetname, $year); // Clean up all mortage from dataH even from this year before recalculating it back into the array.
             // Recalculate the mortgage from this year an onwards.
-            print_r($mortgage);
+
             $this->dataH = (new \App\Services\Prognosis\AmortizationService($this->debug, $this->config, $this->changerate, $this->dataH, $mortgage, $assetname, $year))->get();
 
         } else {
@@ -1127,7 +1153,7 @@ class PrognosisService
     }
 
     // Calculates an amount based on the value of another asset
-    public function source(bool $debug, string $path, string $rule): float
+    public function source(bool $debug, string $path, string $rule): array
     {
         $paidAmount = 0;
         $amount = $this->ArrGet($path); // Retrive the amount from another asset. Do not change the other asset.

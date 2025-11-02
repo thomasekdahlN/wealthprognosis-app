@@ -6,6 +6,7 @@ namespace App\Services\Tax;
 
 use App\Models\AssetType;
 use App\Models\TaxConfiguration;
+use App\Services\Utilities\HelperService;
 use Illuminate\Support\Arr;
 
 /**
@@ -24,8 +25,10 @@ class TaxConfigRepository
 
     private string $country;
 
-    public function __construct(string $country = 'no')
-    {
+    public function __construct(
+        string $country = 'no',
+        private HelperService $helperService = new HelperService
+    ) {
         $this->country = strtolower($country);
     }
 
@@ -80,7 +83,7 @@ class TaxConfigRepository
     {
         $configH = $this->getTaxConfig($year, $taxType);
 
-        return Arr::get($configH, 'fortune', 0) / 100;
+        return $this->helperService->percentToRate(Arr::get($configH, 'fortune', 0));
     }
 
     /**
@@ -167,22 +170,48 @@ class TaxConfigRepository
     }
 
     // *****************************************************************************
-    // Helper functions to retrieve correct salary tax config
+    // Helper functions to retrieve correct salary/pension tax config
+    /**
+     * Get tax configuration for a specific income type (salary or pension).
+     * Each income type has its own tax_type record in the database.
+     *
+     * @return array<string, mixed>
+     */
+    private function getTaxIncomeTypeConfig(string $incomeType, string $TaxSubType, int $year): array
+    {
+        $configH = $this->getTaxConfig($year, $incomeType);
+
+        return $configH[$TaxSubType] ?? [];
+    }
+
     /**
      * @return array<string, mixed>
      */
     private function getTaxSalaryConfig(string $TaxSubType, int $year): array
     {
-        $configH = $this->getTaxConfig($year, 'salary');
+        return $this->getTaxIncomeTypeConfig('salary', $TaxSubType, $year);
+    }
 
-        return $configH[$TaxSubType] ?? [];
+    /**
+     * @return array<string, mixed>
+     */
+    private function getTaxPensionConfig(string $TaxSubType, int $year): array
+    {
+        return $this->getTaxIncomeTypeConfig('pension', $TaxSubType, $year);
     }
 
     public function getSalaryTaxCommonRate(int $year): float
     {
         $taxSalaryConfigH = $this->getTaxSalaryConfig('common', (int) $year);
 
-        return Arr::get($taxSalaryConfigH, 'percent', 0) / 100;
+        return $this->helperService->percentToRate(Arr::get($taxSalaryConfigH, 'percent', 0));
+    }
+
+    public function getPensionTaxCommonRate(int $year): float
+    {
+        $taxPensionConfigH = $this->getTaxPensionConfig('common', (int) $year);
+
+        return $this->helperService->percentToRate(Arr::get($taxPensionConfigH, 'percent', 0));
     }
 
     /**
@@ -193,11 +222,26 @@ class TaxConfigRepository
         return $this->getTaxSalaryConfig('deduction', $year);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function getPensionTaxDeductionConfig(int $year): array
+    {
+        return $this->getTaxPensionConfig('deduction', $year);
+    }
+
     public function getSalaryTaxSocialSecurityRate(int $year): float
     {
         $taxSalaryConfigH = $this->getTaxSalaryConfig('socialsecurity', $year);
 
         return Arr::get($taxSalaryConfigH, 'percent', 0) / 100;
+    }
+
+    public function getPensionTaxSocialSecurityRate(int $year): float
+    {
+        $taxPensionConfigH = $this->getTaxPensionConfig('socialsecurity', $year);
+
+        return Arr::get($taxPensionConfigH, 'percent', 0) / 100;
     }
 
     /**
@@ -206,5 +250,13 @@ class TaxConfigRepository
     public function getSalaryTaxBracketConfig(int $year): array
     {
         return $this->getTaxSalaryConfig('bracket', $year);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getPensionTaxBracketConfig(int $year): array
+    {
+        return $this->getTaxPensionConfig('bracket', $year);
     }
 }

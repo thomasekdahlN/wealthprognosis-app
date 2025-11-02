@@ -16,6 +16,7 @@
 
 namespace App\Services\Tax;
 
+use App\Services\Utilities\HelperService;
 use App\Support\Contracts\TaxCalculatorInterface;
 use App\Support\ValueObjects\BracketTaxResult;
 use App\Support\ValueObjects\SalaryTaxResult;
@@ -49,8 +50,11 @@ class TaxSalaryService implements TaxCalculatorInterface
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
      */
-    public function __construct(string $country = 'no', ?TaxConfigRepository $taxConfigRepo = null)
-    {
+    public function __construct(
+        string $country = 'no',
+        ?TaxConfigRepository $taxConfigRepo = null,
+        private HelperService $helperService = new HelperService
+    ) {
         $this->country = strtolower($country) ?: 'no';
         $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
     }
@@ -72,8 +76,9 @@ class TaxSalaryService implements TaxCalculatorInterface
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
+     * @param  string  $taxType  The tax type ('salary' or 'pension')
      */
-    public function calculatesalarytax(bool $debug, int $year, int $amount): SalaryTaxResult
+    public function calculatesalarytax(bool $debug, int $year, int $amount, string $taxType = 'salary'): SalaryTaxResult
     {
         $explanation = '';
         $commonTaxAmount = 0; // Fellesskatt
@@ -83,10 +88,16 @@ class TaxSalaryService implements TaxCalculatorInterface
         $taxAveragePercent = 0; // Utregnet hva skatten faktisak er i prosent
         $taxAverageRate = 0; // Utregnet hva skatten faktisak er i rate
 
-        $commonTaxRate = $this->taxConfigRepo->getSalaryTaxCommonRate($year);
-        $commonTaxDeductionAmount = $this->commonDeduction($year, $amount);
-
-        $socialSecurityTaxRate = $this->taxConfigRepo->getSalaryTaxSocialSecurityRate($year);
+        // Get tax rates based on tax type (salary or pension)
+        if ($taxType === 'pension') {
+            $commonTaxRate = $this->taxConfigRepo->getPensionTaxCommonRate($year);
+            $commonTaxDeductionAmount = $this->commonDeduction($year, $amount, 'pension');
+            $socialSecurityTaxRate = $this->taxConfigRepo->getPensionTaxSocialSecurityRate($year);
+        } else {
+            $commonTaxRate = $this->taxConfigRepo->getSalaryTaxCommonRate($year);
+            $commonTaxDeductionAmount = $this->commonDeduction($year, $amount, 'salary');
+            $socialSecurityTaxRate = $this->taxConfigRepo->getSalaryTaxSocialSecurityRate($year);
+        }
 
         $socialSecurityTaxableAmount = $amount; // Man betaler trygdeavgift av hele lønnen uten fradrag
         if ($socialSecurityTaxableAmount > 0) {
@@ -96,7 +107,7 @@ class TaxSalaryService implements TaxCalculatorInterface
         $commonTaxableAmount = $amount - $socialSecurityTaxAmount - $commonTaxDeductionAmount; // Man betaler fellesskatt av lønnen etter at trygdeavgidt og minstefradraget er trukket fra
         $commonTaxAmount = round($commonTaxableAmount * $commonTaxRate);
 
-        $bracketTaxResult = $this->calculateBracketTax($debug, $year, $amount); // Man betaler trinnskatt av hele lønnen uten fradrag
+        $bracketTaxResult = $this->calculateBracketTax($debug, $year, $amount, $taxType); // Man betaler trinnskatt av hele lønnen uten fradrag
         $bracketTaxAmount = $bracketTaxResult->taxAmount;
         $explanation = $bracketTaxResult->explanation;
 
@@ -130,17 +141,23 @@ class TaxSalaryService implements TaxCalculatorInterface
      * @param  bool  $debug  Whether to output debug information
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
+     * @param  string  $taxType  The tax type ('salary' or 'pension')
      */
-    public function calculateBracketTax(bool $debug, int $year, int $amount): BracketTaxResult
+    public function calculateBracketTax(bool $debug, int $year, int $amount, string $taxType = 'salary'): BracketTaxResult
     {
-        $brackets = $this->taxConfigRepo->getSalaryTaxBracketConfig($year);
+        // Get bracket configuration based on tax type
+        if ($taxType === 'pension') {
+            $brackets = $this->taxConfigRepo->getPensionTaxBracketConfig($year);
+        } else {
+            $brackets = $this->taxConfigRepo->getSalaryTaxBracketConfig($year);
+        }
         $totalTaxAmount = 0;
         $prevLimitAmount = 0;
         $explanationParts = [];
 
         foreach ($brackets as $index => $bracket) {
             $bracketPercent = $bracket['percent'] ?? 0;
-            $bracketRate = $bracketPercent / 100; // Convert percent to decimal rate (e.g., 1.7% -> 0.00017)
+            $bracketRate = $this->helperService->percentToRate($bracketPercent); // Convert percent to decimal rate (e.g., 1.7% -> 0.017)
             $bracketLimit = $bracket['limit'] ?? null;
 
             // Determine taxable amount for this bracket
@@ -221,24 +238,31 @@ class TaxSalaryService implements TaxCalculatorInterface
     }
 
     /**
-     * Calculate the standard deduction (minstefradrag) for salary income.
+     * Calculate the standard deduction (minstefradrag) for salary/pension income.
      *
      * The deduction is calculated as a percentage of income, with minimum and maximum limits.
      * This deduction reduces the taxable base for common tax calculations.
      *
      * @param  int  $year  The tax year
      * @param  int  $amount  The salary/pension amount
+     * @param  string  $taxType  The tax type ('salary' or 'pension')
      * @return float The deduction amount
      */
-    public function commonDeduction(int $year, int $amount): float
+    public function commonDeduction(int $year, int $amount, string $taxType = 'salary'): float
     {
-        $deductionConfig = $this->taxConfigRepo->getSalaryTaxDeductionConfig($year);
-        $minAmount = Arr::get($deductionConfig, 'deduction.min');
-        $maxAmount = Arr::get($deductionConfig, 'deduction.max');
-        $percent = Arr::get($deductionConfig, 'deduction.percent');
-        $rate = $percent / 100;
+        // Get deduction configuration based on tax type
+        if ($taxType === 'pension') {
+            $deductionConfig = $this->taxConfigRepo->getPensionTaxDeductionConfig($year);
+        } else {
+            $deductionConfig = $this->taxConfigRepo->getSalaryTaxDeductionConfig($year);
+        }
 
-        $deduction = $amount * rate; // FIX: Er dette riktig da?
+        $minAmount = Arr::get($deductionConfig, 'min');
+        $maxAmount = Arr::get($deductionConfig, 'max');
+        $percent = Arr::get($deductionConfig, 'percent');
+        $rate = $this->helperService->percentToRate($percent);
+
+        $deduction = $amount * $rate;
         if ($deduction > $maxAmount) {
             $deduction = $maxAmount;
         }
@@ -247,6 +271,7 @@ class TaxSalaryService implements TaxCalculatorInterface
         }
 
         Log::debug('commonDeduction', [
+            'taxType' => $taxType,
             'amount' => $amount,
             'min' => $minAmount,
             'max' => $maxAmount,

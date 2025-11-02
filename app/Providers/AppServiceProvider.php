@@ -49,8 +49,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Tax\TaxFortuneService::class, function ($app) {
             return new \App\Services\Tax\TaxFortuneService(
                 'no',
-                $app->make(\App\Services\Tax\TaxConfigRepository::class),
-                $app->make(\App\Services\Tax\TaxConfigPropertyRepository::class)
+                $app->make(\App\Services\Tax\TaxConfigRepository::class)
             );
         });
 
@@ -72,7 +71,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(\App\Services\Utilities\RulesService::class, function ($app) {
-            return new \App\Services\Utilities\RulesService;
+            return new \App\Services\Utilities\RulesService(
+                $app->make(\App\Services\Utilities\HelperService::class)
+            );
         });
 
         // Register Changerate as a singleton
@@ -89,6 +90,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\Processing\YearlyProcessor::class, function ($app) {
             return new \App\Services\Processing\YearlyProcessor(
                 $app->make(\App\Services\Tax\TaxFortuneService::class),
+                $app->make(\App\Services\Tax\TaxCashflowService::class),
                 $app->make(\App\Services\Utilities\HelperService::class),
                 $app->make(\App\Services\AssetTypeService::class)
             );

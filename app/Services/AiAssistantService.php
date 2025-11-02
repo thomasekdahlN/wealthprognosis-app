@@ -1310,7 +1310,7 @@ class AiAssistantService
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<int, string>
      */
     protected function createLifeEvents(array $data, int $configurationId, User $user): array
     {
@@ -1369,7 +1369,7 @@ class AiAssistantService
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<int, string>
      */
     protected function createChildrenEvents(array $data, int $configurationId, User $user): array
     {
@@ -1380,7 +1380,7 @@ class AiAssistantService
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<int, string>
      */
     protected function createInheritanceEvent(array $data, int $configurationId, User $user): array
     {

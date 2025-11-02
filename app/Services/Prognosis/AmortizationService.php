@@ -66,8 +66,8 @@ class AmortizationService
     /** @var int Total loan term in years */
     private int $term_years;
 
-    /** @var float Interest rate (can be a reference to changerate) */
-    private float $interest;
+    /** @var string|float Interest rate (can be a reference to changerate like "changerates.interest" or a numeric value) */
+    private string|float $interest;
 
     /** @var int Number of payment terms per year (always 1 for annual) */
     private int $terms;
@@ -93,8 +93,8 @@ class AmortizationService
     /** @var object Changerate service for interest rate lookup */
     private object $changerate;
 
-    /** @var float|int|null Cached changerate value */
-    private float|int|null $assetChangerateValue;
+    /** @var string|null Cached changerate type/variable name */
+    private ?string $assetChangerateValue;
 
     /** @var float Remaining mortgage amount for current calculation */
     private float $remainingMortgageAmount;
@@ -164,11 +164,15 @@ class AmortizationService
         $this->year_start = (int) $year;
         $this->term_years = (int) Arr::get($mortgage, 'years');
         $this->amount = $this->remainingMortgageAmount = (int) Arr::get($mortgage, 'amount');
-        $this->interest = (float) Arr::get($mortgage, 'interest');
+
+        // Interest can be a changerate reference (string) or a numeric value
+        $interestValue = Arr::get($mortgage, 'interest');
+        $this->interest = is_numeric($interestValue) ? (float) $interestValue : (string) $interestValue;
+
         $this->terms = 1; // Annual payments
         $this->remainingYears = $this->terms * $this->term_years;
         $this->balanceAmount = $this->amount;
-        $this->year_end = $year + $this->term_years;
+        $this->year_end = $year + $this->term_years - 1; // Last year of the loan (inclusive)
         $this->interestOnlyYears = (int) Arr::get($mortgage, 'interestOnlyYears', 0);
         $this->interestOnlyYearEnd = $year + $this->interestOnlyYears;
         $this->extraDownpaymentAmount = (int) Arr::get($mortgage, 'extraDownpaymentAmount', 0);
@@ -363,16 +367,9 @@ class AmortizationService
             $this->logCalculation($year, $calculation, $interestPercent, $interestRate);
         }
 
-        // Store mortgage data
-        if ($this->balanceAmount > 0) {
-            $mortgageData = $this->createMortgageData($calculation, $extraDownpaymentAmount, $year);
-            $this->dataH[$this->assettname][$year]['mortgage'] = $mortgageData->toArray();
-        } else {
-            // Mortgage paid off early
-            $this->balanceAmount = 0;
-            $mortgageData = MortgageData::paidOff($this->remainingYears);
-            $this->dataH[$this->assettname][$year]['mortgage'] = $mortgageData->toArray();
-        }
+        // Store mortgage data - always store if we had a remaining balance at the start of the year
+        $mortgageData = $this->createMortgageData($calculation, $extraDownpaymentAmount, $year);
+        $this->dataH[$this->assettname][$year]['mortgage'] = $mortgageData->toArray();
     }
 
     /**

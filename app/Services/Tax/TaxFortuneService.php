@@ -16,6 +16,7 @@
 
 namespace App\Services\Tax;
 
+use App\Services\Utilities\HelperService;
 use App\Support\Contracts\TaxCalculatorInterface;
 use App\Support\ValueObjects\FortuneCalculationResult;
 use App\Support\ValueObjects\FortuneTaxResult;
@@ -50,6 +51,7 @@ class TaxFortuneService implements TaxCalculatorInterface
     public function __construct(
         string $country = 'no',
         ?TaxConfigRepository $taxConfigRepo = null,
+        private HelperService $helperService = new HelperService
     ) {
         $this->country = strtolower($country) ?: 'no';
         $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
@@ -84,6 +86,19 @@ class TaxFortuneService implements TaxCalculatorInterface
         ?int $mortgageBalanceAmount,
         ?bool $taxableAmountOverride = false
     ): FortuneCalculationResult {
+        // Skip tax calculation if tax_type is null
+        if ($taxType === null) {
+            return new FortuneCalculationResult(
+                taxableFortuneAmount: 0,
+                taxableFortunePercent: 0,
+                taxableFortuneRate: 0,
+                taxFortuneAmount: 0,
+                taxFortunePercent: 0,
+                taxFortuneRate: 0,
+                explanation: 'Tax type is null, no tax calculation performed'
+            );
+        }
+
         $taxableFortunePercent = 0;
         $taxableFortuneRate = 0;
         $explanation = '';
@@ -179,7 +194,7 @@ class TaxFortuneService implements TaxCalculatorInterface
 
         foreach ($brackets as $bracket) {
             $percent = Arr::get($bracket, 'percent', 0); // Percentage (e.g., 1.0 = 1%)
-            $rate = $percent / 100; // Convert percentage to decimal
+            $rate = $this->helperService->percentToRate($percent); // Convert percentage to decimal
             $limit = Arr::get($bracket, 'limit', PHP_FLOAT_MAX); // If no limit, use max float
 
             if ($amount > $previousLimit) {

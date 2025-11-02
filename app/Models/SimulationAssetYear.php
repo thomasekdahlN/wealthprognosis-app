@@ -38,7 +38,9 @@ class SimulationAssetYear extends Model
         'income_transfer_amount',
         'income_source',
         'income_changerate',
+        'income_changerate_percent',
         'income_repeat',
+        'income_description',
         // Expense fields
         'expence_amount',
         'expence_factor',
@@ -47,13 +49,15 @@ class SimulationAssetYear extends Model
         'expence_transfer_amount',
         'expence_source',
         'expence_changerate',
+        'expence_changerate_percent',
         'expence_repeat',
+        'expence_description',
         // Cashflow fields
         'cashflow_description',
-        'cashflow_after_taxamount',
-        'cashflow_before_taxamount',
+        'cashflow_after_tax_amount',
+        'cashflow_before_tax_amount',
         'cashflow_before_tax_aggregated_amount',
-        'cashflow_after_tax_aggregatedamount',
+        'cashflow_after_tax_aggregated_amount',
         'cashflow_tax_amount',
         'cashflow_tax_percent',
         'cashflow_rule',
@@ -72,7 +76,6 @@ class SimulationAssetYear extends Model
         'asset_paid_amount',
         'asset_paid_initial_amount',
         'asset_transfered_amount',
-        'asset_mortgage_rate_percent',
         'asset_taxable_percent',
         'asset_taxable_amount',
         'asset_taxable_initial_amount',
@@ -83,12 +86,18 @@ class SimulationAssetYear extends Model
         'asset_taxable_property_amount',
         'asset_tax_property_percent',
         'asset_tax_property_amount',
+        'asset_taxable_fortune_amount',
+        'asset_taxable_fortune_percent',
+        'asset_tax_fortune_amount',
+        'asset_tax_fortune_percent',
+        'asset_gjeldsfradrag_amount',
         'asset_changerate',
         'asset_changerate_percent',
         'asset_rule',
         'asset_transfer',
         'asset_source',
         'asset_repeat',
+        'asset_description',
         // Mortgage fields
         'mortgage_amount',
         'mortgage_term_amount',
@@ -99,9 +108,11 @@ class SimulationAssetYear extends Model
         'mortgage_transfered_amount',
         'mortgage_interest_percent',
         'mortgage_years',
+        'mortgage_interest_only_years',
         'mortgage_gebyr_amount',
         'mortgage_tax_deductable_amount',
         'mortgage_tax_deductable_percent',
+        'mortgage_description',
         // Realization fields
         'realization_description',
         'realization_amount',
@@ -111,19 +122,34 @@ class SimulationAssetYear extends Model
         'realization_tax_shield_amount',
         'realization_tax_shield_percent',
         // Yield fields
-        'yield_brutto_percent',
-        'yield_netto_percent',
+        'yield_gross_percent',
+        'yield_net_percent',
+        'yield_cap_percent',
         // Potential fields
         'potential_income_amount',
         'potential_mortgage_amount',
+        // Metrics fields
+        'metrics_roi_percent',
+        'metrics_total_return_amount',
+        'metrics_total_return_percent',
+        'metrics_coc_percent',
+        'metrics_noi',
+        'metrics_grm',
+        'metrics_dscr',
+        'metrics_ltv_percent',
+        'metrics_de_ratio',
+        'metrics_roe_percent',
+        'metrics_roa_percent',
+        'metrics_pb_ratio',
+        'metrics_ev_ebitda',
+        'metrics_current_ratio',
         // F.I.R.E. fields
         'fire_percent',
         'fire_income_amount',
         'fire_expence_amount',
-        'fire_rate_percent',
         'fire_cashflow_amount',
-        'fire_savings_amount',
-        'fire_savings_rate_percent',
+        'fire_saving_amount',
+        'fire_saving_rate_percent',
         // Audit fields
         'created_by',
         'updated_by',
@@ -135,17 +161,19 @@ class SimulationAssetYear extends Model
         'year' => 'integer',
         // Income
         'income_amount' => 'decimal:2',
+        'income_changerate_percent' => 'decimal:2',
         'income_transfer_amount' => 'decimal:2',
         'income_repeat' => 'boolean',
         // Expense
         'expence_amount' => 'decimal:2',
+        'expence_changerate_percent' => 'decimal:2',
         'expence_transfer_amount' => 'decimal:2',
         'expence_repeat' => 'boolean',
         // Cashflow
-        'cashflow_after_taxamount' => 'decimal:2',
-        'cashflow_before_taxamount' => 'decimal:2',
+        'cashflow_after_tax_amount' => 'decimal:2',
+        'cashflow_before_tax_amount' => 'decimal:2',
         'cashflow_before_tax_aggregated_amount' => 'decimal:2',
-        'cashflow_after_tax_aggregatedamount' => 'decimal:2',
+        'cashflow_after_tax_aggregated_amount' => 'decimal:2',
         'cashflow_tax_amount' => 'decimal:2',
         'cashflow_tax_percent' => 'decimal:2',
         'cashflow_transfer_amount' => 'decimal:2',
@@ -160,7 +188,6 @@ class SimulationAssetYear extends Model
         'asset_paid_amount' => 'decimal:2',
         'asset_paid_initial_amount' => 'decimal:2',
         'asset_transfered_amount' => 'decimal:2',
-        'asset_mortgage_rate_percent' => 'decimal:2',
         'asset_taxable_percent' => 'decimal:2',
         'asset_taxable_amount' => 'decimal:2',
         'asset_taxable_initial_amount' => 'decimal:2',
@@ -171,6 +198,11 @@ class SimulationAssetYear extends Model
         'asset_taxable_property_amount' => 'decimal:2',
         'asset_tax_property_percent' => 'decimal:2',
         'asset_tax_property_amount' => 'decimal:2',
+        'asset_taxable_fortune_amount' => 'decimal:2',
+        'asset_taxable_fortune_percent' => 'decimal:2',
+        'asset_tax_fortune_amount' => 'decimal:2',
+        'asset_tax_fortune_percent' => 'decimal:2',
+        'asset_gjeldsfradrag_amount' => 'decimal:2',
         'asset_changerate_percent' => 'decimal:2',
         'asset_repeat' => 'boolean',
         // Mortgage
@@ -181,7 +213,9 @@ class SimulationAssetYear extends Model
         'mortgage_balance_amount' => 'decimal:2',
         'mortgage_extra_downpayment_amount' => 'decimal:2',
         'mortgage_transfered_amount' => 'decimal:2',
+        'mortgage_interest_percent' => 'decimal:2',
         'mortgage_years' => 'integer',
+        'mortgage_interest_only_years' => 'integer',
         'mortgage_gebyr_amount' => 'decimal:2',
         'mortgage_tax_deductable_amount' => 'decimal:2',
         'mortgage_tax_deductable_percent' => 'decimal:2',
@@ -193,19 +227,34 @@ class SimulationAssetYear extends Model
         'realization_tax_shield_amount' => 'decimal:2',
         'realization_tax_shield_percent' => 'decimal:2',
         // Yield
-        'yield_brutto_percent' => 'decimal:2',
-        'yield_netto_percent' => 'decimal:2',
+        'yield_gross_percent' => 'decimal:2',
+        'yield_net_percent' => 'decimal:2',
+        'yield_cap_percent' => 'decimal:2',
         // Potential
         'potential_income_amount' => 'decimal:2',
         'potential_mortgage_amount' => 'decimal:2',
+        // Metrics
+        'metrics_roi_percent' => 'decimal:2',
+        'metrics_total_return_amount' => 'decimal:2',
+        'metrics_total_return_percent' => 'decimal:2',
+        'metrics_coc_percent' => 'decimal:2',
+        'metrics_noi' => 'decimal:2',
+        'metrics_grm' => 'decimal:2',
+        'metrics_dscr' => 'decimal:2',
+        'metrics_ltv_percent' => 'decimal:2',
+        'metrics_de_ratio' => 'decimal:2',
+        'metrics_roe_percent' => 'decimal:2',
+        'metrics_roa_percent' => 'decimal:2',
+        'metrics_pb_ratio' => 'decimal:2',
+        'metrics_ev_ebitda' => 'decimal:2',
+        'metrics_current_ratio' => 'decimal:2',
         // F.I.R.E.
         'fire_percent' => 'decimal:2',
         'fire_income_amount' => 'decimal:2',
         'fire_expence_amount' => 'decimal:2',
-        'fire_rate_percent' => 'decimal:2',
         'fire_cashflow_amount' => 'decimal:2',
-        'fire_savings_amount' => 'decimal:2',
-        'fire_savings_rate_percent' => 'decimal:2',
+        'fire_saving_amount' => 'decimal:2',
+        'fire_saving_rate_percent' => 'decimal:2',
     ];
 
     // Factor enum constants
@@ -286,7 +335,7 @@ class SimulationAssetYear extends Model
      */
     public function getNetCashflowAmount(): float
     {
-        return $this->cashflow_after_taxamount ?? 0;
+        return $this->cashflow_after_tax_amount ?? 0;
     }
 
     /**
@@ -294,7 +343,7 @@ class SimulationAssetYear extends Model
      */
     public function getFireSavingsRatePercent(): float
     {
-        return $this->fire_savings_rate_percent ?? 0;
+        return $this->fire_saving_rate_percent ?? 0;
     }
 
     /**

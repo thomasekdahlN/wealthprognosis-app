@@ -32,6 +32,10 @@ use Illuminate\Support\Facades\Log;
  */
 class RulesService
 {
+    public function __construct(
+        private HelperService $helperService
+    ) {}
+
     /**
      * Main entry point for calculating rule transformations on amounts.
      *
@@ -198,19 +202,22 @@ class RulesService
         $calcAmount = 0;
 
         if ($ruleH[1][0] == '-') {
-            $newAmount = (int) round($amount * ((-$percent / 100) + 1));
+            $rate = $this->helperService->percentToRate(-$percent);
+            $newAmount = (int) round($amount * ($rate + 1));
             $explanation = "$amount-$percent%=$newAmount";
             $calcAmount = $newAmount - $amount;
 
         } elseif ($ruleH[1][0] == '+') {
-            $newAmount = (int) round($amount * (($percent / 100) + 1));
+            $rate = $this->helperService->percentToRate($percent);
+            $newAmount = (int) round($amount * ($rate + 1));
             $explanation = "$amount+$percent%=$newAmount";
             $calcAmount = $newAmount - $amount;
 
         } else {
             // When no sign is given, we only want the part of the amount. Its like taking this percentage out of the amount.
             $newAmount = $amount; // We do not change the original amount
-            $calcAmount = (int) round($amount * ($percent / 100));
+            $rate = $this->helperService->percentToRate($percent);
+            $calcAmount = (int) round($amount * $rate);
             $explanation = "$percent% of $amount=$calcAmount";
         }
 

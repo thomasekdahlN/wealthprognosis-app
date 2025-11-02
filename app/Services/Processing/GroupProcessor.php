@@ -201,7 +201,12 @@ class GroupProcessor
 
     /**
      * Calculate fortune tax for groups.
-     * We can not subtract mortgage again, it is already subtracted in the taxableAmount part, therefore we send in zero as mortgage here.
+     *
+     * At the group level, we use the aggregated taxableFortuneAmount (which already has mortgage deducted
+     * at the individual asset level) and the aggregated gjeldsfradragAmount (total mortgage balance).
+     *
+     * The group calculation applies the standard deduction (deduct=true) using the bracket system,
+     * which gives the correct total fortune tax including gjeldsfradrag (debt deduction).
      *
      * @param  array<string, mixed>  $totalH  Reference to total group data
      * @param  array<string, mixed>  $companyH  Reference to company group data
@@ -214,29 +219,41 @@ class GroupProcessor
      */
     public function calculateFortuneTax(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
-        $totalResult = $this->taxfortune->calculatefortunetax(false, $year, 'total', Arr::get($totalH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($totalH, "$year.asset.taxableAmount", $totalResult->taxableFortuneAmount);
-        Arr::set($totalH, "$year.asset.taxablePercent", $totalResult->taxableFortunePercent);
-        Arr::set($totalH, "$year.asset.taxableRate", $totalResult->taxableFortuneRate);
+        // Total group fortune tax calculation
+        $totalTaxableFortuneAmount = Arr::get($totalH, "$year.asset.taxableFortuneAmount", 0);
+        $totalGjeldsfradragAmount = Arr::get($totalH, "$year.asset.gjeldsfradragAmount", 0);
 
+        $totalResult = $this->taxfortune->calculatefortunetax(false, $year, 'total', $totalTaxableFortuneAmount, 0, true);
+        Arr::set($totalH, "$year.asset.taxableFortuneAmountAfterDeduction", $totalResult->taxableFortuneAmount);
         Arr::set($totalH, "$year.asset.taxFortuneAmount", $totalResult->taxFortuneAmount);
-        Arr::set($totalH, "$year.asset.taxFortunePercent", $totalResult->taxFortunePercent); // Use Rate not Percent for Excel export
-        Arr::set($totalH, "$year.asset.taxFortuneRate", $totalResult->taxFortuneRate); // Use Rate not Percent for Excel export
+        Arr::set($totalH, "$year.asset.taxFortunePercent", $totalResult->taxFortunePercent);
+        Arr::set($totalH, "$year.asset.taxFortuneRate", $totalResult->taxFortuneRate);
+        Arr::set($totalH, "$year.asset.taxFortuneAveragePercent", $totalResult->taxFortuneAveragePercent);
+        Arr::set($totalH, "$year.asset.taxFortuneAverageRate", $totalResult->taxFortuneAverageRate);
 
-        $companyResult = $this->taxfortune->calculatefortunetax(false, $year, 'company', Arr::get($companyH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($companyH, "$year.asset.taxableAmount", $companyResult->taxableFortuneAmount);
-        Arr::set($companyH, "$year.asset.taxablePercent", $companyResult->taxableFortunePercent);
-        Arr::set($companyH, "$year.asset.taxableRate", $companyResult->taxableFortuneRate);
+        // Company group fortune tax calculation
+        $companyTaxableFortuneAmount = Arr::get($companyH, "$year.asset.taxableFortuneAmount", 0);
+        $companyGjeldsfradragAmount = Arr::get($companyH, "$year.asset.gjeldsfradragAmount", 0);
 
+        $companyResult = $this->taxfortune->calculatefortunetax(false, $year, 'company', $companyTaxableFortuneAmount, 0, true);
+        Arr::set($companyH, "$year.asset.taxableFortuneAmountAfterDeduction", $companyResult->taxableFortuneAmount);
         Arr::set($companyH, "$year.asset.taxFortuneAmount", $companyResult->taxFortuneAmount);
-        Arr::set($companyH, "$year.asset.taxFortunePercent", $companyResult->taxFortunePercent); // Use Rate not Percent for Excel export
-        Arr::set($companyH, "$year.asset.taxFortuneRate", $companyResult->taxFortuneRate); // Use Rate not Percent for Excel export
+        Arr::set($companyH, "$year.asset.taxFortunePercent", $companyResult->taxFortunePercent);
+        Arr::set($companyH, "$year.asset.taxFortuneRate", $companyResult->taxFortuneRate);
+        Arr::set($companyH, "$year.asset.taxFortuneAveragePercent", $companyResult->taxFortuneAveragePercent);
+        Arr::set($companyH, "$year.asset.taxFortuneAverageRate", $companyResult->taxFortuneAverageRate);
 
-        $privateResult = $this->taxfortune->calculatefortunetax(false, $year, 'private', Arr::get($privateH, "$year.asset.taxableAmount", 0), 0, true);
-        Arr::set($privateH, "$year.asset.taxableAmount", $privateResult->taxableFortuneAmount);
+        // Private group fortune tax calculation
+        $privateTaxableFortuneAmount = Arr::get($privateH, "$year.asset.taxableFortuneAmount", 0);
+        $privateGjeldsfradragAmount = Arr::get($privateH, "$year.asset.gjeldsfradragAmount", 0);
+
+        $privateResult = $this->taxfortune->calculatefortunetax(false, $year, 'private', $privateTaxableFortuneAmount, 0, true);
+        Arr::set($privateH, "$year.asset.taxableFortuneAmountAfterDeduction", $privateResult->taxableFortuneAmount);
         Arr::set($privateH, "$year.asset.taxFortuneAmount", $privateResult->taxFortuneAmount);
-        Arr::set($privateH, "$year.asset.taxFortunePercent", $privateResult->taxFortunePercent); // Use Rate (not Percent for Excel export
-        Arr::set($privateH, "$year.asset.taxFortuneRate", $privateResult->taxFortuneRate); // Use Rate not Percent for Excel export
+        Arr::set($privateH, "$year.asset.taxFortunePercent", $privateResult->taxFortunePercent);
+        Arr::set($privateH, "$year.asset.taxFortuneRate", $privateResult->taxFortuneRate);
+        Arr::set($privateH, "$year.asset.taxFortuneAveragePercent", $privateResult->taxFortuneAveragePercent);
+        Arr::set($privateH, "$year.asset.taxFortuneAverageRate", $privateResult->taxFortuneAverageRate);
     }
 
     /**
@@ -641,9 +658,9 @@ class GroupProcessor
                 foreach ($statisticsH as $year => $typeH) {
                     foreach ($typeH as $typename => $data) {
                         if ($typeH['total']['amount'] > 0) {
-                            $statisticsH[$year][$typename]['percent'] = round(($data['amount'] / $typeH['total']['amount']) * 100);
+                            $statisticsH[$year][$typename]['rate'] = round(($data['amount'] / $typeH['total']['amount']) * 100);
                         } else {
-                            $statisticsH[$year][$typename]['percent'] = 0;
+                            $statisticsH[$year][$typename]['rate'] = 0;
                         }
                     }
                 }

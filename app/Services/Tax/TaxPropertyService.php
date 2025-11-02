@@ -16,6 +16,7 @@
 
 namespace App\Services\Tax;
 
+use App\Services\Utilities\HelperService;
 use App\Support\ValueObjects\PropertyTaxResult;
 use Illuminate\Support\Facades\Log;
 
@@ -34,8 +35,10 @@ class TaxPropertyService
      */
     private \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyConfig;
 
-    public function __construct(string $country = 'no')
-    {
+    public function __construct(
+        string $country = 'no',
+        private HelperService $helperService = new HelperService
+    ) {
         $this->country = $country;
 
         // Use the singleton instance from the service container
@@ -56,7 +59,7 @@ class TaxPropertyService
      *
      * @param  int  $year  The year for which the tax is being calculated.
      * @param  string  $taxGroup  The tax group for the calculation ('private' or 'company').
-     * @param  string  $taxProperty  The municipality/property code for the calculation.
+     * @param  string  $taxPropertyArea  The municipality/property code for the calculation.
      * @param  float  $amount  The property market value for the calculation.
      */
     public function calculatePropertyTax(int $year, string $taxGroup, string $taxPropertyArea, float $amount): PropertyTaxResult
@@ -78,7 +81,7 @@ class TaxPropertyService
         $taxPropertyPercent = $taxPropertyRate * 100; // Rate to percent (e.g., 0.0024 -> 0.24%)
         $taxPropertyDeductionAmount = $config->deductionAmount;
         $taxablePropertyPercent = $config->taxablePercent; // e.g., 70.00 for 70%
-        $taxablePropertyRate = $taxablePropertyPercent / 100;
+        $taxablePropertyRate = $this->helperService->percentToRate($taxablePropertyPercent);
 
         // Step 1: Apply the deduction (bunnfradrag) to the reduced value
         $taxablePropertyAmount = max(0, ($amount * $taxablePropertyRate) - $taxPropertyDeductionAmount);
