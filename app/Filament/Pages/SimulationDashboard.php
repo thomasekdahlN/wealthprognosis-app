@@ -2,10 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\SimulationAssetAllocationChartWidget;
-use App\Filament\Widgets\SimulationFireAnalysisWidget;
-use App\Filament\Widgets\SimulationStatsOverviewWidget;
-use App\Filament\Widgets\SimulationTaxAnalysisWidget;
 use App\Models\SimulationConfiguration;
 use Filament\Actions\Action;
 use Filament\Pages\Dashboard;
@@ -231,14 +227,15 @@ class SimulationDashboard extends Dashboard
             return [];
         }
 
-        // Group FIRE widgets together; remove projections per request
         return [
-            SimulationStatsOverviewWidget::class,
-            SimulationFireAnalysisWidget::class,
-            SimulationTaxAnalysisWidget::class,
-            // Removed SimulationNetWorthChartWidget::class,
-            // Removed SimulationCashFlowChartWidget::class,
-            SimulationAssetAllocationChartWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationKeyFiguresWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationMilestonesWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationNetWorthGrowthWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationIncomeVsExpensesWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationAnnualCashFlowWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationFireProgressionWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationAssetAllocationWidget::class,
+            \App\Filament\Widgets\Simulation\SimulationDebtAllocationWidget::class,
         ];
     }
 
@@ -301,7 +298,23 @@ class SimulationDashboard extends Dashboard
             // ignore in direct-instantiation contexts without bound router
         }
 
+        $detailedReportsUrl = '#';
+        try {
+            $detailedReportsUrl = route('filament.admin.pages.simulation-detailed-reporting-dashboard', [
+                'configuration' => $this->simulationConfiguration->asset_configuration_id,
+                'simulation' => $this->simulationConfiguration->id,
+            ]);
+        } catch (\Throwable $e) {
+            // ignore in direct-instantiation contexts without bound router
+        }
+
         return [
+            Action::make('detailed_reports')
+                ->label('View Detailed Reports')
+                ->icon('heroicon-o-document-chart-bar')
+                ->color('success')
+                ->url($detailedReportsUrl),
+
             Action::make('assets')
                 ->label('View Detailed Assets')
                 ->icon('heroicon-o-building-office-2')

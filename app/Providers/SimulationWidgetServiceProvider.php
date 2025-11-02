@@ -20,10 +20,31 @@ class SimulationWidgetServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Manually register simulation widgets as Livewire components
-        Livewire::component('app.filament.widgets.simulation-stats-overview-widget', \App\Filament\Widgets\SimulationStatsOverviewWidget::class);
-        Livewire::component('app.filament.widgets.simulation-fire-analysis-widget', \App\Filament\Widgets\SimulationFireAnalysisWidget::class);
-        Livewire::component('app.filament.widgets.simulation-tax-analysis-widget', \App\Filament\Widgets\SimulationTaxAnalysisWidget::class);
-        Livewire::component('app.filament.widgets.simulation-asset-allocation-chart-widget', \App\Filament\Widgets\SimulationAssetAllocationChartWidget::class);
+        // Manually register simulation dashboard widgets as Livewire components
+        Livewire::component('app.filament.widgets.simulation.simulation-key-figures-widget', \App\Filament\Widgets\Simulation\SimulationKeyFiguresWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-milestones-widget', \App\Filament\Widgets\Simulation\SimulationMilestonesWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-net-worth-growth-widget', \App\Filament\Widgets\Simulation\SimulationNetWorthGrowthWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-income-vs-expenses-widget', \App\Filament\Widgets\Simulation\SimulationIncomeVsExpensesWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-annual-cash-flow-widget', \App\Filament\Widgets\Simulation\SimulationAnnualCashFlowWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-fire-progression-widget', \App\Filament\Widgets\Simulation\SimulationFireProgressionWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-asset-allocation-widget', \App\Filament\Widgets\Simulation\SimulationAssetAllocationWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-debt-allocation-widget', \App\Filament\Widgets\Simulation\SimulationDebtAllocationWidget::class);
+
+        // Manually register detailed reporting widgets as Livewire components
+        Livewire::component('app.filament.widgets.simulation.simulation-asset-drill-down-table-widget', \App\Filament\Widgets\Simulation\SimulationAssetDrillDownTableWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-income-report-widget', \App\Filament\Widgets\Simulation\SimulationIncomeReportWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-expense-report-widget', \App\Filament\Widgets\Simulation\SimulationExpenseReportWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-tax-report-widget', \App\Filament\Widgets\Simulation\SimulationTaxReportWidget::class);
+        Livewire::component('app.filament.widgets.simulation.simulation-financial-metrics-heatmap-widget', \App\Filament\Widgets\Simulation\SimulationFinancialMetricsHeatmapWidget::class);
+
+        // Manually register comparison widgets as Livewire components
+        Livewire::component('app.filament.widgets.compare.compare-scenario-assumptions-widget', \App\Filament\Widgets\Compare\CompareScenarioAssumptionsWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-key-outcomes-widget', \App\Filament\Widgets\Compare\CompareKeyOutcomesWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-net-worth-trajectory-widget', \App\Filament\Widgets\Compare\CompareNetWorthTrajectoryWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-cash-flow-trajectory-widget', \App\Filament\Widgets\Compare\CompareCashFlowTrajectoryWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-delta-chart-widget', \App\Filament\Widgets\Compare\CompareDeltaChartWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-debt-load-widget', \App\Filament\Widgets\Compare\CompareDebtLoadWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-risk-metrics-widget', \App\Filament\Widgets\Compare\CompareRiskMetricsWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-ai-analysis-widget', \App\Filament\Widgets\Compare\CompareAiAnalysisWidget::class);
     }
 }

@@ -49,35 +49,35 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->widgets([
                 // ROW 1: Asset Overview (sort = 0) - 4 stats in 1 widget = 4 per row
-                \App\Filament\Widgets\AssetOverviewWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationAssetOverviewWidget::class,
 
                 // ROW 2: Monthly Cash Flow (sort = 1) - 4 stats in 1 widget = 4 per row
-                \App\Filament\Widgets\MonthlyCashflowWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationMonthlyCashflowWidget::class,
 
                 // Chart Widgets (FIRE grouped together; removed projections)
                 // Removed NetWorthOverTimeWidget per request
                 // Removed YearlyCashflowWidget per request
                 // Keep FIRE widgets grouped together
-                \App\Filament\Widgets\FireProgressAndCrossover::class,
-                \App\Filament\Widgets\SavingsRateOverTimeWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationFireProgressWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationSavingsRateOverTimeWidget::class,
 
                 // FIRE chart + single-value widgets in one row
-                \App\Filament\Widgets\FireMetricsOverview::class,
-                \App\Filament\Widgets\FireCrossoverWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationFireMetricsOverviewWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationFireCrossoverWidget::class,
 
                 // Net Worth & Cash Flow over time (respect active asset configuration)
-                \App\Filament\Widgets\NetWorthOverTime::class,
-                \App\Filament\Widgets\CashFlowOverTime::class,
+                \App\Filament\Widgets\Configuration\ConfigurationNetWorthOverTimeWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationCashFlowOverTimeWidget::class,
 
                 // Asset Allocation Charts (3 different groupings)
-                \App\Filament\Widgets\AssetAllocationByType::class,
-                \App\Filament\Widgets\AssetAllocationByTaxType::class,
-                \App\Filament\Widgets\AssetAllocationByCategory::class,
+                \App\Filament\Widgets\Configuration\ConfigurationAssetAllocationByTypeWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationAssetAllocationByTaxTypeWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationAssetAllocationByCategoryWidget::class,
 
                 // Additional charts
-                \App\Filament\Widgets\ActualTaxRateOverTime::class,
-                \App\Filament\Widgets\RetirementReadinessChart::class,
-                \App\Filament\Widgets\ExpenseBreakdownChart::class,
+                \App\Filament\Widgets\Configuration\ConfigurationActualTaxRateOverTimeWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationRetirementReadinessWidget::class,
+                \App\Filament\Widgets\Configuration\ConfigurationExpenseBreakdownWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
