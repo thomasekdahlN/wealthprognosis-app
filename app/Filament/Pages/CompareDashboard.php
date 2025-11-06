@@ -76,14 +76,14 @@ class CompareDashboard extends Dashboard
         if ($this->simulationAId) {
             $this->simulationA = SimulationConfiguration::where('user_id', auth()->id())
                 ->where('asset_configuration_id', $this->assetConfiguration->id)
-                ->with(['simulationAssets.simulationAssetYears', 'simulationAssets.asset'])
+                ->with(['simulationAssets.simulationAssetYears'])
                 ->find($this->simulationAId);
         }
 
         if ($this->simulationBId) {
             $this->simulationB = SimulationConfiguration::where('user_id', auth()->id())
                 ->where('asset_configuration_id', $this->assetConfiguration->id)
-                ->with(['simulationAssets.simulationAssetYears', 'simulationAssets.asset'])
+                ->with(['simulationAssets.simulationAssetYears'])
                 ->find($this->simulationBId);
         }
     }
@@ -133,7 +133,15 @@ class CompareDashboard extends Dashboard
                         ->options(function () {
                             return SimulationConfiguration::where('user_id', auth()->id())
                                 ->where('asset_configuration_id', $this->assetConfiguration->id)
-                                ->pluck('name', 'id');
+                                ->get()
+                                ->mapWithKeys(function ($sim) {
+                                    $label = $sim->name;
+                                    if ($sim->description) {
+                                        $label .= ' - '.$sim->description;
+                                    }
+
+                                    return [$sim->id => $label];
+                                });
                         })
                         ->searchable()
                         ->required()
@@ -144,7 +152,15 @@ class CompareDashboard extends Dashboard
                         ->options(function () {
                             return SimulationConfiguration::where('user_id', auth()->id())
                                 ->where('asset_configuration_id', $this->assetConfiguration->id)
-                                ->pluck('name', 'id');
+                                ->get()
+                                ->mapWithKeys(function ($sim) {
+                                    $label = $sim->name;
+                                    if ($sim->description) {
+                                        $label .= ' - '.$sim->description;
+                                    }
+
+                                    return [$sim->id => $label];
+                                });
                         })
                         ->searchable()
                         ->required()
@@ -173,20 +189,27 @@ class CompareDashboard extends Dashboard
         }
 
         return [
-            \App\Filament\Widgets\Compare\CompareScenarioAssumptionsWidget::class,
             \App\Filament\Widgets\Compare\CompareKeyOutcomesWidget::class,
-            \App\Filament\Widgets\Compare\CompareNetWorthTrajectoryWidget::class,
+            // Row 1: Cash Flow, Income, Expenses (3 widgets)
             \App\Filament\Widgets\Compare\CompareCashFlowTrajectoryWidget::class,
-            \App\Filament\Widgets\Compare\CompareDeltaChartWidget::class,
+            \App\Filament\Widgets\Compare\CompareAnnualIncomeWidget::class,
+            \App\Filament\Widgets\Compare\CompareAnnualExpensesWidget::class,
+            // Row 2: Net Worth, Debt, FIRE (3 widgets)
+            \App\Filament\Widgets\Compare\CompareNetWorthTrajectoryWidget::class,
             \App\Filament\Widgets\Compare\CompareDebtLoadWidget::class,
-            \App\Filament\Widgets\Compare\CompareRiskMetricsWidget::class,
+            \App\Filament\Widgets\Compare\CompareFireAchievementWidget::class,
+            // Row 3: Tax widgets (3 widgets)
+            \App\Filament\Widgets\Compare\CompareTotalTaxWidget::class,
+            \App\Filament\Widgets\Compare\CompareTaxToIncomeWidget::class,
+            \App\Filament\Widgets\Compare\CompareTaxToNetWorthWidget::class,
+            // AI Analysis at the end
             \App\Filament\Widgets\Compare\CompareAiAnalysisWidget::class,
         ];
     }
 
     public function getColumns(): int
     {
-        return 1;
+        return 3;
     }
 
     protected function getHeaderWidgets(): array

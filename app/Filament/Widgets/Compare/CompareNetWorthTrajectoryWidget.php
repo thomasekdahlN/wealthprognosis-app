@@ -12,15 +12,16 @@
 namespace App\Filament\Widgets\Compare;
 
 use App\Models\SimulationConfiguration;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class CompareNetWorthTrajectoryWidget extends ChartWidget
 {
-    protected ?string $heading = 'Net Worth Trajectory Comparison';
+    protected ?string $heading = 'Net Worth Trajectory (Before & After Realization Tax)';
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 13;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 1;
 
     public ?SimulationConfiguration $simulationA = null;
 
@@ -46,10 +47,13 @@ class CompareNetWorthTrajectoryWidget extends ChartWidget
             ];
         }
 
-        // Get all years from both simulations
+        // Get all years from both simulations, starting from previous year
+        $startYear = now()->year - 1;
+
         $yearsA = $this->simulationA->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -57,6 +61,7 @@ class CompareNetWorthTrajectoryWidget extends ChartWidget
         $yearsB = $this->simulationB->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -66,49 +71,69 @@ class CompareNetWorthTrajectoryWidget extends ChartWidget
         // Calculate net worth for each year for both simulations
         $netWorthA = [];
         $netWorthB = [];
+        $netWorthAfterTaxA = [];
+        $netWorthAfterTaxB = [];
 
         foreach ($allYears as $year) {
-            $assetsA = $this->simulationA->simulationAssets
+            $yearDataA = $this->simulationA->simulationAssets
                 ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('asset_market_amount');
+                ->where('year', $year);
 
-            $debtA = $this->simulationA->simulationAssets
-                ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('mortgage_balance_amount');
+            $assetsA = $yearDataA->sum('asset_market_amount');
+            $debtA = $yearDataA->sum('mortgage_balance_amount');
+            $realizationTaxA = $yearDataA->sum('realization_tax_amount');
 
             $netWorthA[] = round($assetsA - $debtA, 2);
+            $netWorthAfterTaxA[] = round($assetsA - $debtA - $realizationTaxA, 2);
 
-            $assetsB = $this->simulationB->simulationAssets
+            $yearDataB = $this->simulationB->simulationAssets
                 ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('asset_market_amount');
+                ->where('year', $year);
 
-            $debtB = $this->simulationB->simulationAssets
-                ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('mortgage_balance_amount');
+            $assetsB = $yearDataB->sum('asset_market_amount');
+            $debtB = $yearDataB->sum('mortgage_balance_amount');
+            $realizationTaxB = $yearDataB->sum('realization_tax_amount');
 
             $netWorthB[] = round($assetsB - $debtB, 2);
+            $netWorthAfterTaxB[] = round($assetsB - $debtB - $realizationTaxB, 2);
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => "Simulation A: {$this->simulationA->name}",
+                    'label' => "A: {$this->simulationA->name} (Before Tax)",
                     'data' => $netWorthA,
                     'borderColor' => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                    'borderWidth' => 2,
+                    'borderDash' => [5, 5],
+                    'tension' => 0.3,
+                    'fill' => false,
+                ],
+                [
+                    'label' => "A: {$this->simulationA->name} (After Tax)",
+                    'data' => $netWorthAfterTaxA,
+                    'borderColor' => 'rgb(37, 99, 235)',
+                    'backgroundColor' => 'rgba(37, 99, 235, 0.1)',
                     'borderWidth' => 3,
                     'tension' => 0.3,
                     'fill' => false,
                 ],
                 [
-                    'label' => "Simulation B: {$this->simulationB->name}",
+                    'label' => "B: {$this->simulationB->name} (Before Tax)",
                     'data' => $netWorthB,
                     'borderColor' => 'rgb(34, 197, 94)',
                     'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
+                    'borderWidth' => 2,
+                    'borderDash' => [5, 5],
+                    'tension' => 0.3,
+                    'fill' => false,
+                ],
+                [
+                    'label' => "B: {$this->simulationB->name} (After Tax)",
+                    'data' => $netWorthAfterTaxB,
+                    'borderColor' => 'rgb(22, 163, 74)',
+                    'backgroundColor' => 'rgba(22, 163, 74, 0.1)',
                     'borderWidth' => 3,
                     'tension' => 0.3,
                     'fill' => false,
@@ -123,45 +148,68 @@ class CompareNetWorthTrajectoryWidget extends ChartWidget
         return 'line';
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): RawJs
     {
-        return [
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
-                'tooltip' => [
-                    'enabled' => true,
-                    'mode' => 'index',
-                    'intersect' => false,
-                    'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", minimumFractionDigits: 0 }).format(context.parsed.y); }',
-                    ],
-                ],
-            ],
-            'scales' => [
-                'x' => [
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Year',
-                    ],
-                ],
-                'y' => [
-                    'beginAtZero' => false,
-                    'ticks' => [
-                        'callback' => 'function(value) { return new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", minimumFractionDigits: 0 }).format(value); }',
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Net Worth',
-                    ],
-                ],
-            ],
-            'interaction' => [
-                'mode' => 'index',
-                'intersect' => false,
-            ],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('nb-NO', {
+                                        style: 'currency',
+                                        currency: 'NOK',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Net Worth'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('nb-NO', {
+                                    style: 'currency',
+                                    currency: 'NOK',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value);
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        JS);
     }
 }

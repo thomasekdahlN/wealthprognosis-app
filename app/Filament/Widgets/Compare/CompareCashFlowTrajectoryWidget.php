@@ -12,15 +12,16 @@
 namespace App\Filament\Widgets\Compare;
 
 use App\Models\SimulationConfiguration;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class CompareCashFlowTrajectoryWidget extends ChartWidget
 {
     protected ?string $heading = 'Annual Cash Flow Trajectory Comparison';
 
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 10;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 1;
 
     public ?SimulationConfiguration $simulationA = null;
 
@@ -46,10 +47,13 @@ class CompareCashFlowTrajectoryWidget extends ChartWidget
             ];
         }
 
-        // Get all years from both simulations
+        // Get all years from both simulations, starting from previous year
+        $startYear = now()->year - 1;
+
         $yearsA = $this->simulationA->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -57,6 +61,7 @@ class CompareCashFlowTrajectoryWidget extends ChartWidget
         $yearsB = $this->simulationB->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -113,44 +118,67 @@ class CompareCashFlowTrajectoryWidget extends ChartWidget
         return 'line';
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): RawJs
     {
-        return [
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
-                'tooltip' => [
-                    'enabled' => true,
-                    'mode' => 'index',
-                    'intersect' => false,
-                    'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", minimumFractionDigits: 0 }).format(context.parsed.y); }',
-                    ],
-                ],
-            ],
-            'scales' => [
-                'x' => [
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Year',
-                    ],
-                ],
-                'y' => [
-                    'ticks' => [
-                        'callback' => 'function(value) { return new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", minimumFractionDigits: 0 }).format(value); }',
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Annual Cash Flow (After Tax)',
-                    ],
-                ],
-            ],
-            'interaction' => [
-                'mode' => 'index',
-                'intersect' => false,
-            ],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('nb-NO', {
+                                        style: 'currency',
+                                        currency: 'NOK',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Annual Cash Flow (After Tax)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('nb-NO', {
+                                    style: 'currency',
+                                    currency: 'NOK',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value);
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        JS);
     }
 }

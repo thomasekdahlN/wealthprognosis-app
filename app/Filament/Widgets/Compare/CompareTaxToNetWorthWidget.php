@@ -12,13 +12,14 @@
 namespace App\Filament\Widgets\Compare;
 
 use App\Models\SimulationConfiguration;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class CompareTaxToNetWorthWidget extends ChartWidget
 {
     protected ?string $heading = 'Tax as % of Net Worth Comparison';
 
-    protected static ?int $sort = 10;
+    protected static ?int $sort = 18;
 
     protected int|string|array $columnSpan = 1;
 
@@ -46,10 +47,13 @@ class CompareTaxToNetWorthWidget extends ChartWidget
             ];
         }
 
-        // Get all years from both simulations
+        // Get all years from both simulations, starting from previous year
+        $startYear = now()->year - 1;
+
         $yearsA = $this->simulationA->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -57,6 +61,7 @@ class CompareTaxToNetWorthWidget extends ChartWidget
         $yearsB = $this->simulationB->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -137,77 +142,64 @@ class CompareTaxToNetWorthWidget extends ChartWidget
         return 'line';
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): RawJs
     {
-        return [
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
-                'tooltip' => [
-                    'enabled' => true,
-                    'mode' => 'index',
-                    'intersect' => false,
-                    'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y.toFixed(2) + "%"; }',
-                    ],
-                ],
-                'annotation' => [
-                    'annotations' => [
-                        [
-                            'type' => 'line',
-                            'yMin' => 1,
-                            'yMax' => 1,
-                            'borderColor' => 'rgb(34, 197, 94)',
-                            'borderWidth' => 2,
-                            'borderDash' => [5, 5],
-                            'label' => [
-                                'content' => 'Wealth Tax (~1%)',
-                                'enabled' => true,
-                                'position' => 'end',
-                            ],
-                        ],
-                        [
-                            'type' => 'line',
-                            'yMin' => 2,
-                            'yMax' => 2,
-                            'borderColor' => 'rgb(234, 179, 8)',
-                            'borderWidth' => 2,
-                            'borderDash' => [5, 5],
-                            'label' => [
-                                'content' => 'High Wealth Tax (~2%)',
-                                'enabled' => true,
-                                'position' => 'end',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'scales' => [
-                'x' => [
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Year',
-                    ],
-                ],
-                'y' => [
-                    'beginAtZero' => true,
-                    'max' => 5,
-                    'ticks' => [
-                        'callback' => 'function(value) { return value + "%"; }',
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Tax as % of Net Worth',
-                    ],
-                ],
-            ],
-            'interaction' => [
-                'mode' => 'index',
-                'intersect' => false,
-            ],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('nb-NO', {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(context.parsed.y) + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Tax as % of Net Worth'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('nb-NO', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value) + '%';
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        JS);
     }
 }
-

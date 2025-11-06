@@ -12,13 +12,14 @@
 namespace App\Filament\Widgets\Compare;
 
 use App\Models\SimulationConfiguration;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class CompareTaxToIncomeWidget extends ChartWidget
 {
     protected ?string $heading = 'Tax as % of Income Comparison';
 
-    protected static ?int $sort = 9;
+    protected static ?int $sort = 17;
 
     protected int|string|array $columnSpan = 1;
 
@@ -46,10 +47,13 @@ class CompareTaxToIncomeWidget extends ChartWidget
             ];
         }
 
-        // Get all years from both simulations
+        // Get all years from both simulations, starting from previous year
+        $startYear = now()->year - 1;
+
         $yearsA = $this->simulationA->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -57,6 +61,7 @@ class CompareTaxToIncomeWidget extends ChartWidget
         $yearsB = $this->simulationB->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -72,7 +77,7 @@ class CompareTaxToIncomeWidget extends ChartWidget
                 ->flatMap->simulationAssetYears
                 ->where('year', $year);
 
-            $totalIncomeA = $yearDataA->sum('cashflow_income_amount');
+            $totalIncomeA = $yearDataA->sum('income_amount');
             $totalTaxA = $yearDataA->sum(function ($yearData) {
                 return ($yearData->cashflow_tax_amount ?? 0)
                     + ($yearData->asset_tax_amount ?? 0)
@@ -88,7 +93,7 @@ class CompareTaxToIncomeWidget extends ChartWidget
                 ->flatMap->simulationAssetYears
                 ->where('year', $year);
 
-            $totalIncomeB = $yearDataB->sum('cashflow_income_amount');
+            $totalIncomeB = $yearDataB->sum('income_amount');
             $totalTaxB = $yearDataB->sum(function ($yearData) {
                 return ($yearData->cashflow_tax_amount ?? 0)
                     + ($yearData->asset_tax_amount ?? 0)
@@ -131,77 +136,64 @@ class CompareTaxToIncomeWidget extends ChartWidget
         return 'line';
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): RawJs
     {
-        return [
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
-                'tooltip' => [
-                    'enabled' => true,
-                    'mode' => 'index',
-                    'intersect' => false,
-                    'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y.toFixed(2) + "%"; }',
-                    ],
-                ],
-                'annotation' => [
-                    'annotations' => [
-                        [
-                            'type' => 'line',
-                            'yMin' => 30,
-                            'yMax' => 30,
-                            'borderColor' => 'rgb(234, 179, 8)',
-                            'borderWidth' => 2,
-                            'borderDash' => [5, 5],
-                            'label' => [
-                                'content' => 'Typical Tax Rate (30%)',
-                                'enabled' => true,
-                                'position' => 'end',
-                            ],
-                        ],
-                        [
-                            'type' => 'line',
-                            'yMin' => 50,
-                            'yMax' => 50,
-                            'borderColor' => 'rgb(239, 68, 68)',
-                            'borderWidth' => 2,
-                            'borderDash' => [5, 5],
-                            'label' => [
-                                'content' => 'High Tax Rate (50%)',
-                                'enabled' => true,
-                                'position' => 'end',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'scales' => [
-                'x' => [
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Year',
-                    ],
-                ],
-                'y' => [
-                    'beginAtZero' => true,
-                    'max' => 100,
-                    'ticks' => [
-                        'callback' => 'function(value) { return value + "%"; }',
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Tax as % of Income',
-                    ],
-                ],
-            ],
-            'interaction' => [
-                'mode' => 'index',
-                'intersect' => false,
-            ],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('nb-NO', {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(context.parsed.y) + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Tax as % of Income'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('nb-NO', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value) + '%';
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        JS);
     }
 }
-

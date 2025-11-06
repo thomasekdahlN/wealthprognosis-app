@@ -26,11 +26,11 @@
                         Ready to Analyze
                     </h3>
                     <p style="color: rgb(var(--gray-600)); margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
-                        Click the button below to get AI-powered insights comparing <strong>{{ $simulationA->name }}</strong> and <strong>{{ $simulationB->name }}</strong>. 
+                        Click the button below to get AI-powered insights comparing <strong>{{ $simulationA->name }}</strong> and <strong>{{ $simulationB->name }}</strong>.
                         The AI will analyze financial outcomes, risk factors, and provide actionable recommendations.
                     </p>
-                    <button 
-                        wire:click="loadAiAnalysis" 
+                    <button
+                        wire:click="loadAiAnalysis"
                         type="button"
                         style="
                             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -54,10 +54,10 @@
 
             @if($isLoading)
                 <!-- Loading state -->
-                <div style="text-align: center; padding: 60px 20px;">
+                <div style="text-align: center; padding: 60px 20px;" wire:poll.2s="checkJobStatus">
                     <div style="margin-bottom: 24px;">
                         <div style="display: inline-block; position: relative;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                  style="width: 64px; height: 64px; color: #667eea; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
                             </svg>
@@ -69,11 +69,29 @@
                     <p style="color: rgb(var(--gray-600)); margin-bottom: 16px;">
                         Our AI is comparing the two simulations and generating insights.
                     </p>
+
+                    @if($loadingStatus)
+                        <!-- Status message with icon -->
+                        <div style="background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%); border: 1px solid #c7d2fe; border-radius: 8px; padding: 16px; margin: 0 auto 20px; max-width: 500px;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px; color: #667eea; flex-shrink: 0;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+                                </svg>
+                                <p style="color: #4338ca; font-weight: 600; margin: 0; font-size: 14px; text-align: left;">
+                                    {{ $loadingStatus }}
+                                </p>
+                            </div>
+                        </div>
+                    @endif
+
                     <div style="display: flex; justify-content: center; gap: 8px; margin-top: 20px;">
                         <div style="width: 12px; height: 12px; background: #667eea; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; animation-delay: -0.32s;"></div>
                         <div style="width: 12px; height: 12px; background: #667eea; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; animation-delay: -0.16s;"></div>
                         <div style="width: 12px; height: 12px; background: #667eea; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both;"></div>
                     </div>
+                    <p style="color: rgb(var(--gray-500)); margin-top: 24px; font-size: 13px; font-style: italic;">
+                        ⏱️ This typically takes 1-3 minutes. Status updates every 2 seconds...
+                    </p>
                 </div>
 
                 <style>
@@ -82,11 +100,11 @@
                         50% { opacity: 0.5; }
                     }
                     @keyframes bounce {
-                        0%, 80%, 100% { 
+                        0%, 80%, 100% {
                             transform: scale(0);
                             opacity: 0.5;
                         }
-                        40% { 
+                        40% {
                             transform: scale(1);
                             opacity: 1;
                         }
@@ -107,8 +125,8 @@
                         </div>
                     </div>
                 </div>
-                <button 
-                    wire:click="loadAiAnalysis" 
+                <button
+                    wire:click="loadAiAnalysis"
                     type="button"
                     style="
                         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -132,8 +150,8 @@
                         {!! \Illuminate\Support\Str::markdown($aiAnalysis) !!}
                     </div>
                 </div>
-                <button 
-                    wire:click="loadAiAnalysis" 
+                <button
+                    wire:click="loadAiAnalysis"
                     type="button"
                     style="
                         background: white;

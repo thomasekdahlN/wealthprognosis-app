@@ -47,10 +47,13 @@ class CompareAnnualExpensesWidget extends ChartWidget
             ];
         }
 
-        // Get all years from both simulations
+        // Get all years from both simulations, starting from previous year
+        $startYear = now()->year - 1;
+
         $yearsA = $this->simulationA->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -58,6 +61,7 @@ class CompareAnnualExpensesWidget extends ChartWidget
         $yearsB = $this->simulationB->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -129,8 +133,8 @@ class CompareAnnualExpensesWidget extends ChartWidget
                         intersect: false,
                         callbacks: {
                             label: function(context) {
-                                return context.dataset.label + ': ' + new Intl.NumberFormat('nb-NO', { 
-                                    style: 'currency', 
+                                return context.dataset.label + ': ' + new Intl.NumberFormat('nb-NO', {
+                                    style: 'currency',
                                     currency: 'NOK',
                                     minimumFractionDigits: 0,
                                     maximumFractionDigits: 0
@@ -154,8 +158,8 @@ class CompareAnnualExpensesWidget extends ChartWidget
                         },
                         ticks: {
                             callback: function(value) {
-                                return new Intl.NumberFormat('nb-NO', { 
-                                    style: 'currency', 
+                                return new Intl.NumberFormat('nb-NO', {
+                                    style: 'currency',
                                     currency: 'NOK',
                                     minimumFractionDigits: 0,
                                     maximumFractionDigits: 0
@@ -172,4 +176,3 @@ class CompareAnnualExpensesWidget extends ChartWidget
         JS);
     }
 }
-

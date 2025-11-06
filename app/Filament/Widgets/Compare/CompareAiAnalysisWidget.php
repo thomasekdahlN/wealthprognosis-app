@@ -11,16 +11,14 @@
 
 namespace App\Filament\Widgets\Compare;
 
-use App\Models\AiInstruction;
+use App\Jobs\ProcessAiComparisonAnalysis;
 use App\Models\SimulationConfiguration;
-use App\Services\AiEvaluationService;
-use App\Services\SimulationExportService;
 use Filament\Widgets\Widget;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class CompareAiAnalysisWidget extends Widget
 {
-    protected static string $view = 'filament.widgets.compare.compare-ai-analysis-widget';
+    protected string $view = 'filament.widgets.compare.compare-ai-analysis-widget';
 
     protected static ?int $sort = 8;
 
@@ -36,6 +34,13 @@ class CompareAiAnalysisWidget extends Widget
 
     public ?string $errorMessage = null;
 
+    public ?string $loadingStatus = null;
+
+    public ?string $jobCacheKey = null;
+
+    // Polling interval in milliseconds (2 seconds)
+    public int $pollingInterval = 2000;
+
     public static function canView(): bool
     {
         return request()->routeIs('filament.admin.pages.compare-dashboard');
@@ -45,66 +50,63 @@ class CompareAiAnalysisWidget extends Widget
     {
         $this->simulationA = $simulationA;
         $this->simulationB = $simulationB;
+        $this->jobCacheKey = 'ai_comparison_'.auth()->id().'_'.$simulationA?->id.'_'.$simulationB?->id;
+
+        // Check if there's a cached result
+        $this->checkJobStatus();
     }
 
     public function loadAiAnalysis(): void
     {
+        // Clear any previous results
+        Cache::forget($this->jobCacheKey.':result');
+        Cache::forget($this->jobCacheKey.':error');
+        Cache::forget($this->jobCacheKey.':status');
+        Cache::forget($this->jobCacheKey.':completed');
+
         $this->isLoading = true;
         $this->errorMessage = null;
         $this->aiAnalysis = null;
+        $this->loadingStatus = 'Initializing AI analysis...';
 
-        try {
-            // Get the simulation comparison AI instruction
-            $instruction = AiInstruction::where('type', 'simulation_comparison')
-                ->where('is_active', true)
-                ->where('user_id', auth()->id())
-                ->first();
+        // Dispatch the job
+        ProcessAiComparisonAnalysis::dispatch(
+            $this->simulationA->id,
+            $this->simulationB->id,
+            auth()->id(),
+            $this->jobCacheKey
+        );
 
-            if (! $instruction) {
-                $this->errorMessage = 'AI comparison instruction not found. Please run the AI instruction seeder.';
-                $this->isLoading = false;
+        // Start polling for status updates
+        $this->dispatch('start-polling');
+    }
 
-                return;
-            }
-
-            // Export both simulations to JSON
-            $simulationAJson = SimulationExportService::toJsonString($this->simulationA);
-            $simulationBJson = SimulationExportService::toJsonString($this->simulationB);
-
-            // Build the user prompt with both JSON data
-            $userPrompt = $instruction->buildUserPrompt([
-                'simulation_a_json' => $simulationAJson,
-                'simulation_b_json' => $simulationBJson,
-            ]);
-
-            // Call the AI service
-            $aiService = new AiEvaluationService;
-            $response = $aiService->callOpenAI(
-                $instruction->system_prompt,
-                $userPrompt,
-                $instruction->model,
-                $instruction->max_tokens,
-                (float) $instruction->temperature
-            );
-
-            $this->aiAnalysis = $response;
-
-            Log::info('AI Comparison Analysis completed', [
-                'simulation_a_id' => $this->simulationA->id,
-                'simulation_b_id' => $this->simulationB->id,
-                'user_id' => auth()->id(),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('AI Comparison Analysis failed', [
-                'error' => $e->getMessage(),
-                'simulation_a_id' => $this->simulationA?->id,
-                'simulation_b_id' => $this->simulationB?->id,
-                'user_id' => auth()->id(),
-            ]);
-
-            $this->errorMessage = 'Failed to generate AI analysis: '.$e->getMessage();
-        } finally {
+    public function checkJobStatus(): void
+    {
+        // Check if job is completed
+        if (Cache::has($this->jobCacheKey.':completed')) {
+            $this->aiAnalysis = Cache::get($this->jobCacheKey.':result');
             $this->isLoading = false;
+            $this->loadingStatus = null;
+            $this->dispatch('stop-polling');
+
+            return;
+        }
+
+        // Check for errors
+        if (Cache::has($this->jobCacheKey.':error')) {
+            $this->errorMessage = Cache::get($this->jobCacheKey.':error');
+            $this->isLoading = false;
+            $this->loadingStatus = null;
+            $this->dispatch('stop-polling');
+
+            return;
+        }
+
+        // Check for status updates
+        if (Cache::has($this->jobCacheKey.':status')) {
+            $this->loadingStatus = Cache::get($this->jobCacheKey.':status');
+            $this->isLoading = true;
         }
     }
 
@@ -116,6 +118,7 @@ class CompareAiAnalysisWidget extends Widget
             'aiAnalysis' => $this->aiAnalysis,
             'isLoading' => $this->isLoading,
             'errorMessage' => $this->errorMessage,
+            'loadingStatus' => $this->loadingStatus,
         ];
     }
 }

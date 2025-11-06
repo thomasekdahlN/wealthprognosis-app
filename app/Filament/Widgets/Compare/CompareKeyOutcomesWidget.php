@@ -16,7 +16,7 @@ use Filament\Widgets\Widget;
 
 class CompareKeyOutcomesWidget extends Widget
 {
-    protected static string $view = 'filament.widgets.compare.compare-key-outcomes-widget';
+    protected string $view = 'filament.widgets.compare.compare-key-outcomes-widget';
 
     protected static ?int $sort = 2;
 
@@ -40,8 +40,35 @@ class CompareKeyOutcomesWidget extends Widget
     protected function getViewData(): array
     {
         if (! $this->simulationA || ! $this->simulationB) {
-            return ['outcomes' => []];
+            return [
+                'outcomes' => [],
+                'simulationInfo' => [],
+            ];
         }
+
+        // Simulation information rows
+        $simulationInfo = [
+            [
+                'label' => 'Simulation Name',
+                'valueA' => $this->simulationA->name,
+                'valueB' => $this->simulationB->name,
+            ],
+            [
+                'label' => 'Tax Country',
+                'valueA' => $this->getTaxCountryLabel($this->simulationA->tax_country),
+                'valueB' => $this->getTaxCountryLabel($this->simulationB->tax_country),
+            ],
+            [
+                'label' => 'Prognosis Type',
+                'valueA' => $this->simulationA->prognosis_type_label,
+                'valueB' => $this->simulationB->prognosis_type_label,
+            ],
+            [
+                'label' => 'Risk Tolerance',
+                'valueA' => $this->getRiskToleranceLabel($this->simulationA->risk_tolerance),
+                'valueB' => $this->getRiskToleranceLabel($this->simulationB->risk_tolerance),
+            ],
+        ];
 
         $outcomes = [
             [
@@ -76,7 +103,30 @@ class CompareKeyOutcomesWidget extends Widget
             ],
         ];
 
-        return ['outcomes' => $outcomes];
+        return [
+            'simulationInfo' => $simulationInfo,
+            'outcomes' => $outcomes,
+        ];
+    }
+
+    protected function getTaxCountryLabel(?string $countryCode): string
+    {
+        if (! $countryCode) {
+            return 'N/A';
+        }
+
+        $countries = SimulationConfiguration::getTaxCountries();
+
+        return $countries[$countryCode] ?? strtoupper($countryCode);
+    }
+
+    protected function getRiskToleranceLabel(?string $riskTolerance): string
+    {
+        if (! $riskTolerance) {
+            return 'N/A';
+        }
+
+        return SimulationConfiguration::RISK_TOLERANCE_LEVELS[$riskTolerance] ?? ucfirst(str_replace('_', ' ', $riskTolerance));
     }
 
     protected function getFinalNetWorth(SimulationConfiguration $simulation): ?float

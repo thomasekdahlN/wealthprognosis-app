@@ -12,13 +12,14 @@
 namespace App\Filament\Widgets\Compare;
 
 use App\Models\SimulationConfiguration;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class CompareTotalTaxWidget extends ChartWidget
 {
     protected ?string $heading = 'Total Tax Paid Comparison';
 
-    protected static ?int $sort = 8;
+    protected static ?int $sort = 16;
 
     protected int|string|array $columnSpan = 1;
 
@@ -46,10 +47,13 @@ class CompareTotalTaxWidget extends ChartWidget
             ];
         }
 
-        // Get all years from both simulations
+        // Get all years from both simulations, starting from previous year
+        $startYear = now()->year - 1;
+
         $yearsA = $this->simulationA->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -57,6 +61,7 @@ class CompareTotalTaxWidget extends ChartWidget
         $yearsB = $this->simulationB->simulationAssets
             ->flatMap->simulationAssetYears
             ->pluck('year')
+            ->filter(fn ($year) => $year >= $startYear)
             ->unique()
             ->sort()
             ->values();
@@ -121,46 +126,64 @@ class CompareTotalTaxWidget extends ChartWidget
         return 'bar';
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): RawJs
     {
-        return [
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
-                'tooltip' => [
-                    'enabled' => true,
-                    'mode' => 'index',
-                    'intersect' => false,
-                    'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y.toLocaleString("no-NO") + " kr"; }',
-                    ],
-                ],
-            ],
-            'scales' => [
-                'x' => [
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Year',
-                    ],
-                ],
-                'y' => [
-                    'beginAtZero' => true,
-                    'ticks' => [
-                        'callback' => 'function(value) { return value.toLocaleString("no-NO") + " kr"; }',
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Total Tax Paid (kr)',
-                    ],
-                ],
-            ],
-            'interaction' => [
-                'mode' => 'index',
-                'intersect' => false,
-            ],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('nb-NO', {
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0
+                                    }).format(context.parsed.y) + ' kr';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total Tax Paid (kr)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('nb-NO', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value) + ' kr';
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        JS);
     }
 }
-
