@@ -43,7 +43,6 @@ class SimulationDebtAllocationWidget extends ChartWidget
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
                 'simulationAssets.simulationAssetYears',
-                'simulationAssets.asset',
             ])
                 ->where('user_id', auth()->id())
                 ->find($simulationConfigurationId);
@@ -78,7 +77,7 @@ class SimulationDebtAllocationWidget extends ChartWidget
             $yearData = $simulationAsset->simulationAssetYears->where('year', $currentYear)->first();
 
             if ($yearData && ($yearData->mortgage_balance_amount ?? 0) > 0) {
-                $assetName = $simulationAsset->asset?->name ?? 'Unknown Asset';
+                $assetName = $simulationAsset->name ?? 'Unknown Asset';
 
                 if (! isset($assetDebtData[$assetName])) {
                     $assetDebtData[$assetName] = 0;
@@ -143,7 +142,7 @@ class SimulationDebtAllocationWidget extends ChartWidget
                 'tooltip' => [
                     'enabled' => true,
                     'callbacks' => [
-                        'label' => 'function(context) { 
+                        'label' => 'function(context) {
                             var label = context.label || "";
                             var value = context.parsed || 0;
                             var total = context.dataset.data.reduce((a, b) => a + b, 0);

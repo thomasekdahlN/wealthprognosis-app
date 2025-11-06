@@ -47,7 +47,6 @@ class SimulationFinancialMetricsHeatmapWidget extends BaseWidget
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
                 'simulationAssets.simulationAssetYears',
-                'simulationAssets.asset',
             ])
                 ->where('user_id', auth()->id())
                 ->find($simulationConfigurationId);
@@ -66,10 +65,10 @@ class SimulationFinancialMetricsHeatmapWidget extends BaseWidget
                             $q->where('simulation_configuration_id', $this->simulationConfiguration->id);
                         });
                     })
-                    ->with(['simulationAsset.asset'])
+                    ->with(['simulationAsset'])
             )
             ->columns([
-                TextColumn::make('simulationAsset.asset.name')
+                TextColumn::make('simulationAsset.name')
                     ->label('Asset')
                     ->searchable()
                     ->sortable()
@@ -161,7 +160,7 @@ class SimulationFinancialMetricsHeatmapWidget extends BaseWidget
             ->filters([
                 SelectFilter::make('asset')
                     ->label('Asset')
-                    ->relationship('simulationAsset.asset', 'name')
+                    ->relationship('simulationAsset', 'name')
                     ->searchable()
                     ->preload(),
 

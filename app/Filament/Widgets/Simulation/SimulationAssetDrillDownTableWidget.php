@@ -13,6 +13,8 @@ namespace App\Filament\Widgets\Simulation;
 
 use App\Models\SimulationAssetYear;
 use App\Models\SimulationConfiguration;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -48,7 +50,7 @@ class SimulationAssetDrillDownTableWidget extends BaseWidget
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
                 'simulationAssets.simulationAssetYears',
-                'simulationAssets.asset.assetType',
+                'simulationAssets.assetType',
             ])
                 ->where('user_id', auth()->id())
                 ->find($simulationConfigurationId);
@@ -67,10 +69,10 @@ class SimulationAssetDrillDownTableWidget extends BaseWidget
                             $q->where('simulation_configuration_id', $this->simulationConfiguration->id);
                         });
                     })
-                    ->with(['simulationAsset.asset.assetType'])
+                    ->with(['simulationAsset.assetType'])
             )
             ->columns([
-                TextColumn::make('simulationAsset.asset.name')
+                TextColumn::make('simulationAsset.name')
                     ->label('Asset')
                     ->searchable()
                     ->sortable()
@@ -141,13 +143,13 @@ class SimulationAssetDrillDownTableWidget extends BaseWidget
             ->filters([
                 Filter::make('year')
                     ->form([
-                        \Filament\Forms\Components\Grid::make(2)
+                        Grid::make(2)
                             ->schema([
-                                \Filament\Forms\Components\TextInput::make('year_from')
+                                TextInput::make('year_from')
                                     ->label('From Year')
                                     ->numeric()
                                     ->placeholder('e.g., 2024'),
-                                \Filament\Forms\Components\TextInput::make('year_to')
+                                TextInput::make('year_to')
                                     ->label('To Year')
                                     ->numeric()
                                     ->placeholder('e.g., 2050'),
@@ -167,7 +169,7 @@ class SimulationAssetDrillDownTableWidget extends BaseWidget
 
                 SelectFilter::make('asset')
                     ->label('Asset')
-                    ->relationship('simulationAsset.asset', 'name')
+                    ->relationship('simulationAsset', 'name')
                     ->searchable()
                     ->preload(),
             ])

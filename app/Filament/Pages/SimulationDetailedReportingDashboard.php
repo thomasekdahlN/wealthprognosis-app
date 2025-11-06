@@ -56,7 +56,7 @@ class SimulationDetailedReportingDashboard extends Dashboard
         $this->simulationConfiguration = SimulationConfiguration::with([
             'assetConfiguration',
             'simulationAssets.simulationAssetYears',
-            'simulationAssets.asset.assetType',
+            'simulationAssets.assetType',
         ])
             ->where('user_id', auth()->id())
             ->where('id', $simulationId)

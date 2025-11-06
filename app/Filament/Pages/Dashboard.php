@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Services\CurrentAssetConfiguration;
+use Filament\Actions\Action;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Http\Request;
 
@@ -61,7 +62,20 @@ class Dashboard extends BaseDashboard
 
     protected function getHeaderActions(): array
     {
-        return [];
+        $actions = [];
+
+        // Add Simulations button if we have a configuration
+        if ($this->assetConfigurationId) {
+            $actions[] = Action::make('simulations')
+                ->label('Simulations')
+                ->icon('heroicon-o-calculator')
+                ->color('primary')
+                ->url(route('filament.admin.pages.config-simulations', [
+                    'configuration' => $this->assetConfigurationId,
+                ]));
+        }
+
+        return $actions;
     }
 
     protected function getViewData(): array

@@ -3,15 +3,27 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\HasWideTable;
+use App\Models\SimulationAsset;
 use App\Models\SimulationConfiguration;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Support\Exceptions\Halt;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 
-class SimulationAssets extends Page
+class SimulationAssets extends Page implements HasTable
 {
-    use HasWideTable;
+    use HasWideTable, InteractsWithTable;
+
+    protected string $view = 'filament.pages.simulation-assets';
 
     protected static string $routePath = '/config/{configuration}/sim/{simulation}/assets';
 
@@ -85,10 +97,117 @@ class SimulationAssets extends Page
         return "Based on {$config->name} • {$assetsCount} assets • Read-Only Simulation Data • Created ".$this->simulationConfiguration->created_at->diffForHumans();
     }
 
-    protected function getHeaderWidgets(): array
+    /**
+     * @return Builder<SimulationAsset>
+     */
+    protected function getTableQuery(): Builder
     {
-        // Removed SimulationAssetsTable widget per request
-        return [];
+        if (! $this->simulationConfiguration) {
+            return SimulationAsset::query()->whereRaw('1 = 0'); // Empty result
+        }
+
+        return SimulationAsset::query()
+            ->where('simulation_configuration_id', $this->simulationConfiguration->id)
+            ->with(['assetType', 'simulationAssetYears']);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query($this->getTableQuery())
+            ->columns([
+                TextColumn::make('sort_order')
+                    ->label('Sort Order')
+                    ->alignLeft()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('name')
+                    ->label('Name')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold')
+                    ->toggleable(),
+
+                TextColumn::make('asset_type')
+                    ->label('Type')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('primary')
+                    ->toggleable(),
+
+                TextColumn::make('assetType.name')
+                    ->label('Asset Type')
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('group')
+                    ->label('Group')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'private' => 'success',
+                        'company' => 'warning',
+                        default => 'gray',
+                    })
+                    ->toggleable(),
+
+                TextColumn::make('tax_property')
+                    ->label('Tax Property')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('description')
+                    ->label('Description')
+                    ->limit(60)
+                    ->wrap()
+                    ->toggleable(),
+
+                IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean()
+                    ->toggleable(),
+
+                TextColumn::make('simulationAssetYears_count')
+                    ->label('Years')
+                    ->counts('simulationAssetYears')
+                    ->alignRight()
+                    ->toggleable(),
+            ])
+            ->filters([
+                SelectFilter::make('asset_type')
+                    ->label('Asset Type')
+                    ->options(fn () => \App\Models\AssetType::pluck('name', 'type')->toArray())
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('group')
+                    ->label('Group')
+                    ->options([
+                        'private' => 'Private',
+                        'company' => 'Company',
+                    ]),
+
+                TernaryFilter::make('is_active')
+                    ->label('Active')
+                    ->placeholder('All assets')
+                    ->trueLabel('Active only')
+                    ->falseLabel('Inactive only'),
+            ])
+            ->filtersLayout(FiltersLayout::AboveContent)
+            ->persistFiltersInSession()
+            ->defaultSort('sort_order', 'asc')
+            ->paginated([50, 100, 150])
+            ->defaultPaginationPageOption(50)
+            ->striped()
+            ->recordUrl(fn (SimulationAsset $record) => route('filament.admin.pages.simulation-asset-years.pretty', [
+                'configuration' => $this->simulationConfiguration->asset_configuration_id,
+                'simulation' => $this->simulationConfiguration->id,
+                'asset' => $record->id,
+            ]));
     }
 
     protected function getHeaderActions(): array

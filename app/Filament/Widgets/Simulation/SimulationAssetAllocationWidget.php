@@ -43,7 +43,7 @@ class SimulationAssetAllocationWidget extends ChartWidget
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
                 'simulationAssets.simulationAssetYears',
-                'simulationAssets.asset.assetType',
+                'simulationAssets.assetType',
             ])
                 ->where('user_id', auth()->id())
                 ->find($simulationConfigurationId);
@@ -78,7 +78,7 @@ class SimulationAssetAllocationWidget extends ChartWidget
             $yearData = $simulationAsset->simulationAssetYears->where('year', $currentYear)->first();
 
             if ($yearData && ($yearData->asset_market_amount ?? 0) > 0) {
-                $assetType = $simulationAsset->asset?->assetType?->type ?? 'Unknown';
+                $assetType = $simulationAsset->asset_type ?? 'Unknown';
 
                 if (! isset($assetTypeData[$assetType])) {
                     $assetTypeData[$assetType] = 0;
@@ -127,7 +127,7 @@ class SimulationAssetAllocationWidget extends ChartWidget
                 'tooltip' => [
                     'enabled' => true,
                     'callbacks' => [
-                        'label' => 'function(context) { 
+                        'label' => 'function(context) {
                             var label = context.label || "";
                             var value = context.parsed || 0;
                             var total = context.dataset.data.reduce((a, b) => a + b, 0);

@@ -45,7 +45,6 @@ class SimulationExpenseReportWidget extends ChartWidget
             $this->simulationConfiguration = SimulationConfiguration::with([
                 'assetConfiguration',
                 'simulationAssets.simulationAssetYears',
-                'simulationAssets.asset',
             ])
                 ->where('user_id', auth()->id())
                 ->find($simulationConfigurationId);
@@ -75,7 +74,7 @@ class SimulationExpenseReportWidget extends ChartWidget
         $assetNames = [];
 
         foreach ($simulationAssets as $asset) {
-            $assetName = $asset->asset?->name ?? 'Unknown Asset';
+            $assetName = $asset->name ?? 'Unknown Asset';
             $assetNames[$asset->id] = $assetName;
 
             foreach ($asset->simulationAssetYears as $yearData) {
