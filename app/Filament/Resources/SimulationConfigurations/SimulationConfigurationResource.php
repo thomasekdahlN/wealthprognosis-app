@@ -27,6 +27,10 @@ class SimulationConfigurationResource extends Resource
 
     protected static ?string $navigationLabel = 'Simulations';
 
+    protected static ?string $modelLabel = 'Simulation';
+
+    protected static ?string $pluralModelLabel = 'Simulations';
+
     protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema

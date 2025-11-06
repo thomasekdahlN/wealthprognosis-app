@@ -20,6 +20,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use WatheqAlshowaiter\FilamentStickyTableHeader\StickyTableHeaderPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -41,6 +42,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->assets([
                 \Filament\Support\Assets\Css::make('ai-assistant', resource_path('css/filament/admin/ai-assistant.css')),
+                \Filament\Support\Assets\Css::make('simulation-asset-years', resource_path('css/filament/admin/simulation-asset-years.css')),
+            ])
+            ->plugins([
+                StickyTableHeaderPlugin::make(),
             ])
             ->resources([
                 \App\Filament\Resources\AssetYears\AssetYearResource::class,
@@ -128,6 +133,11 @@ class AdminPanelProvider extends PanelProvider
                 \Illuminate\Support\Facades\Route::get('config/{configuration}/sim/{simulation}/assets', \App\Filament\Pages\SimulationAssets::class)
                     ->middleware([\Filament\Http\Middleware\Authenticate::class])
                     ->name('pages.simulation-assets.pretty');
+
+                // Pretty URL for Simulation Asset Years list (one simulation asset)
+                \Illuminate\Support\Facades\Route::get('config/{configuration}/sim/{simulation}/assets/{asset}/years', \App\Filament\Pages\SimulationAssetYears::class)
+                    ->middleware([\Filament\Http\Middleware\Authenticate::class])
+                    ->name('pages.simulation-asset-years.pretty');
 
                 // Pretty URL for Config Asset Years list (one asset)
                 \Illuminate\Support\Facades\Route::get('config/{configuration}/assets/{asset}/years', \App\Filament\Pages\ConfigAssetYears::class)

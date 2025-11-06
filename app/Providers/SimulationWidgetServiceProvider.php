@@ -42,9 +42,13 @@ class SimulationWidgetServiceProvider extends ServiceProvider
         Livewire::component('app.filament.widgets.compare.compare-key-outcomes-widget', \App\Filament\Widgets\Compare\CompareKeyOutcomesWidget::class);
         Livewire::component('app.filament.widgets.compare.compare-net-worth-trajectory-widget', \App\Filament\Widgets\Compare\CompareNetWorthTrajectoryWidget::class);
         Livewire::component('app.filament.widgets.compare.compare-cash-flow-trajectory-widget', \App\Filament\Widgets\Compare\CompareCashFlowTrajectoryWidget::class);
-        Livewire::component('app.filament.widgets.compare.compare-delta-chart-widget', \App\Filament\Widgets\Compare\CompareDeltaChartWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-annual-income-widget', \App\Filament\Widgets\Compare\CompareAnnualIncomeWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-annual-expenses-widget', \App\Filament\Widgets\Compare\CompareAnnualExpensesWidget::class);
         Livewire::component('app.filament.widgets.compare.compare-debt-load-widget', \App\Filament\Widgets\Compare\CompareDebtLoadWidget::class);
-        Livewire::component('app.filament.widgets.compare.compare-risk-metrics-widget', \App\Filament\Widgets\Compare\CompareRiskMetricsWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-fire-achievement-widget', \App\Filament\Widgets\Compare\CompareFireAchievementWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-total-tax-widget', \App\Filament\Widgets\Compare\CompareTotalTaxWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-tax-to-income-widget', \App\Filament\Widgets\Compare\CompareTaxToIncomeWidget::class);
+        Livewire::component('app.filament.widgets.compare.compare-tax-to-net-worth-widget', \App\Filament\Widgets\Compare\CompareTaxToNetWorthWidget::class);
         Livewire::component('app.filament.widgets.compare.compare-ai-analysis-widget', \App\Filament\Widgets\Compare\CompareAiAnalysisWidget::class);
     }
 }

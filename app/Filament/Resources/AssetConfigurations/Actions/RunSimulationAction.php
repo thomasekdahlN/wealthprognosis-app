@@ -5,7 +5,8 @@ namespace App\Filament\Resources\AssetConfigurations\Actions;
 use App\Models\AssetConfiguration;
 use App\Services\PrognosisSimulationService;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
@@ -65,60 +66,54 @@ class RunSimulationAction extends Action
             ->modalDescription('Create a detailed financial projection based on this asset configuration.')
             ->modalWidth('2xl')
             ->form([
+                Section::make('Simulation Description')
+                    ->description('Describe what you want to simulate and analyze.')
+                    ->schema([
+                        Textarea::make('description')
+                            ->label('Simulation Description')
+                            ->placeholder('Example: What happens if I retire at 60 instead of 67? Or: Impact of buying a vacation home in 2030.')
+                            ->helperText('Describe the scenario you want to simulate. This will be stored with the simulation for future reference.')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                    ]),
+
                 Section::make('Simulation Parameters')
                     ->description('Choose the simulation type, tax country, and scope for your financial projection.')
                     ->schema([
-                        Radio::make('tax_country')
+                        Select::make('tax_country')
                             ->label('Tax Country')
                             ->options($this->getAvailableTaxCountries())
-                            ->descriptions([
-                                'no' => 'Norwegian tax system with wealth tax and progressive income tax',
-                                'se' => 'Swedish tax system with capital gains tax and municipal tax',
-                                'ch' => 'Swiss tax system with cantonal variations and wealth tax',
-                            ])
                             ->default('no')
                             ->required()
-                            ->inline(false)
+                            ->native(false)
+                            ->searchable()
                             ->columnSpanFull(),
 
-                        Radio::make('prognosis_type')
+                        Select::make('prognosis_type')
                             ->label('Prognosis Type')
                             ->options([
-                                'realistic' => 'Realistic',
-                                'positive' => 'Positive',
-                                'negative' => 'Negative',
-                                'tenpercent' => 'Ten Percent',
-                                'zero' => 'Zero Growth',
-                                'variable' => 'Variable',
-                            ])
-                            ->descriptions([
-                                'realistic' => 'Balanced economic assumptions',
-                                'positive' => 'Optimistic economic growth',
-                                'negative' => 'Conservative/pessimistic scenario',
-                                'tenpercent' => 'High growth scenario',
-                                'zero' => 'No growth scenario',
-                                'variable' => 'Mixed scenario with variations',
+                                'realistic' => 'Realistic - Balanced economic assumptions',
+                                'positive' => 'Positive - Optimistic economic growth',
+                                'negative' => 'Negative - Conservative/pessimistic scenario',
+                                'tenpercent' => 'Ten Percent - High growth scenario',
+                                'zero' => 'Zero Growth - No growth scenario',
+                                'variable' => 'Variable - Mixed scenario with variations',
                             ])
                             ->default('realistic')
                             ->required()
-                            ->inline(false)
+                            ->native(false)
                             ->columnSpanFull(),
 
-                        Radio::make('asset_scope')
+                        Select::make('asset_scope')
                             ->label('Asset Scope')
                             ->options([
-                                'private' => 'Private Only',
-                                'business' => 'Business Only',
-                                'both' => 'Both Private & Business',
-                            ])
-                            ->descriptions([
-                                'private' => 'Personal assets and investments',
-                                'business' => 'Business assets and company holdings',
-                                'both' => 'Complete portfolio simulation',
+                                'private' => 'Private Only - Personal assets and investments',
+                                'business' => 'Business Only - Business assets and company holdings',
+                                'both' => 'Both Private & Business - Complete portfolio simulation',
                             ])
                             ->default('private')
                             ->required()
-                            ->inline(false)
+                            ->native(false)
                             ->columnSpanFull(),
                     ]),
             ])
@@ -140,6 +135,7 @@ class RunSimulationAction extends Action
                         'tax_country' => $data['tax_country'],
                         'prognosis_type' => $data['prognosis_type'],
                         'group' => $data['asset_scope'], // Map asset_scope to group field
+                        'description' => $data['description'] ?? null,
                         'start_year' => date('Y'),
                         'end_year' => $record->birth_year + $record->expected_death_age,
                     ];
