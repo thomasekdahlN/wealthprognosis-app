@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('simulation_assets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('asset_configuration_id')->nullable()->constrained('simulation_configurations');
+            $table->foreignId('simulation_configuration_id')->nullable()->constrained('simulation_configurations');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->string('created_checksum')->nullable();
             $table->string('updated_checksum')->nullable();
-            $table->index(['asset_configuration_id', 'is_active']);
+            $table->index(['simulation_configuration_id', 'is_active']);
             $table->index(['asset_type', 'group']);
             $table->index(['user_id', 'team_id']);
         });

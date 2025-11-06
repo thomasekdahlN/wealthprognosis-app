@@ -14,13 +14,13 @@ namespace App\Filament\Widgets\Compare;
 use App\Models\SimulationConfiguration;
 use Filament\Widgets\ChartWidget;
 
-class CompareDeltaChartWidget extends ChartWidget
+class CompareTotalTaxWidget extends ChartWidget
 {
-    protected ?string $heading = 'Net Worth Delta (Simulation B - Simulation A)';
+    protected ?string $heading = 'Total Tax Paid Comparison';
 
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 8;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 1;
 
     public ?SimulationConfiguration $simulationA = null;
 
@@ -63,49 +63,52 @@ class CompareDeltaChartWidget extends ChartWidget
 
         $allYears = $yearsA->merge($yearsB)->unique()->sort()->values()->toArray();
 
-        // Calculate delta for each year
-        $deltas = [];
-        $colors = [];
+        // Calculate total tax for each year for both simulations
+        $totalTaxA = [];
+        $totalTaxB = [];
 
         foreach ($allYears as $year) {
-            $assetsA = $this->simulationA->simulationAssets
+            $yearDataA = $this->simulationA->simulationAssets
                 ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('asset_market_amount');
+                ->where('year', $year);
 
-            $debtA = $this->simulationA->simulationAssets
+            $taxA = $yearDataA->sum(function ($yearData) {
+                return ($yearData->cashflow_tax_amount ?? 0)
+                    + ($yearData->asset_tax_amount ?? 0)
+                    + ($yearData->asset_tax_property_amount ?? 0)
+                    + ($yearData->asset_tax_fortune_amount ?? 0)
+                    + ($yearData->realization_tax_amount ?? 0);
+            });
+            $totalTaxA[] = round($taxA, 0);
+
+            $yearDataB = $this->simulationB->simulationAssets
                 ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('mortgage_balance_amount');
+                ->where('year', $year);
 
-            $netWorthA = $assetsA - $debtA;
-
-            $assetsB = $this->simulationB->simulationAssets
-                ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('asset_market_amount');
-
-            $debtB = $this->simulationB->simulationAssets
-                ->flatMap->simulationAssetYears
-                ->where('year', $year)
-                ->sum('mortgage_balance_amount');
-
-            $netWorthB = $assetsB - $debtB;
-
-            $delta = $netWorthB - $netWorthA;
-            $deltas[] = round($delta, 2);
-
-            // Color bars: green for positive, red for negative
-            $colors[] = $delta >= 0 ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)';
+            $taxB = $yearDataB->sum(function ($yearData) {
+                return ($yearData->cashflow_tax_amount ?? 0)
+                    + ($yearData->asset_tax_amount ?? 0)
+                    + ($yearData->asset_tax_property_amount ?? 0)
+                    + ($yearData->asset_tax_fortune_amount ?? 0)
+                    + ($yearData->realization_tax_amount ?? 0);
+            });
+            $totalTaxB[] = round($taxB, 0);
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Net Worth Difference (B - A)',
-                    'data' => $deltas,
-                    'backgroundColor' => $colors,
-                    'borderColor' => array_map(fn ($color) => str_replace('0.8', '1', $color), $colors),
+                    'label' => "Simulation A: {$this->simulationA->name}",
+                    'data' => $totalTaxA,
+                    'borderColor' => 'rgb(59, 130, 246)',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.5)',
+                    'borderWidth' => 2,
+                ],
+                [
+                    'label' => "Simulation B: {$this->simulationB->name}",
+                    'data' => $totalTaxB,
+                    'borderColor' => 'rgb(34, 197, 94)',
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.5)',
                     'borderWidth' => 2,
                 ],
             ],
@@ -128,8 +131,10 @@ class CompareDeltaChartWidget extends ChartWidget
                 ],
                 'tooltip' => [
                     'enabled' => true,
+                    'mode' => 'index',
+                    'intersect' => false,
                     'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", minimumFractionDigits: 0 }).format(context.parsed.y); }',
+                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y.toLocaleString("no-NO") + " kr"; }',
                     ],
                 ],
             ],
@@ -141,15 +146,21 @@ class CompareDeltaChartWidget extends ChartWidget
                     ],
                 ],
                 'y' => [
+                    'beginAtZero' => true,
                     'ticks' => [
-                        'callback' => 'function(value) { return new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", minimumFractionDigits: 0 }).format(value); }',
+                        'callback' => 'function(value) { return value.toLocaleString("no-NO") + " kr"; }',
                     ],
                     'title' => [
                         'display' => true,
-                        'text' => 'Net Worth Delta',
+                        'text' => 'Total Tax Paid (kr)',
                     ],
                 ],
+            ],
+            'interaction' => [
+                'mode' => 'index',
+                'intersect' => false,
             ],
         ];
     }
 }
+

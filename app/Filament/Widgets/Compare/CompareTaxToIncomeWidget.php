@@ -14,13 +14,13 @@ namespace App\Filament\Widgets\Compare;
 use App\Models\SimulationConfiguration;
 use Filament\Widgets\ChartWidget;
 
-class CompareRiskMetricsWidget extends ChartWidget
+class CompareTaxToIncomeWidget extends ChartWidget
 {
-    protected ?string $heading = 'Portfolio Risk Metrics Comparison (Average LTV)';
+    protected ?string $heading = 'Tax as % of Income Comparison';
 
-    protected static ?int $sort = 7;
+    protected static ?int $sort = 9;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 1;
 
     public ?SimulationConfiguration $simulationA = null;
 
@@ -63,45 +63,63 @@ class CompareRiskMetricsWidget extends ChartWidget
 
         $allYears = $yearsA->merge($yearsB)->unique()->sort()->values()->toArray();
 
-        // Calculate average LTV for each year for both simulations
-        $avgLtvA = [];
-        $avgLtvB = [];
+        // Calculate tax as % of income for each year for both simulations
+        $taxPercentA = [];
+        $taxPercentB = [];
 
         foreach ($allYears as $year) {
             $yearDataA = $this->simulationA->simulationAssets
                 ->flatMap->simulationAssetYears
                 ->where('year', $year);
 
-            $avgA = $yearDataA->avg('metrics_ltv_percent');
-            $avgLtvA[] = $avgA ? round($avgA, 2) : 0;
+            $totalIncomeA = $yearDataA->sum('cashflow_income_amount');
+            $totalTaxA = $yearDataA->sum(function ($yearData) {
+                return ($yearData->cashflow_tax_amount ?? 0)
+                    + ($yearData->asset_tax_amount ?? 0)
+                    + ($yearData->asset_tax_property_amount ?? 0)
+                    + ($yearData->asset_tax_fortune_amount ?? 0)
+                    + ($yearData->realization_tax_amount ?? 0);
+            });
+
+            $percentA = $totalIncomeA > 0 ? ($totalTaxA / $totalIncomeA) * 100 : 0;
+            $taxPercentA[] = round($percentA, 2);
 
             $yearDataB = $this->simulationB->simulationAssets
                 ->flatMap->simulationAssetYears
                 ->where('year', $year);
 
-            $avgB = $yearDataB->avg('metrics_ltv_percent');
-            $avgLtvB[] = $avgB ? round($avgB, 2) : 0;
+            $totalIncomeB = $yearDataB->sum('cashflow_income_amount');
+            $totalTaxB = $yearDataB->sum(function ($yearData) {
+                return ($yearData->cashflow_tax_amount ?? 0)
+                    + ($yearData->asset_tax_amount ?? 0)
+                    + ($yearData->asset_tax_property_amount ?? 0)
+                    + ($yearData->asset_tax_fortune_amount ?? 0)
+                    + ($yearData->realization_tax_amount ?? 0);
+            });
+
+            $percentB = $totalIncomeB > 0 ? ($totalTaxB / $totalIncomeB) * 100 : 0;
+            $taxPercentB[] = round($percentB, 2);
         }
 
         return [
             'datasets' => [
                 [
                     'label' => "Simulation A: {$this->simulationA->name}",
-                    'data' => $avgLtvA,
+                    'data' => $taxPercentA,
                     'borderColor' => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
                     'borderWidth' => 3,
                     'tension' => 0.3,
-                    'fill' => false,
+                    'fill' => true,
                 ],
                 [
                     'label' => "Simulation B: {$this->simulationB->name}",
-                    'data' => $avgLtvB,
-                    'borderColor' => 'rgb(239, 68, 68)',
-                    'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
+                    'data' => $taxPercentB,
+                    'borderColor' => 'rgb(34, 197, 94)',
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
                     'borderWidth' => 3,
                     'tension' => 0.3,
-                    'fill' => false,
+                    'fill' => true,
                 ],
             ],
             'labels' => $allYears,
@@ -126,33 +144,33 @@ class CompareRiskMetricsWidget extends ChartWidget
                     'mode' => 'index',
                     'intersect' => false,
                     'callbacks' => [
-                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1) + "%"; }',
+                        'label' => 'function(context) { return context.dataset.label + ": " + context.parsed.y.toFixed(2) + "%"; }',
                     ],
                 ],
                 'annotation' => [
                     'annotations' => [
                         [
                             'type' => 'line',
-                            'yMin' => 70,
-                            'yMax' => 70,
+                            'yMin' => 30,
+                            'yMax' => 30,
                             'borderColor' => 'rgb(234, 179, 8)',
                             'borderWidth' => 2,
                             'borderDash' => [5, 5],
                             'label' => [
-                                'content' => 'Safe Threshold (70%)',
+                                'content' => 'Typical Tax Rate (30%)',
                                 'enabled' => true,
                                 'position' => 'end',
                             ],
                         ],
                         [
                             'type' => 'line',
-                            'yMin' => 85,
-                            'yMax' => 85,
+                            'yMin' => 50,
+                            'yMax' => 50,
                             'borderColor' => 'rgb(239, 68, 68)',
                             'borderWidth' => 2,
                             'borderDash' => [5, 5],
                             'label' => [
-                                'content' => 'High Risk (85%)',
+                                'content' => 'High Tax Rate (50%)',
                                 'enabled' => true,
                                 'position' => 'end',
                             ],
@@ -175,7 +193,7 @@ class CompareRiskMetricsWidget extends ChartWidget
                     ],
                     'title' => [
                         'display' => true,
-                        'text' => 'Average LTV (%)',
+                        'text' => 'Tax as % of Income',
                     ],
                 ],
             ],
@@ -186,3 +204,4 @@ class CompareRiskMetricsWidget extends ChartWidget
         ];
     }
 }
+

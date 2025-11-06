@@ -1,0 +1,123 @@
+/* Simulation Asset Years Table Styling - ULTRA COMPACT */
+
+/* Global wrapper styling */
+.simulation-asset-years-table,
+.simulation-asset-years-table * {
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+}
+
+/* Target all table cells with maximum specificity */
+.simulation-asset-years-table table tbody tr td,
+.simulation-asset-years-table table tbody tr td > div,
+.simulation-asset-years-table table tbody tr td > div > div,
+.simulation-asset-years-table table tbody tr td > div > div > div,
+.simulation-asset-years-table table tbody tr td span,
+.simulation-asset-years-table .fi-ta-cell,
+.simulation-asset-years-table td {
+    padding: 2px 4px !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+/* Target all header cells */
+.simulation-asset-years-table table thead tr th,
+.simulation-asset-years-table table thead tr th > div,
+.simulation-asset-years-table table thead tr th > div > div,
+.simulation-asset-years-table table thead tr th > div > div > div,
+.simulation-asset-years-table table thead tr th span,
+.simulation-asset-years-table table thead tr th button,
+.simulation-asset-years-table .fi-ta-header-cell,
+.simulation-asset-years-table th {
+    padding: 2px 4px !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+    font-weight: 600 !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+/* Reduce row height to absolute minimum */
+.simulation-asset-years-table table tbody tr,
+.simulation-asset-years-table table thead tr,
+.simulation-asset-years-table .fi-ta-row,
+.simulation-asset-years-table tr {
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+/* Row colors for special years - using CSS classes */
+.simulation-asset-years-table tbody tr.row-current-year td {
+    background-color: rgb(187, 247, 208) !important;
+}
+
+.simulation-asset-years-table tbody tr.row-pension-year td {
+    background-color: rgb(254, 215, 170) !important;
+}
+
+.simulation-asset-years-table tbody tr.row-death-year td {
+    background-color: rgb(254, 226, 226) !important;
+}
+
+/* Hover effect - highlight entire row with yellow */
+.simulation-asset-years-table tbody tr:hover td {
+    background-color: rgb(254, 249, 195) !important;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+/* Darker hover for special rows */
+.simulation-asset-years-table tbody tr.row-current-year:hover td {
+    background-color: rgb(134, 239, 172) !important;
+}
+
+.simulation-asset-years-table tbody tr.row-pension-year:hover td {
+    background-color: rgb(253, 186, 116) !important;
+}
+
+.simulation-asset-years-table tbody tr.row-death-year:hover td {
+    background-color: rgb(254, 202, 202) !important;
+}
+
+/* Column group header styling - ultra compact */
+.simulation-asset-years-table .fi-ta-header-cell-group-label {
+    font-weight: 600;
+    text-align: center;
+    padding: 0.05rem 0.15rem !important;
+    border-bottom: 1px solid rgb(229 231 235);
+    font-size: 0.65rem !important;
+    line-height: 0.9 !important;
+}
+
+/* Reduce spacing in pagination */
+.simulation-asset-years-table .fi-ta-pagination {
+    padding: 0.15rem !important;
+}
+
+/* Make column headers more compact */
+.simulation-asset-years-table thead {
+    font-size: 0.65rem !important;
+}
+
+/* Remove extra spacing from table wrapper */
+.simulation-asset-years-table {
+    border-spacing: 0 !important;
+}
+
+/* Remove extra margins and padding from table container */
+.simulation-asset-years-table .fi-ta {
+    margin: 0 !important;
+}
+
+/* Compact table wrapper */
+.simulation-asset-years-table .fi-ta-ctn {
+    padding: 0 !important;
+}
+
+/* Remove gaps between cells */
+.simulation-asset-years-table table {
+    border-collapse: collapse !important;
+}
+

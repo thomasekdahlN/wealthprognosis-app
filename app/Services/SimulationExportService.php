@@ -112,7 +112,7 @@ class SimulationExportService
         $min = SimulationAssetYear::whereIn('asset_id', function ($q) use ($simulation) {
             $q->select('id')
                 ->from((new SimulationAsset)->getTable())
-                ->where('asset_configuration_id', $simulation->id);
+                ->where('simulation_configuration_id', $simulation->id);
         })
             ->min('year');
 
@@ -252,192 +252,709 @@ class SimulationExportService
     }
 
     /**
-     * Export SimulationConfiguration to JSON format
+     * Export SimulationConfiguration to JSON format for AI analysis
+     * Includes simulation info, summary metrics, key years, yearly progression, and asset summaries
+     */
+    /**
+     * Export simulation to complete JSON with ALL fields from database in original import format
      */
     public static function toJson(SimulationConfiguration $simulation): string
     {
-        $data = self::buildJsonStructure($simulation);
+        $data = self::buildJsonStructure($simulation, false);
 
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
-     * Build the JSON structure from simulation data
-     *
-     * @return array<string, mixed>
+     * Export simulation to compact JSON for AI analysis (only essential fields)
      */
-    protected static function buildJsonStructure(SimulationConfiguration $simulation): array
+    public static function toCompactJson(SimulationConfiguration $simulation): string
+    {
+        $data = self::buildJsonStructure($simulation, true);
+
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Build JSON structure matching original import format
+     */
+    protected static function buildJsonStructure(SimulationConfiguration $simulation, bool $compactMode = false): array
     {
         $data = [];
 
-        // Add meta section from SimulationConfiguration
-        $data['meta'] = [
+        // Add meta section
+        $meta = array_filter([
             'name' => $simulation->name,
-            'description' => $simulation->description ?? '',
+            'description' => $simulation->description,
             'birthYear' => (string) $simulation->birth_year,
-            'prognoseAge' => (string) $simulation->prognose_age,
-            'pensionOfficialAge' => (string) $simulation->pension_official_age,
             'pensionWishAge' => (string) $simulation->pension_wish_age,
+            'pensionOfficialAge' => (string) $simulation->pension_official_age,
             'deathAge' => (string) $simulation->expected_death_age,
-            'exportStartAge' => (string) $simulation->export_start_age,
-            'prognosisType' => $simulation->prognosis_type ?? 'realistic',
-            'group' => $simulation->group ?? 'both',
-            'taxCountry' => $simulation->tax_country ?? 'no',
-            'riskTolerance' => $simulation->risk_tolerance ?? 'moderate',
-        ];
+            'riskTolerance' => $simulation->risk_tolerance,
+            'prognosisType' => $simulation->prognosis_type,
+            'group' => $simulation->group,
+            'taxCountry' => $simulation->tax_country,
+            'isActive' => $simulation->is_active,
+            'public' => $simulation->public,
+        ], fn ($value) => $value !== null && $value !== '');
 
-        // Add timestamps
-        if ($simulation->created_at) {
-            $data['meta']['createdAt'] = $simulation->created_at->toISOString();
-        }
-        if ($simulation->updated_at) {
-            $data['meta']['updatedAt'] = $simulation->updated_at->toISOString();
-        }
-        $data['meta']['exportedAt'] = now()->toISOString();
+        $data['meta'] = $meta;
 
-        // Process each simulation asset (ordered by sort_order to maintain JSON sequence)
+        // Load all simulation assets with their yearly data
         $assets = $simulation->simulationAssets()
-            ->with('simulationAssetYears')
+            ->with(['simulationAssetYears' => function ($q) {
+                $q->orderBy('year');
+            }])
             ->orderBy('sort_order')
+            ->orderBy('name')
             ->get();
 
-        /** @var \App\Models\SimulationAsset $asset */
+        // Process each asset
         foreach ($assets as $asset) {
             $assetData = [];
 
             // Add asset meta section
-            $assetData['meta'] = [
+            $assetMeta = array_filter([
                 'type' => $asset->asset_type,
                 'group' => $asset->group,
                 'name' => $asset->name,
-                'description' => $asset->description ?? '',
+                'description' => $asset->description,
                 'active' => $asset->is_active,
-            ];
+                'taxProperty' => $asset->tax_property,
+                'taxCountry' => $asset->tax_country,
+            ], fn ($value) => $value !== null && $value !== '');
 
-            // Process simulation asset years
-            $years = $asset->simulationAssetYears()->orderBy('year')->get();
+            $assetData['meta'] = $assetMeta;
 
-            /** @var \App\Models\SimulationAssetYear $assetYear */
-            foreach ($years as $assetYear) {
-                $yearKey = (string) $assetYear->year;
-                $assetData[$yearKey] = self::buildSimulationYearData($assetYear);
+            // Process asset years (skip rows with all zero amounts)
+            foreach ($asset->simulationAssetYears as $yearData) {
+                // Skip rows where all amount fields are null or 0
+                if (! self::hasNonZeroAmounts($yearData)) {
+                    continue;
+                }
+
+                $yearKey = (string) $yearData->year;
+                $assetData[$yearKey] = self::buildYearData($yearData, $compactMode);
             }
 
-            // Use the asset code as the key
-            $data[$asset->code] = $assetData;
+            // Use asset code as key (or name if code is empty)
+            $assetKey = ! empty($asset->code) ? $asset->code : $asset->name;
+            $data[$assetKey] = $assetData;
         }
 
         return $data;
     }
 
     /**
-     * Build year data for simulation asset year
-     *
-     * @return array<string, mixed>
+     * Build year data in original import format
      */
-    protected static function buildSimulationYearData(SimulationAssetYear $assetYear): array
+    protected static function buildYearData($yearData, bool $compactMode = false): array
     {
-        $yearData = [];
+        if ($compactMode) {
+            return self::buildCompactYearData($yearData);
+        }
 
-        // Income data
-        $yearData['income'] = [
-            'amount' => self::toNum($assetYear->income_amount),
-            'description' => $assetYear->income_description ?? '',
-        ];
+        $year = [];
 
-        // Expense data
-        $yearData['expence'] = [
-            'amount' => self::toNum($assetYear->expence_amount),
-            'description' => $assetYear->expence_description ?? '',
-        ];
+        // Description
+        if (! empty($yearData->description)) {
+            $year['description'] = $yearData->description;
+        }
 
-        // Asset data
-        $yearData['asset'] = [
-            'marketAmount' => self::toNum($assetYear->asset_market_amount),
-            'changeratePercent' => (float) ($assetYear->asset_changerate_percent ?? 0),
-            'marketMortgageDeductedAmount' => self::toNum($assetYear->asset_market_mortgage_deducted_amount),
-            'acquisitionAmount' => self::toNum($assetYear->asset_acquisition_amount),
-            'paidAmount' => self::toNum($assetYear->asset_paid_amount),
-            'taxableAmount' => self::toNum($assetYear->asset_taxable_amount),
-            'taxablePercent' => (float) ($assetYear->asset_taxable_percent ?? 0),
-            'taxAmount' => self::toNum($assetYear->asset_tax_amount),
-            'taxPercent' => (float) ($assetYear->asset_tax_percent ?? 0),
-            'taxFortuneAmount' => self::toNum($assetYear->asset_tax_fortune_amount),
-            'taxPropertyAmount' => self::toNum($assetYear->asset_tax_property_amount),
-            'taxablePropertyAmount' => self::toNum($assetYear->asset_taxable_property_amount),
-            'taxablePropertyPercent' => (float) ($assetYear->asset_taxable_property_percent ?? 0),
-            'mortgageRatePercent' => (float) ($assetYear->asset_mortgage_rate_percent ?? 0),
-            'description' => $assetYear->asset_description ?? '',
-        ];
+        // Income section
+        $income = array_filter([
+            'amount' => $yearData->income_amount,
+            'changerate' => $yearData->income_changerate,
+            'transfer' => $yearData->income_transfer,
+            'source' => $yearData->income_source,
+            'rule' => $yearData->income_rule,
+            'repeat' => $yearData->income_repeat,
+        ], fn ($value) => $value !== null && $value !== '');
 
-        // Mortgage data
-        $yearData['mortgage'] = [
-            'termAmount' => self::toNum($assetYear->mortgage_term_amount),
-            'interestPercent' => (float) ($assetYear->mortgage_interest_percent ?? 0),
-            'interestAmount' => self::toNum($assetYear->mortgage_interest_amount),
-            'principalAmount' => self::toNum($assetYear->mortgage_principal_amount),
-            'balanceAmount' => self::toNum($assetYear->mortgage_balance_amount),
-            'taxDeductableAmount' => self::toNum($assetYear->mortgage_tax_deductable_amount),
-            'taxDeductablePercent' => (float) ($assetYear->mortgage_tax_deductable_percent ?? 0),
-            'description' => $assetYear->mortgage_description ?? '',
-        ];
+        if (! empty($income)) {
+            $year['income'] = $income;
+        }
 
-        // Cashflow data
-        $yearData['cashflow'] = [
-            'beforeTaxAmount' => self::toNum($assetYear->cashflow_before_tax_amount),
-            'beforeTaxAggregatedAmount' => self::toNum($assetYear->cashflow_before_tax_aggregated_amount),
-            'afterTaxAmount' => self::toNum($assetYear->cashflow_after_tax_amount),
-            'afterTaxAggregatedAmount' => self::toNum($assetYear->cashflow_after_tax_aggregated_amount),
-            'taxAmount' => self::toNum($assetYear->cashflow_tax_amount),
-            'taxPercent' => (float) ($assetYear->cashflow_tax_percent ?? 0),
-            'description' => $assetYear->cashflow_description ?? '',
-        ];
+        // Expense section
+        $expence = array_filter([
+            'amount' => $yearData->expence_amount,
+            'factor' => $yearData->expence_factor,
+            'changerate' => $yearData->expence_changerate,
+            'transfer' => $yearData->expence_transfer,
+            'source' => $yearData->expence_source,
+            'rule' => $yearData->expence_rule,
+            'repeat' => $yearData->expence_repeat,
+        ], fn ($value) => $value !== null && $value !== '');
 
-        // Realization data
-        $yearData['realization'] = [
-            'amount' => self::toNum($assetYear->realization_amount),
-            'taxableAmount' => self::toNum($assetYear->realization_taxable_amount),
-            'taxAmount' => self::toNum($assetYear->realization_tax_amount),
-            'taxPercent' => (float) ($assetYear->realization_tax_percent ?? 0),
-            'taxShieldAmount' => self::toNum($assetYear->realization_tax_shield_amount),
-            'taxShieldPercent' => (float) ($assetYear->realization_tax_shield_percent ?? 0),
-            'description' => $assetYear->realization_description ?? '',
-        ];
+        if (! empty($expence)) {
+            $year['expence'] = $expence;
+        }
 
-        // Yield data
-        $yearData['yield'] = [
-            'bruttoPercent' => (float) ($assetYear->yield_brutto_percent ?? 0),
-            'nettoPercent' => (float) ($assetYear->yield_netto_percent ?? 0),
-        ];
+        // Asset section
+        $asset = array_filter([
+            'marketAmount' => $yearData->asset_market_amount,
+            'acquisitionAmount' => $yearData->asset_acquisition_amount,
+            'equityAmount' => $yearData->asset_equity_amount,
+            'taxableInitialAmount' => $yearData->asset_taxable_initial_amount,
+            'paidAmount' => $yearData->asset_paid_amount,
+            'changerate' => $yearData->asset_changerate,
+            'rule' => $yearData->asset_rule,
+            'transfer' => $yearData->asset_transfer,
+            'source' => $yearData->asset_source,
+            'repeat' => $yearData->asset_repeat,
+        ], fn ($value) => $value !== null && $value !== '');
 
-        // FIRE metrics
-        $yearData['fire'] = [
-            'incomeAmount' => self::toNum($assetYear->fire_income_amount),
-            'expenceAmount' => self::toNum($assetYear->fire_expence_amount),
-            'cashFlowAmount' => self::toNum($assetYear->fire_cashflow_amount),
-            'savingAmount' => self::toNum($assetYear->fire_saving_amount),
-            'rate' => (float) ($assetYear->fire_rate ?? 0),
-            'percent' => (float) ($assetYear->fire_percent ?? 0),
-            'savingRate' => (float) ($assetYear->fire_saving_rate ?? 0),
-        ];
+        if (! empty($asset)) {
+            $year['asset'] = $asset;
+        }
 
-        // Financial metrics
-        $yearData['metrics'] = [
-            'ltvPercent' => (float) ($assetYear->metrics_ltv_percent ?? 0),
-            'dscr' => (float) ($assetYear->metrics_dscr ?? 0),
-            'roiPercent' => (float) ($assetYear->metrics_roi_percent ?? 0),
-            'roePercent' => (float) ($assetYear->metrics_roe_percent ?? 0),
-            'cocPercent' => (float) ($assetYear->metrics_coc_percent ?? 0),
-        ];
+        // Mortgage section
+        $mortgage = array_filter([
+            'amount' => $yearData->mortgage_amount,
+            'years' => $yearData->mortgage_years,
+            'interest' => $yearData->mortgage_interest,
+            'gebyr' => $yearData->mortgage_gebyr,
+            'tax' => $yearData->mortgage_tax,
+            'paymentExtra' => $yearData->mortgage_extra_downpayment_amount,
+        ], fn ($value) => $value !== null && $value !== '');
 
-        return $yearData;
+        if (! empty($mortgage)) {
+            $year['mortgage'] = $mortgage;
+        }
+
+        return $year;
     }
 
     /**
-     * Static method to get JSON string
+     * Build compact year data for AI analysis (only essential calculated fields)
      */
-    public static function toJsonString(SimulationConfiguration $simulation): string
+    protected static function buildCompactYearData($yearData): array
     {
-        return self::toJson($simulation);
+        return array_filter([
+            'year' => $yearData->year,
+            'incomeAmount' => $yearData->income_amount,
+            'expenceAmount' => $yearData->expence_amount,
+            'cashflowAfterTaxAmount' => $yearData->cashflow_after_tax_amount,
+            'cashflowTaxAmount' => $yearData->cashflow_tax_amount,
+            'assetMarketAmount' => $yearData->asset_market_amount,
+            'assetMarketMortgageDeductedAmount' => $yearData->asset_market_mortgage_deducted_amount,
+            'mortgageBalanceAmount' => $yearData->mortgage_balance_amount,
+            'mortgageInterestAmount' => $yearData->mortgage_interest_amount,
+            'assetTaxAmount' => $yearData->asset_tax_amount,
+            'realizationTaxAmount' => $yearData->realization_tax_amount,
+            'firePercent' => $yearData->fire_percent,
+            'metricsLtvPercent' => $yearData->metrics_ltv_percent,
+        ], fn ($value) => $value !== null && $value !== '');
+    }
+
+    /**
+     * Export simulation to compact CSV format for AI analysis
+     * More compact than JSON - uses flat structure with one row per asset-year
+     * Only includes essential calculated fields
+     * Only includes rows where at least one amount field is non-zero
+     */
+    public static function toCsvCompact(SimulationConfiguration $simulation): string
+    {
+        $output = [];
+
+        // CSV Header
+        $header = [
+            'simulation_name',
+            'simulation_description',
+            'birth_year',
+            'pension_wish_age',
+            'pension_official_age',
+            'death_age',
+            'risk_tolerance',
+            'prognosis_type',
+            'group',
+            'tax_country',
+            'asset_name',
+            'asset_type',
+            'asset_group',
+            'asset_description',
+            'year',
+            'income_amount',
+            'expence_amount',
+            'cashflow_after_tax_amount',
+            'cashflow_tax_amount',
+            'asset_market_amount',
+            'asset_market_mortgage_deducted_amount',
+            'mortgage_balance_amount',
+            'mortgage_interest_amount',
+            'asset_tax_amount',
+            'realization_tax_amount',
+            'fire_percent',
+            'metrics_ltv_percent',
+        ];
+
+        $output[] = implode(',', $header);
+
+        // Load all simulation assets with their yearly data
+        $assets = $simulation->simulationAssets()
+            ->with(['simulationAssetYears' => function ($q) {
+                $q->orderBy('year');
+            }])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        // Process each asset and year
+        foreach ($assets as $asset) {
+            foreach ($asset->simulationAssetYears as $yearData) {
+                // Skip rows where all amount fields are null or 0
+                if (! self::hasNonZeroAmounts($yearData)) {
+                    continue;
+                }
+
+                $row = [
+                    self::csvEscape($simulation->name),
+                    self::csvEscape($simulation->description),
+                    $simulation->birth_year,
+                    $simulation->pension_wish_age,
+                    $simulation->pension_official_age,
+                    $simulation->expected_death_age,
+                    self::csvEscape($simulation->risk_tolerance),
+                    self::csvEscape($simulation->prognosis_type),
+                    self::csvEscape($simulation->group),
+                    self::csvEscape($simulation->tax_country),
+                    self::csvEscape($asset->name),
+                    self::csvEscape($asset->asset_type),
+                    self::csvEscape($asset->group),
+                    self::csvEscape($asset->description),
+                    $yearData->year,
+                    $yearData->income_amount ?? 0,
+                    $yearData->expence_amount ?? 0,
+                    $yearData->cashflow_after_tax_amount ?? 0,
+                    $yearData->cashflow_tax_amount ?? 0,
+                    $yearData->asset_market_amount ?? 0,
+                    $yearData->asset_market_mortgage_deducted_amount ?? 0,
+                    $yearData->mortgage_balance_amount ?? 0,
+                    $yearData->mortgage_interest_amount ?? 0,
+                    $yearData->asset_tax_amount ?? 0,
+                    $yearData->realization_tax_amount ?? 0,
+                    $yearData->fire_percent ?? 0,
+                    $yearData->metrics_ltv_percent ?? 0,
+                ];
+
+                $output[] = implode(',', $row);
+            }
+        }
+
+        return implode("\n", $output);
+    }
+
+    /**
+     * Export simulation to full CSV format with ALL columns from simulation_asset_years table
+     * Includes all fields for complete data export
+     * Only includes rows where at least one amount field is non-zero
+     */
+    public static function toCsvFull(SimulationConfiguration $simulation): string
+    {
+        $output = [];
+
+        // CSV Header - ALL columns from simulation_asset_years table
+        $header = [
+            // Simulation metadata
+            'simulation_name',
+            'simulation_description',
+            'birth_year',
+            'pension_wish_age',
+            'pension_official_age',
+            'death_age',
+            'risk_tolerance',
+            'prognosis_type',
+            'group',
+            'tax_country',
+            // Asset metadata
+            'asset_name',
+            'asset_type',
+            'asset_group',
+            'asset_description',
+            // Year data
+            'year',
+            'description',
+            // Income fields
+            'income_amount',
+            'income_factor',
+            'income_rule',
+            'income_transfer',
+            'income_transfer_amount',
+            'income_source',
+            'income_changerate',
+            'income_changerate_percent',
+            'income_repeat',
+            'income_description',
+            // Expense fields
+            'expence_amount',
+            'expence_factor',
+            'expence_rule',
+            'expence_transfer',
+            'expence_transfer_amount',
+            'expence_source',
+            'expence_changerate',
+            'expence_changerate_percent',
+            'expence_repeat',
+            'expence_description',
+            // Cashflow fields
+            'cashflow_description',
+            'cashflow_after_tax_amount',
+            'cashflow_before_tax_amount',
+            'cashflow_before_tax_aggregated_amount',
+            'cashflow_after_tax_aggregated_amount',
+            'cashflow_tax_amount',
+            'cashflow_tax_percent',
+            'cashflow_rule',
+            'cashflow_transfer',
+            'cashflow_transfer_amount',
+            'cashflow_source',
+            'cashflow_changerate',
+            'cashflow_repeat',
+            // Asset fields
+            'asset_market_amount',
+            'asset_market_mortgage_deducted_amount',
+            'asset_acquisition_amount',
+            'asset_acquisition_initial_amount',
+            'asset_equity_amount',
+            'asset_equity_initial_amount',
+            'asset_paid_amount',
+            'asset_paid_initial_amount',
+            'asset_transfered_amount',
+            'asset_taxable_percent',
+            'asset_taxable_amount',
+            'asset_taxable_initial_amount',
+            'asset_taxable_amount_override',
+            'asset_tax_percent',
+            'asset_tax_amount',
+            'asset_taxable_property_percent',
+            'asset_taxable_property_amount',
+            'asset_tax_property_percent',
+            'asset_tax_property_amount',
+            'asset_taxable_fortune_amount',
+            'asset_taxable_fortune_percent',
+            'asset_tax_fortune_amount',
+            'asset_tax_fortune_percent',
+            'asset_gjeldsfradrag_amount',
+            'asset_changerate',
+            'asset_changerate_percent',
+            'asset_rule',
+            'asset_transfer',
+            'asset_source',
+            'asset_repeat',
+            // Mortgage fields
+            'mortgage_amount',
+            'mortgage_term_amount',
+            'mortgage_interest_amount',
+            'mortgage_principal_amount',
+            'mortgage_balance_amount',
+            'mortgage_extra_downpayment_amount',
+            'mortgage_transfered_amount',
+            'mortgage_interest_percent',
+            'mortgage_years',
+            'mortgage_interest_only_years',
+            'mortgage_gebyr_amount',
+            'mortgage_tax_deductable_amount',
+            'mortgage_tax_deductable_percent',
+            'mortgage_description',
+            // Realization fields
+            'realization_description',
+            'realization_amount',
+            'realization_taxable_amount',
+            'realization_tax_amount',
+            'realization_tax_percent',
+            'realization_tax_shield_amount',
+            'realization_tax_shield_percent',
+            // Yield fields
+            'yield_gross_percent',
+            'yield_net_percent',
+            'yield_cap_percent',
+            // Potential fields
+            'potential_income_amount',
+            'potential_mortgage_amount',
+            // Metrics fields
+            'metrics_roi_percent',
+            'metrics_total_return_amount',
+            'metrics_total_return_percent',
+            'metrics_coc_percent',
+            'metrics_noi',
+            'metrics_grm',
+            'metrics_dscr',
+            'metrics_ltv_percent',
+            'metrics_de_ratio',
+            'metrics_roe_percent',
+            'metrics_roa_percent',
+            'metrics_pb_ratio',
+            'metrics_ev_ebitda',
+            'metrics_current_ratio',
+            // F.I.R.E. fields
+            'fire_percent',
+            'fire_income_amount',
+            'fire_expence_amount',
+            'fire_cashflow_amount',
+            'fire_saving_amount',
+            'fire_saving_rate_percent',
+        ];
+
+        $output[] = implode(',', $header);
+
+        // Load all simulation assets with their yearly data
+        $assets = $simulation->simulationAssets()
+            ->with(['simulationAssetYears' => function ($q) {
+                $q->orderBy('year');
+            }])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        // Process each asset and year
+        foreach ($assets as $asset) {
+            foreach ($asset->simulationAssetYears as $yearData) {
+                // Skip rows where all amount fields are null or 0
+                if (! self::hasNonZeroAmounts($yearData)) {
+                    continue;
+                }
+
+                $row = [
+                    // Simulation metadata
+                    self::csvEscape($simulation->name),
+                    self::csvEscape($simulation->description),
+                    $simulation->birth_year,
+                    $simulation->pension_wish_age,
+                    $simulation->pension_official_age,
+                    $simulation->expected_death_age,
+                    self::csvEscape($simulation->risk_tolerance),
+                    self::csvEscape($simulation->prognosis_type),
+                    self::csvEscape($simulation->group),
+                    self::csvEscape($simulation->tax_country),
+                    // Asset metadata
+                    self::csvEscape($asset->name),
+                    self::csvEscape($asset->asset_type),
+                    self::csvEscape($asset->group),
+                    self::csvEscape($asset->description),
+                    // Year data
+                    $yearData->year,
+                    self::csvEscape($yearData->description),
+                    // Income fields (continuing in next chunk due to 150 line limit)
+                ];
+
+                // Add all remaining fields
+                $row = array_merge($row, [
+                    // Income fields
+                    $yearData->income_amount ?? 0,
+                    self::csvEscape($yearData->income_factor),
+                    self::csvEscape($yearData->income_rule),
+                    self::csvEscape($yearData->income_transfer),
+                    $yearData->income_transfer_amount ?? 0,
+                    self::csvEscape($yearData->income_source),
+                    self::csvEscape($yearData->income_changerate),
+                    $yearData->income_changerate_percent ?? 0,
+                    $yearData->income_repeat ? 1 : 0,
+                    self::csvEscape($yearData->income_description),
+                    // Expense fields
+                    $yearData->expence_amount ?? 0,
+                    self::csvEscape($yearData->expence_factor),
+                    self::csvEscape($yearData->expence_rule),
+                    self::csvEscape($yearData->expence_transfer),
+                    $yearData->expence_transfer_amount ?? 0,
+                    self::csvEscape($yearData->expence_source),
+                    self::csvEscape($yearData->expence_changerate),
+                    $yearData->expence_changerate_percent ?? 0,
+                    $yearData->expence_repeat ? 1 : 0,
+                    self::csvEscape($yearData->expence_description),
+                    // Cashflow fields
+                    self::csvEscape($yearData->cashflow_description),
+                    $yearData->cashflow_after_tax_amount ?? 0,
+                    $yearData->cashflow_before_tax_amount ?? 0,
+                    $yearData->cashflow_before_tax_aggregated_amount ?? 0,
+                    $yearData->cashflow_after_tax_aggregated_amount ?? 0,
+                    $yearData->cashflow_tax_amount ?? 0,
+                    $yearData->cashflow_tax_percent ?? 0,
+                    self::csvEscape($yearData->cashflow_rule),
+                    self::csvEscape($yearData->cashflow_transfer),
+                    $yearData->cashflow_transfer_amount ?? 0,
+                    self::csvEscape($yearData->cashflow_source),
+                    self::csvEscape($yearData->cashflow_changerate),
+                    $yearData->cashflow_repeat ? 1 : 0,
+                    // Asset fields
+                    $yearData->asset_market_amount ?? 0,
+                    $yearData->asset_market_mortgage_deducted_amount ?? 0,
+                    $yearData->asset_acquisition_amount ?? 0,
+                    $yearData->asset_acquisition_initial_amount ?? 0,
+                    $yearData->asset_equity_amount ?? 0,
+                    $yearData->asset_equity_initial_amount ?? 0,
+                    $yearData->asset_paid_amount ?? 0,
+                    $yearData->asset_paid_initial_amount ?? 0,
+                    $yearData->asset_transfered_amount ?? 0,
+                    $yearData->asset_taxable_percent ?? 0,
+                    $yearData->asset_taxable_amount ?? 0,
+                    $yearData->asset_taxable_initial_amount ?? 0,
+                    $yearData->asset_taxable_amount_override ? 1 : 0,
+                    $yearData->asset_tax_percent ?? 0,
+                    $yearData->asset_tax_amount ?? 0,
+                    $yearData->asset_taxable_property_percent ?? 0,
+                    $yearData->asset_taxable_property_amount ?? 0,
+                    $yearData->asset_tax_property_percent ?? 0,
+                    $yearData->asset_tax_property_amount ?? 0,
+                    $yearData->asset_taxable_fortune_amount ?? 0,
+                    $yearData->asset_taxable_fortune_percent ?? 0,
+                    $yearData->asset_tax_fortune_amount ?? 0,
+                    $yearData->asset_tax_fortune_percent ?? 0,
+                    $yearData->asset_gjeldsfradrag_amount ?? 0,
+                    self::csvEscape($yearData->asset_changerate),
+                    $yearData->asset_changerate_percent ?? 0,
+                    self::csvEscape($yearData->asset_rule),
+                    self::csvEscape($yearData->asset_transfer),
+                    self::csvEscape($yearData->asset_source),
+                    $yearData->asset_repeat ? 1 : 0,
+                    // Mortgage fields
+                    $yearData->mortgage_amount ?? 0,
+                    $yearData->mortgage_term_amount ?? 0,
+                    $yearData->mortgage_interest_amount ?? 0,
+                    $yearData->mortgage_principal_amount ?? 0,
+                    $yearData->mortgage_balance_amount ?? 0,
+                    $yearData->mortgage_extra_downpayment_amount ?? 0,
+                    $yearData->mortgage_transfered_amount ?? 0,
+                    $yearData->mortgage_interest_percent ?? 0,
+                    $yearData->mortgage_years ?? 0,
+                    $yearData->mortgage_interest_only_years ?? 0,
+                    $yearData->mortgage_gebyr_amount ?? 0,
+                    $yearData->mortgage_tax_deductable_amount ?? 0,
+                    $yearData->mortgage_tax_deductable_percent ?? 0,
+                    self::csvEscape($yearData->mortgage_description),
+                    // Realization fields
+                    self::csvEscape($yearData->realization_description),
+                    $yearData->realization_amount ?? 0,
+                    $yearData->realization_taxable_amount ?? 0,
+                    $yearData->realization_tax_amount ?? 0,
+                    $yearData->realization_tax_percent ?? 0,
+                    $yearData->realization_tax_shield_amount ?? 0,
+                    $yearData->realization_tax_shield_percent ?? 0,
+                    // Yield fields
+                    $yearData->yield_gross_percent ?? 0,
+                    $yearData->yield_net_percent ?? 0,
+                    $yearData->yield_cap_percent ?? 0,
+                    // Potential fields
+                    $yearData->potential_income_amount ?? 0,
+                    $yearData->potential_mortgage_amount ?? 0,
+                    // Metrics fields
+                    $yearData->metrics_roi_percent ?? 0,
+                    $yearData->metrics_total_return_amount ?? 0,
+                    $yearData->metrics_total_return_percent ?? 0,
+                    $yearData->metrics_coc_percent ?? 0,
+                    $yearData->metrics_noi ?? 0,
+                    $yearData->metrics_grm ?? 0,
+                    $yearData->metrics_dscr ?? 0,
+                    $yearData->metrics_ltv_percent ?? 0,
+                    $yearData->metrics_de_ratio ?? 0,
+                    $yearData->metrics_roe_percent ?? 0,
+                    $yearData->metrics_roa_percent ?? 0,
+                    $yearData->metrics_pb_ratio ?? 0,
+                    $yearData->metrics_ev_ebitda ?? 0,
+                    $yearData->metrics_current_ratio ?? 0,
+                    // F.I.R.E. fields
+                    $yearData->fire_percent ?? 0,
+                    $yearData->fire_income_amount ?? 0,
+                    $yearData->fire_expence_amount ?? 0,
+                    $yearData->fire_cashflow_amount ?? 0,
+                    $yearData->fire_saving_amount ?? 0,
+                    $yearData->fire_saving_rate_percent ?? 0,
+                ]);
+
+                $output[] = implode(',', $row);
+            }
+        }
+
+        return implode("\n", $output);
+    }
+
+    /**
+     * Escape CSV field (handle commas, quotes, newlines)
+     */
+    protected static function csvEscape(?string $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        // If contains comma, quote, or newline, wrap in quotes and escape quotes
+        if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
+            return '"'.str_replace('"', '""', $value).'"';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Check if a simulation asset year has any non-zero amount fields
+     */
+    protected static function hasNonZeroAmounts(SimulationAssetYear $yearData): bool
+    {
+        $amountFields = [
+            'income_amount',
+            'income_transfer_amount',
+            'expence_amount',
+            'expence_transfer_amount',
+            'cashflow_after_tax_amount',
+            'cashflow_before_tax_amount',
+            'cashflow_before_tax_aggregated_amount',
+            'cashflow_after_tax_aggregated_amount',
+            'cashflow_tax_amount',
+            'cashflow_transfer_amount',
+            'asset_market_amount',
+            'asset_market_mortgage_deducted_amount',
+            'asset_acquisition_amount',
+            'asset_acquisition_initial_amount',
+            'asset_equity_amount',
+            'asset_equity_initial_amount',
+            'asset_paid_amount',
+            'asset_paid_initial_amount',
+            'asset_transfered_amount',
+            'asset_taxable_amount',
+            'asset_taxable_initial_amount',
+            'asset_tax_amount',
+            'asset_taxable_property_amount',
+            'asset_tax_property_amount',
+            'asset_taxable_fortune_amount',
+            'asset_tax_fortune_amount',
+            'asset_gjeldsfradrag_amount',
+            'mortgage_amount',
+            'mortgage_term_amount',
+            'mortgage_interest_amount',
+            'mortgage_principal_amount',
+            'mortgage_balance_amount',
+            'mortgage_extra_downpayment_amount',
+            'mortgage_transfered_amount',
+            'mortgage_gebyr_amount',
+            'mortgage_tax_deductable_amount',
+            'realization_amount',
+            'realization_taxable_amount',
+            'realization_tax_amount',
+            'realization_tax_shield_amount',
+            'potential_income_amount',
+            'potential_mortgage_amount',
+            'metrics_total_return_amount',
+            'fire_income_amount',
+            'fire_expence_amount',
+            'fire_cashflow_amount',
+            'fire_saving_amount',
+        ];
+
+        foreach ($amountFields as $field) {
+            $value = $yearData->$field;
+            if ($value !== null && $value != 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Export simulation to Excel format and return file path
+     * Uses the existing export() method
+     */
+    public static function toExcel(SimulationConfiguration $simulation): string
+    {
+        return self::export($simulation);
     }
 }
