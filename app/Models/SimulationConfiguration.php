@@ -172,7 +172,7 @@ class SimulationConfiguration extends Model
 
     public function simulationAssets(): HasMany
     {
-        return $this->hasMany(SimulationAsset::class, 'asset_configuration_id');
+        return $this->hasMany(SimulationAsset::class, 'simulation_configuration_id');
     }
 
     /**

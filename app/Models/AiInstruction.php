@@ -93,6 +93,7 @@ class AiInstruction extends Model
 
         foreach ($variables as $key => $value) {
             $prompt = str_replace("{{$key}}", $value, $prompt);
+            $prompt = str_replace('{'.$key.'}', $value, $prompt);
         }
 
         return $prompt;

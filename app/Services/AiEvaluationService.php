@@ -15,11 +15,13 @@ class AiEvaluationService
 
     public function __construct()
     {
-        $this->apiKey = config('services.openai.api_key');
+        $apiKey = config('ai.api_key');
 
-        if (! $this->apiKey) {
-            throw new \RuntimeException('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment.');
+        if (! $apiKey || ! is_string($apiKey)) {
+            throw new \RuntimeException('OpenAI API key not configured. Please set AI_API_KEY or OPENAI_API_KEY in your environment.');
         }
+
+        $this->apiKey = $apiKey;
     }
 
     /**
@@ -121,7 +123,7 @@ class AiEvaluationService
      *
      * @return array<string, mixed>
      */
-    protected function callOpenAI(
+    public function callOpenAI(
         string $systemPrompt,
         string $userPrompt,
         string $model = 'gpt-4',
@@ -129,10 +131,7 @@ class AiEvaluationService
         float $temperature = 0.7
     ): array {
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer '.$this->apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(120)->post($this->baseUrl.'/chat/completions', [
+            $payload = [
                 'model' => $model,
                 'messages' => [
                     [
@@ -144,12 +143,67 @@ class AiEvaluationService
                         'content' => $userPrompt,
                     ],
                 ],
-                'max_tokens' => $maxTokens,
+                'max_completion_tokens' => $maxTokens,
+            ];
+
+            // Only add temperature if it's not the default value of 1
+            // Some models (like gpt-5) only support temperature = 1
+            if ($temperature !== 1.0) {
+                $payload['temperature'] = $temperature;
+            }
+
+            // Log the complete request details including full payload (using dedicated ai channel)
+            Log::channel('ai')->info('OpenAI API Request - Summary', [
+                'model' => $model,
+                'max_completion_tokens' => $maxTokens,
                 'temperature' => $temperature,
+                'system_prompt_length' => strlen($systemPrompt),
+                'user_prompt_length' => strlen($userPrompt),
+                'estimated_input_tokens' => (int) ((strlen($systemPrompt) + strlen($userPrompt)) / 4),
+            ]);
+
+            // Log the complete payload being sent to OpenAI
+            Log::channel('ai')->info('OpenAI API Request - Complete Payload', [
+                'payload' => $payload,
+                'endpoint' => $this->baseUrl.'/chat/completions',
+            ]);
+
+            // Log the full prompts separately for easier reading
+            Log::channel('ai')->info('OpenAI API Request - System Prompt', [
+                'system_prompt' => $systemPrompt,
+            ]);
+
+            Log::channel('ai')->info('OpenAI API Request - User Prompt', [
+                'user_prompt' => $userPrompt,
+            ]);
+
+            Log::channel('ai')->info('🚀 Starting OpenAI API HTTP Request', [
+                'timestamp' => now()->toDateTimeString(),
+                'timeout' => 300,
+            ]);
+
+            $startTime = microtime(true);
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer '.$this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->timeout(300)->post($this->baseUrl.'/chat/completions', $payload);
+            $duration = microtime(true) - $startTime;
+
+            Log::channel('ai')->info('✅ OpenAI API HTTP Request Completed', [
+                'timestamp' => now()->toDateTimeString(),
+                'duration_seconds' => round($duration, 2),
+                'status_code' => $response->status(),
             ]);
 
             if ($response->successful()) {
                 $data = $response->json();
+
+                Log::info('OpenAI API Response Success', [
+                    'model' => $model,
+                    'usage' => $data['usage'] ?? null,
+                    'response_length' => strlen($data['choices'][0]['message']['content'] ?? ''),
+                    'finish_reason' => $data['choices'][0]['finish_reason'] ?? null,
+                ]);
 
                 return [
                     'success' => true,
@@ -161,9 +215,12 @@ class AiEvaluationService
                 $errorMessage = $errorData['error']['message'] ?? 'Unknown API error';
 
                 Log::error('OpenAI API error', [
+                    'model' => $model,
                     'status' => $response->status(),
                     'error' => $errorMessage,
                     'response' => $response->body(),
+                    'system_prompt_length' => strlen($systemPrompt),
+                    'user_prompt_length' => strlen($userPrompt),
                 ]);
 
                 return [

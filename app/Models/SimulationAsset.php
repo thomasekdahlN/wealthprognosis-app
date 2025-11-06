@@ -15,7 +15,11 @@ use Illuminate\Validation\Rule;
  * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\SimulationAssetYear> $simulationAssetYears
  * @property string $name
  * @property string $asset_type
+ * @property int|null $asset_configuration_id
+ * @property int|null $simulation_configuration_id
  * @property \App\Models\AssetType|null $assetType
+ * @property \App\Models\AssetConfiguration|null $assetConfiguration
+ * @property \App\Models\SimulationConfiguration|null $simulationConfiguration
  */
 class SimulationAsset extends Model
 {
@@ -32,6 +36,7 @@ class SimulationAsset extends Model
     }
 
     protected $fillable = [
+        'simulation_configuration_id',
         'asset_configuration_id',
         'user_id',
         'team_id',
@@ -81,9 +86,14 @@ class SimulationAsset extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+    public function simulationConfiguration(): BelongsTo
+    {
+        return $this->belongsTo(SimulationConfiguration::class, 'simulation_configuration_id');
+    }
+
     public function assetConfiguration(): BelongsTo
     {
-        return $this->belongsTo(AssetConfiguration::class);
+        return $this->belongsTo(AssetConfiguration::class, 'asset_configuration_id');
     }
 
     public function assetType(): BelongsTo

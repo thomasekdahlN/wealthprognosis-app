@@ -96,6 +96,11 @@ class PrognosisService
         $this->rules = app(\App\Services\Utilities\RulesService::class);
         $this->taxCashflow = app(TaxCashflowService::class);
         $this->postProcessor = app(\App\Services\Processing\PostProcessorService::class);
+
+        // Debug logging
+        \Illuminate\Support\Facades\Log::debug('PrognosisService created', [
+            'taxincome_country' => $this->taxincome->getCountry(),
+        ]);
         $this->assetTypeService = app(AssetTypeService::class);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');

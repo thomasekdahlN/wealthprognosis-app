@@ -52,7 +52,7 @@ class AiConfigurationAnalysisService
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer '.$this->openaiApiKey,
                 'Content-Type' => 'application/json',
-            ])->timeout(20)->post('https://api.openai.com/v1/chat/completions', [
+            ])->timeout(300)->post('https://api.openai.com/v1/chat/completions', [
                 'model' => $this->model,
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],

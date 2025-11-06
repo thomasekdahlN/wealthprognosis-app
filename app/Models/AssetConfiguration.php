@@ -116,4 +116,9 @@ class AssetConfiguration extends Model
     {
         return $this->hasMany(Asset::class, 'asset_configuration_id');
     }
+
+    public function simulationAssets(): HasMany
+    {
+        return $this->hasMany(SimulationAsset::class, 'asset_configuration_id');
+    }
 }

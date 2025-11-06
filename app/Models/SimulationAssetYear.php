@@ -295,7 +295,7 @@ class SimulationAssetYear extends Model
 
     public function simulationAsset(): BelongsTo
     {
-        return $this->belongsTo(SimulationAsset::class);
+        return $this->belongsTo(SimulationAsset::class, 'asset_id');
     }
 
     /**

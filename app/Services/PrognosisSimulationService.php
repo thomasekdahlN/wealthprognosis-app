@@ -23,12 +23,14 @@ class PrognosisSimulationService
         $prognosisType = $simulationData['prognosis_type'];
         $assetScope = $simulationData['group'] ?? $simulationData['asset_scope']; // Support both field names
         $taxCountry = $simulationData['tax_country'] ?? 'no';
+        $description = $simulationData['description'] ?? null;
 
         Log::info('Starting PrognosisSimulationService', [
             'asset_configuration_id' => $assetConfigurationId,
             'prognosis_type' => $prognosisType,
             'asset_scope' => $assetScope,
             'tax_country' => $taxCountry,
+            'description' => $description,
         ]);
 
         // Get the asset configuration
@@ -36,30 +38,62 @@ class PrognosisSimulationService
             ->findOrFail($assetConfigurationId);
 
         // Create simulation configuration record
-        $simulationConfig = $this->createSimulationConfiguration($assetConfiguration, $prognosisType, $assetScope, $taxCountry);
+        $simulationConfig = $this->createSimulationConfiguration($assetConfiguration, $prognosisType, $assetScope, $taxCountry, $description);
 
         // Copy assets to simulation tables
         $this->copyAssetsToSimulation($assetConfiguration, $simulationConfig, $assetScope);
 
-        // TODO: Implement prognosis calculation engine
-        // For now, return basic structure
+        // Prepare config data for PrognosisService
+        Log::info('Preparing config data for PrognosisService');
+        $configData = $this->prepareConfigData($assetConfiguration, $assetScope);
+
+        // Bind ChangerateService with the specified prognosis type
+        app()->singleton(\App\Services\Prognosis\ChangerateService::class, function () use ($prognosisType) {
+            return new \App\Services\Prognosis\ChangerateService($prognosisType);
+        });
+
+        // Bind tax services with the specified tax country
+        Log::info('Binding tax services with country: '.$taxCountry);
+        app()->singleton(\App\Services\Tax\TaxConfigRepository::class, function () use ($taxCountry) {
+            return new \App\Services\Tax\TaxConfigRepository($taxCountry);
+        });
+
+        app()->singleton(\App\Services\Tax\TaxIncomeService::class, function () use ($taxCountry) {
+            return new \App\Services\Tax\TaxIncomeService($taxCountry);
+        });
+
+        app()->singleton(\App\Services\Tax\TaxFortuneService::class, function () use ($taxCountry) {
+            return new \App\Services\Tax\TaxFortuneService($taxCountry);
+        });
+
+        app()->singleton(\App\Services\Tax\TaxRealizationService::class, function () use ($taxCountry) {
+            return new \App\Services\Tax\TaxRealizationService($taxCountry);
+        });
+
+        // Run the prognosis calculation
+        Log::info('Running PrognosisService calculation');
+        $prognosisService = new \App\Services\Prognosis\PrognosisService($configData);
+
+        // Get the calculated dataH
+        $dataH = $prognosisService->dataH;
+
+        // Store the results in simulation_asset_years table
+        Log::info('Storing prognosis results to simulation tables');
+        $this->storePrognosisDataH($simulationConfig, $dataH);
+
+        // Build summary results from the calculated data
         $results = [
             'configuration' => [
                 'asset_configuration_id' => $assetConfiguration->id,
                 'prognosis_type' => $prognosisType,
                 'asset_scope' => $assetScope,
             ],
-            'summary' => [
-                'total_assets_start' => 0,
-                'total_assets_end' => 0,
-                'total_income' => 0,
-                'total_expenses' => 0,
-            ],
-            'yearly_data' => [],
+            'summary' => $this->buildSummary($dataH, $prognosisService),
+            'yearly_data' => $dataH,
             'asset_breakdown' => [],
         ];
 
-        // Store detailed results in simulation tables
+        // Store summary metadata in simulation configuration
         $this->storeSimulationResults($simulationConfig, $results);
 
         Log::info('PrognosisSimulationService completed', [
@@ -77,12 +111,17 @@ class PrognosisSimulationService
     /**
      * Create simulation configuration record
      */
-    protected function createSimulationConfiguration(AssetConfiguration $assetConfig, string $prognosisType, string $assetScope, string $taxCountry = 'no'): SimulationConfiguration
+    protected function createSimulationConfiguration(AssetConfiguration $assetConfig, string $prognosisType, string $assetScope, string $taxCountry = 'no', ?string $userDescription = null): SimulationConfiguration
     {
+        // Build description: use user's description if provided, otherwise generate default
+        $description = $userDescription
+            ? $userDescription
+            : "Financial simulation using {$prognosisType} scenario for {$assetScope} assets with {$taxCountry} tax system";
+
         return SimulationConfiguration::create([
             'asset_configuration_id' => $assetConfig->id,
-            'name' => "Simulation - {$assetConfig->name} ({$prognosisType})",
-            'description' => "Financial simulation using {$prognosisType} scenario for {$assetScope} assets with {$taxCountry} tax system",
+            'name' => $assetConfig->name,
+            'description' => $description,
             'birth_year' => $assetConfig->birth_year,
             'prognose_age' => $assetConfig->prognose_age,
             'pension_official_age' => $assetConfig->pension_official_age,
@@ -125,7 +164,8 @@ class PrognosisSimulationService
         foreach ($assets as $asset) {
             // Create simulation asset (metadata only, no year data)
             SimulationAsset::create([
-                'asset_configuration_id' => $simulationConfig->id,
+                'simulation_configuration_id' => $simulationConfig->id,
+                'asset_configuration_id' => $assetConfig->id,
                 'name' => $asset->name,
                 'code' => $asset->code,
                 'description' => $asset->description,
@@ -171,7 +211,7 @@ class PrognosisSimulationService
             }
 
             // Find the simulation asset by name
-            $simulationAsset = SimulationAsset::where('asset_configuration_id', $simulationConfig->id)
+            $simulationAsset = SimulationAsset::where('simulation_configuration_id', $simulationConfig->id)
                 ->where('name', $assetName)
                 ->first();
 
@@ -190,7 +230,7 @@ class PrognosisSimulationService
                     continue;
                 }
 
-                $this->storeYearData($simulationAsset, (int) $year, $yearData);
+                $this->storeYearData($simulationAsset, $simulationConfig, (int) $year, $yearData);
             }
         }
 
@@ -204,7 +244,7 @@ class PrognosisSimulationService
      *
      * @param  array<string, mixed>  $yearData
      */
-    protected function storeYearData(SimulationAsset $simulationAsset, int $year, array $yearData): void
+    protected function storeYearData(SimulationAsset $simulationAsset, SimulationConfiguration $simulationConfig, int $year, array $yearData): void
     {
         // Find or create the simulation asset year record
         $simulationAssetYear = SimulationAssetYear::updateOrCreate(
@@ -215,7 +255,7 @@ class PrognosisSimulationService
             [
                 'user_id' => Auth::id() ?? $simulationAsset->user_id,
                 'team_id' => Auth::user()->currentTeam->id ?? $simulationAsset->team_id,
-                'asset_configuration_id' => $simulationAsset->asset_configuration_id,
+                'asset_configuration_id' => $simulationConfig->asset_configuration_id,
 
                 // Income data
                 'income_amount' => $yearData['income']['amount'] ?? null,
@@ -380,6 +420,133 @@ class PrognosisSimulationService
             'fire_achieved' => $results['summary']['fire_achieved'] ?? null,
             'total_assets_end' => $results['summary']['total_assets_end'] ?? null,
         ]);
+    }
+
+    /**
+     * Prepare config data for PrognosisService from AssetConfiguration
+     *
+     * @return array<string, mixed>
+     */
+    protected function prepareConfigData(AssetConfiguration $assetConfiguration, string $assetScope): array
+    {
+        $configData = [
+            'meta' => [
+                'name' => $assetConfiguration->name,
+                'description' => $assetConfiguration->description,
+                'birthYear' => $assetConfiguration->birth_year,
+                'deathAge' => $assetConfiguration->expected_death_age,
+                'prognoseAge' => $assetConfiguration->prognose_age,
+                'pensionOfficialAge' => $assetConfiguration->pension_official_age,
+                'pensionWishAge' => $assetConfiguration->pension_wish_age,
+                'expectedDeathAge' => $assetConfiguration->expected_death_age,
+                'exportStartAge' => $assetConfiguration->export_start_age,
+            ],
+        ];
+
+        // Filter assets based on scope
+        $assetsQuery = $assetConfiguration->assets()->where('is_active', true);
+
+        if ($assetScope === 'private') {
+            $assetsQuery->where('group', 'private');
+        } elseif ($assetScope === 'business') {
+            $assetsQuery->where('group', 'business');
+        }
+
+        $assets = $assetsQuery->with('years')->get();
+
+        // Add assets and their years
+        foreach ($assets as $asset) {
+            $assetName = $asset->name;
+            $configData[$assetName] = [
+                'meta' => [
+                    'type' => $asset->asset_type,
+                    'group' => $asset->group,
+                    'name' => $asset->name,
+                    'description' => $asset->description,
+                    'active' => $asset->is_active,
+                ],
+            ];
+
+            foreach ($asset->years as $assetYear) {
+                $configData[$assetName][$assetYear->year] = [
+                    'description' => $assetYear->description,
+                    'asset' => [
+                        'marketAmount' => (float) $assetYear->asset_market_amount,
+                        'acquisitionAmount' => (float) $assetYear->asset_acquisition_amount,
+                        'changerate' => $assetYear->asset_changerate,
+                        'repeat' => $assetYear->asset_repeat,
+                    ],
+                    'income' => [
+                        'amount' => (float) $assetYear->income_amount,
+                        'factor' => $assetYear->income_factor,
+                        'changerate' => $assetYear->income_changerate,
+                        'repeat' => $assetYear->income_repeat,
+                    ],
+                    'expence' => [
+                        'amount' => (float) $assetYear->expence_amount,
+                        'factor' => $assetYear->expence_factor,
+                        'changerate' => $assetYear->expence_changerate,
+                        'repeat' => $assetYear->expence_repeat,
+                    ],
+                ];
+
+                // Add mortgage if present
+                if ($assetYear->mortgage_amount > 0) {
+                    $configData[$assetName][$assetYear->year]['mortgage'] = [
+                        'amount' => (float) $assetYear->mortgage_amount,
+                        'interest' => $assetYear->mortgage_interest,
+                        'years' => (int) $assetYear->mortgage_years,
+                    ];
+                }
+            }
+        }
+
+        return $configData;
+    }
+
+    /**
+     * Build summary from calculated dataH
+     *
+     * @param  array<string, mixed>  $dataH
+     * @return array<string, mixed>
+     */
+    protected function buildSummary(array $dataH, \App\Services\Prognosis\PrognosisService $prognosisService): array
+    {
+        // Extract summary metrics from the calculated data
+        $totalAssets = $prognosisService->totalH ?? [];
+        $privateAssets = $prognosisService->privateH ?? [];
+        $companyAssets = $prognosisService->companyH ?? [];
+
+        $startYear = $prognosisService->economyStartYear;
+        $endYear = $prognosisService->deathYear;
+
+        return [
+            'total_assets_start' => $totalAssets[$startYear]['asset']['marketAmount'] ?? 0,
+            'total_assets_end' => $totalAssets[$endYear]['asset']['marketAmount'] ?? 0,
+            'total_income' => array_sum(array_column(array_filter($totalAssets, fn ($year) => is_numeric($year), ARRAY_FILTER_USE_KEY), 'income.amount' ?? 0)),
+            'total_expenses' => array_sum(array_column(array_filter($totalAssets, fn ($year) => is_numeric($year), ARRAY_FILTER_USE_KEY), 'expence.amount' ?? 0)),
+            'fire_achieved' => $this->checkFireAchieved($totalAssets),
+        ];
+    }
+
+    /**
+     * Check if FIRE was achieved in the simulation
+     *
+     * @param  array<string, mixed>  $totalAssets
+     */
+    protected function checkFireAchieved(array $totalAssets): bool
+    {
+        foreach ($totalAssets as $year => $data) {
+            if (! is_numeric($year)) {
+                continue;
+            }
+
+            if (isset($data['fire']['achieved']) && $data['fire']['achieved']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

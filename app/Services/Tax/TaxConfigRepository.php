@@ -33,6 +33,14 @@ class TaxConfigRepository
     }
 
     /**
+     * Get the country code this repository is configured for.
+     */
+    public function getCountry(): string
+    {
+        return $this->country;
+    }
+
+    /**
      * Fetch configuration for a given country and year with a specific tax type, falling back to
      * the most recent configuration at or before the requested year.
      *

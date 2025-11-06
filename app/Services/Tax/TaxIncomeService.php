@@ -61,6 +61,12 @@ class TaxIncomeService implements TaxCalculatorInterface
         $this->country = strtolower($country) ?: 'no';
         $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
         $this->taxsalary = $taxSalary ?? new TaxSalaryService($this->country, $this->taxConfigRepo);
+
+        // Debug logging
+        Log::debug('TaxIncomeService created', [
+            'country' => $this->country,
+            'repo_country' => $this->taxConfigRepo->getCountry(),
+        ]);
     }
 
     /**

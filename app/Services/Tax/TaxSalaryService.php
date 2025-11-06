@@ -99,6 +99,16 @@ class TaxSalaryService implements TaxCalculatorInterface
             $socialSecurityTaxRate = $this->taxConfigRepo->getSalaryTaxSocialSecurityRate($year);
         }
 
+        // Debug logging
+        Log::debug('TaxSalaryService rates', [
+            'country' => $this->country,
+            'year' => $year,
+            'amount' => $amount,
+            'common_rate' => $commonTaxRate,
+            'social_security_rate' => $socialSecurityTaxRate,
+            'common_deduction' => $commonTaxDeductionAmount,
+        ]);
+
         $socialSecurityTaxableAmount = $amount; // Man betaler trygdeavgift av hele lønnen uten fradrag
         if ($socialSecurityTaxableAmount > 0) {
             $socialSecurityTaxAmount = round($socialSecurityTaxableAmount * $socialSecurityTaxRate);
