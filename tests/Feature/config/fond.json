@@ -1,6 +1,6 @@
 {
   "meta": {
-    "name": "Alex Aksjefond",
+    "name": "Lena Lønn & Aksjefond",
     "description": "Early career professional building wealth through systematic fund investments and compound growth",
     "birthYear": "2005",
     "prognoseAge": "50",
@@ -16,7 +16,7 @@
   },
   "income": {
     "meta": {
-      "type": "income",
+      "type": "salary",
       "group": "private",
       "name": "Software Developer Salary",
       "description": "Entry-level to senior software developer career progression",
@@ -28,7 +28,7 @@
       "income": {
         "name": "Income",
         "description": "Income",
-        "amount": 40000,
+        "amount": 50000,
         "factor": "monthly",
         "changerate": "changerates.kpi",
         "repeat": true
@@ -36,7 +36,7 @@
       "expence": {
         "name": "Expences",
         "description": "",
-        "amount": 15000,
+        "amount": 20000,
         "factor": "monthly",
         "changerate": "changerates.kpi",
         "repeat": true
@@ -58,15 +58,15 @@
       "type": "equityfund",
       "group": "private",
       "name": "Global Equity Index Fund",
-      "description": "Low-cost global equity index fund for long-term wealth building",
+      "description": "Startet med 1 mill, sparer 100K pr år i fondet",
       "active": true,
       "debug": true
     },
     "2025": {
-      "description": "Income:  | Expense:  | Asset:  | Mortgage: ",
+      "description": "Startet med 1 mill, sparer 100K pr år i fondet",
       "asset": {
         "marketAmount": 1000000,
-        "rule": "+5000",
+        "rule": "+100000",
         "changerate": "changerates.equityfund",
         "description": "",
         "repeat": true

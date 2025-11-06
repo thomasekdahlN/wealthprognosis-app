@@ -24,14 +24,12 @@
       "debug": true
     },
     "2023": {
-      "description": "Income: Rental AirBNB | Expense: Expences | Asset: Fortune sets the value from the tax authorities | Mortgage: interest changerates.interest, years 20",
       "asset": {
         "marketAmount": 10000000,
         "acquisitionAmount": 6000000,
         "paiddAmount": 300000,
         "taxableAmount": 200000,
         "changerate": "changerates.cabin",
-        "description": "Fortune sets the value from the tax authorities, which is different from marketprice",
         "repeat": true
       },
       "income": {

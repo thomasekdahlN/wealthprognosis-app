@@ -31,9 +31,9 @@ class SimulationExportServiceTest extends TestCase
                 'export_start_age' => 25,
             ]);
 
-        // Create one simulation asset linked to this simulation (note: FK is asset_configuration_id)
+        // Create one simulation asset linked to this simulation
         $asset = SimulationAsset::factory()->create([
-            'asset_configuration_id' => $simulation->id,
+            'simulation_configuration_id' => $simulation->id,
             'user_id' => $user->id,
             'name' => 'Equity Fund ABC',
             'asset_type' => 'equity',

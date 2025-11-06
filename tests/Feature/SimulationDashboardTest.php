@@ -60,7 +60,7 @@ function createSimulationAssetsWithYears($simulationConfiguration, $assetConfigu
     // Create multiple simulation assets
     for ($i = 1; $i <= 3; $i++) {
         $simulationAsset = SimulationAsset::factory()->create([
-            'asset_configuration_id' => $assetConfiguration->id,
+            'simulation_configuration_id' => $simulationConfiguration->id,
             'user_id' => $user->id,
             'team_id' => $user->currentTeam?->id,
             'name' => "Test Asset {$i}",
