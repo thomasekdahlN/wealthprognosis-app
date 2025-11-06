@@ -242,15 +242,15 @@ Note: Data is in CSV format with headers. Each row represents one asset-year.
 - Only meaningful data sent to AI
 - Cleaner analysis results
 
-## Next Steps
+## Implementation Complete
 
 1. ✅ **CSV export function created** (`toCsvFull()`)
 2. ✅ **Empty row filtering implemented** (all formats)
 3. ✅ **Excel export function added** (`toExcel()`)
 4. ✅ **Documentation updated**
-5. ⏳ **Update AI comparison job** to use CSV (optional)
-6. ⏳ **Update AI instruction prompts** to mention CSV format (optional)
-7. ⏳ **Test AI response quality** with CSV vs JSON (optional)
+5. ✅ **AI comparison job updated** to use CSV
+6. ✅ **AI instruction prompts updated** to mention CSV format
+7. ⏳ **Test AI response quality** with CSV vs JSON (ready to test)
 
 ## Files Modified
 
@@ -260,6 +260,17 @@ Note: Data is in CSV format with headers. Each row represents one asset-year.
   - Added `toExcel()` method
   - Updated `buildJsonStructure()` to filter empty rows
   - Updated CSV export to filter empty rows
+
+- `app/Jobs/ProcessAiComparisonAnalysis.php`
+  - Changed from `toCompactJson()` to `toCsvFull()`
+  - Updated variable names: `simulation_a_json` → `simulation_a_csv`
+  - Updated logging to track CSV data instead of JSON
+  - Updated status messages
+
+- `database/seeders/AiInstructionSeeder.php`
+  - Updated prompt template placeholders: `{simulation_a_json}` → `{simulation_a_csv}`
+  - Added data format explanation in prompt
+  - Mentioned CSV format and empty row filtering
 
 - `docs/AI_DATA_FORMAT_COMPARISON.md`
   - Updated with new benchmark results

@@ -11,28 +11,34 @@ CSV provides the best balance of:
 - ✅ **Lower cost** - ~$0.04 savings per comparison
 - ✅ **Faster processing** - Less tokens to parse
 
-## Format Comparison Results
+## Format Comparison Results (OPTIMIZED - Empty Rows Filtered)
 
-### Single Simulation (110 asset-years)
+### Single Simulation (110 asset-years, 106 non-empty)
 
 | Format | Size | Tokens | Cost/Request |
 |--------|------|--------|--------------|
-| JSON (Full) | 61,982 bytes | 15,496 | $0.1550 |
-| JSON (Compact) | 40,973 bytes | 10,243 | $0.1024 |
-| **CSV** | **32,837 bytes** | **8,209** | **$0.0821** |
+| JSON (Full) | 60,382 bytes | 15,096 | $0.1510 |
+| JSON (Compact) | 39,877 bytes | 9,969 | $0.0997 |
+| Excel (.xlsx) | 38,361 bytes | binary | N/A |
+| **CSV** | **31,757 bytes** | **7,939** | **$0.0794** |
 
 ### Two Simulations (AI Comparison)
 
 | Format | Total Size | Tokens | Cost/Request |
 |--------|-----------|--------|--------------|
-| JSON (Compact) | 81,633 bytes | 20,408 | $0.2041 |
-| **CSV** | **65,906 bytes** | **16,477** | **$0.1648** |
+| JSON (Compact) | 79,441 bytes | 19,860 | $0.1986 |
+| Excel (.xlsx) | 75,869 bytes | binary | N/A |
+| **CSV** | **63,726 bytes** | **15,932** | **$0.1593** |
 
 **Savings with CSV:**
-- Size: 19.3% smaller
-- Tokens: 3,932 fewer tokens
+- Size: 19.8% smaller than JSON
+- Tokens: 3,929 fewer tokens
 - Cost: $0.0393 per comparison
 - **Annual savings (100 comparisons): $3.93**
+
+**Optimization Impact:**
+- Empty rows filtered: 4 rows removed (3.6%)
+- All formats now exclude rows where all amount fields are null or 0
 
 ## Format Details
 
@@ -92,6 +98,13 @@ CSV provides the best balance of:
 
 ## Other Compact Formats Considered
 
+### Excel (.xlsx)
+- **Binary spreadsheet format** with multiple sheets
+- **19% larger than CSV** (75,869 vs 63,726 bytes for 2 simulations)
+- **NOT AI-readable** - Binary format cannot be sent to LLMs
+- **Recommendation:** Avoid for AI - use CSV instead
+- **Use case:** Human-readable exports only
+
 ### TSV (Tab-Separated Values)
 - **Similar to CSV** but uses tabs instead of commas
 - **Slightly more compact** - No need to escape commas in text
@@ -122,7 +135,7 @@ CSV provides the best balance of:
 ### CSV Export Function
 
 ```php
-SimulationExportService::toCsv($simulation)
+SimulationExportService::toCsvFull($simulation)
 ```
 
 **Features:**
@@ -130,6 +143,7 @@ SimulationExportService::toCsv($simulation)
 - 27 columns covering all essential data
 - Proper CSV escaping for commas, quotes, newlines
 - Simulation metadata on every row for context
+- **Optimized:** Excludes rows where all amount fields are null or 0
 
 **Column Headers:**
 ```
@@ -152,8 +166,15 @@ $simulationBJson = SimulationExportService::toCompactJson($simulationB);
 
 ### Recommended (CSV)
 ```php
-$simulationACsv = SimulationExportService::toCsv($simulationA);
-$simulationBCsv = SimulationExportService::toCsv($simulationB);
+$simulationACsv = SimulationExportService::toCsvFull($simulationA);
+$simulationBCsv = SimulationExportService::toCsvFull($simulationB);
+```
+
+### Excel Export (for human download only)
+```php
+$excelPath = SimulationExportService::toExcel($simulationA);
+// Returns file path to .xlsx file
+// Note: Cannot be sent to AI - binary format
 ```
 
 ### Prompt Template Update

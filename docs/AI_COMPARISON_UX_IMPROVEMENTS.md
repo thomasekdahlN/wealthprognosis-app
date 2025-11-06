@@ -118,11 +118,12 @@ The job provides these status updates:
 **Added Imports:**
 ```php
 use App\Services\SimulationExportService;
-use Filament\Tables\Actions\ActionGroup;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 ```
 
-**Added Action Group:**
+**Added Action Group (Filament 4):**
 ```php
 ActionGroup::make([
     Action::make('export_json_full')
@@ -132,14 +133,14 @@ ActionGroup::make([
         ->action(function (\App\Models\SimulationConfiguration $record): StreamedResponse {
             $json = SimulationExportService::toJson($record);
             $filename = now()->format('Y-m-d').'_'.\Illuminate\Support\Str::slug($record->name).'_full.json';
-            
+
             return response()->streamDownload(function () use ($json) {
                 echo $json;
             }, $filename, [
                 'Content-Type' => 'application/json',
             ]);
         }),
-    
+
     // ... similar for compact JSON, CSV, and Excel ...
 ])
     ->label('Export')
@@ -147,6 +148,8 @@ ActionGroup::make([
     ->color('gray')
     ->button()
 ```
+
+**Note:** In Filament 4, all action classes extend `Filament\Actions\Action`. Use `Filament\Actions\ActionGroup` (not `Filament\Tables\Actions\ActionGroup`) to group table row actions.
 
 #### Export Formats Available
 

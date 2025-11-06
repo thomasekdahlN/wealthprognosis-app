@@ -95,3 +95,5 @@ Do not redirect on save unless explicitely asked for it.
 Use filament Money cast for all database fields handling money/amount. 
 Ff more than two parameters are sendt/returned a value object is prefered). But always consider what is the bestr architectural solution.
 Create all value object before they are returned with the name of the function as the first text, and log the content befor returning.
+Do not run pint other than before commiting changes (This is to save time and speed up development)
+THe gpt-5 AI model exists - you find it here: https://platform.openai.com/docs/models/gpt-5-chat-latest

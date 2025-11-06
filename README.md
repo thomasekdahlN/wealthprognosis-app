@@ -1280,3 +1280,65 @@ A crystal ball that has a subtle outline of a calculator within it, symbolizing 
 Circle with Tax Icons:
 
 A circle with various small icons around its border representing different taxes and financial elements (e.g., a small house for property tax, a bag of money for income tax), with a central icon that represents overall wealth, like a growing graph or tree.
+
+---
+
+## Queue Worker Setup
+
+This application uses Laravel queues to handle long-running tasks like AI analysis. The queue is configured to use the database driver.
+
+### Starting the Queue Worker
+
+To process background jobs, you need to run the queue worker:
+
+```bash
+php artisan queue:work --tries=3 --timeout=300
+```
+
+**Options:**
+- `--tries=3` - Retry failed jobs up to 3 times
+- `--timeout=300` - Allow jobs to run for up to 5 minutes (300 seconds)
+
+### For Production
+
+For production environments, you should use a process manager like **Supervisor** to keep the queue worker running:
+
+1. Install Supervisor:
+```bash
+sudo apt-get install supervisor
+```
+
+2. Create a configuration file at `/etc/supervisor/conf.d/wealthprognosis-worker.conf`:
+```ini
+[program:wealthprognosis-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path/to/your/app/artisan queue:work --tries=3 --timeout=300
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/path/to/your/app/storage/logs/worker.log
+stopwaitsecs=3600
+```
+
+3. Start Supervisor:
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start wealthprognosis-worker:*
+```
+
+### Monitoring Jobs
+
+- View failed jobs: `php artisan queue:failed`
+- Retry failed jobs: `php artisan queue:retry all`
+- Clear failed jobs: `php artisan queue:flush`
+
+### Important Notes
+
+- The queue worker must be running for AI analysis and other background tasks to work
+- After code changes, restart the queue worker: `php artisan queue:restart`
+- Monitor the `jobs` and `failed_jobs` tables in your database
