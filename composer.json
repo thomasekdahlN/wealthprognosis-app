@@ -16,7 +16,8 @@
     "laravel/tinker": "^2.10",
     "maatwebsite/excel": "^3.1.48",
     "phpoffice/phpspreadsheet": "^1.29.0",
-    "psr/simple-cache": "^1.0|^3.0"
+    "psr/simple-cache": "^1.0|^3.0",
+    "watheqalshowaiter/filament-sticky-table-header": "^1.0"
   },
   "require-dev": {
     "fakerphp/faker": "^1.9.1",

@@ -51,37 +51,37 @@ return [
         'gpt-3.5-turbo' => [
             'max_tokens' => 1000,
             'temperature' => 0.7,
-            'timeout' => 30,
+            'timeout' => 120,
         ],
         'gpt-4' => [
             'max_tokens' => 1500,
             'temperature' => 0.7,
-            'timeout' => 45,
+            'timeout' => 180,
         ],
         'gpt-4-turbo' => [
             'max_tokens' => 2000,
             'temperature' => 0.7,
-            'timeout' => 45,
+            'timeout' => 180,
         ],
         'gpt-4o' => [
             'max_tokens' => 2000,
             'temperature' => 0.7,
-            'timeout' => 45,
+            'timeout' => 300,
         ],
         'gpt-5' => [
             'max_tokens' => 3000,
             'temperature' => 0.7,
-            'timeout' => 60,
+            'timeout' => 300,
         ],
         'o1-preview' => [
             'max_tokens' => 2000,
             'temperature' => 1.0, // o1 models use fixed temperature
-            'timeout' => 60,
+            'timeout' => 300,
         ],
         'o1-mini' => [
             'max_tokens' => 1500,
             'temperature' => 1.0, // o1 models use fixed temperature
-            'timeout' => 45,
+            'timeout' => 180,
         ],
     ],
 
