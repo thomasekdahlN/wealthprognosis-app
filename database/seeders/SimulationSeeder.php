@@ -77,15 +77,23 @@ class SimulationSeeder extends Seeder
                     continue;
                 }
 
-                // Run simulation with realistic scenario
-                $simulationConfig = $this->runSimulation($assetConfiguration, $user);
+                // Run simulations with realistic scenario for three different tax countries
+                $taxCountries = [
+                    'no' => 'Norway',
+                    'se' => 'Sweden',
+                    'ch' => 'Switzerland',
+                ];
 
-                if ($simulationConfig) {
-                    $this->command->info("  ✅ Simulation created: {$simulationConfig->name} (ID: {$simulationConfig->id})");
-                    $successCount++;
-                } else {
-                    $this->command->warn("  ⚠️  Failed to create simulation for {$filename}");
-                    $errorCount++;
+                foreach ($taxCountries as $taxCode => $taxCountryName) {
+                    $simulationConfig = $this->runSimulation($assetConfiguration, $user, $taxCode, $taxCountryName);
+
+                    if ($simulationConfig) {
+                        $this->command->info("  ✅ Simulation created: {$simulationConfig->name} - {$taxCountryName} (ID: {$simulationConfig->id})");
+                        $successCount++;
+                    } else {
+                        $this->command->warn("  ⚠️  Failed to create simulation for {$filename} with {$taxCountryName} tax");
+                        $errorCount++;
+                    }
                 }
 
             } catch (\Exception $e) {
@@ -139,8 +147,28 @@ class SimulationSeeder extends Seeder
             $this->command->line("  🔄 Deleting existing configuration: {$configName}");
 
             DB::transaction(function () use ($existingConfig) {
-                // Delete related simulations first
-                SimulationConfiguration::where('asset_configuration_id', $existingConfig->id)->delete();
+                // Get all simulation configurations for this asset configuration
+                $simulationConfigs = SimulationConfiguration::where('asset_configuration_id', $existingConfig->id)->get();
+
+                // Delete simulation data in correct order (respecting foreign keys)
+                foreach ($simulationConfigs as $simConfig) {
+                    // Get all simulation asset IDs for this simulation
+                    $simulationAssetIds = \App\Models\SimulationAsset::where('simulation_configuration_id', $simConfig->id)
+                        ->pluck('id')
+                        ->toArray();
+
+                    // 1. Delete simulation_asset_years first
+                    if (! empty($simulationAssetIds)) {
+                        \App\Models\SimulationAssetYear::whereIn('asset_id', $simulationAssetIds)->delete();
+                    }
+
+                    // 2. Delete simulation_assets second
+                    \App\Models\SimulationAsset::where('simulation_configuration_id', $simConfig->id)->delete();
+
+                    // 3. Delete simulation_configuration last
+                    $simConfig->delete();
+                }
+
                 // Delete related asset years
                 \App\Models\AssetYear::where('asset_configuration_id', $existingConfig->id)->delete();
                 // Delete assets under this configuration
@@ -165,37 +193,22 @@ class SimulationSeeder extends Seeder
     /**
      * Run simulation with realistic scenario
      */
-    protected function runSimulation(AssetConfiguration $assetConfiguration, User $user): ?SimulationConfiguration
+    protected function runSimulation(AssetConfiguration $assetConfiguration, User $user, string $taxCountry = 'no', string $taxCountryName = 'Norway'): ?SimulationConfiguration
     {
         try {
-            // Load the realistic prognosis configuration
-            $prognosisFile = base_path('config/prognosis/realistic.json');
-            if (! File::exists($prognosisFile)) {
-                $this->command->error("  ❌ Prognosis file not found: {$prognosisFile}");
-
-                return null;
-            }
-
-            $prognosisConfig = json_decode(File::get($prognosisFile), true);
-
-            // Load the tax configuration
-            $taxFile = base_path('config/tax/no/no-tax-2025.json');
-            if (! File::exists($taxFile)) {
-                $this->command->error("  ❌ Tax file not found: {$taxFile}");
-
-                return null;
-            }
-
-            $taxConfig = json_decode(File::get($taxFile), true);
 
             // Create simulation configuration
             $simulationService = new PrognosisSimulationService;
+
+            // Build description with tax country name
+            $description = "Realistic financial simulation for all assets with {$taxCountryName} tax system";
 
             $simulationData = [
                 'asset_configuration_id' => $assetConfiguration->id,
                 'prognosis_type' => 'realistic',
                 'group' => 'all', // Run for all assets
-                'tax_country' => 'no',
+                'tax_country' => $taxCountry,
+                'description' => $description,
             ];
 
             // Create the simulation configuration and copy assets
@@ -209,12 +222,8 @@ class SimulationSeeder extends Seeder
             // Prepare the config data for PrognosisService
             $configData = $this->prepareConfigData($assetConfiguration);
 
-            // Run the prognosis calculation
-            $prognosisService = new PrognosisService(
-                $configData,
-                $taxConfig,
-                (object) $prognosisConfig
-            );
+            // Run the prognosis calculation (PrognosisService loads tax and prognosis config from services)
+            $prognosisService = new PrognosisService($configData);
 
             // Get the calculated dataH
             $dataH = $prognosisService->dataH;
@@ -248,6 +257,7 @@ class SimulationSeeder extends Seeder
                 'name' => $assetConfiguration->name,
                 'description' => $assetConfiguration->description,
                 'birthYear' => $assetConfiguration->birth_year,
+                'deathAge' => $assetConfiguration->expected_death_age, // This is already an age, not a year
                 'prognoseAge' => $assetConfiguration->prognose_age,
                 'pensionOfficialAge' => $assetConfiguration->pension_official_age,
                 'pensionWishAge' => $assetConfiguration->pension_wish_age,
@@ -273,19 +283,19 @@ class SimulationSeeder extends Seeder
                 $configData[$assetName][$assetYear->year] = [
                     'description' => $assetYear->description,
                     'asset' => [
-                        'marketAmount' => $assetYear->asset_market_amount,
-                        'acquisitionAmount' => $assetYear->asset_acquisition_amount,
+                        'marketAmount' => (float) $assetYear->asset_market_amount,
+                        'acquisitionAmount' => (float) $assetYear->asset_acquisition_amount,
                         'changerate' => $assetYear->asset_changerate,
                         'repeat' => $assetYear->asset_repeat,
                     ],
                     'income' => [
-                        'amount' => $assetYear->income_amount,
+                        'amount' => (float) $assetYear->income_amount,
                         'factor' => $assetYear->income_factor,
                         'changerate' => $assetYear->income_changerate,
                         'repeat' => $assetYear->income_repeat,
                     ],
                     'expence' => [
-                        'amount' => $assetYear->expence_amount,
+                        'amount' => (float) $assetYear->expence_amount,
                         'factor' => $assetYear->expence_factor,
                         'changerate' => $assetYear->expence_changerate,
                         'repeat' => $assetYear->expence_repeat,
@@ -295,9 +305,9 @@ class SimulationSeeder extends Seeder
                 // Add mortgage if present
                 if ($assetYear->mortgage_amount > 0) {
                     $configData[$assetName][$assetYear->year]['mortgage'] = [
-                        'amount' => $assetYear->mortgage_amount,
-                        'interest' => $assetYear->mortgage_interest_changerate,
-                        'years' => $assetYear->mortgage_years,
+                        'amount' => (float) $assetYear->mortgage_amount,
+                        'interest' => $assetYear->mortgage_interest,
+                        'years' => (int) $assetYear->mortgage_years,
                     ];
                 }
             }

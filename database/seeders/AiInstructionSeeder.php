@@ -40,9 +40,9 @@ Please provide:
 6. Potential concerns or red flags
 
 Format your response in clear sections with actionable insights.',
-                'model' => 'gpt-4',
-                'max_tokens' => 2000,
-                'temperature' => 0.7,
+                'model' => 'gpt-4o',
+                'max_tokens' => 10000,
+                'temperature' => 1,
                 'is_active' => true,
                 'sort_order' => 1,
             ],
@@ -64,9 +64,9 @@ Focus on:
 6. Risk mitigation recommendations
 
 Provide specific, actionable risk management strategies.',
-                'model' => 'gpt-4',
-                'max_tokens' => 1500,
-                'temperature' => 0.6,
+                'model' => 'gpt-4o',
+                'max_tokens' => 10000,
+                'temperature' => 1,
                 'is_active' => true,
                 'sort_order' => 2,
             ],
@@ -88,9 +88,9 @@ Analyze:
 6. Estate planning considerations
 
 Provide specific tax optimization recommendations.',
-                'model' => 'gpt-4',
-                'max_tokens' => 1800,
-                'temperature' => 0.5,
+                'model' => 'gpt-4o',
+                'max_tokens' => 10000,
+                'temperature' => 1,
                 'is_active' => true,
                 'sort_order' => 3,
             ],
@@ -101,11 +101,13 @@ Provide specific tax optimization recommendations.',
                 'system_prompt' => 'You are an expert financial advisor specializing in scenario analysis and financial planning. You excel at comparing different financial strategies, identifying trade-offs, and providing clear, actionable recommendations. You understand concepts like FIRE (Financial Independence, Retire Early), LTV (Loan-to-Value), DSCR (Debt Service Coverage Ratio), cash flow analysis, and long-term wealth building. Your analysis is thorough, balanced, and considers both quantitative metrics and qualitative factors like risk tolerance and life goals.',
                 'user_prompt_template' => 'I need you to compare two financial simulation scenarios and provide a comprehensive analysis with recommendations.
 
-**Simulation A (Baseline):**
-{simulation_a_json}
+**Data Format:** The simulations are provided in CSV format with headers. Each row represents one asset-year with all financial metrics. Empty rows (where all amounts are zero) have been filtered out for efficiency.
 
-**Simulation B (Alternative Scenario):**
-{simulation_b_json}
+**Simulation A (Baseline) - CSV Data:**
+{simulation_a_csv}
+
+**Simulation B (Alternative Scenario) - CSV Data:**
+{simulation_b_csv}
 
 Please provide a detailed comparison analysis in **markdown format** covering:
 
@@ -145,9 +147,9 @@ Please provide a detailed comparison analysis in **markdown format** covering:
 - Warning signs to watch for
 
 Please format your response with clear headings, bullet points, and emphasis on key insights. Use Norwegian number formatting where appropriate (space as thousand separator).',
-                'model' => 'gpt-4',
-                'max_tokens' => 3000,
-                'temperature' => 0.7,
+                'model' => 'gpt-4o',
+                'max_tokens' => 16000,
+                'temperature' => 1,
                 'is_active' => true,
                 'sort_order' => 4,
             ],

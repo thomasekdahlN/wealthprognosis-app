@@ -29,7 +29,7 @@ class SimulationAssetFactory extends Factory
         $groups = ['private', 'business'];
 
         return [
-            'asset_configuration_id' => \App\Models\AssetConfiguration::factory(),
+            'simulation_configuration_id' => \App\Models\SimulationConfiguration::factory(),
             'code' => $this->faker->unique()->slug(2),
             'name' => $this->faker->words(2, true),
             'description' => $this->faker->sentence(),
