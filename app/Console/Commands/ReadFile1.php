@@ -16,7 +16,6 @@
 
 namespace App\Console\Commands;
 
-use App\Exports\PrognosisExport1;
 use Illuminate\Console\Command;
 
 class ReadFile1 extends Command
@@ -33,7 +32,7 @@ class ReadFile1 extends Command
      *
      * @var string
      */
-    protected $description = 'Reads json config file using maatwebsite/excel';
+    protected $description = 'Deprecated - reads json config file';
 
     /**
      * Execute the console command.
