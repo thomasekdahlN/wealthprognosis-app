@@ -122,6 +122,7 @@ class TaxRealizationService implements TaxCalculatorInterface
         $finalResult = $this->applyTaxShieldAndFinalize(
             $baseTaxCalculation,
             $taxRates,
+            $debug,
             $year,
             $taxGroup,
             $taxType,
@@ -131,7 +132,7 @@ class TaxRealizationService implements TaxCalculatorInterface
             $taxShieldPrevAmount
         );
 
-        $this->logCalculationEnd($taxGroup, $taxType, $year, $baseTaxCalculation['taxAmount'], $finalResult);
+        $this->logCalculationEnd($debug, $taxGroup, $taxType, $year, $baseTaxCalculation['taxAmount'], $finalResult);
 
         return $finalResult;
     }
@@ -156,6 +157,7 @@ class TaxRealizationService implements TaxCalculatorInterface
      * @param  float  $taxShieldPrevAmount  The accumulated tax shield from previous years
      */
     public function taxShield(
+        bool $debug,
         int $year,
         string $taxGroup,
         string $taxType,
@@ -220,7 +222,9 @@ class TaxRealizationService implements TaxCalculatorInterface
             explanation: $explanation
         );
 
-        Log::debug('Tax shield calculation', ['year' => $year, 'amount' => $amount, 'result' => (array) $result]);
+        if ($debug && $amount != 0) {
+            Log::debug('Tax shield calculation', ['year' => $year, 'amount' => $amount, 'result' => (array) $result]);
+        }
 
         return $result;
     }
@@ -256,23 +260,28 @@ class TaxRealizationService implements TaxCalculatorInterface
      * Log the end of realization tax calculation.
      */
     private function logCalculationEnd(
+        bool $debug,
         string $taxGroup,
         string $taxType,
         int $year,
         float $realizationBeforeShieldTaxAmount,
         RealizationTaxResult $result
     ): void {
-        Log::debug('Realization tax calculation end', [
-            'taxGroup' => $taxGroup,
-            'taxType' => $taxType,
-            'year' => $year,
-            'realizationBeforeShieldTaxAmount' => $realizationBeforeShieldTaxAmount,
-            'result' => (array) $result,
-        ]);
+        if ($debug) {
+            Log::debug('Realization tax calculation end', [
+                'taxGroup' => $taxGroup,
+                'taxType' => $taxType,
+                'year' => $year,
+                'realizationBeforeShieldTaxAmount' => $realizationBeforeShieldTaxAmount,
+                'result' => (array) $result,
+            ]);
+        }
     }
 
     /**
      * Calculate tax rates for the given tax type and year.
+     *
+     * @return array{rate: float, percent: float, shieldRate: float}
      */
     private function calculateTaxRates(string $taxType, int $year): array
     {
@@ -287,6 +296,9 @@ class TaxRealizationService implements TaxCalculatorInterface
 
     /**
      * Calculate base tax before tax shield application.
+     *
+     * @param  array{rate: float, percent: float, shieldRate: float}  $taxRates
+     * @return array{taxableAmount: float, taxAmount: float, explanation: string}
      */
     private function calculateBaseTax(
         string $taxType,
@@ -382,10 +394,14 @@ class TaxRealizationService implements TaxCalculatorInterface
 
     /**
      * Apply tax shield and finalize the realization tax result.
+     *
+     * @param  array{taxableAmount: float, taxAmount: float, explanation: string}  $baseTaxCalculation
+     * @param  array{rate: float, percent: float, shieldRate: float}  $taxRates
      */
     private function applyTaxShieldAndFinalize(
         array $baseTaxCalculation,
         array $taxRates,
+        bool $debug,
         int $year,
         string $taxGroup,
         string $taxType,
@@ -402,6 +418,7 @@ class TaxRealizationService implements TaxCalculatorInterface
         // Apply tax shield if applicable
         if ($this->taxConfigRepo->hasTaxShield($taxType)) {
             $taxShieldResult = $this->taxShield(
+                $debug,
                 $year,
                 $taxGroup,
                 $taxType,
