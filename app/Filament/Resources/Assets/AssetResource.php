@@ -32,13 +32,28 @@ class AssetResource extends Resource
         return true;
     }
 
+    /**
+     * @param  array<string, mixed>  $parameters
+     */
     public static function getRecordUrl(string $name, array $parameters = []): string
     {
         return static::getUrl('edit', $parameters);
     }
 
-    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false): string
+    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false, ?string $configuration = null): string
     {
+        if (filled($configuration)) {
+            return static::withConfiguration($configuration, static fn (): string => static::getUrl(
+                $name,
+                $parameters,
+                $isAbsolute,
+                $panel,
+                $tenant,
+                $shouldGuessMissingParameters,
+                configuration: null,
+            ));
+        }
+
         $name ??= 'index';
 
         // Prefer pretty routes that include configuration
@@ -79,7 +94,7 @@ class AssetResource extends Resource
             ], $isAbsolute);
         }
 
-        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters);
+        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters, $configuration);
     }
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder

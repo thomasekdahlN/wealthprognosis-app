@@ -30,6 +30,9 @@ class TaxConfigurationResource extends Resource
 
     protected static ?string $maxContentWidth = 'full';
 
+    /**
+     * @param  array<string, mixed>  $parameters
+     */
     public static function getRecordUrl(string $name, array $parameters = []): string
     {
         return static::getUrl('edit', $parameters);
@@ -50,17 +53,29 @@ class TaxConfigurationResource extends Resource
         return static::getUrl('index');
     }
 
-    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false): string
+    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false, ?string $configuration = null): string
     {
+        if (filled($configuration)) {
+            return static::withConfiguration($configuration, static fn (): string => static::getUrl(
+                $name,
+                $parameters,
+                $isAbsolute,
+                $panel,
+                $tenant,
+                $shouldGuessMissingParameters,
+                configuration: null,
+            ));
+        }
+
         $name ??= 'index';
 
         if (in_array($name, ['index', 'create', 'edit'], true)) {
             if (! array_key_exists('country', $parameters) || ! array_key_exists('year', $parameters)) {
-                return parent::getUrl('index', [], $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters);
+                return parent::getUrl('index', [], $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters, $configuration);
             }
         }
 
-        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters);
+        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters, $configuration);
     }
 
     public static function form(Schema $schema): Schema

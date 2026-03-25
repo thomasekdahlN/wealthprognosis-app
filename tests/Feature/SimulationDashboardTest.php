@@ -237,34 +237,31 @@ it('displays simulation overview widget', function () {
     $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
-    // Check for widget content
-    $response->assertSee('Starting Portfolio Value');
-    $response->assertSee('Projected End Value');
-    $response->assertSee('Total Growth');
+    $response->assertSeeText('Total Net Worth');
+    $response->assertSeeText('Total Assets');
+    $response->assertSeeText('Total Debt');
 });
 
-it('displays fire analysis widget', function () {
+it('displays simulation milestones widget', function () {
     $this->actingAs($this->user);
 
     $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
-    // Check for FIRE widget content
-    $response->assertSee('FIRE Number');
-    $response->assertSee('Current Progress');
-    $response->assertSee('Safe Withdrawal Rate');
+    $response->assertSeeText('FIRE Achieved');
+    $response->assertSeeText('Debt-Free');
+    $response->assertSeeText('Net Worth 1M NOK');
 });
 
-it('displays tax analysis widget', function () {
+it('displays fire and cash flow widgets', function () {
     $this->actingAs($this->user);
 
     $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
-    // Check for tax widget content
-    $response->assertSee('Total Tax Burden');
-    $response->assertSee('Effective Tax Rate');
-    $response->assertSee('Tax Efficiency Score');
+    $response->assertSeeText('Annual Cash Flow (After Tax)');
+    $response->assertSeeText('FIRE Progression Over Time');
+    $response->assertSeeText('FIRE %');
 });
 
 it('displays chart widgets', function () {
@@ -273,8 +270,9 @@ it('displays chart widgets', function () {
     $response = $this->get(route('filament.admin.pages.simulation-dashboard', ['configuration' => $this->assetConfiguration->id, 'simulation' => $this->simulationConfiguration->id]));
 
     $response->assertStatus(200);
-    // Check for chart sections that remain
-    $response->assertSee('Portfolio Allocation Evolution');
+    $response->assertSeeText('Net Worth Growth Over Time');
+    $response->assertSeeText('Income vs Expenses Over Time');
+    $response->assertSeeText('Asset Allocation (Current Year)');
 });
 
 it('displays navigation buttons', function () {

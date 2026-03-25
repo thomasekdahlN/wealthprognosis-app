@@ -5,6 +5,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Services\Tax\TaxRealizationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 
 uses(RefreshDatabase::class);
 
@@ -243,4 +244,25 @@ it('taxCalculationRealization applies tax shield only for eligible asset types',
             expect($result->taxShieldPercent)->toEqual(0, "Asset type $assetType should not have tax shield percent");
         }
     }
+});
+
+it('does not emit debug logs when debug mode is disabled', function () {
+    Log::spy();
+
+    $taxRealization = new TaxRealizationService('no');
+
+    $taxRealization->taxCalculationRealization(
+        debug: false,
+        transfer: false,
+        taxGroup: 'private',
+        taxType: 'stock',
+        year: 2025,
+        amount: 100000,
+        acquisitionAmount: 50000,
+        assetDiffAmount: 50000,
+        taxShieldPrevAmount: 0,
+        acquisitionYear: 2020
+    );
+
+    Log::shouldNotHaveReceived('debug');
 });

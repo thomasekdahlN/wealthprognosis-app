@@ -29,8 +29,20 @@ class AssetConfigurationResource extends Resource
         return true;
     }
 
-    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false): string
+    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false, ?string $configuration = null): string
     {
+        if (filled($configuration)) {
+            return static::withConfiguration($configuration, static fn (): string => static::getUrl(
+                $name,
+                $parameters,
+                $isAbsolute,
+                $panel,
+                $tenant,
+                $shouldGuessMissingParameters,
+                configuration: null,
+            ));
+        }
+
         $name = $name ?? 'index';
 
         // Map to our pretty route names
@@ -52,7 +64,7 @@ class AssetConfigurationResource extends Resource
                     'record' => $recordId,
                 ], $isAbsolute);
             })(),
-            default => parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters),
+            default => parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters, $configuration),
         };
     }
 
