@@ -1,9 +1,8 @@
 {
     "mcpServers": {
         "laravel-boost": {
-            "command": "/Users/thomasek/Library/Application",
+            "command": "/Users/thomasek/Library/Application Support/Herd/bin/php85",
             "args": [
-                "Support/Herd/bin/php85",
                 "/Users/thomasek/Code/wealthprognosis-app/artisan",
                 "boost:mcp"
             ]
