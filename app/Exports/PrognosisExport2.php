@@ -228,8 +228,8 @@ class PrognosisExport2
             return new \App\Services\Prognosis\ChangerateService($prognosisType);
         });
 
-        // Prognosis gets Tax and Changerate singletons from the service container automatically
-        $prognosis = (new PrognosisService($this->config));
+        // Resolve via container so all dependencies are injected automatically
+        $prognosis = app(PrognosisService::class, ['config' => $this->config]);
         // dd($prognosis->privateH);
         $meta = [
             'active' => true,

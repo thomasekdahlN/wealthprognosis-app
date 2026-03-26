@@ -223,7 +223,7 @@ class SimulationSeeder extends Seeder
             $configData = $this->prepareConfigData($assetConfiguration);
 
             // Run the prognosis calculation (PrognosisService loads tax and prognosis config from services)
-            $prognosisService = new PrognosisService($configData);
+            $prognosisService = app(PrognosisService::class, ['config' => $configData]);
 
             // Get the calculated dataH
             $dataH = $prognosisService->dataH;

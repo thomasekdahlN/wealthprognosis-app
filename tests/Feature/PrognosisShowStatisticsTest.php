@@ -41,7 +41,7 @@ it('uses asset_types.show_statistics to control visibility in statistics', funct
     ];
 
     // Test uses the real PrognosisService which gets services from container
-    $prognosis = new TestablePrognosisShowStatistics($config);
+    $prognosis = app(TestablePrognosisShowStatistics::class, ['config' => $config]);
 
     expect($prognosis->isShownInStatisticsPublic('equityfund'))->toBeTrue();
     expect($prognosis->isShownInStatisticsPublic('spouse'))->toBeFalse();

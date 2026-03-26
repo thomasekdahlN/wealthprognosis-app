@@ -17,7 +17,13 @@
 namespace App\Services\Prognosis;
 
 use App\Services\AssetTypeService;
+use App\Services\Processing\PostProcessorService;
 use App\Services\Tax\TaxCashflowService;
+use App\Services\Tax\TaxIncomeService;
+use App\Services\Tax\TaxFortuneService;
+use App\Services\Tax\TaxRealizationService;
+use App\Services\Utilities\HelperService;
+use App\Services\Utilities\RulesService;
 use App\Support\ValueObjects\AssetMeta;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -37,7 +43,7 @@ class PrognosisService
     /** @var array<string, mixed> */
     public array $tax;
 
-    public object $changerate;
+    public ChangerateService $changerate;
 
     /** @var array<string, mixed> */
     public array $dataH = [];
@@ -60,19 +66,19 @@ class PrognosisService
     /** @var array<string, mixed> */
     public array $statisticsH = [];
 
-    public object $postProcessor;
+    public PostProcessorService $postProcessor;
 
     private AssetTypeService $assetTypeService;
 
-    public \App\Services\Tax\TaxIncomeService $taxincome;
+    public TaxIncomeService $taxincome;
 
-    public \App\Services\Tax\TaxFortuneService $taxfortune;
+    public TaxFortuneService $taxfortune;
 
-    public \App\Services\Tax\TaxRealizationService $taxrealization;
+    public TaxRealizationService $taxrealization;
 
-    public \App\Services\Utilities\HelperService $helper;
+    public HelperService $helper;
 
-    public \App\Services\Utilities\RulesService $rules;
+    public RulesService $rules;
 
     public TaxCashflowService $taxCashflow;
 
@@ -83,25 +89,33 @@ class PrognosisService
     /**
      * @param  array<string, mixed>  $config
      */
-    public function __construct(array $config)
-    {
+    public function __construct(
+        array $config,
+        TaxIncomeService $taxincome,
+        TaxFortuneService $taxfortune,
+        TaxRealizationService $taxrealization,
+        ChangerateService $changerate,
+        HelperService $helper,
+        RulesService $rules,
+        TaxCashflowService $taxCashflow,
+        PostProcessorService $postProcessor,
+        AssetTypeService $assetTypeService,
+    ) {
         $this->config = $config;
-
-        // Get singletons from the service container
-        $this->taxincome = app(\App\Services\Tax\TaxIncomeService::class);
-        $this->taxfortune = app(\App\Services\Tax\TaxFortuneService::class);
-        $this->taxrealization = app(\App\Services\Tax\TaxRealizationService::class);
-        $this->changerate = app(\App\Services\Prognosis\ChangerateService::class);
-        $this->helper = app(\App\Services\Utilities\HelperService::class);
-        $this->rules = app(\App\Services\Utilities\RulesService::class);
-        $this->taxCashflow = app(TaxCashflowService::class);
-        $this->postProcessor = app(\App\Services\Processing\PostProcessorService::class);
+        $this->taxincome = $taxincome;
+        $this->taxfortune = $taxfortune;
+        $this->taxrealization = $taxrealization;
+        $this->changerate = $changerate;
+        $this->helper = $helper;
+        $this->rules = $rules;
+        $this->taxCashflow = $taxCashflow;
+        $this->postProcessor = $postProcessor;
+        $this->assetTypeService = $assetTypeService;
 
         // Debug logging
-        \Illuminate\Support\Facades\Log::debug('PrognosisService created', [
+        Log::debug('PrognosisService created', [
             'taxincome_country' => $this->taxincome->getCountry(),
         ]);
-        $this->assetTypeService = app(AssetTypeService::class);
 
         $this->birthYear = (int) Arr::get($this->config, 'meta.birthYear');
         $this->economyStartYear = $this->birthYear + 16; // We look at economy from 16 years of age

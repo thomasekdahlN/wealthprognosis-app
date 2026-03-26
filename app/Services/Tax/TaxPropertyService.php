@@ -37,12 +37,11 @@ class TaxPropertyService
 
     public function __construct(
         string $country = 'no',
-        private HelperService $helperService = new HelperService
+        private HelperService $helperService = new HelperService,
+        \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyConfig = new \App\Services\Tax\TaxConfigPropertyRepository
     ) {
         $this->country = $country;
-
-        // Use the singleton instance from the service container
-        $this->taxPropertyConfig = app(\App\Services\Tax\TaxConfigPropertyRepository::class);
+        $this->taxPropertyConfig = $taxPropertyConfig;
     }
 
     /**

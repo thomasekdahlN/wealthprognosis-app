@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(AiAssistantService::class);
         $this->app->singleton(FinancialPlanningService::class);
@@ -62,7 +62,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(\App\Services\Tax\TaxPropertyService::class, function ($app) {
-            return new \App\Services\Tax\TaxPropertyService('no');
+            return new \App\Services\Tax\TaxPropertyService(
+                'no',
+                $app->make(\App\Services\Utilities\HelperService::class),
+                $app->make(\App\Services\Tax\TaxConfigPropertyRepository::class)
+            );
         });
 
         // Register utility classes as singletons
@@ -108,6 +112,23 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(\App\Services\Processing\GroupProcessor::class)
             );
         });
+
+        // PrognosisService is not a singleton because it takes a runtime $config array.
+        // Resolve via: app(PrognosisService::class, ['config' => $configArray])
+        $this->app->bind(\App\Services\Prognosis\PrognosisService::class, function ($app, array $parameters) {
+            return new \App\Services\Prognosis\PrognosisService(
+                $parameters['config'] ?? [],
+                $app->make(\App\Services\Tax\TaxIncomeService::class),
+                $app->make(\App\Services\Tax\TaxFortuneService::class),
+                $app->make(\App\Services\Tax\TaxRealizationService::class),
+                $app->make(\App\Services\Prognosis\ChangerateService::class),
+                $app->make(\App\Services\Utilities\HelperService::class),
+                $app->make(\App\Services\Utilities\RulesService::class),
+                $app->make(\App\Services\Tax\TaxCashflowService::class),
+                $app->make(\App\Services\Processing\PostProcessorService::class),
+                $app->make(\App\Services\AssetTypeService::class),
+            );
+        });
     }
 
     /**
@@ -115,7 +136,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         // Manually register AI Assistant Widget as Livewire component
         Livewire::component('ai-assistant-widget', AiAssistantWidget::class);

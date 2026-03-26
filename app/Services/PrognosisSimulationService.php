@@ -70,9 +70,9 @@ class PrognosisSimulationService
             return new \App\Services\Tax\TaxRealizationService($taxCountry);
         });
 
-        // Run the prognosis calculation
+        // Run the prognosis calculation (resolved via container so all dependencies are injected)
         Log::info('Running PrognosisService calculation');
-        $prognosisService = new \App\Services\Prognosis\PrognosisService($configData);
+        $prognosisService = app(\App\Services\Prognosis\PrognosisService::class, ['config' => $configData]);
 
         // Get the calculated dataH
         $dataH = $prognosisService->dataH;
