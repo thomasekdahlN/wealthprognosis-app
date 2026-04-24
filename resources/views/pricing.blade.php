@@ -2,27 +2,11 @@
 
 @section('title', 'Pricing — Wealth Prognosis')
 @section('description',
-    'Simple, transparent pricing for Wealth Prognosis — free self-hosted, hosted plans for private users
-    and families, and dedicated tiers for advisors, businesses and enterprises.')
+    'Simple, transparent pricing for Wealth Prognosis. Hosted plans for private users and families,
+    and dedicated tiers for advisors, businesses and enterprises.')
 
     @php
         $privatePlans = [
-            [
-                'name' => 'Self-hosted',
-                'tagline' => 'For developers and tinkerers',
-                'price' => '0',
-                'period' => 'forever',
-                'cta' => 'Open on GitHub',
-                'ctaUrl' => 'https://github.com/thomasek/wealthprognosis-app',
-                'ctaExternal' => true,
-                'featured' => false,
-                'features' => [
-                    'Full MIT-licensed source',
-                    'Run on your own infrastructure',
-                    'All features included',
-                    'Community support on GitHub',
-                ],
-            ],
             [
                 'name' => 'Solo',
                 'tagline' => 'For one person planning one life',
@@ -30,7 +14,7 @@
                 'period' => '/ month',
                 'cta' => 'Start 30-day trial',
                 'ctaUrl' => '/admin',
-                'featured' => true,
+                'featured' => false,
                 'features' => [
                     'Hosted on secure EU infrastructure',
                     '1 user, unlimited assets',
@@ -38,22 +22,6 @@
                     'Excel &amp; PDF export',
                     'Automatic backups',
                     'Email support',
-                ],
-            ],
-            [
-                'name' => 'Family',
-                'tagline' => 'For households planning together',
-                'price' => '149',
-                'period' => '/ month',
-                'cta' => 'Start 30-day trial',
-                'ctaUrl' => '/admin',
-                'featured' => false,
-                'features' => [
-                    'Everything in Solo',
-                    'Up to 5 household members',
-                    'Shared household prognosis',
-                    'Per-member private assets',
-                    'Priority email support',
                 ],
             ],
         ];
@@ -143,12 +111,12 @@
                         '@type' => 'Product',
                         '@id' => route('pricing') . '#product',
                         'name' => 'Wealth Prognosis',
-                        'description' => 'Financial planning and simulation SaaS with accurate Norwegian taxation.',
+                        'description' => 'Financial planning and simulation SaaS with accurate taxation.',
                         'brand' => ['@type' => 'Brand', 'name' => 'Wealth Prognosis'],
                         'offers' => [
                             '@type' => 'AggregateOffer',
                             'priceCurrency' => 'NOK',
-                            'lowPrice' => '0',
+                            'lowPrice' => '79',
                             'highPrice' => '1499',
                             'offerCount' => count($offerCatalog),
                             'offers' => $offerCatalog,
@@ -185,41 +153,22 @@
                     thinking.</span>
             </h1>
             <p class="mt-6 text-lg sm:text-xl text-slate-300 leading-relaxed">
-                Self-host for free, or pick a hosted plan that fits your life or your business. All prices in NOK,
-                excluding VAT. 30-day trial on hosted plans, cancel any time.
+                Pick a hosted plan that fits your life or your business. All prices in NOK, excluding VAT. 30-day trial
+                on every hosted plan, cancel any time.
             </p>
         </div>
     </section>
 
-    <section class="relative border-t border-white/5 bg-slate-950" aria-labelledby="private-title">
+    <section class="relative border-t border-white/5 bg-slate-950" aria-labelledby="plans-title">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16 sm:py-20">
             <div class="max-w-2xl">
-                <h2 id="private-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-white">For private
-                    users</h2>
-                <p class="mt-3 text-slate-300">Households planning for financial independence, early retirement or just
-                    clear long-term finances.</p>
+                <h2 id="plans-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Plans</h2>
+                <p class="mt-3 text-slate-300">One plan for private long-term planning, three tiers for advisors,
+                    firms and enterprises.</p>
             </div>
 
-            <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-                @foreach ($privatePlans as $plan)
-                    @include('partials.pricing-card', ['plan' => $plan])
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    <section class="relative border-t border-white/5 bg-gradient-to-b from-slate-950 to-slate-900/50"
-        aria-labelledby="corporate-title">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16 sm:py-20">
-            <div class="max-w-2xl">
-                <h2 id="corporate-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-white">For
-                    corporate users</h2>
-                <p class="mt-3 text-slate-300">Financial advisors, advisory firms, banks and funds that need to plan
-                    with and for their clients.</p>
-            </div>
-
-            <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-                @foreach ($corporatePlans as $plan)
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                @foreach (array_merge($privatePlans, $corporatePlans) as $plan)
                     @include('partials.pricing-card', ['plan' => $plan])
                 @endforeach
             </div>
@@ -231,7 +180,7 @@
             <h2 id="pricing-notes-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Good to know
             </h2>
             <dl class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach ([['q' => 'Can I self-host and still get support?', 'a' => 'Yes. A paid support add-on is available for self-hosted deployments — contact sales for pricing. Community support on GitHub is always free.'], ['q' => 'Do you offer annual billing?', 'a' => 'Annual plans are billed with a 2-month discount on all hosted tiers. Contact sales to switch.'], ['q' => 'Is the Norwegian tax configuration included?', 'a' => 'Yes. Every hosted plan ships with the maintained Norwegian tax configuration. Custom jurisdictions are available on Business and Enterprise.'], ['q' => 'What about data ownership?', 'a' => 'Your data is yours. Full export to JSON and Excel on every plan. Hosted plans run on EU infrastructure with encrypted backups.']] as $note)
+                @foreach ([['q' => 'Is there a free trial?', 'a' => 'Yes. Every hosted plan includes a 30-day trial with full functionality. No credit card required to start.'], ['q' => 'Do you offer annual billing?', 'a' => 'Annual plans are billed with a 2-month discount on all hosted tiers. Contact sales to switch.'], ['q' => 'Which tax configurations are included?', 'a' => 'Every hosted plan ships with the maintained Norwegian tax configuration. Swedish and Swiss tax calculations are available in beta on every plan. Custom jurisdictions are available on Business and Enterprise.'], ['q' => 'What about data ownership?', 'a' => 'Your data is yours. Full export to JSON and Excel on every plan. Hosted plans run on EU infrastructure with encrypted backups.']] as $note)
                     <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-6">
                         <dt class="font-semibold text-white">{{ $note['q'] }}</dt>
                         <dd class="mt-2 text-sm text-slate-300 leading-relaxed">{{ $note['a'] }}</dd>

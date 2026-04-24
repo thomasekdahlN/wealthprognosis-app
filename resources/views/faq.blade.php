@@ -14,7 +14,7 @@
                 [
                     'q' => 'What is Wealth Prognosis?',
                     'a' =>
-                        '<p>A financial planning and simulation system that tracks every asset you own, applies accurate Norwegian taxation, and simulates your economy year by year — from today until your expected death year.</p><p class="mt-3">You can run pessimistic, realistic and optimistic scenarios side by side, see exactly when you can retire, and ask an AI assistant to explain or adjust your configuration in plain language.</p>',
+                        '<p>A financial planning and simulation system that tracks every asset you own, applies accurate taxation, and simulates your economy year by year — from today until your expected death year.</p><p class="mt-3">You can run pessimistic, realistic and optimistic scenarios side by side, see exactly when you can retire, and ask an AI assistant to explain or adjust your configuration in plain language.</p>',
                 ],
                 [
                     'q' => 'Who is it for?',
@@ -27,9 +27,11 @@
                         '<p>No. Everything is managed through the Filament admin dashboard — adding assets, running simulations, exporting to Excel. The command line and JSON configs are there if you want them, but not required.</p>',
                 ],
                 [
-                    'q' => 'Is it free?',
+                    'q' => 'How much does it cost?',
                     'a' =>
-                        '<p>Yes. The project is open source under the MIT licence. You can self-host it or run it locally at no cost.</p>',
+                        '<p>Hosted plans start at 79 NOK / month for a single user, with tiers for households, advisors, businesses and enterprises. Every hosted plan includes a 30-day trial. See the <a href="' .
+                        route('pricing') .
+                        '" class="text-brand-300 hover:text-brand-200 underline underline-offset-2">pricing page</a> for details.</p>',
                 ],
             ],
         ],
@@ -69,7 +71,7 @@
                 [
                     'q' => 'What about other countries?',
                     'a' =>
-                        '<p>The tax engine is driven by configuration files, so other countries can be modelled too. Norway is the fully-supported default today; contributions for other jurisdictions are welcome.</p>',
+                        '<p>Norway is the fully-supported default today. <strong class="text-white">Sweden and Switzerland are available in beta</strong> — the core brackets, wealth tax and capital gains rules are modelled and usable, but some edge cases (municipal variations, cantonal differences, pension specifics) are still being refined. Feedback from beta users shapes what ships next.</p><p class="mt-3">The tax engine is configuration-driven, so additional jurisdictions can be added. Enterprise customers can request custom tax configurations.</p>',
                 ],
                 [
                     'q' => 'Does it handle company-to-private transfers correctly?',
@@ -104,7 +106,7 @@
                 [
                     'q' => 'Where is my data stored?',
                     'a' =>
-                        '<p>Wherever you host it. Self-host on your own server, deploy to Laravel Cloud, or run it locally — the database and files stay under your control.</p>',
+                        '<p>Hosted plans run on secure EU infrastructure with encrypted backups. You can export everything to JSON or Excel at any time — your data belongs to you.</p>',
                 ],
                 [
                     'q' => 'Is the data multi-tenant?',
@@ -129,11 +131,6 @@
                         '" class="text-brand-300 hover:text-brand-200 underline">dashboard</a>, sign in, and add your first asset. The <a href="' .
                         route('features') .
                         '" class="text-brand-300 hover:text-brand-200 underline">features page</a> walks through everything the engine can do.</p>',
-                ],
-                [
-                    'q' => 'Where is the source code?',
-                    'a' =>
-                        '<p>On <a href="https://github.com/thomasek/wealthprognosis-app" target="_blank" rel="noopener" class="text-brand-300 hover:text-brand-200 underline">GitHub</a>. Issues and pull requests are welcome.</p>',
                 ],
             ],
         ],
@@ -195,8 +192,8 @@
     <section class="relative border-t border-white/5 bg-slate-950">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 py-20 sm:py-28 text-center">
             <h2 class="text-3xl sm:text-5xl font-bold tracking-tight text-white">Still have questions?</h2>
-            <p class="mt-6 text-lg text-slate-300 max-w-2xl mx-auto">Open a GitHub issue or just try the dashboard and see
-                for yourself.</p>
+            <p class="mt-6 text-lg text-slate-300 max-w-2xl mx-auto">Try the dashboard and see for yourself, or get in
+                touch with the team.</p>
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ url('/admin') }}"
                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-slate-950 font-semibold px-6 py-3.5 text-base transition shadow-xl shadow-brand-500/30">
@@ -206,9 +203,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
                 </a>
-                <a href="https://github.com/thomasek/wealthprognosis-app" target="_blank" rel="noopener noreferrer"
+                <a href="{{ route('pricing') }}"
                     class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-semibold px-6 py-3.5 text-base transition">
-                    Open on GitHub<span class="sr-only"> (opens in a new tab)</span>
+                    See pricing
                 </a>
             </div>
         </div>

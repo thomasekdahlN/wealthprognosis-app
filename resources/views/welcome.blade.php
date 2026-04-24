@@ -18,15 +18,15 @@
                 'applicationCategory' => 'FinanceApplication',
                 'operatingSystem' => 'Web',
                 'description' =>
-                    'Open-source financial planning and simulation system that tracks every asset, applies accurate Norwegian taxation, and forecasts your economy year by year until your death date with AI-powered insights.',
+                    'Financial planning and simulation system that tracks every asset, applies accurate taxation, and forecasts your economy year by year until your death date with AI-powered insights — across pessimistic, realistic and optimistic scenarios.',
                 'url' => url('/'),
                 'softwareVersion' => '1.0',
                 'inLanguage' => ['en', 'no'],
-                'license' => 'https://opensource.org/licenses/MIT',
                 'offers' => [
                     '@type' => 'Offer',
-                    'price' => '0',
-                    'priceCurrency' => 'USD',
+                    'price' => '79',
+                    'priceCurrency' => 'NOK',
+                    'url' => url('/pricing'),
                 ],
                 'featureList' => [
                     'Year-by-year financial prognosis',
@@ -67,7 +67,7 @@
         [
             'title' => 'Complete Norwegian tax',
             'body' =>
-                'Fortune tax, property tax, income tax, capital tax, pension tax, rental tax, company tax, dividend tax and the tax shield — all computed per year, per asset.',
+                'Fortune tax, property tax, income tax, capital tax, pension tax, rental tax, company tax, dividend tax and the tax shield — all computed per year, per asset. Swedish and Swiss tax calculations are available in beta.',
             'icon' =>
                 'M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z',
         ],
@@ -100,6 +100,45 @@
                 'M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z',
         ],
     ];
+
+    $scenarios = [
+        [
+            'badge' => '−',
+            'name' => 'Pessimistic',
+            'body' =>
+                'Lower returns, higher inflation, weaker wage growth. Stress-test whether your plan survives a bad decade before you commit to it.',
+        ],
+        [
+            'badge' => '=',
+            'name' => 'Realistic',
+            'body' =>
+                'Historical averages per asset class, current Norwegian tax rules and your configured change rates. Your working baseline plan.',
+        ],
+        [
+            'badge' => '+',
+            'name' => 'Optimistic',
+            'body' =>
+                'Favourable markets, strong wage growth, best-case taxation outcomes. The upside you are aiming at — modelled year by year.',
+        ],
+    ];
+
+    $simulationCoverage = [
+        'Yearly cash flow for every asset — income, expenses, mortgage, taxes',
+        'Fortune, property, income, capital, pension, rental, company, dividend and shielding tax',
+        'Wealth trajectory and FIRE year across every scenario',
+        'Mortgage amortisation, extra downpayments and deductible interest',
+        'Pension payouts: offentlig, tjenestepensjon and private savings',
+        'Per-asset change rates — returns, inflation, maintenance, wage growth',
+    ];
+
+    $simulationEvents = [
+        'Sell an asset in any future year',
+        'Transfer an asset from a company to private (with realisation tax)',
+        'Change mortgage terms, interest rate or refinance mid-plan',
+        'Early, normal or delayed retirement side by side',
+        'Draw down liquid assets to zero while keeping house, cabin, car and boat',
+        'Add a new salary, pension or inheritance at any future date',
+    ];
 @endphp
 
 @section('content')
@@ -107,21 +146,15 @@
         <div class="absolute inset-0 grid-pattern opacity-40" aria-hidden="true"></div>
         <div class="relative max-w-7xl mx-auto px-6 lg:px-8 pt-20 pb-24 sm:pt-28 sm:pb-32">
             <div class="max-w-3xl">
-                <span
-                    class="inline-flex items-center gap-2 rounded-full border border-brand-400/20 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-300">
-                    <span class="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" aria-hidden="true"></span>
-                    Open-source · Laravel 13 · AI-powered
-                </span>
-                <h1 id="hero-title"
-                    class="mt-6 text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.05]">
+                <h1 id="hero-title" class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.05]">
                     See your <span
                         class="bg-gradient-to-r from-brand-300 via-brand-400 to-emerald-200 bg-clip-text text-transparent">financial
                         future</span>, year by year.
                 </h1>
                 <p class="mt-6 text-lg sm:text-xl text-slate-300 leading-relaxed">
                     Wealth Prognosis is a comprehensive planning system that tracks every asset you own, applies accurate
-                    Norwegian taxation, and simulates your economy from today until your death date — with AI insights that
-                    explain what the numbers actually mean for you.
+                    taxation, and simulates your economy from today until your death date — with AI insights that explain
+                    what the numbers actually mean for you.
                 </p>
                 <div class="mt-10 flex flex-col sm:flex-row gap-4">
                     <a href="{{ url('/admin') }}"
@@ -140,7 +173,7 @@
             </div>
 
             <dl class="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl" aria-label="Key project facts">
-                @foreach ([['label' => 'Asset types', 'value' => '15+'], ['label' => 'Tax rules', 'value' => 'NO · complete'], ['label' => 'Simulation horizon', 'value' => 'to death year'], ['label' => 'Licence', 'value' => 'MIT']] as $stat)
+                @foreach ([['label' => 'Asset types', 'value' => '40+'], ['label' => 'Tax types', 'value' => '29'], ['label' => 'Property tax types', 'value' => '327'], ['label' => 'Tax rules', 'value' => 'NO · SE · CH']] as $stat)
                     <div class="rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur p-5">
                         <dt class="text-xs uppercase tracking-wider text-slate-300">{{ $stat['label'] }}</dt>
                         <dd class="mt-1.5 text-xl font-bold text-white">{{ $stat['value'] }}</dd>
@@ -211,11 +244,72 @@
         </div>
     </section>
 
+    <section id="simulation" class="relative border-t border-white/5 bg-slate-950" aria-labelledby="simulation-title">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-20 sm:py-28">
+            <div class="max-w-2xl">
+                <span
+                    class="inline-flex items-center gap-2 rounded-full border border-brand-400/20 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-300">
+                    Simulation engine
+                </span>
+                <h2 id="simulation-title" class="mt-5 text-3xl sm:text-4xl font-bold tracking-tight text-white">Three
+                    scenarios. One life.</h2>
+                <p class="mt-4 text-lg text-slate-300 leading-relaxed">Every prognosis runs three times — pessimistic,
+                    realistic and optimistic — so you can see how resilient your plan is before you bet on it. Every
+                    asset, every tax, every year.</p>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                @foreach ($scenarios as $scenario)
+                    <article class="rounded-2xl border border-white/5 bg-white/[0.02] p-6">
+                        <span
+                            class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-500/10 text-brand-300 ring-1 ring-brand-400/20 text-xl font-bold"
+                            aria-hidden="true">{{ $scenario['badge'] }}</span>
+                        <h3 class="mt-4 text-lg font-semibold text-white">{{ $scenario['name'] }}</h3>
+                        <p class="mt-2 text-sm text-slate-300 leading-relaxed">{{ $scenario['body'] }}</p>
+                    </article>
+                @endforeach
+            </div>
+
+            <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-8">
+                    <h3 class="text-xl font-semibold text-white">What the simulation covers</h3>
+                    <ul class="mt-6 space-y-3 text-sm text-slate-300">
+                        @foreach ($simulationCoverage as $item)
+                            <li class="flex items-start gap-3">
+                                <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-brand-300" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2.5" stroke="currentColor" aria-hidden="true" focusable="false">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                                <span>{{ $item }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-8">
+                    <h3 class="text-xl font-semibold text-white">What you can simulate</h3>
+                    <ul class="mt-6 space-y-3 text-sm text-slate-300">
+                        @foreach ($simulationEvents as $item)
+                            <li class="flex items-start gap-3">
+                                <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-brand-300" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true"
+                                    focusable="false">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                                <span>{{ $item }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="relative border-t border-white/5 bg-slate-950">
         <div class="max-w-5xl mx-auto px-6 lg:px-8 py-20 sm:py-28 text-center">
             <h2 class="text-3xl sm:text-5xl font-bold tracking-tight text-white">Plan the next 50 years in an afternoon.
             </h2>
-            <p class="mt-6 text-lg text-slate-300 max-w-2xl mx-auto">Open the dashboard, add your first asset and watch your
+            <p class="mt-6 text-lg text-slate-300 max-w-2xl mx-auto">Open the dashboard, add your first asset and watch
+                your
                 financial future take shape.</p>
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ url('/admin') }}"

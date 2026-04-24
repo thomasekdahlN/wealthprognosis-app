@@ -20,7 +20,6 @@
 - [Asset types](#asset-types)
 - [Configuration reference](#configuration-reference)
 - [Output reference](#output-reference)
-- [Licence](#licence)
 
 ---
 
@@ -405,12 +404,6 @@ php artisan db:seed --class=TaxTypesFromConfigSeeder --force
 php artisan make:filament-user
 php artisan cache:clear
 ```
-
----
-
-## Licence
-
-The code is under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007. Free for personal usage and free for non-commercial usage (that means that you do not make money on this software). Contributors wanted. Commercial usage is allowed with a commercial licence — please contact the author. If you want to pay for new functionality, please feel free to get in touch.
 
 ---
 

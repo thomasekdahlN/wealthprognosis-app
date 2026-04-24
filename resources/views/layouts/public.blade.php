@@ -143,16 +143,13 @@
                     '@type' => 'ImageObject',
                     'url' => $ogImage,
                 ],
-                'sameAs' => [
-                    'https://github.com/thomasek/wealthprognosis-app',
-                ],
             ],
             [
                 '@type' => 'WebSite',
                 '@id' => url('/') . '#website',
                 'url' => url('/'),
                 'name' => $siteName,
-                'description' => 'Open-source financial planning and simulation system with year-by-year prognosis, Norwegian taxation and an AI assistant.',
+                'description' => 'Financial planning and simulation system with year-by-year prognosis, Norwegian taxation and an AI assistant.',
                 'publisher' => ['@id' => url('/') . '#organization'],
                 'inLanguage' => app()->getLocale(),
             ],
@@ -189,8 +186,6 @@
                         class="hover:text-white transition"@if (request()->routeIs('about')) aria-current="page" @endif>About</a>
                     <a href="{{ route('faq') }}"
                         class="hover:text-white transition"@if (request()->routeIs('faq')) aria-current="page" @endif>FAQ</a>
-                    <a href="https://github.com/thomasek/wealthprognosis-app" target="_blank" rel="noopener noreferrer"
-                        class="hover:text-white transition">GitHub<span class="sr-only"> (opens in a new tab)</span></a>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -231,8 +226,8 @@
                         <span class="font-semibold text-white">Wealth Prognosis</span>
                     </div>
                     <p class="mt-4 text-sm text-slate-300 max-w-md">
-                        Open-source financial planning and simulation system. Track assets, run year-by-year prognoses,
-                        and plan your path to financial independence.
+                        Financial planning and simulation system. Track assets, run year-by-year prognoses across three
+                        scenarios, and plan your path to financial independence.
                     </p>
                 </div>
                 <nav aria-label="Product">
@@ -250,12 +245,6 @@
                     <ul class="mt-4 space-y-2 text-sm text-slate-300">
                         <li><a href="{{ route('about') }}" class="hover:text-white transition">About</a></li>
                         <li><a href="{{ route('faq') }}" class="hover:text-white transition">FAQ</a></li>
-                        <li><a href="https://github.com/thomasek/wealthprognosis-app" target="_blank"
-                                rel="noopener noreferrer" class="hover:text-white transition">GitHub<span
-                                    class="sr-only"> (opens in a new tab)</span></a></li>
-                        <li><a href="https://github.com/thomasek/wealthprognosis-app#readme" target="_blank"
-                                rel="noopener noreferrer" class="hover:text-white transition">Documentation<span
-                                    class="sr-only"> (opens in a new tab)</span></a></li>
                     </ul>
                 </nav>
             </div>

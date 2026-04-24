@@ -23,7 +23,7 @@
                 'name' => 'Wealth Prognosis features',
                 'itemListElement' => [
                     ['@type' => 'ListItem', 'position' => 1, 'name' => 'Prognosis engine', 'description' => 'Year-by-year simulation of income, expenses, mortgages, cash flow, taxes and asset value across pessimistic, realistic and optimistic scenarios.'],
-                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Norwegian taxation', 'description' => 'Complete coverage of fortune tax, property tax, income tax, capital tax, rental tax, company tax, dividend tax and the tax shield.'],
+                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Norwegian taxation', 'description' => 'Complete coverage of fortune tax, property tax, income tax, capital tax, rental tax, company tax, dividend tax and the tax shield. Swedish and Swiss tax calculations are available in beta.'],
                     ['@type' => 'ListItem', 'position' => 3, 'name' => 'Mortgages and loans', 'description' => 'Annuity mortgages, extra downpayments, tax-deductible interest and max-mortgage calculation.'],
                     ['@type' => 'ListItem', 'position' => 4, 'name' => 'F.I.R.E metrics', 'description' => 'Sell-down strategy for liquid assets while keeping essential assets such as house, cabin, car and boat.'],
                     ['@type' => 'ListItem', 'position' => 5, 'name' => 'AI assistant', 'description' => 'Natural-language English and Norwegian access to the full configuration via Google Gemini with tool-calling.'],
@@ -76,7 +76,8 @@
             ],
             [
                 'title' => 'Norwegian taxation',
-                'intro' => 'Complete coverage of Norwegian tax rules, year by year.',
+                'intro' =>
+                    'Complete coverage of Norwegian tax rules, year by year. Swedish and Swiss tax calculations are available in beta.',
                 'items' => [
                     [
                         'name' => 'Fortune tax (formueskatt)',
@@ -104,6 +105,11 @@
                         'name' => 'Realization &amp; transfer tax',
                         'body' =>
                             'Correct taxation when realizing assets inside a company before transferring to private.',
+                    ],
+                    [
+                        'name' => 'Sweden &amp; Switzerland (beta)',
+                        'body' =>
+                            'Core Swedish taxation (kapitalinkomst, ISK/KF schablonskatt, kapitalvinst, statlig &amp; kommunal inkomstskatt) and Swiss taxation (federal + cantonal income, wealth tax, Säule 3a) are usable today in beta.',
                     ],
                 ],
             ],
