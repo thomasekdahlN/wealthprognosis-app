@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\ConfigAssets;
 use App\Filament\Pages\ConfigAssetYears;
 use App\Filament\Pages\ConfigEvents;
@@ -24,13 +25,14 @@ use App\Filament\Widgets\Configuration\ConfigurationCashFlowOverTimeWidget;
 use App\Filament\Widgets\Configuration\ConfigurationExpenseBreakdownWidget;
 use App\Filament\Widgets\Configuration\ConfigurationFireCrossoverWidget;
 use App\Filament\Widgets\Configuration\ConfigurationFireMetricsOverviewWidget;
-use App\Filament\Widgets\Configuration\ConfigurationFireProgressWidget;
 use App\Filament\Widgets\Configuration\ConfigurationMonthlyCashflowWidget;
 use App\Filament\Widgets\Configuration\ConfigurationNetWorthOverTimeWidget;
+use App\Filament\Widgets\Configuration\ConfigurationProjectionNoticeWidget;
 use App\Filament\Widgets\Configuration\ConfigurationRetirementReadinessWidget;
 use App\Filament\Widgets\Configuration\ConfigurationSavingsRateOverTimeWidget;
 use App\Services\CurrentAssetConfiguration;
 use Filament\Actions\Action;
+use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -63,6 +65,12 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration(Register::class)
+            ->profile(isSimple: false)
+            ->multiFactorAuthentication([
+                AppAuthentication::make()
+                    ->recoverable(),
+            ])
             ->brandName(fn () => $this->getBrandName())
             ->brandLogo(fn () => $this->getBrandLogo())
             ->brandLogoHeight('2rem')
@@ -85,24 +93,17 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->widgets([
+                // TOP: Projection vs. Simulation notice (sort = -10)
+                ConfigurationProjectionNoticeWidget::class,
+
                 // ROW 1: Asset Overview (sort = 0) - 4 stats in 1 widget = 4 per row
                 ConfigurationAssetOverviewWidget::class,
 
                 // ROW 2: Monthly Cash Flow (sort = 1) - 4 stats in 1 widget = 4 per row
                 ConfigurationMonthlyCashflowWidget::class,
 
-                // Chart Widgets (FIRE grouped together; removed projections)
-                // Removed NetWorthOverTimeWidget per request
-                // Removed YearlyCashflowWidget per request
-                // Keep FIRE widgets grouped together
-                ConfigurationFireProgressWidget::class,
-                ConfigurationSavingsRateOverTimeWidget::class,
-
-                // FIRE chart + single-value widgets in one row
-                ConfigurationFireMetricsOverviewWidget::class,
+                // FIRE context widgets
                 ConfigurationFireCrossoverWidget::class,
-
-                // Follow-up context behind the FIRE crossover
                 ConfigurationExpenseBreakdownWidget::class,
                 ConfigurationRetirementReadinessWidget::class,
 
@@ -114,6 +115,10 @@ class AdminPanelProvider extends PanelProvider
                 ConfigurationAssetAllocationByTypeWidget::class,
                 ConfigurationAssetAllocationByTaxTypeWidget::class,
                 ConfigurationAssetAllocationByCategoryWidget::class,
+
+                // FIRE progress charts (after allocation charts)
+                ConfigurationFireMetricsOverviewWidget::class,
+                ConfigurationSavingsRateOverTimeWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

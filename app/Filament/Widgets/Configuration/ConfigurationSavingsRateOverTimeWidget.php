@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfigurationSavingsRateOverTimeWidget extends ChartWidget
 {
-    protected static ?int $sort = 6;
+    protected static ?int $sort = 24;
 
     protected int|string|array $columnSpan = 'full';
 

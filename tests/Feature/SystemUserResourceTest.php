@@ -109,7 +109,10 @@ it('validates required name, email, and password on create', function () {
 });
 
 it('returns 200 on the users list page for an admin', function () {
-    $admin = User::factory()->create(['is_admin' => true]);
+    $admin = User::factory()->create([
+        'is_admin' => true,
+        'app_authentication_secret' => 'test-secret',
+    ]);
 
     actingAs($admin)
         ->get('/system/users')

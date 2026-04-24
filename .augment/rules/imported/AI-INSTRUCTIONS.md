@@ -83,6 +83,7 @@ Always generate feature tests for new models
 Always generate page tests that check for HTTP 200 for all new pages
 Always run feature and page tests after making new functionality
 Always run the tests for all pages, models, controllers and resources that have been involved in a change.
+Always run the full test suite in parallel using `php artisan test --parallel --compact` to speed up the run. Use a specific file or `--filter` only for quick iteration while fixing a single failing test; once fixed, re-run the full suite in parallel.
 
 Use pretty routes, avoid using query parameters to identify resources. Always use routes like /admin/config/{configuration}/
 Remove html tags from the presentation of string and text fields that are listed in tables.

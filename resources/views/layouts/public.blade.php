@@ -138,10 +138,30 @@
                 '@type' => 'Organization',
                 '@id' => url('/') . '#organization',
                 'name' => $siteName,
+                'legalName' => 'Ekdahl Enterprises AS',
                 'url' => url('/'),
                 'logo' => [
                     '@type' => 'ImageObject',
                     'url' => $ogImage,
+                ],
+                'email' => 'thomas@ekdahl.no',
+                'telephone' => '+4791143630',
+                'taxID' => 'NO933662541',
+                'vatID' => 'NO933662541MVA',
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'streetAddress' => 'Smørbukkveien 3',
+                    'postalCode' => '3123',
+                    'addressLocality' => 'Tønsberg',
+                    'addressCountry' => 'NO',
+                ],
+                'contactPoint' => [
+                    '@type' => 'ContactPoint',
+                    'contactType' => 'customer support',
+                    'email' => 'thomas@ekdahl.no',
+                    'telephone' => '+4791143630',
+                    'areaServed' => 'NO',
+                    'availableLanguage' => ['en', 'no'],
                 ],
             ],
             [
@@ -149,7 +169,7 @@
                 '@id' => url('/') . '#website',
                 'url' => url('/'),
                 'name' => $siteName,
-                'description' => 'Financial planning and simulation system with year-by-year prognosis, Norwegian taxation and an AI assistant.',
+                'description' => 'Financial planning and simulation system with year-by-year prognosis, taxation and an AI assistant.',
                 'publisher' => ['@id' => url('/') . '#organization'],
                 'inLanguage' => app()->getLocale(),
             ],
@@ -179,9 +199,15 @@
                         class="hover:text-white transition"@if (request()->path() === '/') aria-current="page" @endif>Overview</a>
                     <a href="{{ route('features') }}"
                         class="hover:text-white transition"@if (request()->routeIs('features')) aria-current="page" @endif>Features</a>
+                    <a href="{{ route('use-cases') }}"
+                        class="hover:text-white transition"@if (request()->routeIs('use-cases')) aria-current="page" @endif>Use
+                        cases</a>
                     <a href="{{ route('pricing') }}"
                         class="hover:text-white transition"@if (request()->routeIs('pricing')) aria-current="page" @endif>Pricing</a>
-                    <a href="{{ url('/') }}#how-it-works" class="hover:text-white transition">How it works</a>
+                    <a href="{{ route('glossary') }}"
+                        class="hover:text-white transition"@if (request()->routeIs('glossary')) aria-current="page" @endif>Glossary</a>
+                    <a href="{{ route('methodology') }}"
+                        class="hover:text-white transition"@if (request()->routeIs('methodology')) aria-current="page" @endif>Methodology</a>
                     <a href="{{ route('about') }}"
                         class="hover:text-white transition"@if (request()->routeIs('about')) aria-current="page" @endif>About</a>
                     <a href="{{ route('faq') }}"
@@ -218,8 +244,8 @@
 
     <footer class="border-t border-white/5 bg-slate-950" role="contentinfo" aria-label="Site footer">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div class="md:col-span-2">
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-8">
+                <div class="col-span-2 md:col-span-2">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('logo.png') }}" alt=""
                             class="h-8 w-8 rounded-lg ring-1 ring-white/10">
@@ -227,32 +253,87 @@
                     </div>
                     <p class="mt-4 text-sm text-slate-300 max-w-md">
                         Financial planning and simulation system. Track assets, run year-by-year prognoses across three
-                        scenarios, and plan your path to financial independence.
+                        scenarios, and plan your path to wealth.
                     </p>
+
+                    <address class="mt-6 not-italic text-sm text-slate-300 leading-relaxed" itemscope
+                        itemtype="https://schema.org/Organization">
+                        <span class="block font-semibold text-white" itemprop="legalName">Ekdahl Enterprises AS</span>
+                        <span class="block text-slate-400">Org.nr:
+                            <span itemprop="taxID">933 662 541</span>
+                        </span>
+                        <span class="block mt-2" itemprop="address" itemscope
+                            itemtype="https://schema.org/PostalAddress">
+                            <span class="block" itemprop="streetAddress">Smørbukkveien 3</span>
+                            <span class="block">
+                                <span itemprop="postalCode">3123</span>
+                                <span itemprop="addressLocality">Tønsberg</span>,
+                                <span itemprop="addressCountry">Norge</span>
+                            </span>
+                        </span>
+                    </address>
                 </div>
                 <nav aria-label="Product">
                     <h2 class="text-sm font-semibold text-white">Product</h2>
                     <ul class="mt-4 space-y-2 text-sm text-slate-300">
                         <li><a href="{{ route('features') }}" class="hover:text-white transition">Features</a></li>
                         <li><a href="{{ route('pricing') }}" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="{{ route('use-cases') }}" class="hover:text-white transition">Use cases</a></li>
+                        <li><a href="{{ url('/admin') }}" class="hover:text-white transition">Dashboard</a></li>
+                    </ul>
+                </nav>
+                <nav aria-label="Resources">
+                    <h2 class="text-sm font-semibold text-white">Resources</h2>
+                    <ul class="mt-4 space-y-2 text-sm text-slate-300">
+                        <li><a href="{{ route('glossary') }}" class="hover:text-white transition">Glossary</a></li>
+                        <li><a href="{{ route('methodology') }}" class="hover:text-white transition">Methodology</a>
+                        </li>
+                        <li><a href="{{ route('faq') }}" class="hover:text-white transition">FAQ</a></li>
                         <li><a href="{{ url('/') }}#how-it-works" class="hover:text-white transition">How it
                                 works</a></li>
-                        <li><a href="{{ url('/admin') }}" class="hover:text-white transition">Dashboard</a></li>
                     </ul>
                 </nav>
                 <nav aria-label="Company">
                     <h2 class="text-sm font-semibold text-white">Company</h2>
                     <ul class="mt-4 space-y-2 text-sm text-slate-300">
                         <li><a href="{{ route('about') }}" class="hover:text-white transition">About</a></li>
-                        <li><a href="{{ route('faq') }}" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="{{ route('legal') }}" class="hover:text-white transition">Legal</a></li>
+                        <li><a href="{{ route('personvern') }}" class="hover:text-white transition">Personvern</a>
+                        </li>
+                    </ul>
+                </nav>
+                <nav aria-label="Contact">
+                    <h2 class="text-sm font-semibold text-white">Kontakt oss</h2>
+                    <ul class="mt-4 space-y-2 text-sm text-slate-300">
+                        <li>
+                            <a href="mailto:thomas@ekdahl.no"
+                                class="inline-flex items-center gap-2 hover:text-white transition break-all">
+                                <svg class="w-4 h-4 shrink-0 text-brand-400" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2" stroke="currentColor" aria-hidden="true" focusable="false">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                </svg>
+                                thomas@ekdahl.no
+                            </a>
+                        </li>
+                        <li>
+                            <a href="tel:+4791143630"
+                                class="inline-flex items-center gap-2 hover:text-white transition">
+                                <svg class="w-4 h-4 shrink-0 text-brand-400" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2" stroke="currentColor" aria-hidden="true" focusable="false">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                                </svg>
+                                +47 911 43 630
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
             <div
                 class="mt-10 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p class="text-xs text-slate-400">&copy; {{ date('Y') }} Wealth Prognosis. Built with Laravel
-                    &amp;
-                    Filament.</p>
+                <p class="text-xs text-slate-400">&copy; {{ date('Y') }} Ekdahl Enterprises AS. All rights
+                    reserved.</p>
                 <p class="text-xs text-slate-400">Made for long-term thinkers.</p>
             </div>
         </div>

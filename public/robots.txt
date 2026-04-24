@@ -1,2 +1,52 @@
+# Wealth Prognosis — robots directives
+# Public pages are indexable. Authenticated dashboard area is not.
+
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /system
+Disallow: /system/
+Disallow: /download/
+Disallow: /livewire/
+
+# AI / LLM crawlers — explicitly allowed to index public marketing and reference pages.
+# See /llms.txt for a curated entry point.
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /system
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /system
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /system
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /system
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /system
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /system
+
+User-agent: CCBot
+Disallow: /
+
+# Sitemap: update APP_URL in deployment to generate absolute links.
+# Sitemap: https://wealthprognosis.com/sitemap.xml

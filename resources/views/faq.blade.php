@@ -19,12 +19,12 @@
                 [
                     'q' => 'Who is it for?',
                     'a' =>
-                        '<p>Long-term thinkers who want clarity about their finances over decades, not just this month. It is especially strong for people planning for early retirement (FIRE), optimising Norwegian taxation, or modelling how a mortgage strategy plays out over 20–30 years.</p>',
+                        '<p>Long-term thinkers who want clarity about their finances over decades, not just this month. It is especially strong for people planning for early retirement (FIRE), optimising taxation, or modelling how a mortgage strategy plays out over 20–30 years.</p>',
                 ],
                 [
                     'q' => 'Do I need to be a developer to use it?',
                     'a' =>
-                        '<p>No. Everything is managed through the Filament admin dashboard — adding assets, running simulations, exporting to Excel. The command line and JSON configs are there if you want them, but not required.</p>',
+                        '<p>No. Everything is managed through the admin dashboard — adding assets, running simulations, exporting to Excel. The command line and JSON configs are there if you want them, but not required.</p>',
                 ],
                 [
                     'q' => 'How much does it cost?',
@@ -61,7 +61,7 @@
             ],
         ],
         [
-            'title' => 'Norwegian taxation',
+            'title' => 'Taxation',
             'items' => [
                 [
                     'q' => 'Which Norwegian taxes are supported?',
@@ -91,7 +91,7 @@
                 [
                     'q' => 'Which AI model is used?',
                     'a' =>
-                        '<p>Google Gemini through the official Laravel AI SDK. Conversation history is stored per user so the assistant has context between questions.</p>',
+                        '<p>Google Gemini. Conversation history is stored per user so the assistant has context between questions.</p>',
                 ],
                 [
                     'q' => 'Does the AI ever see other users\' data?',

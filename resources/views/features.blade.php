@@ -2,7 +2,7 @@
 
 @section('title', 'Features — Wealth Prognosis')
 @section('description',
-    'A complete feature overview: year-by-year prognosis, Norwegian taxation, FIRE metrics, AI
+    'A complete feature overview: year-by-year prognosis, taxation, FIRE metrics, AI
     assistant, multi-tenancy, mortgage modelling and more.')
 
     @push('head')
@@ -23,11 +23,11 @@
                 'name' => 'Wealth Prognosis features',
                 'itemListElement' => [
                     ['@type' => 'ListItem', 'position' => 1, 'name' => 'Prognosis engine', 'description' => 'Year-by-year simulation of income, expenses, mortgages, cash flow, taxes and asset value across pessimistic, realistic and optimistic scenarios.'],
-                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Norwegian taxation', 'description' => 'Complete coverage of fortune tax, property tax, income tax, capital tax, rental tax, company tax, dividend tax and the tax shield. Swedish and Swiss tax calculations are available in beta.'],
+                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Taxation', 'description' => 'Complete coverage of fortune tax, property tax, income tax, capital tax, rental tax, company tax, dividend tax and the tax shield. Swedish and Swiss tax calculations are available in beta.'],
                     ['@type' => 'ListItem', 'position' => 3, 'name' => 'Mortgages and loans', 'description' => 'Annuity mortgages, extra downpayments, tax-deductible interest and max-mortgage calculation.'],
                     ['@type' => 'ListItem', 'position' => 4, 'name' => 'F.I.R.E metrics', 'description' => 'Sell-down strategy for liquid assets while keeping essential assets such as house, cabin, car and boat.'],
                     ['@type' => 'ListItem', 'position' => 5, 'name' => 'AI assistant', 'description' => 'Natural-language English and Norwegian access to the full configuration via Google Gemini with tool-calling.'],
-                    ['@type' => 'ListItem', 'position' => 6, 'name' => 'Multi-tenancy and security', 'description' => 'Team-scoped data, audit stamping, signed download URLs and a Filament admin UI.'],
+                    ['@type' => 'ListItem', 'position' => 6, 'name' => 'Multi-tenancy and security', 'description' => 'Team-scoped data, audit stamping, signed download URLs and a modern admin UI.'],
                     ['@type' => 'ListItem', 'position' => 7, 'name' => 'Assets and configuration', 'description' => '15+ asset types covering real estate, vehicles, pensions, financial assets, companies and liabilities.'],
                 ],
             ],
@@ -75,7 +75,7 @@
                 ],
             ],
             [
-                'title' => 'Norwegian taxation',
+                'title' => 'Taxation',
                 'intro' =>
                     'Complete coverage of Norwegian tax rules, year by year. Swedish and Swiss tax calculations are available in beta.',
                 'items' => [
@@ -169,7 +169,7 @@
                     [
                         'name' => 'Powered by Gemini',
                         'body' =>
-                            'Uses the Laravel AI SDK with Google Gemini under the hood; conversation history is stored per user.',
+                            'Google Gemini under the hood; conversation history is stored per user so the assistant has context between questions.',
                     ],
                     [
                         'name' => 'Tool-calling',
@@ -202,8 +202,8 @@
                         'body' => 'Analysis files are served through signed, auth-protected routes.',
                     ],
                     [
-                        'name' => 'Filament admin',
-                        'body' => 'Modern, fast admin UI with resource tables, forms, filters and bulk actions.',
+                        'name' => 'Modern admin',
+                        'body' => 'Fast admin UI with resource tables, forms, filters and bulk actions.',
                     ],
                 ],
             ],

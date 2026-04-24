@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Filament\Actions\Action;
+use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,6 +29,11 @@ class SystemPanelProvider extends PanelProvider
             ->id('system')
             ->path('system')
             ->login()
+            ->profile(isSimple: false)
+            ->multiFactorAuthentication([
+                AppAuthentication::make()
+                    ->recoverable(),
+            ], isRequired: true)
             ->brandName(fn (): string => config('app.name', 'Laravel').' · System')
             ->brandLogo(fn (): ?string => is_file(public_path('logo.png')) ? asset('logo.png') : null)
             ->brandLogoHeight('2rem')

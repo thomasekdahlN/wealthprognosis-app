@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfigurationRetirementReadinessWidget extends ChartWidget
 {
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 4;
 
     public function getHeading(): string
     {

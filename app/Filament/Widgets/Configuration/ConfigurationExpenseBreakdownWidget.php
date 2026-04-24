@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfigurationExpenseBreakdownWidget extends ChartWidget
 {
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 3;
 
     public function getHeading(): string
     {

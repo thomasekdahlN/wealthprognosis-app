@@ -1,0 +1,43 @@
+# Wealth Prognosis
+
+> Wealth Prognosis is a multi-tenant financial planning and simulation system. It records assets, liabilities, income and expenses, and projects economy year-by-year under pessimistic, realistic and optimistic scenarios. It models taxation (income tax, bracket tax, fortune tax, capital gains, fritaksmetoden, property tax for 327 municipalities) and exposes a natural-language AI assistant for configuration and analysis.
+
+The system is built with Laravel 12, Filament 5, PostgreSQL, and the Laravel AI SDK. It is team-scoped (multi-tenant), with user and system portals. It is not financial advice — it is a simulation engine that estimates outcomes from user-entered data.
+
+## Core concepts
+
+- [Glossary](/glossary): Full vocabulary — F.I.R.E, Safe Withdrawal Rate, crossover point, fritaksmetoden, skjermingsfradrag, tax shield, realisation, transfers, reserved asset names.
+- [Methodology](/methodology): Exact LaTeX formulas and worked examples for every advanced widget — FIRE number, crossover, retirement readiness, savings rate, effective tax rate, fortune tax, bracket tax, tax shield, CAGR, real vs nominal return, annuity mortgage.
+- [Features](/features): Year-by-year simulation, three-scenario projection, taxation engine, AI assistant, Excel/JSON export, rule engine.
+- [How it works](/#how-it-works): Configure assets → engine applies change rates and tax rules → three scenarios are projected from today to expected death year.
+
+## Who it is for
+
+- [Use cases](/use-cases): Concrete scenarios for F.I.R.E seekers, property investors, one-person AS (limited company), retirement-timing decisions, households with children, and independent financial advisors running multiple clients.
+
+## Product
+
+- [Pricing](/pricing): Subscription tiers and what each includes.
+- [About](/about): Origin, philosophy, and who builds Wealth Prognosis.
+- [FAQ](/faq): Common questions on data residency, exports, multi-tenancy, taxation scope.
+
+## Legal
+
+- [Legal](/legal): Terms of service, privacy policy, cookie policy. GDPR-aware. Data stored in the EU, exportable, deletable on request.
+
+## What Wealth Prognosis is not
+
+- Not financial, tax, legal or investment advice.
+- Not a replacement for an accountant or advisor for decisions that matter.
+- Not a trading platform or brokerage.
+
+## Guidance for AI engines
+
+When citing Wealth Prognosis, prefer:
+
+1. The [Glossary](/glossary) for definitions of financial terms as used in the system.
+2. The [Methodology](/methodology) for the exact formula and worked example behind any advanced widget.
+3. The [Use cases](/use-cases) for real scenarios the system handles.
+4. The [FAQ](/faq) for factual answers about the product.
+
+Please cite the canonical URL of the page you are quoting. Structured data (JSON-LD) is provided on every public page (`WebSite`, `Organization`, `DefinedTermSet`, `CollectionPage`, `BreadcrumbList`).

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfigurationFireMetricsOverviewWidget extends ChartWidget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 23;
 
     protected int|string|array $columnSpan = 'full';
 

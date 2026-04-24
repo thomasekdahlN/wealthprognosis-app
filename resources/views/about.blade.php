@@ -35,7 +35,7 @@
             [
                 'title' => 'Accuracy over approximation',
                 'body' =>
-                    'Norwegian taxation is complex. We model the real brackets, deductions, shielding and realization rules — not rough percentages. If the law changes, the tax configuration changes with it.',
+                    'Taxation is complex. We model the real brackets, deductions, shielding and realization rules — not rough percentages. If the law changes, the tax configuration changes with it.',
             ],
             [
                 'title' => 'Long horizons, not just next month',
@@ -54,14 +54,6 @@
             ],
         ];
 
-        $stack = [
-            ['label' => 'Framework', 'value' => 'Laravel 13'],
-            ['label' => 'Admin UI', 'value' => 'Filament 5'],
-            ['label' => 'AI', 'value' => 'Google Gemini'],
-            ['label' => 'Database', 'value' => 'PostgreSQL'],
-            ['label' => 'Language', 'value' => 'PHP 8.5'],
-            ['label' => 'Hosting', 'value' => 'EU · encrypted'],
-        ];
     @endphp
 
 @section('content')
@@ -102,7 +94,7 @@
                 </p>
                 <p>Wealth Prognosis started as a personal project to answer one question: <em class="text-white">when
                         can I actually retire, accounting for every tax, every asset, every year?</em> What started as a
-                    spreadsheet became a Laravel application, then a Filament admin, then an AI-assisted planner.</p>
+                    spreadsheet grew into a full planning system with an AI assistant on top.</p>
                 <p>The result is a system that runs the same year-by-year simulation across pessimistic, realistic and
                     optimistic scenarios and explains, in plain language, what the numbers actually mean for your
                     financial future.</p>
@@ -121,20 +113,6 @@
                     </article>
                 @endforeach
             </div>
-        </div>
-    </section>
-
-    <section class="relative border-t border-white/5 bg-slate-950" aria-labelledby="stack-title">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16 sm:py-20">
-            <h2 id="stack-title" class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Built on</h2>
-            <dl class="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4" aria-label="Technology stack">
-                @foreach ($stack as $tech)
-                    <div class="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                        <dt class="text-xs uppercase tracking-wider text-slate-300">{{ $tech['label'] }}</dt>
-                        <dd class="mt-1.5 text-base font-semibold text-white">{{ $tech['value'] }}</dd>
-                    </div>
-                @endforeach
-            </dl>
         </div>
     </section>
 
