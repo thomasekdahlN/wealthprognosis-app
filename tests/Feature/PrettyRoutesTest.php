@@ -1,11 +1,15 @@
 <?php
 
+use App\Filament\Resources\AssetConfigurations\AssetConfigurationResource;
+use App\Filament\Resources\Assets\AssetResource;
+use App\Filament\System\Resources\TaxConfigurations\TaxConfigurationResource;
 use App\Models\AssetConfiguration;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class)->in('Feature');
+uses(TestCase::class)->in('Feature');
 
 it('pretty config assets URL renders directly and loads', function () {
     $user = User::factory()->create();
@@ -63,13 +67,13 @@ it('pretty nested simulation assets URL returns 404 when records are missing', f
 });
 
 it('resource getUrl overrides stay compatible with filament', function (string $resourceClass) {
-    $baseMethod = new \ReflectionMethod(Resource::class, 'getUrl');
-    $resourceMethod = new \ReflectionMethod($resourceClass, 'getUrl');
+    $baseMethod = new ReflectionMethod(Resource::class, 'getUrl');
+    $resourceMethod = new ReflectionMethod($resourceClass, 'getUrl');
 
     expect(array_map(fn ($parameter) => $parameter->getName(), $resourceMethod->getParameters()))
         ->toBe(array_map(fn ($parameter) => $parameter->getName(), $baseMethod->getParameters()));
 })->with([
-    App\Filament\Resources\AssetConfigurations\AssetConfigurationResource::class,
-    App\Filament\Resources\Assets\AssetResource::class,
-    App\Filament\Resources\TaxConfigurations\TaxConfigurationResource::class,
+    AssetConfigurationResource::class,
+    AssetResource::class,
+    TaxConfigurationResource::class,
 ]);

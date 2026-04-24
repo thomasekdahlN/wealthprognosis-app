@@ -1,6 +1,6 @@
 <?php
 
-use App\Filament\Resources\TaxConfigurations\Widgets\StandardDeductionWidget;
+use App\Filament\System\Resources\TaxConfigurations\Widgets\StandardDeductionWidget;
 use App\Models\TaxConfiguration;
 use App\Models\TaxType;
 use App\Models\User;

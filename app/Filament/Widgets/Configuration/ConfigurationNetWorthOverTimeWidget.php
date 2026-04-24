@@ -2,13 +2,14 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\AssetYear;
 use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
 class ConfigurationNetWorthOverTimeWidget extends ChartWidget
 {
-    protected static ?int $sort = 6;
+    protected static ?int $sort = 8;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -37,7 +38,7 @@ class ConfigurationNetWorthOverTimeWidget extends ChartWidget
         $assetConfigId = app(CurrentAssetConfiguration::class)->id();
 
         // Collect years with data for this user & configuration up to current year
-        $years = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+        $years = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
             if ($assetConfigId) {
                 $query->where('asset_configuration_id', $assetConfigId);
@@ -56,7 +57,7 @@ class ConfigurationNetWorthOverTimeWidget extends ChartWidget
         $netWorthData = [];
 
         foreach ($years as $year) {
-            $totals = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+            $totals = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
                 $query->where('user_id', $user->id)->where('is_active', true);
                 if ($assetConfigId) {
                     $query->where('asset_configuration_id', $assetConfigId);

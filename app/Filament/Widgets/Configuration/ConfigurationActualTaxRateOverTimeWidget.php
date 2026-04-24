@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\AssetYear;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,7 +29,7 @@ class ConfigurationActualTaxRateOverTimeWidget extends ChartWidget
         }
 
         // Get years with data from asset_years table for the current user - only up to current year
-        $years = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        $years = AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
             ->where('year', '<=', now()->year) // Don't go beyond current year
@@ -48,7 +49,7 @@ class ConfigurationActualTaxRateOverTimeWidget extends ChartWidget
 
         foreach ($years as $year) {
             // Calculate total income for this year (considering factors)
-            $incomeRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+            $incomeRecords = AssetYear::whereHas('asset', function ($query) use ($user) {
                 $query->where('user_id', $user->id)->where('is_active', true);
             })
                 ->where('year', $year)
@@ -62,19 +63,8 @@ class ConfigurationActualTaxRateOverTimeWidget extends ChartWidget
                 return $record->income_amount * $factor; // Convert to annual
             });
 
-            // Calculate total tax paid for this year for the current user
-            // First try to get actual tax_amount, if not available, estimate from income
-            $totalTax = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
-                $query->where('user_id', $user->id)->where('is_active', true);
-            })
-                ->where('year', $year)
-                ->whereNotNull('tax_amount')
-                ->sum('tax_amount') ?: 0;
-
-            // If no tax_amount data, estimate tax based on Norwegian tax system
-            if ($totalTax == 0 && $totalIncome > 0) {
-                $totalTax = $this->estimateTaxFromIncome($totalIncome);
-            }
+            // asset_years has no tax columns; estimate tax based on income
+            $totalTax = $totalIncome > 0 ? $this->estimateTaxFromIncome($totalIncome) : 0;
 
             // Calculate tax rate as percentage of income
             $taxRate = $totalIncome > 0 ? ($totalTax / $totalIncome) * 100 : 0;

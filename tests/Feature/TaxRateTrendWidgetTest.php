@@ -1,9 +1,10 @@
 <?php
 
-use App\Filament\Resources\TaxConfigurations\Widgets\TaxRateTrendWidget;
+use App\Filament\System\Resources\TaxConfigurations\Widgets\TaxRateTrendWidget;
 use App\Models\TaxConfiguration;
 use App\Models\TaxType;
 use App\Models\User;
+use Illuminate\Routing\Route;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -203,7 +204,7 @@ it('resolves context from route parameters', function () {
 
     // Simulate route parameters
     request()->setRouteResolver(function () use ($taxConfig) {
-        $route = Mockery::mock(\Illuminate\Routing\Route::class);
+        $route = Mockery::mock(Route::class);
         $route->shouldReceive('parameter')->with('country')->andReturn('no');
         $route->shouldReceive('parameter')->with('record', null)->andReturn($taxConfig);
 

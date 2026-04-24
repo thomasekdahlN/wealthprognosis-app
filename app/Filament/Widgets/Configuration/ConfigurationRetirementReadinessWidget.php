@@ -2,7 +2,6 @@
 
 namespace App\Filament\Widgets\Configuration;
 
-use App\Models\Asset;
 use App\Models\AssetConfiguration;
 use App\Models\AssetYear;
 use App\Models\User;
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfigurationRetirementReadinessWidget extends ChartWidget
 {
-    protected static ?int $sort = 8;
+    protected static ?int $sort = 5;
 
     public function getHeading(): string
     {
@@ -216,11 +215,15 @@ class ConfigurationRetirementReadinessWidget extends ChartWidget
         // Basic pension amount (simplified)
         $basicPension = 120000; // Approximate basic pension in NOK
 
-        // Add occupational pension if available
-        $occupationalPension = Asset::where('user_id', $user->id)
-            ->where('is_active', true)
-            ->where('asset_type', 'otp')
-            ->sum('market_amount') * 0.04; // 4% withdrawal
+        // Add occupational pension if available (4% withdrawal of current market value)
+        $currentYear = now()->year;
+        $occupationalPension = AssetYear::whereHas('asset', function ($query) use ($user) {
+            $query->where('user_id', $user->id)
+                ->where('is_active', true)
+                ->where('asset_type', 'otp');
+        })
+            ->where('year', $currentYear)
+            ->sum('asset_market_amount') * 0.04;
 
         return $basicPension + $occupationalPension;
     }

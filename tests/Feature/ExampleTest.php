@@ -50,8 +50,8 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Pricing', false);
-        $response->assertSee('Self-hosted', false);
         $response->assertSee('Solo', false);
+        $response->assertSee('Family', false);
         $response->assertSee('Advisor', false);
     }
 }

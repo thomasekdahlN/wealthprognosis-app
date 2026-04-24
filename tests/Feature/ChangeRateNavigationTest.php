@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,10 +14,11 @@ class ChangeRateNavigationTest extends TestCase
     public function test_change_rate_scenarios_page_loads()
     {
         $user = User::factory()->create();
+        Filament::setCurrentPanel('system');
 
         $response = $this->actingAs($user)
             ->withoutMiddleware()
-            ->get('/admin/change-rate-scenarios');
+            ->get('/system/change-rate-scenarios');
 
         $response->assertStatus(200);
     }
@@ -24,10 +26,11 @@ class ChangeRateNavigationTest extends TestCase
     public function test_change_rate_assets_page_loads()
     {
         $user = User::factory()->create();
+        Filament::setCurrentPanel('system');
 
         $response = $this->actingAs($user)
             ->withoutMiddleware()
-            ->get('/admin/change-rate-assets?scenario=realistic');
+            ->get('/system/change-rate-assets?scenario=realistic');
 
         $response->assertStatus(200);
     }
@@ -35,10 +38,11 @@ class ChangeRateNavigationTest extends TestCase
     public function test_change_rate_table_page_loads()
     {
         $user = User::factory()->create();
+        Filament::setCurrentPanel('system');
 
         $response = $this->actingAs($user)
             ->withoutMiddleware()
-            ->get('/admin/change-rate-table?scenario=realistic&asset=equityfund');
+            ->get('/system/change-rate-table?scenario=realistic&asset=equityfund');
 
         $response->assertStatus(200);
     }

@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\TaxType;
 use App\Models\User;
+use Filament\Facades\Filament;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -41,10 +43,11 @@ class TaxTypeManagementTest extends TestCase
         $this->artisan('db:seed', ['--class' => 'TaxTypesFromConfigSeeder']);
 
         $user = User::factory()->create();
+        Filament::setCurrentPanel('system');
 
         $response = $this->actingAs($user)
             ->withoutMiddleware()
-            ->get('/admin/tax-types');
+            ->get('/system/tax-types');
 
         $response->assertStatus(200);
     }
@@ -70,7 +73,7 @@ class TaxTypeManagementTest extends TestCase
     {
         TaxType::factory()->create(['type' => 'unique_test']);
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
 
         TaxType::factory()->create(['type' => 'unique_test']); // Same type should fail
     }

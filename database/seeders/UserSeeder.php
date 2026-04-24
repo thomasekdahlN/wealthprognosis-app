@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Thomas Ekdahl',
                 'password' => Hash::make('ballball'),
+                'is_admin' => true,
             ]
         );
 
@@ -27,6 +28,25 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Tommy L',
                 'password' => Hash::make('ballball'),
+                'is_admin' => true,
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'linus@ekdahl.no'],
+            [
+                'name' => 'Linus Ekdahl',
+                'password' => Hash::make('ballball'),
+                'is_admin' => true,
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'lilje@ekdahl.no'],
+            [
+                'name' => 'Lilje Ekdahl',
+                'password' => Hash::make('ballball'),
+                'is_admin' => true,
             ]
         );
     }

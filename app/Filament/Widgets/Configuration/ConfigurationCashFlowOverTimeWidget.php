@@ -2,13 +2,14 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\AssetYear;
 use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
 class ConfigurationCashFlowOverTimeWidget extends ChartWidget
 {
-    protected static ?int $sort = 6;
+    protected static ?int $sort = 9;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -39,7 +40,7 @@ class ConfigurationCashFlowOverTimeWidget extends ChartWidget
             ?? request()->get('asset_owner_id');
 
         // Collect years with data up to current year
-        $years = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+        $years = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
             if ($assetConfigId) {
                 $query->where('asset_configuration_id', $assetConfigId);
@@ -60,7 +61,7 @@ class ConfigurationCashFlowOverTimeWidget extends ChartWidget
         $netCashflowData = [];
 
         foreach ($years as $year) {
-            $incomeRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+            $incomeRecords = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
                 $query->where('user_id', $user->id)->where('is_active', true);
                 if ($assetConfigId) {
                     $query->where('asset_configuration_id', $assetConfigId);
@@ -71,7 +72,7 @@ class ConfigurationCashFlowOverTimeWidget extends ChartWidget
                 ->where('income_amount', '>', 0)
                 ->get();
 
-            $expenseRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+            $expenseRecords = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
                 $query->where('user_id', $user->id)->where('is_active', true);
                 if ($assetConfigId) {
                     $query->where('asset_configuration_id', $assetConfigId);

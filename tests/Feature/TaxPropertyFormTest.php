@@ -2,10 +2,12 @@
 
 use App\Models\TaxProperty;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 it('can display tax property edit form with calculation example', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['is_admin' => true]);
     $this->actingAs($user);
+    Filament::setCurrentPanel('system');
 
     $taxProperty = TaxProperty::create([
         'country_code' => 'no',
@@ -21,7 +23,7 @@ it('can display tax property edit form with calculation example', function () {
         'is_active' => true,
     ]);
 
-    $response = $this->get("/admin/tax-property/tax-properties/{$taxProperty->id}/edit");
+    $response = $this->get("/system/tax-property/tax-properties/{$taxProperty->id}/edit");
 
     $response->assertSuccessful();
     $response->assertSee('Test Municipality');
@@ -30,8 +32,9 @@ it('can display tax property edit form with calculation example', function () {
 });
 
 it('displays correct calculation example for ringerike', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['is_admin' => true]);
     $this->actingAs($user);
+    Filament::setCurrentPanel('system');
 
     $ringerike = TaxProperty::where('code', 'ringerike')->first();
 
@@ -51,7 +54,7 @@ it('displays correct calculation example for ringerike', function () {
         ]);
     }
 
-    $response = $this->get("/admin/tax-property/tax-properties/{$ringerike->id}/edit");
+    $response = $this->get("/system/tax-property/tax-properties/{$ringerike->id}/edit");
 
     $response->assertSuccessful();
     $response->assertSee('Ringerike');

@@ -26,6 +26,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property Team|null $currentTeam
+ * @property bool $is_admin
  */
 class User extends Authenticatable implements FilamentUser
 {
@@ -40,6 +41,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     /**
@@ -59,10 +61,15 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
     ];
 
     public function canAccessPanel(Panel $panel): bool
     {
+        if ($panel->getId() === 'system') {
+            return (bool) $this->is_admin;
+        }
+
         return true;
     }
 

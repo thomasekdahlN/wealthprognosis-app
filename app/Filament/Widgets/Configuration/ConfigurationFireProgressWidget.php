@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfigurationFireProgressWidget extends ChartWidget
 {
-    protected static ?int $sort = 5;
+    protected static ?int $sort = 7;
 
     protected int|string|array $columnSpan = 'full';
 

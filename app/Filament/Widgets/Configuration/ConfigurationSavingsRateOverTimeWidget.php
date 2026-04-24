@@ -2,12 +2,15 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\AssetConfiguration;
+use App\Models\AssetYear;
+use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
 class ConfigurationSavingsRateOverTimeWidget extends ChartWidget
 {
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 6;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -15,7 +18,7 @@ class ConfigurationSavingsRateOverTimeWidget extends ChartWidget
 
     public function mount(): void
     {
-        $this->assetConfigId = app(\App\Services\CurrentAssetConfiguration::class)->id();
+        $this->assetConfigId = app(CurrentAssetConfiguration::class)->id();
     }
 
     public function getHeading(): string
@@ -23,7 +26,7 @@ class ConfigurationSavingsRateOverTimeWidget extends ChartWidget
         $heading = 'Savings Rate Over Time';
 
         if ($this->assetConfigId) {
-            $assetConfiguration = \App\Models\AssetConfiguration::find($this->assetConfigId);
+            $assetConfiguration = AssetConfiguration::find($this->assetConfigId);
             if ($assetConfiguration) {
                 $heading = 'Savings Rate Over Time - '.$assetConfiguration->name;
             }
@@ -44,7 +47,7 @@ class ConfigurationSavingsRateOverTimeWidget extends ChartWidget
         }
 
         // Get years with data from asset_years table for the current user - only up to current year
-        $years = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        $years = AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
 
             // Apply asset configuration filtering if specified
@@ -68,7 +71,7 @@ class ConfigurationSavingsRateOverTimeWidget extends ChartWidget
 
         foreach ($years as $year) {
             // Calculate total income for this year (considering factors)
-            $incomeRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+            $incomeRecords = AssetYear::whereHas('asset', function ($query) use ($user) {
                 $query->where('user_id', $user->id)->where('is_active', true);
 
                 // Apply asset configuration filtering if specified
@@ -88,7 +91,7 @@ class ConfigurationSavingsRateOverTimeWidget extends ChartWidget
             });
 
             // Calculate total expenses for this year (considering factors)
-            $expenseRecords = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+            $expenseRecords = AssetYear::whereHas('asset', function ($query) use ($user) {
                 $query->where('user_id', $user->id)->where('is_active', true);
 
                 // Apply asset configuration filtering if specified

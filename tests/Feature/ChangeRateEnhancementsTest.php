@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\ChangeRateTable;
+use App\Filament\System\Pages\ChangeRateTable;
 use App\Models\ChangeRateConfiguration;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,7 +17,7 @@ class ChangeRateEnhancementsTest extends TestCase
     {
         // Create user and team for the test
         $user = User::factory()->create();
-        $team = \App\Models\Team::factory()->create();
+        $team = Team::factory()->create();
 
         // Don't seed to avoid conflicts, create fresh test data
         // Create some test data with unique years
@@ -72,7 +73,7 @@ class ChangeRateEnhancementsTest extends TestCase
     {
         // Create user and team for the test
         $user = User::factory()->create();
-        $team = \App\Models\Team::factory()->create();
+        $team = Team::factory()->create();
 
         // Create test data with gaps using unique scenario/asset
         ChangeRateConfiguration::create([

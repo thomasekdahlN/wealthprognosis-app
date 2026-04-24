@@ -2,12 +2,13 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\AssetYear;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
 class ConfigurationExpenseBreakdownWidget extends ChartWidget
 {
-    protected static ?int $sort = 7;
+    protected static ?int $sort = 4;
 
     public function getHeading(): string
     {
@@ -28,7 +29,7 @@ class ConfigurationExpenseBreakdownWidget extends ChartWidget
         // Get expense data by asset type from asset_years
         $currentYear = now()->year;
 
-        $expenseData = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        $expenseData = AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
             ->where('year', $currentYear)

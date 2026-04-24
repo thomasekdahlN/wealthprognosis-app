@@ -2,19 +2,20 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Services\CurrentAssetConfiguration;
 use App\Services\FireCalculationService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class ConfigurationFireCrossoverWidget extends BaseWidget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
 
-    protected int|string|array $columnSpan = ['default' => 6, 'md' => 6, 'lg' => 6, 'xl' => 6]; // Place side-by-side on md+ in one row
+    protected int|string|array $columnSpan = 'full';
 
     protected function getStats(): array
     {
-        $data = FireCalculationService::getFinancialData(app(\App\Services\CurrentAssetConfiguration::class)->id());
+        $data = FireCalculationService::getFinancialData(app(CurrentAssetConfiguration::class)->id());
 
         if (! $data['user']) {
             return [

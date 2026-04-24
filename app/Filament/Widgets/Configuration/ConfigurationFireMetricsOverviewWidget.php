@@ -2,15 +2,17 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\AssetYear;
+use App\Models\User;
 use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
 class ConfigurationFireMetricsOverviewWidget extends ChartWidget
 {
-    protected static ?int $sort = 2; // Same row as FireCrossoverWidget
+    protected static ?int $sort = 2;
 
-    protected int|string|array $columnSpan = ['default' => 6, 'md' => 6, 'lg' => 6, 'xl' => 6]; // Share row with FIRE: Crossover Point
+    protected int|string|array $columnSpan = 'full';
 
     public function getHeading(): string
     {
@@ -44,7 +46,7 @@ class ConfigurationFireMetricsOverviewWidget extends ChartWidget
 
         // Get current financial data (respect active asset configuration)
         $assetConfigId = $activeScenario->id;
-        $totalAssets = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+        $totalAssets = AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
             $query->where('asset_configuration_id', $assetConfigId);
         })
@@ -125,12 +127,12 @@ class ConfigurationFireMetricsOverviewWidget extends ChartWidget
         ];
     }
 
-    private function calculateAnnualIncome(\App\Models\User $user, ?int $assetConfigId = null): float
+    private function calculateAnnualIncome(User $user, ?int $assetConfigId = null): float
     {
         // Get income from asset_years for the current year
         $currentYear = now()->year;
 
-        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+        return AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
             if ($assetConfigId) {
                 $query->where('asset_configuration_id', $assetConfigId);
@@ -141,12 +143,12 @@ class ConfigurationFireMetricsOverviewWidget extends ChartWidget
             ->sum('income_amount') ?: 0;
     }
 
-    private function calculateAnnualExpenses(\App\Models\User $user, ?int $assetConfigId = null): float
+    private function calculateAnnualExpenses(User $user, ?int $assetConfigId = null): float
     {
         // Get expenses from asset_years for the current year
         $currentYear = now()->year;
 
-        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
+        return AssetYear::whereHas('asset', function ($query) use ($user, $assetConfigId) {
             $query->where('user_id', $user->id)->where('is_active', true);
             if ($assetConfigId) {
                 $query->where('asset_configuration_id', $assetConfigId);

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AssetCategory;
+use App\Models\AssetType;
 use App\Models\Team;
 use App\Models\User;
 use Filament\Facades\Filament;
@@ -28,11 +29,11 @@ class AssetCategoryGuiTest extends TestCase
             'joined_at' => now(),
         ]);
 
-        Filament::setCurrentPanel('admin');
+        Filament::setCurrentPanel('system');
 
         $response = $this->actingAs($user)
             ->withoutMiddleware()
-            ->get('/admin/asset-categories');
+            ->get('/system/asset-categories');
 
         $response->assertStatus(200);
     }
@@ -40,11 +41,11 @@ class AssetCategoryGuiTest extends TestCase
     public function test_asset_category_create_page_loads()
     {
         $user = User::factory()->create();
-        Filament::setCurrentPanel('admin');
+        Filament::setCurrentPanel('system');
 
         $response = $this->actingAs($user)
             ->withoutMiddleware()
-            ->get('/admin/asset-categories/create');
+            ->get('/system/asset-categories/create');
 
         $response->assertStatus(200);
     }
@@ -54,12 +55,12 @@ class AssetCategoryGuiTest extends TestCase
         $this->artisan('db:seed', ['--class' => 'AssetCategorySeeder']);
 
         $user = User::factory()->create();
-        Filament::setCurrentPanel('admin');
+        Filament::setCurrentPanel('system');
         $category = AssetCategory::first();
 
         $response = $this->actingAs($user)
             ->withoutMiddleware()
-            ->get("/admin/asset-categories/{$category->id}/edit");
+            ->get("/system/asset-categories/{$category->id}/edit");
 
         $response->assertStatus(200);
     }
@@ -71,7 +72,7 @@ class AssetCategoryGuiTest extends TestCase
         $user->current_team_id = $team->id;
         $user->save();
 
-        Filament::setCurrentPanel('admin');
+        Filament::setCurrentPanel('system');
 
         // Create using the model directly since Filament form submission is complex
         $assetCategory = AssetCategory::create([
@@ -110,7 +111,7 @@ class AssetCategoryGuiTest extends TestCase
 
         foreach ($categoryMap as $categoryName => $categoryId) {
             if ($categoryId) {
-                \App\Models\AssetType::where('category', $categoryName)->update(['asset_category_id' => $categoryId]);
+                AssetType::where('category', $categoryName)->update(['asset_category_id' => $categoryId]);
             }
         }
 

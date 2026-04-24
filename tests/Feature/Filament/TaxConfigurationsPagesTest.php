@@ -17,9 +17,9 @@ class TaxConfigurationsPagesTest extends TestCase
         $this->actingAs($user);
 
         // Ensure Filament uses the admin panel for routing.
-        Filament::setCurrentPanel('admin');
+        Filament::setCurrentPanel('system');
 
-        $response = $this->withoutMiddleware()->get('/admin/tax-configurations');
+        $response = $this->withoutMiddleware()->get('/system/tax-configurations');
         $response->assertStatus(200);
         $response->assertSee('Choose Country');
     }
