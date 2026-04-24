@@ -17,11 +17,11 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->boolean('is_active')->default(true);
-            $table->json('settings')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
-            $table->string('created_checksum')->nullable();
-            $table->string('updated_checksum')->nullable();
+            $table->jsonb('settings')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users', 'id')->name('teams_created_by_foreign');
+            $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->name('teams_updated_by_foreign');
+            $table->char('created_checksum', 64)->nullable();
+            $table->char('updated_checksum', 64)->nullable();
             $table->timestamps();
 
             $table->index(['owner_id', 'is_active']);

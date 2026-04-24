@@ -127,8 +127,8 @@ class StandardDeductionWidget extends ChartWidget
         }
 
         // Fall back to properties
-        $country = $this->country ?? (string) (request()->route('country') ?? '');
-        $taxType = $this->taxType ?? '';
+        $country = $this->country === '' ? (string) (request()->route('country') ?? '') : $this->country;
+        $taxType = $this->taxType;
 
         // Finally, try route parameters
         if ($taxType === '') {

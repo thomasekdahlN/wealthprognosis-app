@@ -127,7 +127,7 @@ class TaxCashflowService
      * Recalculate cashflow for post-processing adjustments.
      * Used by YearlyProcessor to adjust for mortgage extra payments and other changes.
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      * @param  int  $thisYear  Current year for aggregation calculations
      */
@@ -250,7 +250,7 @@ class TaxCashflowService
     /**
      * Helper to set values in dataH.
      *
-     * @param  array<string, mixed>  $dataH
+     * @param  array  $dataH
      */
     private function ArrSet(array &$dataH, string $path, mixed $value): void
     {

@@ -452,6 +452,7 @@ class PrognosisSimulationService
             $assetsQuery->where('group', 'business');
         }
 
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $assets */
         $assets = $assetsQuery->with('years')->get();
 
         // Add assets and their years
@@ -513,18 +514,20 @@ class PrognosisSimulationService
     protected function buildSummary(array $dataH, \App\Services\Prognosis\PrognosisService $prognosisService): array
     {
         // Extract summary metrics from the calculated data
-        $totalAssets = $prognosisService->totalH ?? [];
-        $privateAssets = $prognosisService->privateH ?? [];
-        $companyAssets = $prognosisService->companyH ?? [];
+        $totalAssets = $prognosisService->totalH;
+        $privateAssets = $prognosisService->privateH;
+        $companyAssets = $prognosisService->companyH;
 
         $startYear = $prognosisService->economyStartYear;
         $endYear = $prognosisService->deathYear;
 
+        $numericYears = array_filter($totalAssets, fn ($year) => is_numeric($year), ARRAY_FILTER_USE_KEY);
+
         return [
-            'total_assets_start' => $totalAssets[$startYear]['asset']['marketAmount'] ?? 0,
-            'total_assets_end' => $totalAssets[$endYear]['asset']['marketAmount'] ?? 0,
-            'total_income' => array_sum(array_column(array_filter($totalAssets, fn ($year) => is_numeric($year), ARRAY_FILTER_USE_KEY), 'income.amount' ?? 0)),
-            'total_expenses' => array_sum(array_column(array_filter($totalAssets, fn ($year) => is_numeric($year), ARRAY_FILTER_USE_KEY), 'expence.amount' ?? 0)),
+            'total_assets_start' => $totalAssets[(string) $startYear]['asset']['marketAmount'] ?? 0,
+            'total_assets_end' => $totalAssets[(string) $endYear]['asset']['marketAmount'] ?? 0,
+            'total_income' => array_sum(array_column($numericYears, 'income.amount')),
+            'total_expenses' => array_sum(array_column($numericYears, 'expence.amount')),
             'fire_achieved' => $this->checkFireAchieved($totalAssets),
         ];
     }

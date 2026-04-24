@@ -160,7 +160,7 @@ class SimulationAssetYears extends Page implements HasTable
      */
     protected function hideIfZeroOrNull($state)
     {
-        if ($state == 0 || $state === null) {
+        if ($state === null || $state == 0) {
             return null;
         }
 
@@ -172,7 +172,7 @@ class SimulationAssetYears extends Page implements HasTable
      */
     protected function formatMoney($state): ?string
     {
-        if ($state == 0 || $state === null) {
+        if ($state === null || $state == 0) {
             return null;
         }
 

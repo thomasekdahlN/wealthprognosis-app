@@ -3,7 +3,7 @@
         "name": "Test Null Tax Type",
         "birth_year": 1980,
         "death_age": 90,
-        "country": "norway"
+        "country": "no"
     },
     "assets": {
         "test_asset": {
@@ -28,4 +28,3 @@
         }
     }
 }
-

@@ -40,7 +40,7 @@ Please provide:
 6. Potential concerns or red flags
 
 Format your response in clear sections with actionable insights.',
-                'model' => 'gpt-4o',
+                'model' => 'gemini-3.1-flash-lite-preview',
                 'max_tokens' => 10000,
                 'temperature' => 1,
                 'is_active' => true,
@@ -64,7 +64,7 @@ Focus on:
 6. Risk mitigation recommendations
 
 Provide specific, actionable risk management strategies.',
-                'model' => 'gpt-4o',
+                'model' => 'gemini-3.1-flash-lite-preview',
                 'max_tokens' => 10000,
                 'temperature' => 1,
                 'is_active' => true,
@@ -88,7 +88,7 @@ Analyze:
 6. Estate planning considerations
 
 Provide specific tax optimization recommendations.',
-                'model' => 'gpt-4o',
+                'model' => 'gemini-3.1-flash-lite-preview',
                 'max_tokens' => 10000,
                 'temperature' => 1,
                 'is_active' => true,
@@ -147,7 +147,7 @@ Please provide a detailed comparison analysis in **markdown format** covering:
 - Warning signs to watch for
 
 Please format your response with clear headings, bullet points, and emphasis on key insights. Use Norwegian number formatting where appropriate (space as thousand separator).',
-                'model' => 'gpt-4o',
+                'model' => 'gemini-3.1-flash-lite-preview',
                 'max_tokens' => 16000,
                 'temperature' => 1,
                 'is_active' => true,

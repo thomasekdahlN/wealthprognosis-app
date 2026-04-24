@@ -28,17 +28,10 @@ use Illuminate\Support\Facades\Log;
  */
 class TaxPropertyService
 {
-    protected string $country;
-
-    /**
-     * Shared TaxConfigPropertyRepository instance.
-     */
-    private \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyConfig;
-
     public function __construct(
-        string $country = 'no',
+        protected string $country = 'no',
         private HelperService $helperService = new HelperService,
-        \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyConfig = new \App\Services\Tax\TaxConfigPropertyRepository
+        private \App\Services\Tax\TaxConfigPropertyRepository $taxPropertyConfig = new \App\Services\Tax\TaxConfigPropertyRepository
     ) {
         $this->country = $country;
         $this->taxPropertyConfig = $taxPropertyConfig;

@@ -142,10 +142,10 @@ class SimulationExportService
                     'description' => $year->description,
                 ],
                 'cashflow' => [
-                    'amount' => self::toNum($year->cashflow_before_taxamount),
+                    'amount' => self::toNum($year->cashflow_before_tax_amount),
                     'amountAccumulated' => self::toNum($year->cashflow_before_tax_aggregated_amount),
-                    'afterTaxAmount' => self::toNum($year->cashflow_after_taxamount),
-                    'afterTaxAggregatedAmount' => self::toNum($year->cashflow_after_tax_aggregatedamount),
+                    'afterTaxAmount' => self::toNum($year->cashflow_after_tax_amount),
+                    'afterTaxAggregatedAmount' => self::toNum($year->cashflow_after_tax_aggregated_amount),
                     'taxAmount' => self::toNum($year->cashflow_tax_amount),
                     'taxDecimal' => self::$helperService->percentToRate($year->cashflow_tax_percent ?? 0),
                     'description' => $year->cashflow_description,
@@ -294,7 +294,7 @@ class SimulationExportService
             'prognosisType' => $simulation->prognosis_type,
             'group' => $simulation->group,
             'taxCountry' => $simulation->tax_country,
-            'isActive' => $simulation->is_active,
+            'isActive' => $simulation->public,
             'public' => $simulation->public,
         ], fn ($value) => $value !== null && $value !== '');
 
@@ -311,6 +311,7 @@ class SimulationExportService
 
         // Process each asset
         foreach ($assets as $asset) {
+            /** @var \App\Models\SimulationAsset $asset */
             $assetData = [];
 
             // Add asset meta section
@@ -491,6 +492,7 @@ class SimulationExportService
         $output[] = implode(',', $header);
 
         // Load all simulation assets with their yearly data
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\SimulationAsset> $assets */
         $assets = $simulation->simulationAssets()
             ->with(['simulationAssetYears' => function ($q) {
                 $q->orderBy('year');
@@ -521,7 +523,7 @@ class SimulationExportService
                     self::csvEscape($asset->name),
                     self::csvEscape($asset->asset_type),
                     self::csvEscape($asset->group),
-                    self::csvEscape($asset->description),
+                    self::csvEscape((string) $asset->description),
                     $yearData->year,
                     $yearData->income_amount ?? 0,
                     $yearData->expence_amount ?? 0,
@@ -698,6 +700,7 @@ class SimulationExportService
         $output[] = implode(',', $header);
 
         // Load all simulation assets with their yearly data
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\SimulationAsset> $assets */
         $assets = $simulation->simulationAssets()
             ->with(['simulationAssetYears' => function ($q) {
                 $q->orderBy('year');

@@ -5,22 +5,16 @@ namespace App\Services;
 use App\Models\AssetType;
 use App\Models\TaxType;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AiConfigurationAnalysisService
 {
-    protected ?string $openaiApiKey;
-
-    protected string $model = 'gpt-4';
+    protected string $model;
 
     public function __construct()
     {
-        $this->openaiApiKey = config('services.openai.api_key');
-
-        if (! $this->openaiApiKey) {
-            throw new \Exception('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment.');
-        }
+        $defaultModel = config('ai.default_model');
+        $this->model = is_string($defaultModel) ? $defaultModel : 'gemini-3.1-flash-lite-preview';
     }
 
     /**
@@ -39,7 +33,7 @@ class AiConfigurationAnalysisService
     }
 
     /**
-     * Perform the actual AI analysis
+     * Perform the actual AI analysis using Laravel AI SDK
      *
      * @return array<string, mixed>
      */
@@ -49,28 +43,20 @@ class AiConfigurationAnalysisService
         $userPrompt = $this->buildUserPrompt($description);
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer '.$this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(300)->post('https://api.openai.com/v1/chat/completions', [
+            Log::info('AI Configuration Analysis - Starting', [
+                'description_length' => strlen($description),
                 'model' => $this->model,
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $userPrompt],
-                ],
-                'temperature' => 0.3,
-                'max_tokens' => 4000,
             ]);
 
-            if (! $response->successful()) {
-                throw new \Exception('OpenAI API request failed: '.$response->body());
-            }
+            /** @var \Laravel\Ai\Responses\AgentResponse $response */
+            $response = (new \Laravel\Ai\AnonymousAgent($systemPrompt, [], []))->prompt($userPrompt, model: $this->model, timeout: 300);
 
-            $responseData = $response->json();
-            $content = $responseData['choices'][0]['message']['content'] ?? '';
+            $content = (string) $response;
 
-            // Parse the JSON response
-            $analysisResult = json_decode($content, true);
+            // Parse the JSON response (strip markdown code fences if present)
+            $content = preg_replace('/^```(?:json)?\s*/m', '', $content) ?? $content;
+            $content = preg_replace('/\s*```\s*$/m', '', $content) ?? $content;
+            $analysisResult = json_decode(trim($content), true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new \Exception('Failed to parse AI response as JSON: '.json_last_error_msg());

@@ -1,119 +1,62 @@
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | AI Provider Configuration
-    |--------------------------------------------------------------------------
-    |
-    | This file contains the configuration for AI services used in the
-    | Wealth Prognosis application, particularly for the AI Assistant.
-    |
-    */
-
-    'provider' => env('AI_PROVIDER', 'openai'),
-
-    'api_key' => env('AI_API_KEY', env('OPENAI_API_KEY')),
-
-    'model' => env('AI_MODEL', 'gpt-4'),
 
     /*
     |--------------------------------------------------------------------------
-    | Available Models
+    | Default AI Provider
     |--------------------------------------------------------------------------
     |
-    | List of available AI models for different providers
+    | The default provider used for all AI operations unless explicitly
+    | overridden. Must match a key in the "providers" array below.
     |
     */
 
-    'models' => [
+    'default' => env('AI_PROVIDER', 'gemini'),
+
+    'default_model' => env('AI_MODEL', 'gemini-3.1-flash-lite-preview'),
+
+    'default_for_images' => 'gemini',
+    'default_for_audio' => 'openai',
+    'default_for_transcription' => 'openai',
+    'default_for_embeddings' => 'gemini',
+    'default_for_reranking' => 'cohere',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Caching
+    |--------------------------------------------------------------------------
+    */
+
+    'caching' => [
+        'embeddings' => [
+            'cache' => false,
+            'store' => env('CACHE_STORE', 'database'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    */
+
+    'providers' => [
+        'gemini' => [
+            'driver' => 'gemini',
+            'key' => env('GEMINI_API_KEY'),
+        ],
+
         'openai' => [
-            'gpt-3.5-turbo' => 'GPT-3.5 Turbo',
-            'gpt-4' => 'GPT-4',
-            'gpt-4-turbo' => 'GPT-4 Turbo',
-            'gpt-4o' => 'GPT-4o',
-            'gpt-5' => 'GPT-5',
-            'o1-preview' => 'o1 Preview',
-            'o1-mini' => 'o1 Mini',
+            'driver' => 'openai',
+            'key' => env('OPENAI_API_KEY'),
+            'url' => env('OPENAI_URL', 'https://api.openai.com/v1'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'key' => env('ANTHROPIC_API_KEY'),
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Model Settings
-    |--------------------------------------------------------------------------
-    |
-    | Configuration for different AI models
-    |
-    */
-
-    'settings' => [
-        'gpt-3.5-turbo' => [
-            'max_tokens' => 1000,
-            'temperature' => 0.7,
-            'timeout' => 120,
-        ],
-        'gpt-4' => [
-            'max_tokens' => 1500,
-            'temperature' => 0.7,
-            'timeout' => 180,
-        ],
-        'gpt-4-turbo' => [
-            'max_tokens' => 2000,
-            'temperature' => 0.7,
-            'timeout' => 180,
-        ],
-        'gpt-4o' => [
-            'max_tokens' => 2000,
-            'temperature' => 0.7,
-            'timeout' => 300,
-        ],
-        'gpt-5' => [
-            'max_tokens' => 3000,
-            'temperature' => 0.7,
-            'timeout' => 300,
-        ],
-        'o1-preview' => [
-            'max_tokens' => 2000,
-            'temperature' => 1.0, // o1 models use fixed temperature
-            'timeout' => 300,
-        ],
-        'o1-mini' => [
-            'max_tokens' => 1500,
-            'temperature' => 1.0, // o1 models use fixed temperature
-            'timeout' => 180,
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Logging Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Configuration for AI interaction logging
-    |
-    */
-
-    'logging' => [
-        'enabled' => env('AI_LOGGING_ENABLED', true),
-        'log_requests' => env('AI_LOG_REQUESTS', true),
-        'log_responses' => env('AI_LOG_RESPONSES', true),
-        'log_context' => env('AI_LOG_CONTEXT', true),
-        'log_errors' => env('AI_LOG_ERRORS', true),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Rate Limiting
-    |--------------------------------------------------------------------------
-    |
-    | Rate limiting configuration for AI API calls
-    |
-    */
-
-    'rate_limiting' => [
-        'enabled' => env('AI_RATE_LIMITING_ENABLED', true),
-        'max_requests_per_minute' => env('AI_MAX_REQUESTS_PER_MINUTE', 60),
-        'max_requests_per_hour' => env('AI_MAX_REQUESTS_PER_HOUR', 1000),
-    ],
 ];

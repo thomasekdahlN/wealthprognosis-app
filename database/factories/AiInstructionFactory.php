@@ -25,7 +25,7 @@ class AiInstructionFactory extends Factory
             'type' => $this->faker->randomElement(['portfolio_analysis', 'risk_assessment', 'tax_optimization', 'market_analysis', 'performance_review']),
             'system_prompt' => $this->faker->paragraph(),
             'user_prompt_template' => 'Analyze this data: {json_data}',
-            'model' => $this->faker->randomElement(['gpt-4', 'gpt-3.5-turbo']),
+            'model' => 'gemini-3.1-flash-lite-preview',
             'max_tokens' => $this->faker->numberBetween(100, 2000),
             'temperature' => $this->faker->randomFloat(2, 0, 2),
             'is_active' => true,

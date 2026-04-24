@@ -12,12 +12,37 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 /**
+ * @property int $id
+ * @property int $asset_configuration_id
+ * @property int|null $user_id
+ * @property int|null $team_id
  * @property string $name
  * @property string|null $description
- * @property int $asset_configuration_id
- * @property int $id
- *
- * @method \Illuminate\Database\Eloquent\Relations\HasMany simulationAssets()
+ * @property int|null $birth_year
+ * @property int|null $prognose_age
+ * @property int|null $pension_official_age
+ * @property int|null $pension_wish_age
+ * @property int|null $expected_death_age
+ * @property int|null $export_start_age
+ * @property bool $public
+ * @property string|null $icon
+ * @property string|null $image
+ * @property string|null $color
+ * @property array<int, string>|null $tags
+ * @property string|null $risk_tolerance
+ * @property string|null $tax_country
+ * @property string|null $prognosis_type
+ * @property string|null $group
+ * @property string|null $created_by
+ * @property string|null $updated_by
+ * @property string|null $created_checksum
+ * @property string|null $updated_checksum
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\SimulationAsset> $simulationAssets
+ * @property \App\Models\AssetConfiguration|null $assetConfiguration
+ * @property \App\Models\User|null $user
+ * @property \App\Models\Team|null $team
  */
 class SimulationConfiguration extends Model
 {

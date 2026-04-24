@@ -16,6 +16,8 @@ class AiAssistantWidget extends Component
 
     public string $message = '';
 
+    public ?string $conversationId = null;
+
     public array $conversation = [];
 
     public bool $isLoading = false;
@@ -144,7 +146,7 @@ class AiAssistantWidget extends Component
             // Process message with AI service with real-time status updates
             $response = $this->aiService->processMessage(
                 $userMessage,
-                $this->conversation,
+                $this->conversationId,
                 Auth::user(),
                 $this->currentConfigurationId,
                 function ($status) {
@@ -179,6 +181,8 @@ class AiAssistantWidget extends Component
             );
 
             \Log::info('AiAssistantWidget: Got AI response', ['response' => $response]);
+
+            $this->conversationId = $response['conversation_id'] ?? $this->conversationId;
 
             // Add assistant response to conversation
             $this->conversation[] = [

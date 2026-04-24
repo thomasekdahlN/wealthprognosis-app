@@ -30,35 +30,20 @@ use Illuminate\Support\Facades\Log;
 class TaxRealizationService implements TaxCalculatorInterface
 {
     /**
-     * Country code for tax lookups (e.g., 'no').
-     */
-    private string $country;
-
-    /**
-     * Shared TaxConfigRepository instance.
-     */
-    private TaxConfigRepository $taxConfigRepo;
-
-    /**
-     * TaxSalaryService instance for OTP calculations.
-     */
-    private TaxSalaryService $taxsalary;
-
-    /**
      * Create a new TaxRealizationService service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
-     * @param  TaxSalaryService|null  $taxSalary  Optional TaxSalaryService instance for dependency injection
+     * @param  TaxSalaryService|null  $taxsalary  Optional TaxSalaryService instance for dependency injection
      */
     public function __construct(
-        string $country = 'no',
-        ?TaxConfigRepository $taxConfigRepo = null,
-        ?TaxSalaryService $taxSalary = null
+        private string $country = 'no',
+        private ?TaxConfigRepository $taxConfigRepo = null,
+        private ?TaxSalaryService $taxsalary = null
     ) {
         $this->country = strtolower($country) ?: 'no';
         $this->taxConfigRepo = $taxConfigRepo ?? app(TaxConfigRepository::class);
-        $this->taxsalary = $taxSalary ?? new TaxSalaryService($this->country, $this->taxConfigRepo);
+        $this->taxsalary = $taxsalary ?? new TaxSalaryService($this->country, $this->taxConfigRepo);
     }
 
     /**

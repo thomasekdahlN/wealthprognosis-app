@@ -199,9 +199,9 @@ class ConfigurationAssets extends ListRecords implements HasTable
                             throw new \InvalidArgumentException('Please select at least one AI instruction');
                         }
 
-                        // Check if OpenAI API key is configured
-                        if (! config('services.openai.api_key')) {
-                            throw new \RuntimeException('OpenAI API key not configured. Please set OPENAI_API_KEY in your environment.');
+                        // Check if Gemini API key is configured
+                        if (! config('ai.providers.gemini.key')) {
+                            throw new \RuntimeException('Gemini API key not configured. Please set GEMINI_API_KEY in your environment.');
                         }
 
                         $this->dispatch('ai-evaluation-started');

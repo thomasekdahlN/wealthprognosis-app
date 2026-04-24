@@ -12,11 +12,28 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
 /**
- * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\SimulationAssetYear> $simulationAssetYears
- * @property string $name
- * @property string $asset_type
- * @property int|null $asset_configuration_id
+ * @property int $id
  * @property int|null $simulation_configuration_id
+ * @property int|null $asset_configuration_id
+ * @property int|null $user_id
+ * @property int|null $team_id
+ * @property string $name
+ * @property string|null $code
+ * @property string|null $description
+ * @property string $asset_type
+ * @property string|null $group
+ * @property string|null $tax_property
+ * @property string|null $tax_country
+ * @property bool $is_active
+ * @property int|null $sort_order
+ * @property string|null $created_by
+ * @property string|null $updated_by
+ * @property string|null $created_checksum
+ * @property string|null $updated_checksum
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $tax_type Virtual accessor returning the tax_type from the related AssetType
+ * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\SimulationAssetYear> $simulationAssetYears
  * @property \App\Models\AssetType|null $assetType
  * @property \App\Models\AssetConfiguration|null $assetConfiguration
  * @property \App\Models\SimulationConfiguration|null $simulationConfiguration
@@ -117,6 +134,15 @@ class SimulationAsset extends Model
     public function getGroupLabel(): string
     {
         return self::GROUPS[$this->group] ?? $this->group;
+    }
+
+    /**
+     * Virtual accessor returning the tax_type value from the related AssetType model.
+     * Returns the tax_type string (e.g. 'none', 'capital_gains', 'tax_deferred') or null.
+     */
+    public function getTaxTypeAttribute(): ?string
+    {
+        return $this->assetType?->tax_type;
     }
 
     public function getTaxTypeLabel(): string

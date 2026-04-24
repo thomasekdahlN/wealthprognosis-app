@@ -7,7 +7,7 @@ use App\Models\TaxType;
 use App\Models\User;
 use App\Services\AiConfigurationAnalysisService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
+use Laravel\Ai\AnonymousAgent;
 use Tests\TestCase;
 
 class AiAssistedConfigurationTest extends TestCase
@@ -34,62 +34,50 @@ class AiAssistedConfigurationTest extends TestCase
 
     public function test_ai_configuration_analysis_service_validates_input(): void
     {
-        // Mock the OpenAI API response
-        Http::fake([
-            'api.openai.com/*' => Http::response([
-                'choices' => [
+        // Fake the AI SDK response
+        AnonymousAgent::fake([
+            json_encode([
+                'configuration' => [
+                    'name' => 'Test Configuration',
+                    'description' => 'Test description',
+                    'birth_year' => 1988,
+                    'prognose_age' => 65,
+                    'pension_official_age' => 67,
+                    'pension_wish_age' => 65,
+                    'death_age' => 85,
+                    'export_start_age' => 25,
+                ],
+                'assets' => [
                     [
-                        'message' => [
-                            'content' => json_encode([
-                                'configuration' => [
-                                    'name' => 'Test Configuration',
-                                    'description' => 'Test description',
-                                    'birth_year' => 1988,
-                                    'prognose_age' => 65,
-                                    'pension_official_age' => 67,
-                                    'pension_wish_age' => 65,
-                                    'death_age' => 85,
-                                    'export_start_age' => 25,
-                                ],
-                                'assets' => [
-                                    [
-                                        'name' => 'Savings Account',
-                                        'description' => 'Primary savings',
-                                        'code' => 'savings_account',
-                                        'asset_type' => 'cash',
-
-                                        'group' => 'private',
-                                        'tax_country' => 'no',
-                                        'sort_order' => 1,
-                                        'years' => [
-                                            [
-                                                'year' => 2024,
-                                                'market_amount' => 50000,
-                                                'acquisition_amount' => 50000,
-                                                'equity_amount' => 50000,
-                                                'paid_amount' => 0,
-                                                'taxable_initial_amount' => 0,
-                                                'income_amount' => 1000,
-                                                'income_factor' => 'yearly',
-                                                'expence_amount' => 100,
-                                                'expence_factor' => 'yearly',
-                                                'change_rate_type' => 'cash',
-                                                'start_year' => 2024,
-                                                'end_year' => null,
-                                                'sort_order' => 1,
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ]),
+                        'name' => 'Savings Account',
+                        'description' => 'Primary savings',
+                        'code' => 'savings_account',
+                        'asset_type' => 'cash',
+                        'group' => 'private',
+                        'tax_country' => 'no',
+                        'sort_order' => 1,
+                        'years' => [
+                            [
+                                'year' => 2024,
+                                'market_amount' => 50000,
+                                'acquisition_amount' => 50000,
+                                'equity_amount' => 50000,
+                                'paid_amount' => 0,
+                                'taxable_initial_amount' => 0,
+                                'income_amount' => 1000,
+                                'income_factor' => 'yearly',
+                                'expence_amount' => 100,
+                                'expence_factor' => 'yearly',
+                                'change_rate_type' => 'cash',
+                                'start_year' => 2024,
+                                'end_year' => null,
+                                'sort_order' => 1,
+                            ],
                         ],
                     ],
                 ],
-            ], 200),
+            ]),
         ]);
-
-        // Set a fake OpenAI API key
-        config(['services.openai.api_key' => 'fake-api-key']);
 
         $service = new AiConfigurationAnalysisService;
         $result = $service->analyzeEconomicSituation('I have $50,000 in savings and earn $80,000 per year.');
@@ -103,50 +91,34 @@ class AiAssistedConfigurationTest extends TestCase
 
     public function test_ai_configuration_analysis_service_handles_invalid_asset_types(): void
     {
-        // Mock the OpenAI API response with invalid asset type
-        Http::fake([
-            'api.openai.com/*' => Http::response([
-                'choices' => [
+        // Fake the AI SDK response with an invalid asset type
+        AnonymousAgent::fake([
+            json_encode([
+                'configuration' => [
+                    'name' => 'Test Configuration',
+                    'description' => 'Test description',
+                ],
+                'assets' => [
                     [
-                        'message' => [
-                            'content' => json_encode([
-                                'configuration' => [
-                                    'name' => 'Test Configuration',
-                                    'description' => 'Test description',
-                                ],
-                                'assets' => [
-                                    [
-                                        'name' => 'Invalid Asset',
-                                        'asset_type' => 'invalid_type', // This should be corrected to 'other'
-
-                                        'years' => [],
-                                    ],
-                                ],
-                            ]),
-                        ],
+                        'name' => 'Invalid Asset',
+                        'asset_type' => 'invalid_type', // This should be corrected to 'other'
+                        'years' => [],
                     ],
                 ],
-            ], 200),
+            ]),
         ]);
-
-        config(['services.openai.api_key' => 'fake-api-key']);
 
         $service = new AiConfigurationAnalysisService;
         $result = $service->analyzeEconomicSituation('Test description');
 
         // Should fallback to valid types
         $this->assertEquals('other', $result['assets'][0]['asset_type']);
-        // tax_type removed; tax is derived via asset_type -> asset_type.tax_type relation
     }
 
     public function test_ai_configuration_analysis_service_provides_fallback_when_api_fails(): void
     {
-        // Mock API failure
-        Http::fake([
-            'api.openai.com/*' => Http::response([], 500),
-        ]);
-
-        config(['services.openai.api_key' => 'fake-api-key']);
+        // Fake an exception from the AI SDK
+        AnonymousAgent::fake(fn () => throw new \RuntimeException('AI API error'));
 
         $service = new AiConfigurationAnalysisService;
         $result = $service->analyzeEconomicSituation('Test description');
@@ -159,14 +131,12 @@ class AiAssistedConfigurationTest extends TestCase
         $this->assertEquals('Basic Savings', $result['assets'][0]['name']);
     }
 
-    public function test_ai_configuration_analysis_service_throws_exception_when_no_api_key(): void
+    public function test_ai_configuration_analysis_service_can_be_instantiated_without_api_key(): void
     {
-        config(['services.openai.api_key' => null]);
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('OpenAI API key not configured');
-
-        new AiConfigurationAnalysisService;
+        // The service no longer requires an API key in the constructor
+        // (Laravel AI SDK handles provider configuration)
+        $service = new AiConfigurationAnalysisService;
+        $this->assertInstanceOf(AiConfigurationAnalysisService::class, $service);
     }
 
     public function test_fallback_configuration_has_valid_structure(): void

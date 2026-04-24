@@ -19,11 +19,11 @@ return new class extends Migration
             $table->foreign('tax_type')->references('type')->on('tax_types')->cascadeOnDelete();
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->json('configuration')->nullable();
+            $table->jsonb('configuration')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
-            $table->string('created_checksum')->nullable();
-            $table->string('updated_checksum')->nullable();
+            $table->char('created_checksum', 64)->nullable();
+            $table->char('updated_checksum', 64)->nullable();
             $table->timestamps();
 
             $table->unique(['country_code', 'year', 'tax_type']);

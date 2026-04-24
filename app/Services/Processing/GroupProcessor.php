@@ -34,13 +34,11 @@ class GroupProcessor
     /**
      * Initialize group structures with empty data for proper sorting.
      *
-     * @param  array<string, mixed>  $privateH  Reference to private group data
-     * @param  array<string, mixed>  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  array  $companyH  Reference to company group data
      * @param  int  $economyStartYear  Start year for economy calculations
      * @param  int  $deathYear  End year for calculations
      *
-     * @param-out array<string, mixed> $privateH
-     * @param-out array<string, mixed> $companyH
      */
     public function initGroups(array &$privateH, array &$companyH, int $economyStartYear, int $deathYear): void
     {
@@ -54,19 +52,15 @@ class GroupProcessor
     /**
      * Add a value to group totals.
      *
-     * @param  array<string, mixed>  $totalH  Reference to total group data
-     * @param  array<string, mixed>  $companyH  Reference to company group data
-     * @param  array<string, mixed>  $privateH  Reference to private group data
-     * @param  array<string, mixed>  $groupH  Reference to group hierarchy data
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  array  $groupH  Reference to group hierarchy data
      * @param  int  $year  Year for the data
-     * @param  array<string, mixed>  $meta  Asset metadata
-     * @param  array<string, mixed>  $data  Year data for the asset
+     * @param  array  $meta  Asset metadata
+     * @param  array  $data  Year data for the asset
      * @param  string  $dotpath  Dot-notation path to the value
      *
-     * @param-out array<string, mixed> $totalH
-     * @param-out array<string, mixed> $companyH
-     * @param-out array<string, mixed> $privateH
-     * @param-out array<string, mixed> $groupH
      */
     public function additionToGroup(
         array &$totalH,
@@ -101,19 +95,15 @@ class GroupProcessor
     /**
      * Set a value to group (not additive).
      *
-     * @param  array<string, mixed>  $totalH  Reference to total group data
-     * @param  array<string, mixed>  $companyH  Reference to company group data
-     * @param  array<string, mixed>  $privateH  Reference to private group data
-     * @param  array<string, mixed>  $groupH  Reference to group hierarchy data
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
+     * @param  array  $groupH  Reference to group hierarchy data
      * @param  int  $year  Year for the data
-     * @param  array<string, mixed>  $meta  Asset metadata
-     * @param  array<string, mixed>  $data  Year data for the asset
+     * @param  array  $meta  Asset metadata
+     * @param  array  $data  Year data for the asset
      * @param  string  $dotpath  Dot-notation path to the value
      *
-     * @param-out array<string, mixed> $totalH
-     * @param-out array<string, mixed> $companyH
-     * @param-out array<string, mixed> $privateH
-     * @param-out array<string, mixed> $groupH
      */
     public function setToGroup(
         array &$totalH,
@@ -208,14 +198,11 @@ class GroupProcessor
      * The group calculation applies the standard deduction (deduct=true) using the bracket system,
      * which gives the correct total fortune tax including gjeldsfradrag (debt deduction).
      *
-     * @param  array<string, mixed>  $totalH  Reference to total group data
-     * @param  array<string, mixed>  $companyH  Reference to company group data
-     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
      *
-     * @param-out array<string, mixed> $totalH
-     * @param-out array<string, mixed> $companyH
-     * @param-out array<string, mixed> $privateH
      */
     public function calculateFortuneTax(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
@@ -260,14 +247,10 @@ class GroupProcessor
      * Calculate group-level financial metrics aggregation.
      * Aggregates metrics from individual assets to group totals (total, company, private).
      *
-     * @param  array<string, mixed>  $totalH  Reference to total group data
-     * @param  array<string, mixed>  $companyH  Reference to company group data
-     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
-     *
-     * @param-out array<string, mixed> $totalH
-     * @param-out array<string, mixed> $companyH
-     * @param-out array<string, mixed> $privateH
      */
     public function calculateGroupFinancialMetrics(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
@@ -299,7 +282,7 @@ class GroupProcessor
     /**
      * Calculate group-level investment return metrics.
      *
-     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  array  $groupH  Reference to group data
      * @param  int  $year  Year to calculate for
      */
     private function calculateGroupInvestmentReturns(array &$groupH, int $year): void
@@ -340,7 +323,7 @@ class GroupProcessor
     /**
      * Calculate group-level property metrics.
      *
-     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  array  $groupH  Reference to group data
      * @param  int  $year  Year to calculate for
      */
     private function calculateGroupPropertyMetrics(array &$groupH, int $year): void
@@ -364,7 +347,7 @@ class GroupProcessor
     /**
      * Calculate group-level leverage metrics.
      *
-     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  array  $groupH  Reference to group data
      * @param  int  $year  Year to calculate for
      */
     private function calculateGroupLeverageMetrics(array &$groupH, int $year): void
@@ -399,7 +382,7 @@ class GroupProcessor
     /**
      * Calculate group-level profitability ratios.
      *
-     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  array  $groupH  Reference to group data
      * @param  int  $year  Year to calculate for
      */
     private function calculateGroupProfitabilityRatios(array &$groupH, int $year): void
@@ -428,7 +411,7 @@ class GroupProcessor
     /**
      * Calculate group-level valuation metrics.
      *
-     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  array  $groupH  Reference to group data
      * @param  int  $year  Year to calculate for
      */
     private function calculateGroupValuationMetrics(array &$groupH, int $year): void
@@ -455,7 +438,7 @@ class GroupProcessor
     /**
      * Calculate group-level liquidity metrics.
      *
-     * @param  array<string, mixed>  $groupH  Reference to group data
+     * @param  array  $groupH  Reference to group data
      * @param  int  $year  Year to calculate for
      */
     private function calculateGroupLiquidityMetrics(array &$groupH, int $year): void
@@ -475,14 +458,11 @@ class GroupProcessor
     /**
      * Calculate actual change rates of income, expense and assets - not the prognosed one.
      *
-     * @param  array<string, mixed>  $totalH  Reference to total group data
-     * @param  array<string, mixed>  $companyH  Reference to company group data
-     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
      *
-     * @param-out array<string, mixed> $totalH
-     * @param-out array<string, mixed> $companyH
-     * @param-out array<string, mixed> $privateH
      */
     public function calculateChangerates(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {
@@ -595,14 +575,11 @@ class GroupProcessor
     /**
      * Calculate yield percentages for groups.
      *
-     * @param  array<string, mixed>  $totalH  Reference to total group data
-     * @param  array<string, mixed>  $companyH  Reference to company group data
-     * @param  array<string, mixed>  $privateH  Reference to private group data
+     * @param  array  $totalH  Reference to total group data
+     * @param  array  $companyH  Reference to company group data
+     * @param  array  $privateH  Reference to private group data
      * @param  int  $year  Year to calculate for
      *
-     * @param-out array<string, mixed> $totalH
-     * @param-out array<string, mixed> $companyH
-     * @param-out array<string, mixed> $privateH
      */
     public function calculateYield(array &$totalH, array &$companyH, array &$privateH, int $year): void
     {

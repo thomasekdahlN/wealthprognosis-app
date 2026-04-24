@@ -8,7 +8,6 @@ use App\Models\AssetType;
 use App\Models\AssetYear;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AiAssistantService
@@ -19,24 +18,10 @@ class AiAssistantService
     /** @var array<string, mixed> */
     protected array $pendingConfiguration = [];
 
-    protected string $aiProvider;
-
-    protected string $aiModel;
-
-    protected ?string $apiKey;
-
-    public function __construct()
-    {
-        $this->aiProvider = config('ai.provider', 'openai');
-        $this->aiModel = config('ai.model', 'gpt-4');
-        $this->apiKey = config('ai.api_key', '');
-    }
-
     /**
-     * @param  array<int, array<string, mixed>>  $conversation
      * @return array<string, mixed>
      */
-    public function processMessage(string $message, array $conversation, User $user, ?int $currentConfigurationId = null, ?callable $statusCallback = null): array
+    public function processMessage(string $message, ?string $conversationId, User $user, ?int $currentConfigurationId = null, ?callable $statusCallback = null): array
     {
         $originalMessage = trim($message);
         $message = trim(strtolower($message));
@@ -53,7 +38,7 @@ class AiAssistantService
         if ($statusCallback) {
             $statusCallback('🧠 Analyzing intent and context...');
         }
-        $intent = $this->analyzeIntent($message, $conversation);
+        $intent = $this->analyzeIntent($message, []);
 
         // For general question intents, include financial context and use real AI
         $needsContext = in_array($intent['type'], ['general_question', 'unknown']);
@@ -76,7 +61,7 @@ class AiAssistantService
                     $statusCallback('🤖 Sending request to AI...');
                 }
                 // Use real AI service for contextual responses
-                $aiResponse = $this->callAiService($originalMessage, $contextData, $user, $conversation);
+                $aiResponse = $this->callAiService($originalMessage, $contextData, $user, $conversationId);
 
                 if ($statusCallback) {
                     $statusCallback('✨ Formatting response...');
@@ -90,13 +75,14 @@ class AiAssistantService
                 ]);
 
                 return [
-                    'message' => $aiResponse,
+                    'message' => $aiResponse['message'],
+                    'conversation_id' => $aiResponse['conversation_id'] ?? null,
                 ];
             }
         }
 
         // Process based on intent
-        return match ($intent['type']) {
+        $result = match ($intent['type']) {
             'switch_configuration' => $this->handleSwitchConfiguration($message, $intent, $user),
             'create_configuration' => $this->handleCreateConfiguration($message, $intent, $user),
             'update_mortgage' => $this->handleUpdateMortgage($message, $intent, $user, $currentConfigurationId, $statusCallback),
@@ -109,6 +95,9 @@ class AiAssistantService
             'general_help' => $this->handleGeneralHelp($message, $intent),
             default => $this->handleUnknown($message, $currentConfigurationId, $user),
         };
+
+        $result['conversation_id'] = $conversationId;
+        return $result;
     }
 
     /**
@@ -1546,20 +1535,30 @@ class AiAssistantService
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $conversation
+     * @return array<string, mixed>
      */
-    protected function callAiService(string $message, string $contextData, User $user, array $conversation = []): string
+    protected function callAiService(string $message, string $contextData, User $user, ?string $conversationId): array
     {
         try {
-            if (! $this->apiKey) {
-                return $this->getFallbackResponse($message);
+            $agent = new \App\Ai\Agents\FinancialAssistant($user, $contextData);
+
+            if ($conversationId) {
+                $response = $agent->continue($conversationId, $user)->prompt($message);
+            } else {
+                $response = $agent->forUser($user)->prompt($message);
             }
 
-            $systemPrompt = $this->buildSystemPrompt($contextData, $user);
+            $returnedConversationId = $response->conversationId ?? $conversationId;
 
-            $response = $this->makeAiApiCall($systemPrompt, $message, $conversation);
+            Log::channel('ai')->info('AI agent response received', [
+                'conversation_id' => $returnedConversationId,
+                'response_length' => strlen((string) $response),
+            ]);
 
-            return $response ?: $this->getFallbackResponse($message);
+            return [
+                'message' => (string) $response,
+                'conversation_id' => $returnedConversationId,
+            ];
         } catch (\Exception $e) {
             Log::error('AI Service call failed', [
                 'error' => $e->getMessage(),
@@ -1567,156 +1566,11 @@ class AiAssistantService
                 'message' => $message,
             ]);
 
-            return $this->getFallbackResponse($message);
-        }
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $conversation
-     */
-    protected function makeAiApiCall(string $systemPrompt, string $userMessage, array $conversation = []): ?string
-    {
-        $endpoint = $this->getApiEndpoint();
-        $headers = $this->getApiHeaders();
-        $payload = $this->buildApiPayload($systemPrompt, $userMessage, $conversation);
-
-        $timeout = config("ai.settings.{$this->aiModel}.timeout", 30);
-
-        $response = Http::withHeaders($headers)
-            ->timeout($timeout)
-            ->post($endpoint, $payload);
-
-        if ($response->successful()) {
-            return $this->extractResponseContent($response->json());
-        }
-
-        Log::error('AI API call failed', [
-            'status' => $response->status(),
-            'response' => $response->body(),
-        ]);
-
-        return null;
-    }
-
-    protected function getApiEndpoint(): string
-    {
-        return match ($this->aiProvider) {
-            'openai' => 'https://api.openai.com/v1/chat/completions',
-            default => 'https://api.openai.com/v1/chat/completions',
-        };
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    protected function getApiHeaders(): array
-    {
-        return match ($this->aiProvider) {
-            'openai' => [
-                'Authorization' => 'Bearer '.$this->apiKey,
-                'Content-Type' => 'application/json',
-            ],
-            default => [
-                'Authorization' => 'Bearer '.$this->apiKey,
-                'Content-Type' => 'application/json',
-            ],
-        };
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $conversation
-     * @return array<string, mixed>
-     */
-    protected function buildApiPayload(string $systemPrompt, string $userMessage, array $conversation = []): array
-    {
-        $settings = config("ai.settings.{$this->aiModel}", [
-            'max_tokens' => 1000,
-            'temperature' => 0.7,
-        ]);
-
-        // Build messages array starting with system prompt
-        $messages = [
-            [
-                'role' => 'system',
-                'content' => $systemPrompt,
-            ],
-        ];
-
-        // Add conversation history (excluding the current message)
-        foreach ($conversation as $msg) {
-            if (isset($msg['type']) && isset($msg['message'])) {
-                $role = $msg['type'] === 'user' ? 'user' : 'assistant';
-                $messages[] = [
-                    'role' => $role,
-                    'content' => $msg['message'],
-                ];
-            }
-        }
-
-        // Add the current user message
-        $messages[] = [
-            'role' => 'user',
-            'content' => $userMessage,
-        ];
-
-        $payload = [
-            'model' => $this->aiModel,
-            'messages' => $messages,
-            'max_tokens' => $settings['max_tokens'],
-            'temperature' => $settings['temperature'],
-        ];
-
-        // Special handling for o1 models which don't support system messages
-        if (str_starts_with($this->aiModel, 'o1-')) {
-            // For o1 models, combine system prompt with conversation history
-            $conversationText = '';
-            foreach ($conversation as $msg) {
-                if (isset($msg['type']) && isset($msg['message'])) {
-                    $role = $msg['type'] === 'user' ? 'User' : 'Assistant';
-                    $conversationText .= "\n{$role}: {$msg['message']}";
-                }
-            }
-
-            $payload['messages'] = [
-                [
-                    'role' => 'user',
-                    'content' => $systemPrompt.$conversationText."\n\nUser Question: ".$userMessage,
-                ],
+            return [
+                'message' => $this->getFallbackResponse($message),
+                'conversation_id' => $conversationId,
             ];
-            // o1 models don't support temperature parameter
-            unset($payload['temperature']);
         }
-
-        return $payload;
-    }
-
-    /**
-     * @param  array<string, mixed>  $responseData
-     */
-    protected function extractResponseContent(array $responseData): ?string
-    {
-        return match ($this->aiProvider) {
-            'openai' => $responseData['choices'][0]['message']['content'] ?? null,
-            default => $responseData['choices'][0]['message']['content'] ?? null,
-        };
-    }
-
-    protected function buildSystemPrompt(string $contextData, User $user): string
-    {
-        return 'You are an expert financial advisor AI assistant for the Wealth Prognosis application. '.
-               "You have access to the user's complete financial configuration data in JSON format. ".
-               "Use this data to provide accurate, personalized financial advice and analysis.\n\n".
-               "USER'S FINANCIAL DATA:\n{$contextData}\n\n".
-               "INSTRUCTIONS:\n".
-               "- Analyze the provided financial data thoroughly\n".
-               "- Provide specific, actionable advice based on the actual numbers\n".
-               "- Reference specific assets, values, and projections from the data\n".
-               "- Be conversational but professional\n".
-               "- Use Norwegian currency formatting (NOK) when discussing amounts\n".
-               "- Focus on practical financial planning and wealth building strategies\n".
-               "- If asked about assets, list them specifically with their current values\n".
-               "- Calculate net worth, income, expenses based on the actual data provided\n\n".
-               'Respond in a helpful, knowledgeable manner as a personal financial advisor would.';
     }
 
     protected function getFallbackResponse(string $message): string
@@ -1808,15 +1662,12 @@ class AiAssistantService
         $logData = [
             'type' => $type,
             'timestamp' => now()->toISOString(),
-            'ai_provider' => $this->aiProvider,
-            'ai_model' => $this->aiModel,
+            'ai_provider' => config('ai.default', 'gemini'),
             ...$data,
         ];
 
-        // Log to dedicated AI interaction log file
         Log::channel('single')->info("AI_INTERACTION_{$type}", $logData);
 
-        // Also log to a dedicated AI log file if configured
         if (config('logging.channels.ai')) {
             Log::channel('ai')->info("AI_INTERACTION_{$type}", $logData);
         }

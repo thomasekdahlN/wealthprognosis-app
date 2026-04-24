@@ -51,9 +51,6 @@ use Illuminate\Support\Facades\Log;
  */
 class AmortizationService
 {
-    /** @var bool Enable debug logging */
-    private bool $debug;
-
     /** @var int Original loan amount */
     private int $amount;
 
@@ -75,23 +72,8 @@ class AmortizationService
     /** @var int Remaining years on the loan */
     private int $remainingYears;
 
-    /** @var float Current period's principal payment */
-    private float $principalAmount = 0;
-
     /** @var float Current remaining balance */
     private float $balanceAmount = 0;
-
-    /** @var float Current period's total payment */
-    private float $termAmount = 0;
-
-    /** @var string Name of the asset */
-    private string $assettname;
-
-    /** @var array<string, mixed> Data history array */
-    private array $dataH = [];
-
-    /** @var object Changerate service for interest rate lookup */
-    private object $changerate;
 
     /** @var string|null Cached changerate type/variable name */
     private ?string $assetChangerateValue;
@@ -138,19 +120,15 @@ class AmortizationService
      * @param  HelperService  $helperService  Helper service for utility functions
      */
     public function __construct(
-        bool $debug,
+        private bool $debug,
         array $config,
-        object $changerate,
-        array $dataH,
+        private object $changerate,
+        private array $dataH,
         array $mortgage,
-        string $assettname,
+        private string $assettname,
         int $year,
         private HelperService $helperService = new HelperService
     ) {
-        $this->debug = $debug;
-        $this->dataH = $dataH;
-        $this->assettname = $assettname;
-        $this->changerate = $changerate;
         $this->assetChangerateValue = null;
 
         // Extract tax information from config
@@ -358,8 +336,6 @@ class AmortizationService
         $calculation = $this->performCalculation($year, $interestPercent, $interestRate, $extraDownpaymentAmount);
 
         // Update instance state
-        $this->termAmount = $calculation->termAmount;
-        $this->principalAmount = $calculation->principalAmount;
         $this->balanceAmount = $calculation->balanceAmount;
 
         // Debug logging

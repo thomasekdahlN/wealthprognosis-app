@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('team_id')->nullable()->constrained('teams', 'id')->name('asset_years_team_id_foreign')->onDelete('cascade');
             $table->integer('year');
             $table->foreignId('asset_id')->constrained('assets')->onDelete('cascade');
-            $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations')->onDelete('cascade');
+            $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations', 'id')->name('asset_years_asset_configuration_id_foreign')->onDelete('cascade');
 
             // Unified description field (replaces income_description, expence_description, asset_description, mortgage_description)
             $table->text('description')->nullable();
@@ -59,10 +59,10 @@ return new class extends Migration
             $table->decimal('mortgage_gebyr', 15, 2)->nullable();
             $table->decimal('mortgage_tax', 5, 2)->nullable();
 
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
-            $table->string('created_checksum')->nullable();
-            $table->string('updated_checksum')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users', 'id')->name('asset_years_created_by_foreign');
+            $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->name('asset_years_updated_by_foreign');
+            $table->char('created_checksum', 64)->nullable();
+            $table->char('updated_checksum', 64)->nullable();
             $table->timestamps();
 
             $table->index(['asset_id', 'year']);

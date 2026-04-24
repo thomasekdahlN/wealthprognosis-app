@@ -38,7 +38,6 @@ class SimulationWidgetServiceProvider extends ServiceProvider
         Livewire::component('app.filament.widgets.simulation.simulation-financial-metrics-heatmap-widget', \App\Filament\Widgets\Simulation\SimulationFinancialMetricsHeatmapWidget::class);
 
         // Manually register comparison widgets as Livewire components
-        Livewire::component('app.filament.widgets.compare.compare-scenario-assumptions-widget', \App\Filament\Widgets\Compare\CompareScenarioAssumptionsWidget::class);
         Livewire::component('app.filament.widgets.compare.compare-key-outcomes-widget', \App\Filament\Widgets\Compare\CompareKeyOutcomesWidget::class);
         Livewire::component('app.filament.widgets.compare.compare-net-worth-trajectory-widget', \App\Filament\Widgets\Compare\CompareNetWorthTrajectoryWidget::class);
         Livewire::component('app.filament.widgets.compare.compare-cash-flow-trajectory-widget', \App\Filament\Widgets\Compare\CompareCashFlowTrajectoryWidget::class);

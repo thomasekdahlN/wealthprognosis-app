@@ -29,16 +29,11 @@ use Illuminate\Support\Facades\Log;
 class ChangerateService
 {
     /**
-     * In-memory cache: [scenarioType][assetType][year] => [percent, decimal]
+     * In-memory cache: [scenarioType][assetType][year] => [percent, decimal, explanation]
      *
-     * @var array<string, array<string, array<int, array{0: float|int, 1: float}>>>
+     * @var array<string, array<string, array<int, array{0: float|int, 1: float, 2: string}>>>
      */
     private array $cache = [];
-
-    /**
-     * Scenario type (aka prognosis code) used to fetch change rates from DB.
-     */
-    private string $scenarioType;
 
     /**
      * Constructor - only stores the scenario type, does not preload data.
@@ -46,10 +41,9 @@ class ChangerateService
      * @param  string  $scenarioType  The scenario/prognosis type (e.g., 'realistic', 'baseline')
      */
     public function __construct(
-        string $scenarioType = 'realistic',
+        private string $scenarioType = 'realistic',
         private HelperService $helperService = new HelperService
     ) {
-        $this->scenarioType = $scenarioType;
     }
 
     /**

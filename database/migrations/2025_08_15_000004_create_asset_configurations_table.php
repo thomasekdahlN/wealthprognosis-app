@@ -22,17 +22,17 @@ return new class extends Migration
             $table->string('icon')->nullable();
             $table->string('image')->nullable();
             $table->string('color')->nullable();
-            $table->json('tags')->nullable();
+            $table->jsonb('tags')->nullable();
             $table->enum('risk_tolerance', ['conservative', 'moderate_conservative', 'moderate', 'moderate_aggressive', 'aggressive'])->default('moderate');
             $table->string('country', 5)->default('no');
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('team_id')->nullable()->constrained('teams', 'id')->name('asset_configurations_team_id_foreign')->onDelete('cascade');
 
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
-            $table->string('created_checksum')->nullable();
-            $table->string('updated_checksum')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users', 'id')->name('asset_configurations_created_by_foreign');
+            $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->name('asset_configurations_updated_by_foreign');
+            $table->char('created_checksum', 64)->nullable();
+            $table->char('updated_checksum', 64)->nullable();
             $table->timestamps();
 
             $table->index(['user_id', 'team_id']);

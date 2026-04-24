@@ -8,7 +8,7 @@ use App\Models\TaxType;
 use App\Models\User;
 use App\Services\AiConfigurationAnalysisService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
+use Laravel\Ai\AnonymousAgent;
 use Tests\TestCase;
 
 class AiAssistedConfigurationIntegrationTest extends TestCase
@@ -35,13 +35,8 @@ class AiAssistedConfigurationIntegrationTest extends TestCase
 
     public function test_ai_assisted_configuration_creates_complete_setup_with_fallback(): void
     {
-        // Mock API failure to trigger fallback
-        Http::fake([
-            'api.openai.com/*' => Http::response([], 500),
-        ]);
-
-        // Set a fake API key to avoid the "no API key" exception
-        config(['services.openai.api_key' => 'fake-api-key']);
+        // Fake an AI SDK failure to trigger fallback
+        AnonymousAgent::fake(fn () => throw new \RuntimeException('AI API error'));
 
         $this->actingAs($this->user);
 
@@ -114,89 +109,77 @@ class AiAssistedConfigurationIntegrationTest extends TestCase
 
     public function test_ai_assisted_configuration_works_with_successful_api_response(): void
     {
-        // Mock successful API response
-        Http::fake([
-            'api.openai.com/*' => Http::response([
-                'choices' => [
+        // Fake the AI SDK with a successful response
+        AnonymousAgent::fake([
+            json_encode([
+                'configuration' => [
+                    'name' => 'Software Engineer Portfolio',
+                    'description' => 'Portfolio for a 35-year-old software engineer',
+                    'birth_year' => 1989,
+                    'prognose_age' => 65,
+                    'pension_official_age' => 67,
+                    'pension_wish_age' => 65,
+                    'death_age' => 85,
+                    'export_start_age' => 25,
+                ],
+                'assets' => [
                     [
-                        'message' => [
-                            'content' => json_encode([
-                                'configuration' => [
-                                    'name' => 'Software Engineer Portfolio',
-                                    'description' => 'Portfolio for a 35-year-old software engineer',
-                                    'birth_year' => 1989,
-                                    'prognose_age' => 65,
-                                    'pension_official_age' => 67,
-                                    'pension_wish_age' => 65,
-                                    'death_age' => 85,
-                                    'export_start_age' => 25,
-                                ],
-                                'assets' => [
-                                    [
-                                        'name' => 'Emergency Fund',
-                                        'description' => 'Emergency savings account',
-                                        'code' => 'emergency_fund',
-                                        'asset_type' => 'cash',
-
-                                        'group' => 'private',
-                                        'tax_country' => 'no',
-                                        'sort_order' => 1,
-                                        'years' => [
-                                            [
-                                                'year' => 2024,
-                                                'market_amount' => 50000,
-                                                'acquisition_amount' => 50000,
-                                                'equity_amount' => 50000,
-                                                'paid_amount' => 0,
-                                                'taxable_initial_amount' => 0,
-                                                'income_amount' => 500,
-                                                'income_factor' => 'yearly',
-                                                'expence_amount' => 0,
-                                                'expence_factor' => 'yearly',
-                                                'change_rate_type' => 'cash',
-                                                'start_year' => 2024,
-                                                'end_year' => null,
-                                                'sort_order' => 1,
-                                            ],
-                                        ],
-                                    ],
-                                    [
-                                        'name' => 'Stock Portfolio',
-                                        'description' => 'Diversified stock investments',
-                                        'code' => 'stock_portfolio',
-                                        'asset_type' => 'equity',
-
-                                        'group' => 'private',
-                                        'tax_country' => 'no',
-                                        'sort_order' => 2,
-                                        'years' => [
-                                            [
-                                                'year' => 2024,
-                                                'market_amount' => 20000,
-                                                'acquisition_amount' => 18000,
-                                                'equity_amount' => 20000,
-                                                'paid_amount' => 0,
-                                                'taxable_initial_amount' => 0,
-                                                'income_amount' => 1000,
-                                                'income_factor' => 'yearly',
-                                                'expence_amount' => 100,
-                                                'expence_factor' => 'yearly',
-                                                'change_rate_type' => 'equity',
-                                                'start_year' => 2024,
-                                                'end_year' => null,
-                                                'sort_order' => 1,
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ]),
+                        'name' => 'Emergency Fund',
+                        'description' => 'Emergency savings account',
+                        'code' => 'emergency_fund',
+                        'asset_type' => 'cash',
+                        'group' => 'private',
+                        'tax_country' => 'no',
+                        'sort_order' => 1,
+                        'years' => [
+                            [
+                                'year' => 2024,
+                                'market_amount' => 50000,
+                                'acquisition_amount' => 50000,
+                                'equity_amount' => 50000,
+                                'paid_amount' => 0,
+                                'taxable_initial_amount' => 0,
+                                'income_amount' => 500,
+                                'income_factor' => 'yearly',
+                                'expence_amount' => 0,
+                                'expence_factor' => 'yearly',
+                                'change_rate_type' => 'cash',
+                                'start_year' => 2024,
+                                'end_year' => null,
+                                'sort_order' => 1,
+                            ],
+                        ],
+                    ],
+                    [
+                        'name' => 'Stock Portfolio',
+                        'description' => 'Diversified stock investments',
+                        'code' => 'stock_portfolio',
+                        'asset_type' => 'equity',
+                        'group' => 'private',
+                        'tax_country' => 'no',
+                        'sort_order' => 2,
+                        'years' => [
+                            [
+                                'year' => 2024,
+                                'market_amount' => 20000,
+                                'acquisition_amount' => 18000,
+                                'equity_amount' => 20000,
+                                'paid_amount' => 0,
+                                'taxable_initial_amount' => 0,
+                                'income_amount' => 1000,
+                                'income_factor' => 'yearly',
+                                'expence_amount' => 100,
+                                'expence_factor' => 'yearly',
+                                'change_rate_type' => 'equity',
+                                'start_year' => 2024,
+                                'end_year' => null,
+                                'sort_order' => 1,
+                            ],
                         ],
                     ],
                 ],
-            ], 200),
+            ]),
         ]);
-
-        config(['services.openai.api_key' => 'fake-api-key']);
 
         $service = new AiConfigurationAnalysisService;
         $result = $service->analyzeEconomicSituation('I am a 35-year-old software engineer with $50,000 in savings and $20,000 in stocks. I want to retire at 65.');

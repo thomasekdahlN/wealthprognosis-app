@@ -33,24 +33,14 @@ use Illuminate\Support\Facades\Log;
 class TaxFortuneService implements TaxCalculatorInterface
 {
     /**
-     * Country code for tax lookups.
-     */
-    private string $country;
-
-    /**
-     * Shared TaxConfigRepository instance.
-     */
-    private TaxConfigRepository $taxConfigRepo;
-
-    /**
      * Create a new TaxFortuneService service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
      */
     public function __construct(
-        string $country = 'no',
-        ?TaxConfigRepository $taxConfigRepo = null,
+        private string $country = 'no',
+        private ?TaxConfigRepository $taxConfigRepo = null,
         private HelperService $helperService = new HelperService
     ) {
         $this->country = strtolower($country) ?: 'no';
@@ -95,6 +85,8 @@ class TaxFortuneService implements TaxCalculatorInterface
                 taxFortuneAmount: 0,
                 taxFortunePercent: 0,
                 taxFortuneRate: 0,
+                taxFortuneAveragePercent: 0,
+                taxFortuneAverageRate: 0,
                 explanation: 'Tax type is null, no tax calculation performed'
             );
         }

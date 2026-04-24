@@ -7,7 +7,7 @@ use App\Models\AssetType;
 use App\Models\TaxType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
+use Laravel\Ai\AnonymousAgent;
 use Tests\TestCase;
 
 class AiAssistedConfigurationActionTest extends TestCase
@@ -43,13 +43,8 @@ class AiAssistedConfigurationActionTest extends TestCase
 
     public function test_ai_assisted_configuration_creates_fallback_when_ai_fails(): void
     {
-        // Mock HTTP to simulate AI service failure
-        Http::fake([
-            'api.openai.com/*' => Http::response([], 500),
-        ]);
-
-        // Set fake API key to avoid the "no API key" exception in constructor
-        config(['services.openai.api_key' => 'fake-api-key']);
+        // Fake an AI SDK failure to trigger fallback
+        AnonymousAgent::fake(fn () => throw new \RuntimeException('AI API error'));
 
         $this->actingAs($this->user);
 
@@ -93,16 +88,17 @@ class AiAssistedConfigurationActionTest extends TestCase
 
     public function test_ai_assisted_configuration_handles_missing_api_key_gracefully(): void
     {
-        // Don't set API key to test graceful handling
-        config(['services.openai.api_key' => null]);
-
         $this->actingAs($this->user);
 
-        // The service should throw an exception when no API key is provided
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('OpenAI API key not configured');
+        // Fake an AI SDK authentication failure — should return fallback
+        AnonymousAgent::fake(fn () => throw new \RuntimeException('API authentication failed'));
 
-        new \App\Services\AiConfigurationAnalysisService;
+        $service = new \App\Services\AiConfigurationAnalysisService;
+        $result = $service->analyzeEconomicSituation('Test');
+
+        // Should return fallback, not throw
+        $this->assertArrayHasKey('configuration', $result);
+        $this->assertEquals('Basic Configuration', $result['configuration']['name']);
     }
 
     public function test_action_has_correct_properties(): void

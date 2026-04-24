@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('simulation_configurations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations');
+            $table->foreignId('asset_configuration_id')->nullable()->constrained('asset_configurations', 'id')->name('simulation_configurations_asset_config_id_foreign');
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('birth_year')->nullable();
@@ -20,22 +20,22 @@ return new class extends Migration
             $table->integer('expected_death_age')->nullable();
             $table->integer('export_start_age')->nullable();
             $table->boolean('public')->default(false);
-            $table->string('tax_country', 2)->default('no')->after('risk_tolerance')->comment('Country code for tax calculations (no, se, ch, etc.)');
-            $table->string('prognosis_type')->default('realistic')->after('tax_country')->comment('Prognosis scenario type (realistic, positive, negative, tenpercent, zero, variable)');
-            $table->string('group')->default('private')->after('prognosis_type')->comment('Asset group filter (private, company, or both)');
+            $table->string('tax_country', 2)->default('no');
+            $table->string('prognosis_type')->default('realistic');
+            $table->string('group')->default('private');
             $table->string('icon')->nullable();
             $table->string('image')->nullable();
             $table->string('color')->nullable();
-            $table->json('tags')->nullable();
+            $table->jsonb('tags')->nullable();
             $table->enum('risk_tolerance', ['conservative', 'moderate_conservative', 'moderate', 'moderate_aggressive', 'aggressive'])->default('moderate');
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('team_id')->nullable()->constrained('teams', 'id')->name('simulation_configurations_team_id_foreign')->onDelete('cascade');
 
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
-            $table->string('created_checksum')->nullable();
-            $table->string('updated_checksum')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users', 'id')->name('simulation_configurations_created_by_foreign');
+            $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->name('simulation_configurations_updated_by_foreign');
+            $table->char('created_checksum', 64)->nullable();
+            $table->char('updated_checksum', 64)->nullable();
             $table->timestamps();
 
             $table->index(['user_id', 'team_id']);

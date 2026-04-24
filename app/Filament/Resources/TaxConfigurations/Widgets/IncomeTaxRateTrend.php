@@ -94,8 +94,8 @@ class IncomeTaxRateTrend extends ChartWidget
 
     private function resolveContext(): array
     {
-        $country = $this->country ?? (string) (request()->route('country') ?? '');
-        $taxType = $this->taxType ?? '';
+        $country = $this->country === '' ? (string) (request()->route('country') ?? '') : $this->country;
+        $taxType = $this->taxType;
 
         if ($taxType === '') {
             $recordParam = request()->route('record');

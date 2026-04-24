@@ -58,8 +58,8 @@ class YearlyProcessor
         if ($meta->year >= $thisYear) { // For efficiensy, not neccessarry to calculate previous tax
             $taxType = $this->assetTypeService->getTaxType($meta->type);
 
-            // Skip tax calculation if tax_type is null
-            if ($taxType === null) {
+            // Skip tax calculation if tax_type is none
+            if ($taxType === 'none') {
                 return;
             }
 
@@ -126,7 +126,7 @@ class YearlyProcessor
     /**
      * Post-processes asset yearly data.
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     public function processAssetYearly(array &$dataH, string $path): void
@@ -176,7 +176,7 @@ class YearlyProcessor
     /**
      * Calculate yield percentages for a specific year and asset path.
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     public function processYieldYearly(array &$dataH, string $path): void
@@ -229,7 +229,7 @@ class YearlyProcessor
      * Calculate financial metrics for a specific year and asset path.
      * Orchestrates all metric calculations by calling specialized methods.
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     public function processFinancialMetricsYearly(array &$dataH, string $path): void
@@ -245,7 +245,7 @@ class YearlyProcessor
     /**
      * Calculate investment return metrics (ROI, Total Return, CoC).
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     private function processInvestmentReturns(array &$dataH, string $path): void
@@ -292,7 +292,7 @@ class YearlyProcessor
     /**
      * Calculate property-specific metrics (NOI, GRM).
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     private function processPropertyMetrics(array &$dataH, string $path): void
@@ -317,7 +317,7 @@ class YearlyProcessor
     /**
      * Calculate leverage metrics (DSCR, LTV, D/E).
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     private function processLeverageMetrics(array &$dataH, string $path): void
@@ -361,7 +361,7 @@ class YearlyProcessor
     /**
      * Calculate profitability ratios (ROE, ROA).
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     private function processProfitabilityRatios(array &$dataH, string $path): void
@@ -394,7 +394,7 @@ class YearlyProcessor
     /**
      * Calculate valuation metrics (P/B, EV/EBITDA).
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     private function processValuationMetrics(array &$dataH, string $path): void
@@ -429,7 +429,7 @@ class YearlyProcessor
     /**
      * Calculate liquidity metrics (Current Ratio).
      *
-     * @param  array<string, mixed>  $dataH  Reference to the main data structure
+     * @param  array  $dataH  Reference to the main data structure
      * @param  string  $path  Asset path (e.g., "assetname.year")
      */
     private function processLiquidityMetrics(array &$dataH, string $path): void
@@ -533,7 +533,7 @@ class YearlyProcessor
     /**
      * Helper to set values in dataH. Almost duplicate with same function in PrognosisService
      *
-     * @param  array<string, mixed>  $dataH
+     * @param  array  $dataH
      */
     private function ArrSet(array &$dataH, string $path, mixed $value): void
     {

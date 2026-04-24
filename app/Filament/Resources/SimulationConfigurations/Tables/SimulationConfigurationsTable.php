@@ -247,7 +247,9 @@ class SimulationConfigurationsTable
                             return;
                         }
 
+                        /** @var \App\Models\SimulationConfiguration $simulation1 */
                         $simulation1 = $records->first();
+                        /** @var \App\Models\SimulationConfiguration $simulation2 */
                         $simulation2 = $records->last();
 
                         // Redirect to CompareDashboard with query parameters

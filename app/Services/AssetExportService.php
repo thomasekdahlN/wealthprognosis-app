@@ -8,11 +8,8 @@ use Illuminate\Support\Str;
 
 class AssetExportService
 {
-    protected AssetConfiguration $assetConfiguration;
-
-    public function __construct(AssetConfiguration $assetConfiguration)
+    public function __construct(protected AssetConfiguration $assetConfiguration)
     {
-        $this->assetConfiguration = $assetConfiguration;
     }
 
     /**

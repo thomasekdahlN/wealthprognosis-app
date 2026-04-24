@@ -38,12 +38,7 @@ class PrognosisService
     public int $deathYear;
 
     /** @var array<string, mixed> */
-    public array $config;
-
-    /** @var array<string, mixed> */
     public array $tax;
-
-    public ChangerateService $changerate;
 
     /** @var array<string, mixed> */
     public array $dataH = [];
@@ -66,22 +61,6 @@ class PrognosisService
     /** @var array<string, mixed> */
     public array $statisticsH = [];
 
-    public PostProcessorService $postProcessor;
-
-    private AssetTypeService $assetTypeService;
-
-    public TaxIncomeService $taxincome;
-
-    public TaxFortuneService $taxfortune;
-
-    public TaxRealizationService $taxrealization;
-
-    public HelperService $helper;
-
-    public RulesService $rules;
-
-    public TaxCashflowService $taxCashflow;
-
     public int $birthYear;
 
     public bool $debug = false;
@@ -90,27 +69,17 @@ class PrognosisService
      * @param  array<string, mixed>  $config
      */
     public function __construct(
-        array $config,
-        TaxIncomeService $taxincome,
-        TaxFortuneService $taxfortune,
-        TaxRealizationService $taxrealization,
-        ChangerateService $changerate,
-        HelperService $helper,
-        RulesService $rules,
-        TaxCashflowService $taxCashflow,
-        PostProcessorService $postProcessor,
-        AssetTypeService $assetTypeService,
+        public array $config,
+        public TaxIncomeService $taxincome,
+        public TaxFortuneService $taxfortune,
+        public TaxRealizationService $taxrealization,
+        public ChangerateService $changerate,
+        public HelperService $helper,
+        public RulesService $rules,
+        public TaxCashflowService $taxCashflow,
+        public PostProcessorService $postProcessor,
+        private AssetTypeService $assetTypeService,
     ) {
-        $this->config = $config;
-        $this->taxincome = $taxincome;
-        $this->taxfortune = $taxfortune;
-        $this->taxrealization = $taxrealization;
-        $this->changerate = $changerate;
-        $this->helper = $helper;
-        $this->rules = $rules;
-        $this->taxCashflow = $taxCashflow;
-        $this->postProcessor = $postProcessor;
-        $this->assetTypeService = $assetTypeService;
 
         // Debug logging
         Log::debug('PrognosisService created', [
@@ -999,7 +968,7 @@ class PrognosisService
      * @param  string  $variable  The specific variable within the type being retrieved.
      * @return mixed The retrieved value.
      */
-    public function configOrPrevValueRespectRepeat(bool $debug, string $assetname, int $year, string $type, string $variable)
+    public function configOrPrevValueRespectRepeat(bool $debug, string $assetname, int $year, string $type, string $variable): mixed
     {
         $prevYear = $year - 1;
         $value = $this->ArrGetConfig("$assetname.$year.$type.$variable");

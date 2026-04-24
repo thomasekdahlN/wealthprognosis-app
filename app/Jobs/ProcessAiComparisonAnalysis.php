@@ -134,7 +134,7 @@ class ProcessAiComparisonAnalysis implements ShouldQueue
             // Call the AI service
             Cache::put($this->cacheKey.':status', 'Calling AI service (this may take 1-3 minutes)...', 600);
             $aiService = new AiEvaluationService;
-            $response = $aiService->callOpenAI(
+            $response = $aiService->callAi(
                 $instruction->system_prompt,
                 $userPrompt,
                 $instruction->model,

@@ -35,24 +35,14 @@ use Illuminate\Support\Facades\Log;
 class TaxSalaryService implements TaxCalculatorInterface
 {
     /**
-     * Country code for tax lookups.
-     */
-    private string $country;
-
-    /**
-     * Shared TaxConfigRepository instance.
-     */
-    private TaxConfigRepository $taxConfigRepo;
-
-    /**
      * Create a new TaxSalaryService service.
      *
      * @param  string  $country  Country code for tax calculations (default: 'no')
      * @param  TaxConfigRepository|null  $taxConfigRepo  Optional repository instance for dependency injection
      */
     public function __construct(
-        string $country = 'no',
-        ?TaxConfigRepository $taxConfigRepo = null,
+        private string $country = 'no',
+        private ?TaxConfigRepository $taxConfigRepo = null,
         private HelperService $helperService = new HelperService
     ) {
         $this->country = strtolower($country) ?: 'no';

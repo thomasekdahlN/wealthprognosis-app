@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('asset_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('team_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('team_id')->nullable()->constrained('teams', 'id')->name('asset_types_team_id_foreign')->onDelete('cascade');
             $table->string('type')->unique();
             $table->string('tax_type')->nullable();
             $table->foreign('tax_type')->references('type')->on('tax_types');
@@ -46,11 +46,11 @@ return new class extends Migration
             $table->string('color')->default('gray');
 
             $table->integer('sort_order')->default(0);
-            $table->foreignId('asset_category_id')->nullable()->constrained('asset_categories');
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
-            $table->string('created_checksum')->nullable();
-            $table->string('updated_checksum')->nullable();
+            $table->foreignId('asset_category_id')->nullable()->constrained('asset_categories', 'id')->name('asset_types_asset_category_id_foreign');
+            $table->foreignId('created_by')->nullable()->constrained('users', 'id')->name('asset_types_created_by_foreign');
+            $table->foreignId('updated_by')->nullable()->constrained('users', 'id')->name('asset_types_updated_by_foreign');
+            $table->char('created_checksum', 64)->nullable();
+            $table->char('updated_checksum', 64)->nullable();
             $table->timestamps();
 
             $table->index(['user_id', 'team_id']);
