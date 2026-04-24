@@ -1,7 +1,32 @@
 <meta name="google-site-verification" content="sVU5VtIVFfRVyzYylywIA2XMMxLQez6ehHqDndMjI1M" />
 <img src="public/logo.png" alt="Logo" width="200"/>
 
-## Wealth prognosis predicts your yearly future economy from now until you die
+# Wealth Prognosis
+
+> A comprehensive financial planning and simulation system — track all your assets, run year-by-year prognoses to your death date, and get AI-powered insights on your economic future.
+
+## Table of contents
+
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Technology stack](#technology-stack)
+- [Getting started](#getting-started)
+- [Environment variables](#environment-variables)
+- [Database setup](#database-setup)
+- [Artisan commands](#artisan-commands)
+- [Seeding](#seeding)
+- [Deployment](#deployment)
+- [Dashboards](#dashboards)
+- [Asset types](#asset-types)
+- [Configuration reference](#configuration-reference)
+- [Output reference](#output-reference)
+- [Licence](#licence)
+
+---
+
+## Overview
+
+**Wealth Prognosis** predicts your yearly future economy from now until you die.
 
 Makes a qualified prognosis of your economic future year for year until your death. It takes into account your income, expences, assets/liabilities, loans, taxes, inflation and more.
 
@@ -19,63 +44,414 @@ On each asset you can do a rule based addition or subtraction, like adding 5000 
 On each asset you can do an calculation based on other assets value and add it to this asset. Like taking 5% of the salary and add it to OTP (this does not change your salary but it increases your OTP)
 On each asset you can do an transfer to another asset. This will correctly calculate the taxes for the sale involved before transfer.
 
-#### Licence
-The code is under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007. Free for personal usage and free for non-commercial usage (that means that you do not make money on this software). Contributors wanted. Commercial usage is allowed with a commercial licence - please contact me to obtain a commercial usage. If you want to pay for new functionality, please feel free to contact me.
+---
 
-#### Examples
-- Like taking 1/15 part of a equity fund each year and add it to your income for spending
-- taking 50% of the positive cachflow of one asset to make a extra mortgage downpayment for finish mortgage earlier.
-- Take 100% of the sales value of a stock/company and transfer it to a equity fund on your exit from the stock.
-- Transfer the value from one asset to another (to simulate if it gives you more wealth)
-- Children asset has both income and expences until the children move out, then they are removed from your economy
-- Public pension is added to your income the year you pension
-- Public pension is added to your income the year you pension until you ar 77 years.
+## Architecture
 
-Your asset configuration can then be run with different prognossis, like realistic, positive, negative, tenpercent, zero, variable, all, private, company.
-Each asset can have a changerate, that can be different for each year on how the asset behaves. The different prognosis configurations has different yearly change paths for each type of asset or you can make your own.
-Assets can both increase and decrease in value based on the changerates.
+### System overview
 
-#### Example:
-- Change path for interest can på 4% in 2023, 6% in 2024 and then 5% in 2025, etc
-- Change path for your car or boat would be -10% in 2023, -10% in 2024 and then -10% in 2025, etc
-It then sums everything up and shows you all the details on how your economy behaves.
+```mermaid
+graph TB
+    subgraph UI["UI Layer (Filament 5 + Livewire 4)"]
+        AP[Admin Panel /admin]
+        DB[Dashboards]
+        RC[Resources / CRUD]
+        AI[AI Assistant Widget]
+    end
+
+    subgraph SVC["Services Layer"]
+        PS[PrognosisService]
+        PSS[PrognosisSimulationService]
+        TAX[Tax Services\nIncome · Fortune · Property\nRealization · Salary]
+        FIRE[FireCalculationService]
+        AIS[AiAssistantService]
+        EXP[Export Services\nExcel · JSON]
+    end
+
+    subgraph DATA["Data Layer (PostgreSQL)"]
+        AC[asset_configurations]
+        AS[assets]
+        AY[asset_years]
+        SC[simulation_configurations]
+        SA[simulation_assets]
+        SAY[simulation_asset_years]
+        TC[tax_configurations]
+        CR[change_rate_configurations]
+        AI2[agent_conversations]
+    end
+
+    AP --> RC
+    AP --> DB
+    AP --> AI
+    RC --> SVC
+    DB --> SVC
+    AI --> AIS
+    PS --> DATA
+    PSS --> PS
+    TAX --> DATA
+    FIRE --> DATA
+    AIS --> AI2
+    SVC --> DATA
+```
+
+### Multi-tenancy
+
+```mermaid
+graph LR
+    U[User] -->|belongs to| T[Team]
+    T -->|owns| AC[AssetConfiguration]
+    AC -->|has many| A[Assets]
+    A -->|has many| AY[AssetYears]
+    AC -->|has many| SC[SimulationConfigurations]
+    SC -->|has many| SA[SimulationAssets]
+    SA -->|has many| SAY[SimulationAssetYears\ncalculated]
+
+    TS[TeamScope\nglobal scope] -.->|filters all queries by team_id| AC
+    TS -.-> A
+    TS -.-> SC
+```
+
+All models with a `team_id` column are automatically filtered by the authenticated user's `current_team_id`. Tax configurations and reference data are global (not team-scoped).
+
+### Simulation data flow
+
+```mermaid
+flowchart LR
+    CFG[AssetConfiguration\n+ Assets + AssetYears]
+    SIM[SimulationConfiguration\nprognosis type · group · country]
+    CPY[Copy assets\nto simulation tables]
+    CALC[PrognosisService\nyear-by-year calculations]
+    RES[SimulationAssetYears\nfull calculated dataset]
+    DASH[Dashboards\n& Excel exports]
+
+    CFG --> SIM
+    SIM --> CPY
+    CPY --> CALC
+    CALC -->|income · expense · mortgage\ntax · FIRE · metrics| RES
+    RES --> DASH
+```
+
+### AI integration
+
+```mermaid
+graph LR
+    W[AiAssistantWidget\nLivewire] --> AS[AiAssistantService]
+    AS --> FA[FinancialAssistant\nAgent]
+    FA -->|RemembersConversations| CV[agent_conversations\nagent_conversation_messages]
+    FA -->|Gemini API| GM[gemini-3.1-flash-lite-preview]
+
+    AE[AiEvaluationService] --> AN[AnonymousAgent]
+    ACA[AiConfigurationAnalysisService] --> AN
+    AN --> GM
+```
+
+---
+
+## Technology stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Laravel 13, PHP 8.5 |
+| UI | Filament 5, Livewire 4, Alpine.js, Tailwind CSS |
+| Database | PostgreSQL (production), SQLite (local/test) |
+| AI | Laravel AI SDK (`laravel/ai`), Google Gemini |
+| Testing | Pest 4, PHPUnit 12 |
+| Code quality | Larastan level 9, Laravel Pint |
+| Deployment | Laravel Cloud |
+| Asset bundling | Laravel Mix |
+
+---
+
+## Getting started
+
+```bash
+# 1. Clone and install
+git clone https://github.com/thomasekdahlN/wealthprognosis-app.git
+cd wealthprognosis-app
+composer install
+npm install
+
+# 2. Environment
+cp .env.example .env
+php artisan key:generate
+
+# 3. Database
+php artisan migrate
+php artisan db:seed
+
+# 4. Build assets
+npm run dev       # development (watch)
+npm run build     # production build
+
+# 5. Start server
+php artisan serve
+```
+
+Visit `http://localhost:8000/admin` and log in with the credentials from `UserSeeder`.
+
+---
+
+## Environment variables
+
+```dotenv
+APP_NAME="Wealth Prognosis"
+APP_ENV=local
+APP_KEY=                        # generated by php artisan key:generate
+APP_DEBUG=true
+APP_URL=http://localhost
+
+# Database (PostgreSQL for production)
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=wealthprognosis
+DB_USERNAME=postgres
+DB_PASSWORD=
+
+# AI (Laravel AI SDK — Google Gemini)
+AI_PROVIDER=gemini
+GEMINI_API_KEY=                 # your Google AI Studio key
+```
+
+---
+
+## Database setup
+
+### Local (SQLite — quickstart)
+
+```bash
+touch database/database.sqlite
+# DB_CONNECTION=sqlite in .env
+php artisan migrate --seed
+```
+
+### Local (PostgreSQL via DBngin or Docker)
+
+```bash
+# DB_CONNECTION=pgsql, set host/port/db/user/password in .env
+php artisan migrate --seed
+```
+
+### Production (Laravel Cloud)
+
+Set the database environment variables in **Environment → Environment Variables** in the Cloud dashboard, then run migrations and seeds as one-off commands:
+
+```bash
+php artisan migrate --force
+php artisan db:seed --class=ProductionSeeder --force
+```
+
+---
+
+## Artisan commands
+
+### Application commands
+
+```mermaid
+graph TD
+    CMD[php artisan]
+
+    CMD --> EXP[assets:export]
+    CMD --> IMP[assets:import]
+    CMD --> RF2[ReadFile2]
+    CMD --> IPT[tax:import-norwegian-property]
+    CMD --> SSB[tax:scrape-ssb-property]
+
+    EXP --> |export by ID| E1[assets:export 123]
+    EXP --> |export to path| E2[assets:export 123 --path=/tmp/out.json]
+    EXP --> |export all| E3[assets:export --all]
+
+    IMP --> |import for user| I1[assets:import file.json --user-id=1 --team-id=1]
+
+    RF2 --> |run simulation to Excel| R1["ReadFile2 config.json realistic private"]
+```
+
+#### `assets:export`
+
+Export one or all asset configurations to JSON.
+
+```bash
+php artisan assets:export {id}              # export single configuration
+php artisan assets:export {id} --path=FILE  # export to specific path
+php artisan assets:export --all             # export all configurations
+```
+
+Output files are named `YYYY-MM-DD-{name}.json`.
+
+#### `assets:import`
+
+Import a JSON configuration file into the database.
+
+```bash
+php artisan assets:import path/to/config.json
+php artisan assets:import path/to/config.json --user-id=1 --team-id=1
+```
+
+#### `ReadFile2` *(legacy CLI runner)*
+
+Run a prognosis directly from a JSON config file and generate an Excel output.
+
+```bash
+php artisan ReadFile2 {configfile} {prognosis} {generate}
+
+# Arguments:
+#   configfile   Path to JSON asset config
+#   prognosis    realistic | positive | negative | tenpercent | zero | variable
+#   generate     all | private | company
+
+# Example:
+php artisan ReadFile2 tests/Feature/config/example.json realistic private
+```
+
+Output: an Excel file saved next to the config file with the same base name.
+
+#### `tax:import-norwegian-property`
+
+Import Norwegian property tax rates from a local file.
+
+#### `tax:scrape-ssb-property`
+
+Scrape current property tax rates from Statistics Norway (SSB).
+
+---
+
+## Seeding
+
+### Seeder overview
+
+```mermaid
+graph TD
+    DS[DatabaseSeeder]
+    DS --> US[UserSeeder\ndev users]
+    DS --> TS[TeamSeeder\ndev team]
+    DS --> TT[TaxTypesFromConfigSeeder\nreference data]
+    DS --> AC[AssetCategorySeeder\nreference data]
+    DS --> AT[AssetTypeSeeder\nreference data]
+    DS --> AS[AssetConfigurationSeeder\ndev sample config]
+    DS --> AI[AiInstructionSeeder\nAI prompts]
+    DS --> TC[TaxConfigurationSeeder\nNorway tax rules]
+    DS --> TP[TaxPropertySeeder\nproperty tax rates]
+    DS --> PG[PrognosisSeeder\nprognosis types]
+    DS --> CR[ChangeRateConfigurationSeeder\ngrowth rates]
+    DS --> JI[JsonConfigImportSeeder\nsample JSON configs]
+    DS --> SI[SimulationSeeder\nrun sample simulations]
+
+    style US fill:#f9a,stroke:#c66
+    style TS fill:#f9a,stroke:#c66
+    style AS fill:#f9a,stroke:#c66
+    style JI fill:#f9a,stroke:#c66
+    style SI fill:#f9a,stroke:#c66
+    style TT fill:#9f9,stroke:#393
+    style AC fill:#9f9,stroke:#393
+    style AT fill:#9f9,stroke:#393
+    style AI fill:#9f9,stroke:#393
+    style TC fill:#9f9,stroke:#393
+    style TP fill:#9f9,stroke:#393
+    style PG fill:#9f9,stroke:#393
+    style CR fill:#9f9,stroke:#393
+```
+
+🟢 Green = safe reference data for production · 🔴 Red = development/sample data only
+
+### Development (full seed)
+
+```bash
+php artisan db:seed
+# or reset everything:
+php artisan migrate:fresh --seed
+```
+
+### Production (reference data only)
+
+Run individual seeders that are safe for production:
+
+```bash
+php artisan db:seed --class=TaxTypesFromConfigSeeder --force
+php artisan db:seed --class=AssetCategorySeeder --force
+php artisan db:seed --class=AssetTypeSeeder --force
+php artisan db:seed --class=AiInstructionSeeder --force
+php artisan db:seed --class=TaxConfigurationSeeder --force
+php artisan db:seed --class=TaxPropertySeeder --force
+php artisan db:seed --class=PrognosisSeeder --force
+php artisan db:seed --class=ChangeRateConfigurationSeeder --force
+```
+
+### Creating users in production
+
+Use Filament's built-in command (interactive, no hardcoded passwords):
+
+```bash
+php artisan make:filament-user
+```
+
+---
+
+## Deployment
+
+### Laravel Cloud
+
+1. Push code to your repository
+2. Connect the repository in [Laravel Cloud](https://cloud.laravel.com)
+3. Set environment variables (see [Environment variables](#environment-variables))
+4. Link or provision a PostgreSQL database
+5. Deploy — Cloud runs `composer install`, `npm run build`, and `php artisan migrate --force` automatically
+
+### One-off commands on Cloud
+
+Run from **Environment → Commands** in the Cloud dashboard:
+
+```bash
+php artisan db:seed --class=TaxTypesFromConfigSeeder --force
+php artisan make:filament-user
+php artisan cache:clear
+```
+
+---
+
+## Licence
+
+The code is under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007. Free for personal usage and free for non-commercial usage (that means that you do not make money on this software). Contributors wanted. Commercial usage is allowed with a commercial licence — please contact the author. If you want to pay for new functionality, please feel free to get in touch.
+
+---
+
+## Rule engine examples
+
+- Taking 1/15 of an equity fund each year and adding it to income for spending
+- Taking 50% of the positive cashflow of one asset to make an extra mortgage downpayment
+- Taking 100% of the sales value of a stock/company and transferring it to an equity fund on exit
+- Transferring value from one asset to another (to simulate if it yields more wealth)
+- A child asset has both income and expenses until the child moves out, then is removed from your economy
+- Public pension is added to income the year you retire
+
+Asset configurations can be run with different prognoses: `realistic`, `positive`, `negative`, `tenpercent`, `zero`, `variable`.
+Each asset can have a change rate that differs per year. Assets can both increase and decrease in value.
+
+#### Change rate examples
+
+- Interest: 4% in 2023 → 6% in 2024 → 5% in 2025
+- Car or boat: −10% per year (depreciation)
+
+The system sums everything up and shows you all the details on how your economy behaves.
 
 It outputs a very detailed excel spreadsheet of your future economy prognosis where you can see how well a single asset performs, or you can look at the total performance for your private or company economy - or the sum of your private and company economy. Se examples and definitions below.
 It also outputs a page with the spread of your different asset types - so you can see where you are most heavily invested.
 
-Note II: A transfer should always be done to an asset later in the config file, since the assets are calculated in order of appearance in the config file. A source should alsways be retrieved from an asset earlier in the config file.
-Note: This is just a hack and is not production ready, but its already useful.
+> **Note:** A `transfer` must always target an asset later in the config file (assets are calculated in order). A `source` must always retrieve from an asset earlier in the config file.
 
-#### Special asset names:
-total, company (total company summary), private (total private summary), income (private collecting all income from assets that are taxed - not same as salary which will be taxed)
+#### Special reserved asset names
 
-### Examples:
+| Name | Description |
+|---|---|
+| `total` | Sum of all assets |
+| `company` | Total company summary |
+| `private` | Total private summary |
+| `income` | Collects all taxed private income (not the same as salary) |
 
-* [boat](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [car](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [cash](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [child](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [company](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [crypto](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [example_simple](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [example_advanced](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [fond](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [house](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [inheritance](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [kpi](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [otp](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [pension](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [property](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [property-mortgage-interest-only-vs-fond](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [property-mortgage-vs-fond](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [property-rental](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [rental-vs-fond](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
-* [salary-otp](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
+---
 
+## Dashboards
 
-### Dashboards og widgets
-
-#### Actual Assets Dashboard (/admin)
+### Actual assets dashboard (`/admin`)
 - **Asset Overview (GUI)** — App\Filament\Widgets\AssetOverviewWidget
   - Hva: Hurtigstatus for totaler
   - Matematikk: Henter summer fra FireCalculationService. Viser bl.a. Total Assets (sum markedsverdi), Investment (liquid) Assets, Net Worth = Total Assets − Total Liabilities, Total Mortgage = sum lån.
@@ -116,7 +492,7 @@ total, company (total company summary), private (total private summary), income 
   - Hva: Doughnut‑diagram av månedlige utgifter pr type
   - Matematikk: Sum expence_amount per asset‑type for inneværende år, delt på 12.
 
-#### Simulation Assets Dashboard (/admin/config/{configuration}/sim/{simulation}/dashboard)
+### Simulation dashboard (`/admin/config/{configuration}/sim/{simulation}/dashboard`)
 - **Simulation Overview** — App\Filament\Widgets\SimulationStatsOverviewWidget
   - Hva: Nøkkeltall for porteføljen i simuleringen
   - Matematikk: Startverdi = sum første års start_value. Sluttverdi = sum siste års end_value. Total vekst = slutt − start. CAGR ≈ (slutt/start)^(1/år) − 1. Viser også totale inntekter, utgifter, netto og skatt.
@@ -130,53 +506,20 @@ total, company (total company summary), private (total private summary), income 
   - Hva: Fordeling av portefølje i siste simulerte år
   - Matematikk: Finn siste år i datasettet, grupper end_value per asset_type og summer.
 
-### How to run
-php artisan ReadFile2 yourassetconfig.json realistic|positive|negative|tenpercent|zero|variable all|private|company
+---
 
-php artisan ReadFile2 tests/Feature/config/example.json realistic private
+## Configuration reference
 
-tests/Feature/config/example.json = path to your asset definition.
-realistic|positive|negative are standard prognosis. You can copy and make your own, just place them in the same directory. tenpercent/zero/variable is just for manual testing.
-all|private|company - run the prognosis for only, private, only company or both.
+### Supported features
 
-Output:
-The command will automatically generate [excel](https://github.com/thomasekdahlN/wealthprognosis-app/blob/main/tests/Feature/config/example_simple_tenpercent.xlsx) files in the same directory as your config file, with the same name as the run config file.
+- Percentage change rates on expenses, income, and asset values
+- Mortgage calculations, including new mortgages replacing previous ones
+- Incremental decrease of income / expense / asset (negative amount)
+- Norwegian fortune, property, income, capital gains, salary tax calculations
+- Asset grouping into `total`, `company`, and `private` summaries
+- Max loan capacity estimation
 
-
-### CLI: Export configurations
-
-Use the assets:export command to export one or more configurations to JSON files.
-
-Examples:
-
-- Export a single configuration by ID:
-
-  php artisan assets:export 123
-
-- Export a single configuration to a specific path:
-
-  php artisan assets:export 123 --path=/tmp/my-config.json
-
-- Export all configurations:
-
-  php artisan assets:export --all
-
-
-Reads your economic setup as a json file and provides a detail spreadsheet with analysis of your future economy until your death.
-
-### Supports
-- Supports % changerates on expences, income and asset values
-- Supports mortage calculations and new mortages taking over for a previous mortage
-- Support incrementell decrease of income / expence / asset (using negative amount as input)
-- Supports calculation of fortune tax in norway (but not adding it to expences)
-- Calculates all values for all assets
-- Groups assets into groups for group overview
-- Groups assets into total, company and private for a total overview of your economic future
-- Estimates your max loan capasity from banks.
-
-### Support for more sophisticated dynamics in income/expence/asset -
-
-rule - support:
+### Rule engine syntax
 - +10% - Adds 10% to amount
 - -10% - Subtracts 10% from amount
 - 10% - Calculates 10% of the amount
@@ -199,7 +542,9 @@ Overføring av beløp fra den asset regelen er på til den asset som er spesifis
 Beløp blir kun overført hvis det er spesifisert en transfer på asset som skal sende beløpet, hvis ikke blir beløpet lagt til den asset man står på.
 Transfer kan kun foregå til tidligere prosesserte assets i rekkefølgen om det er extraDownPayment på lån, ellers så må transfer alltid skje til en kommende asset.
 
-### Supported asset types (canonical)
+---
+
+## Asset types
 
 Legend: 🟢 = Liquid, 🔴 = Non-liquid
 
@@ -244,7 +589,11 @@ Legend: 🟢 = Liquid, 🔴 = Non-liquid
 | kpi | KPI | 🔴 | Konsumprisindeks (referanse/indikator). |
 | spouse | Ektefelle | 🔴 | Ektefelles inntekter og utgifter. |
 
-### Functionality on the priority wishlist:
+---
+
+## Roadmap
+
+### Priority
 - Check calculations for property tax
 - Check calculations for bracket tax
 - Support for personfradrag in tax calculations - calculating a bit too high now
@@ -254,7 +603,7 @@ Legend: 🟢 = Liquid, 🔴 = Non-liquid
 - Fortune tax is divided into state and municipality tax. Should be calculated separately.
 - Correct the FIRE calulations - the correct is 4% the first year and then KPI adjusted the following years.
 
-#### Not a priority, but have been thinking of it.
+### Future ideas
 - Support for factor on a rule like +1000
 - Support for changerates on rules, like adding 5% to the +1000 rule each year.
 -  Company fortune should be retrieved from the previous year not the current year (tax vise)
@@ -561,224 +910,11 @@ Comprehensive financial analysis metrics calculated for each asset and year.
 
 ---
 
-## Config
+## Example config
 
-### meta - top level - reserved keyword
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| meta.name | Required | Your name or an alias for you |
-| meta.description | Optional | Longer description for the configuration |
-| meta.birthYear | Required | Year you were born |
-| meta.prognoseAge | Optional | Age used for highlighting/projection focus in charts/exports |
-| meta.pensionOfficialAge | Optional | Official retirement age in your country (e.g., 67 in Norway) |
-| meta.pensionWishAge | Optional | Desired retirement age (FIRE target or similar) |
-| meta.deathAge | Required | Expected age of death |
-| meta.exportStartAge | Optional | Calendar year to start Excel export from (defaults to last year) |
-| meta.icon | Optional | Heroicon name (e.g., heroicon-o-user). Invalid values are ignored and set to null. |
-| meta.color | Optional | Color hint for UI (string) |
-| meta.tags | Optional | Array of tags for labeling/grouping |
-| meta.country | Optional | 2 letter country code (e.g., no, us, etc.) Defaults to no. |
-
-Your pensionOfficialAge/pensionWishAge will be used to calculate equal payments (like 1/14 of your assets) from your assets until deathAge. If you live longer, you get less per year.
-
-### Assets configurations
-
-NOTE: Asset name has to be unique, and is used to identify the asset in all calculations.
-
-#### meta - asset level - reserved keyword
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| meta.type | Required | Asset type code. See "Supported asset types (canonical)" above. |
-| meta.group | Required | Owner group for the asset. Valid values: private \| company. Defaults to private. |
-| meta.name | Required | Short name shown in UI/exports. |
-| meta.description | Optional | Longer description of the asset, its income, expence, mortage and asset value. |
-| meta.active | Optional | Boolean (true\|false). If false, the asset will not be calculated. Defaults to true. |
-| meta.tax | Removed | Tax type is implied via the selected asset_type which maps to a TaxType through Asset Types. |
-| meta.taxProperty | Optional | Property-tax specific code/flag used when applicable. |
-| meta.debug | Optional | Boolean (true\|false). If true, the asset will be included in debug exports. Defaults to false. |
-| meta.icon | Optional | Heroicon name (e.g., heroicon-o-user). Invalid values are ignored and set to null. |
-| meta.color | Optional | Color hint for UI (string) |
-| meta.tags | Optional | Array of tags for labeling/grouping |
-| meta.country | Optional | 2 letter country code (e.g., no, us, etc.) Defaults to no. |
-
-#### Income
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| income.amount | Optional | beløp før skatt |
-| income.changerate | Optional | endring i prosent eller variabel hentet fra config fil for prosent f.eks changerates.kpi, changerates.fond, changerates.otp, changerates.house, changerates.car, changerates.cash |
-| income.rule | Optional | regler for hvordan inntekten skal behandles. Se eget kapittel for syntax |
-| income.transfer | Optional | overføring av inntekt til en annen asset, dvs den flytter pengene fra denne asset til den asset som er oppgitt i transfer. Merk at en transfer må beregnes før asset den overføres til. |
-| income.source | Optional | rule beregning av et beløp i en annen asset, som skal legges til denne. Merk at en source må beregnes etter asset den henter verdier fra. Endrer ikke verdien i source. |
-| income.repeat | Optional | true/false - Hvis true gjenta konfigurasjonen inntil den blir overskrevet av en annen konfigurasjon et senere år. |
-| income.factor | Optional | Faktor for å beregne beløpet. Hvis ikke angitt, beregnes beløpet som det står. Hvis angitt, ganges beløpet med faktoren. F.eks 12 for å beregne månedlig beløp til årlig. |
-| income.name | Optional | Navn på inntekten |
-#### Expence
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| expence.amount | Optional | beløp før skatt |
-| expence.changerate | Optional | endring i prosent eller variabel hentet fra config fil for prosent f.eks changerates.kpi, changerates.fond, changerates.otp, changerates.house, changerates.car, changerates.cash |
-| expence.rule | Optional | regler for hvordan inntekten skal behandles. Se eget kapittel for syntax |
-| expence.transfer | Optional | overføring av inntekt til en annen asset, dvs den flytter pengene fra denne asset til den asset som er oppgitt i transfer. Merk at en transfer må beregnes før asset den overføres til. |
-| expence.source | Optional | rule beregning av et beløp i en annen asset, som skal legges til denne. Merk at en source må beregnes etter asset den henter verdier fra. Endrer ikke verdien i source. |
-| expence.repeat | Optional | true/false - Hvis true gjenta konfigurasjonen inntil den blir overskrevet av en annen konfigurasjon et senere år. |
-| expence.factor | Optional | Faktor for å beregne beløpet. Hvis ikke angitt, beregnes beløpet som det står. Hvis angitt, ganges beløpet med faktoren. F.eks 12 for å beregne månedlig beløp til årlig. |
-| expence.name | Optional | Navn på utgiften |
-#### mortgage - Lån
-
-| Field                         | Required | Description |
-|-------------------------------|----------|-------------|
-| mortgage.amount               | Required | The original mortgage amount |
-| mortgage.interest             | Required | rente i prosent. Recommended to use "changerates.interest" to get the interest prediction pr year and not hardcode it. |
-| mortgage.years                | Required | Hvor mange år skal lånet være |
-| mortgage.interestOnlyYears    | Optional | Hvor mange år lånet skal være avdragsfritt og man bare betaler renter. Må være mindre enn mortgage.years. Hvis ikke angitt, betales renter og avdrag for mortgage.years |
-| mortgage.gebyr                | Optional | gebyr pr år |
-| mortgage.extraDownpaymentAmount | Optional | årlig ekstra nedbetaling på lån hele lånets løpetid. Forkorter lånets løpetid om beløpet er stort nok. |
-| mortgage.tax                  | Optional | Skatteprosent for lån. Defaults to 22%. |
-#### asset
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| asset.marketAmount | Required | Markedsverdien på en asset. This is the main value we use when talking about an asset. |
-| asset.acquisitionAmount | Optional | Anskaffelsesverdi. Blir default satt. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp. |
-| asset.equityAmount | Optional | Egenkapital : Blir default satt til asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital. |
-| asset.paidAmount | Optional | Finanskostnader. Blir default satt til asset.marketAmount hvis ikke angitt. Brukes hvsi du har betalt noe annet enn markedsverdi, f.eks ved arv. |
-| asset.taxableInitialAmount | Optional | Skattbart beløp ikke hensyntatt lån. Blir default satt til asset.marketAmount. Antall kroner av markedsverdien til en asset det skal skattes av. F.eks en hytte kan ha mye lavere skattbar verdi enn markedsverdien minus verdsettelsesrabatt. Blir justert med changerate til asset. |
-| asset.changerate | Optional | endring i prosent eller variabel hentet fra config fil for prosent f.eks changerates.kpi, changerates.fond, changerates.otp, changerates.house, changerates.car, changerates.cash |
-| asset.rule | Optional | regler for hvordan inntekten skal behandles. Se eget kapittel for syntax |
-| asset.transfer | Optional | overføring av inntekt til en annen asset, dvs den flytter pengene fra denne asset til den asset som er oppgitt i transfer. Merk at en transfer bør beregnes før asset den overføres til. Hvis du overfører til en som allerede er beregnet, så blir den ikke reberegnet |
-| asset.source | Optional | rule beregning av et beløp i en annen asset, som skal legges til denne. Merk at en source må beregnes etter asset den henter verdier fra. Endrer ikke verdien i source. |
-| asset.repeat | Optional | true/false - Hvis true gjenta konfigurasjonen inntil den blir overskrevet av en annen konfigurasjon et senere år. |
-| asset.name | Optional | Navn på asset/liability |
-### Output: Datasettet vi regner på pr år
-
-#### Income
-
-| Field | Description |
-|-------|-------------|
-| income.amount | beløp før skatt |
-| income.changerate | endring i prosent |
-| income.changeratePercent | endring i prosent |
-| income.rule | regler for hvordan inntekten skal behandles |
-| income.transfer | overføring av inntekt til en annen asset |
-| income.repeat | gjenta konfigurasjonen for kommende år |
-| income.transferedAmount | Hva du har overført til/fra income (fra transfer, source eller rule). Ikke changerate endringer. |
-#### Expence
-
-| Field | Description |
-|-------|-------------|
-| expence.amount | beløp før skatt |
-| expence.changerate | endring i prosent |
-| expence.changeratePercent | endring i prosent |
-| expence.rule | regler for hvordan utgiften skal behandles |
-| expence.transfer | overføring av inntekt til en annen asset |
-| expence.repeat | gjenta konfigurasjonen for kommende år |
-| expence.transferedAmount | Hva du har overført til/fra expence (fra transfer, source eller rule). Ikke changerate endringer. |
-#### Cashflow
-
-| Field                              | Description                                                                                                                                                                                                                                   |
-|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| cashflow.beforeTaxAmount           | (income.amount + income.transferedAmount) - (expence.amount - mortgage.termAmount) //Tax not calculated                                                                                                                                       |
-| cashflow.afterTaxAmount            | (income.amount + income.transferedAmount + mortgage.taxDeductableAmount) - (expence.amount - mortgage.termAmount - expence.transferedAmount - cashflow.taxAmount - asset.taxFortuneAmount - asset.taxPropertyAmount) //tax taken into account |
-| cashflow.beforeTaxAggregatedAmount | += cashflow.beforeTaxAggregatedAmount                                                                                                                                                                                                         |
-| cashflow.afterTaxAggregatedAmount  | += cashflow.afterTaxAggregatedAmount                                                                                                                                                                                                          |
-| cashflow.taxAmount                 | skatten som skal betales av inntekt etter utgifter fratrukket income.amount - expence.amount.                                                                                                                                                 |
-| cashflow.taxRate                   | skatt i desimal                                                                                                                                                                                                                               |
-| cashflow.transferedAmount          | Beløp du har overført til/fra. (fra transfer, source eller rule). Ikke changerate.                                                                                                                                                            |
-| cashflow.rule                      | regler for hvordan beløpet skal beregnes                                                                                                                                                                                                      |
-| cashflow.transfer                  | overføring av positiv cashflow til en annen asset                                                                                                                                                                                             |
-| cashflow.repeat                    | gjenta konfigurasjonen [cashflow.rule, cashflow.transfer, cashflow.repeat]for kommende år                                                                                                                                                     |
-| cashflow.explanation               | beskrivelse av cashflow                                                                                                                                                                                                                       |
-#### mortgage - Lån
-
-| Field                           | Description                                                                                                                                                                                          |
-|---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mortgage.amount                 | The original mortgage amount (the same for every year, for reference and easy calculation)                                                                                                           |
-| mortgage.termAmount             | Nedbetaling av lån pr år ihht betingelsene (renter + avdrag + gebyr) = interestAmount + principalAmount + gebyrAmount                                                                                |
-| mortgage.interestAmount         | renter - i kroner pr år                                                                                                                                                                              |
-| mortgage.principalAmount        | Avdrag - i kroner pr år (det er dette som nedbetaler lånet)                                                                                                                                          |
-| mortgage.balanceAmount          | gjenstående lån i kroner                                                                                                                                                                             |
-| mortgage.extraDownpaymentAmount | ekstra nedbetaling av lån pr år (Utgår nå som vi har: transferedAmount?)                                                                                                                             |
-| mortgage.transferedAmount       | Hva du har overført til/fra mortgage                                                                                                                                                                 |
-| mortgage.interestPercent        | rente i prosent (Brukes i reberegning ved ekstra nedbetaling av lån)                                                                                                                                 |
-| mortgage.interestRate           | rente i desimal                                                                                                                                                                                      |
-| mortgage.years                  | Gjenværende atnall år løpetid på lånet, basert på første konfigurasjon av lånet. Med ekstra nedbetalign vil lånet kunne bli betalt ned på færre antall år om ekstra innbetalingsbeløpene er store nok |
-| mortgage.gebyrAmount            | gebyr pr år                                                                                                                                                                                          |
-| mortgage.taxDeductableAmount    | fradrag                                                                                                                                                                                              |
-| mortgage.taxDeductableRate      | fradrag i decimal                                                                                                                                                                                    |
-| mortgage.taxDeductablePercent   | fradrag i prosent                                                                                                                                                                                    |
-| mortgage.explanation            | beskrivelse av  i låneberegningen.                                                                                                                                                    |
-#### asset
-
-| Field                              | Description                                                                                                                                                                                                                                                                     |
-|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| asset.marketAmount                 | Markedsverdien på en asset                                                                                                                                                                                                                                                      |
-| asset.marketMortgageDeductedAmount | Markedsverdien ved salg hensyntatt restlån men ikke skatt : asset.amount - mortgage.balanceAmount                                                                                                                                                                               |
-| asset.acquisitionAmount            | Anskaffelsesverdi. Vi trenger å vite denne for å skatteberegne ved realisasjon, da det ofte trekkes fra før skatt. F.eks verdi på hus ved kjøp.                                                                                                                                 |
-| asset.acquisitionInitialAmount     | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere                                                                                                                                                               |
-| asset.equityAmount                 | Egenkapital : asset.acquisitionAmount - mortgage.balanceAmount (hensyntar da automatisk ekstra nedbetalign av lån). Legger også til ekstra overføringer fra rule eller transfer regler som egenkapital.                                                                         |
-| asset.equityInitialAmount          | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere                                                                                                                                                               |
-| asset.paidAmount                   | Finanskostnader. Hva du faktisk har betalt, inkl renter, avdrag, gebur, ekstra innbetaling på lån og ekstra kjøp.                                                                                                                                                               |
-| asset.paidInitialAmount            | Settes bare første gang vi ser beløpet i det året vi ser det. For å kunne rekalkulere med transferedAmount senere                                                                                                                                                               |
-| asset.transferedAmount             | Hva du har overført til/fra denne asset. Kan være både positivt og negativt beløp.  (fra transfer, source eller rule). Ikke changerate.                                                                                                                                         |
-| asset.mortageRate                  | Hvor mye i % av en asset som er lånt. Belåningsgrad.                                                                                                                                                                                                                            |
-| asset.taxableRate                  | Skattbar prosent - Antall prosent av markedsverdien til en asset det skal skattes av                                                                                                                                                                                            |
-| asset.taxableAmount                | Skattbart beløp - Antall kroner av markedsverdien til en asset det skal skattes av minus lån. Denne er dynamisk og regnes ut fra asset.taxableInitialAmount - mortgage.balanceAmount. Kan ikke overstyres direkte.                                                              |
-| asset.taxableInitialAmount         | Skattbart beløp før lånet er trukket fra. Dvs det er det samme som asset.taxableAmount hvis det ikke er lån, men vi må holde det tilgjengelig og justere det for å kunne finne det igjen når et lån er nedbetaøt. Trenger aldri vises. Kun for beregninger. Blir justert årlig. |
-| asset.taxableAmountOverride        | Auto: Set to true for all coming years if it finds a asset.taxableAmount the first year.                                                                                                                                                                                        |
-| asset.taxFortuneRate               | Formuesskatt. Prosent skatt på asset op en assets skattbare verdi                                                                                                                                                                                                               |
-| asset.taxFortuneAmount             | Formuesskatt. Kroner skatt på asset                                                                                                                                                                                                                                             |
-| asset.changerate                   | Hvor mye en asset endrer seg i verdi pr år                                                                                                                                                                                                                                      |
-| asset.rule                         | regler for hvordan beløpet skal beregnes                                                                                                                                                                                                                                        |
-| asset.transfer                     | overføring til en annen asset                                                                                                                                                                                                                                                   |
-| asset.repeat                       | gjenta konfigurasjonen for kommende år inntil det kommer et nytt oppsett og overstyrer det                                                                                                                                                                                      |
-| asset.taxablePropertyRate          | Skattbar prosent - Antall prosent av markedsverdien til en asset det skal beregnes eiendomsskatt av                                                                                                                                                                             |
-| asset.taxablePropertyAmount        | Skattbart beløp - Antall kroner av markedsverdien til en asset det skal betales eiendomsskatt av (både % og bunnfradrad hensyntatt)                                                                                                                                             |
-| asset.taxPropertyAmount            | Eiendomsskatt i kroner. Beregnes av asset.marketAmount.                                                                                                                                                                                                                         |
-| asset.taxPropertyRate              | Eiendomsskatt i rate = prosent/100                                                                                                                                                                                                                                              |
-| asset.explanation                        | Beskrivelse av asset/liability                                                                                                                                                                                                                                                  |
-#### realization (Really a part of asset, but we keep the structure simpler by having it separate). This is what happens if we sell the asset. It does not meen we have sold it, sale is done with a transfer to another asset.
-
-| Field                       | Description |
-|-----------------------------|-------------|
-| realization.amount          | Beløpet man sitter igjen med etter et salg = asset.marketAmount - asset.realizationTaxAmount |
-| realization.taxableAmount   | Skattbart beløp ved realisering av asset = asset.marketAmount - asset.acquisitionAmount * (FIX: skattbar %) |
-| realization.taxAmount       | Skattbart beløp ved realisering av asset = asset.realizationTaxableAmount * asset.realizationTaxRate - realization.taxShieldAmount |
-| realization.taxRate         | Skattbar prosent ved realisering av asset. Lest fra tax.json |
-| realization.taxShieldAmount | Skjermingsfradrag beløp (Akkumuleres hvis ubenyttet, reduseres automatisk hvis benyttet) |
-| realization.taxShieldRate   | Skjermingsfradrag prosent |
-| realization.explanation     | Beskrivelse av salg/realisasjon av asset |
-#### Yield
-
-| Field | Description |
-|-------|-------------|
-| yield.bruttoPercent | (income.amount / asset.acquisitionAmount) * 100 |
-| yield.nettoPercent | ((income.amount - expence.amount) / asset.acquisitionAmount) * 100 |
-#### Potential
-
-How much potential the bank sees in your income - expences
-
-| Field | Description |
-|-------|-------------|
-| potential.incomeAmount | On rental it accounts for 10 out of 12 months rented out, then subtracts the mortgage.termAmount (since an existing mortgage reduces your mortgage potential) |
-| potential.mortgageAmount | Hvor mye du potensielt kan låne. debtCapacity? |
-#### fire (F.I.R.E) - beregnes på income, expence, asset, mortgage, cashflow
-
-Før eller etter skatt her?
-
-| Field | Description |
-|-------|-------------|
-| fire.incomeAmount | F.I.R.E inntekt - 4% uttak av assets som er definert som is_liquid=true. Dvs det du kan leve av av sparemidler. Har en del spørsmål her mtp fratrekk av lån/renter/skatt |
-| fire.expenceAmount | F.I.R.E utgift - Assetens faktiske utgifter |
-| fire.cashFlowAmount | fire.incomeAmount - fire.expenceAmount |
-| fire.savingAmount | Hvor mye du sparer pr år. Medberegnet avdrag men ikke renter.Regnes på assets hvor is_saving=true [house, rental, cabin, crypto, fond, stock, otp, ask, pension] |
-| fire.rate | fire.incomeAmount / fire.expenceAmount . Hvor nærme du er å nå FIRE |
-| fire.percent | fire.rate * 100 |
-| fire.savingRate | fire.savingAmount (hvor mye som regnes som sparing) / fire.incomeAmount |
 ### Example simple config
+
+```json
 {
 "meta": {
 "name": "John Doe",

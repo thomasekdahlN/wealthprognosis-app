@@ -16,5 +16,14 @@ class ExampleTest extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
+        $response->assertSee('Wealth Prognosis', false);
+    }
+
+    public function test_the_features_page_returns_a_successful_response()
+    {
+        $response = $this->get('/features');
+
+        $response->assertStatus(200);
+        $response->assertSee('Features', false);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\AssetYear;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,14 +31,14 @@ class ConfigurationFireProgressWidget extends ChartWidget
         // Get current financial data
         $currentYear = now()->year;
 
-        $annualExpenses = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        $annualExpenses = AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
             ->where('year', $currentYear)
             ->whereNotNull('expence_amount')
             ->sum('expence_amount') ?: 0;
 
-        $annualIncome = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        $annualIncome = AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
             ->where('year', $currentYear)
@@ -53,9 +54,11 @@ class ConfigurationFireProgressWidget extends ChartWidget
         $potentialIncomeData = [];
         $expensesData = [];
 
-        $currentAssets = \App\Models\Asset::where('user_id', $user->id)
-            ->where('is_active', true)
-            ->sum('market_amount');
+        $currentAssets = AssetYear::whereHas('asset', function ($query) use ($user) {
+            $query->where('user_id', $user->id)->where('is_active', true);
+        })
+            ->where('year', $currentYear)
+            ->sum('asset_market_amount') ?: 0;
 
         $projectedAssets = $currentAssets;
         $growthRate = 0.07; // 7% annual return

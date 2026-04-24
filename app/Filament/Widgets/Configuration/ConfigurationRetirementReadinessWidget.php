@@ -2,6 +2,10 @@
 
 namespace App\Filament\Widgets\Configuration;
 
+use App\Models\Asset;
+use App\Models\AssetConfiguration;
+use App\Models\AssetYear;
+use App\Models\User;
 use App\Services\CurrentAssetConfiguration;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +39,7 @@ class ConfigurationRetirementReadinessWidget extends ChartWidget
         }
 
         // Get retirement information from asset_configurations table
-        $assetOwner = \App\Models\AssetConfiguration::where('user_id', $user->id)->first();
+        $assetOwner = AssetConfiguration::where('user_id', $user->id)->first();
 
         if (! $assetOwner) {
             // Use default values if no asset owner
@@ -55,13 +59,17 @@ class ConfigurationRetirementReadinessWidget extends ChartWidget
         $pensionIncomeData = [];
 
         // Current financial situation
-        $totalAssets = \App\Models\Asset::where('user_id', $user->id)
-            ->where('is_active', true)
-            ->sum('market_amount');
-        $totalMortgages = \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        $currentYear = (int) date('Y');
+        $totalAssets = AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
-            ->sum('mortgage_amount');
+            ->where('year', $currentYear)
+            ->sum('asset_market_amount') ?: 0;
+        $totalMortgages = AssetYear::whereHas('asset', function ($query) use ($user) {
+            $query->where('user_id', $user->id)->where('is_active', true);
+        })
+            ->where('year', $currentYear)
+            ->sum('mortgage_amount') ?: 0;
         $currentNetWorth = $totalAssets - $totalMortgages;
 
         $annualIncome = $this->calculateAnnualIncome($user);
@@ -167,12 +175,12 @@ class ConfigurationRetirementReadinessWidget extends ChartWidget
         ];
     }
 
-    private function calculateAnnualIncome(\App\Models\User $user): float
+    private function calculateAnnualIncome(User $user): float
     {
         // Get income from asset_years for the current year
         $currentYear = now()->year;
 
-        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        return AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
             ->where('year', $currentYear)
@@ -180,12 +188,12 @@ class ConfigurationRetirementReadinessWidget extends ChartWidget
             ->sum('income_amount') ?: 0;
     }
 
-    private function calculateAnnualExpenses(\App\Models\User $user): float
+    private function calculateAnnualExpenses(User $user): float
     {
         // Get expenses from asset_years for the current year
         $currentYear = now()->year;
 
-        return \App\Models\AssetYear::whereHas('asset', function ($query) use ($user) {
+        return AssetYear::whereHas('asset', function ($query) use ($user) {
             $query->where('user_id', $user->id)->where('is_active', true);
         })
             ->where('year', $currentYear)
@@ -193,7 +201,7 @@ class ConfigurationRetirementReadinessWidget extends ChartWidget
             ->sum('expence_amount') ?: 0;
     }
 
-    private function calculatePensionIncome(\App\Models\User $user, int $age, ?int $retirementAge): float
+    private function calculatePensionIncome(User $user, int $age, ?int $retirementAge): float
     {
         // Simplified Norwegian pension calculation
         // This would normally be much more complex
@@ -209,7 +217,7 @@ class ConfigurationRetirementReadinessWidget extends ChartWidget
         $basicPension = 120000; // Approximate basic pension in NOK
 
         // Add occupational pension if available
-        $occupationalPension = \App\Models\Asset::where('user_id', $user->id)
+        $occupationalPension = Asset::where('user_id', $user->id)
             ->where('is_active', true)
             ->where('asset_type', 'otp')
             ->sum('market_amount') * 0.04; // 4% withdrawal

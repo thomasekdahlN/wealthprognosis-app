@@ -16,3 +16,4 @@ yarn-error.log
 # Excel temporary files
 ~$*.xlsx
 ~$*.xls
+.git-commit-msg-tmp

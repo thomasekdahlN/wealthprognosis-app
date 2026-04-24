@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AnalysisDownloadController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,11 +12,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\AnalysisDownloadController;
+Route::view('/', 'welcome')->name('home');
+Route::view('/features', 'features')->name('features');
 
 Route::get('/download/analysis/{file}', [AnalysisDownloadController::class, 'download'])
     ->middleware(['auth', 'signed'])
