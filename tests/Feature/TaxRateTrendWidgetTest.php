@@ -202,10 +202,12 @@ it('resolves context from route parameters', function () {
         ],
     ]);
 
-    // Simulate route parameters
+    // Simulate route parameters. Laravel's request()->route($key) ultimately
+    // calls $route->parameter($key, $default = null), so the Mockery
+    // expectation must include the default value argument.
     request()->setRouteResolver(function () use ($taxConfig) {
         $route = Mockery::mock(Route::class);
-        $route->shouldReceive('parameter')->with('country')->andReturn('no');
+        $route->shouldReceive('parameter')->with('country', null)->andReturn('no');
         $route->shouldReceive('parameter')->with('record', null)->andReturn($taxConfig);
 
         return $route;

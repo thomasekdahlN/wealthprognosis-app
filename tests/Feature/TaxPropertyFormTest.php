@@ -5,7 +5,10 @@ use App\Models\User;
 use Filament\Facades\Filament;
 
 it('can display tax property edit form with calculation example', function () {
-    $user = User::factory()->create(['is_admin' => true]);
+    $user = User::factory()->create([
+        'is_admin' => true,
+        'app_authentication_secret' => 'test-secret',
+    ]);
     $this->actingAs($user);
     Filament::setCurrentPanel('system');
 
@@ -32,7 +35,10 @@ it('can display tax property edit form with calculation example', function () {
 });
 
 it('displays correct calculation example for ringerike', function () {
-    $user = User::factory()->create(['is_admin' => true]);
+    $user = User::factory()->create([
+        'is_admin' => true,
+        'app_authentication_secret' => 'test-secret',
+    ]);
     $this->actingAs($user);
     Filament::setCurrentPanel('system');
 
