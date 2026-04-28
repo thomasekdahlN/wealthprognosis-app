@@ -2,7 +2,7 @@
     /** @var array<string, mixed> $plan */
     $isFeatured = $plan['featured'] ?? false;
     $isExternal = $plan['ctaExternal'] ?? false;
-    $anchorId = strtolower($plan['name']);
+    $anchorId = strtolower((string) $plan['name']);
     $isNumeric = is_numeric(str_replace(' ', '', (string) $plan['price']));
 @endphp
 
@@ -16,7 +16,7 @@
     @if ($isFeatured)
         <span
             class="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 rounded-full bg-brand-500 text-slate-950 text-xs font-semibold px-3 py-1">
-            Most popular
+            {{ __('public.pricing.most_popular') }}
         </span>
     @endif
 
@@ -29,7 +29,7 @@
         @if ($isNumeric)
             <span class="text-xs text-slate-400" aria-hidden="true">NOK</span>
             <span class="text-4xl font-extrabold tracking-tight text-white">{{ $plan['price'] }}</span>
-            <span class="sr-only">Norwegian kroner</span>
+            <span class="sr-only">{{ __('public.pricing.currency_full') }}</span>
         @else
             <span class="text-4xl font-extrabold tracking-tight text-white">{{ $plan['price'] }}</span>
         @endif
@@ -39,7 +39,7 @@
     </div>
 
     <ul class="mt-6 space-y-3 text-sm text-slate-300 flex-1">
-        @foreach ($plan['features'] as $feature)
+        @foreach ((array) ($plan['features'] ?? []) as $feature)
             <li class="flex items-start gap-2">
                 <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-brand-300" fill="none" viewBox="0 0 24 24"
                     stroke-width="2.5" stroke="currentColor" aria-hidden="true" focusable="false">
@@ -60,7 +60,7 @@
             ])>
             {{ $plan['cta'] }}
             @if ($isExternal)
-                <span class="sr-only"> (opens in a new tab)</span>
+                <span class="sr-only"> {{ __('public.pricing.opens_new_tab') }}</span>
             @endif
         </a>
     </div>

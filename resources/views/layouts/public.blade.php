@@ -2,16 +2,29 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 
 @php
-    $pageTitle = trim($__env->yieldContent('title', 'Wealth Prognosis'));
-    $pageDescription = trim(
-        $__env->yieldContent(
-            'description',
-            'Wealth Prognosis — track your assets, simulate year-by-year financial forecasts, and plan for financial independence with AI-powered insights.',
-        ),
-    );
+    /** @var \App\Support\ValueObjects\MarkdownPage|null $page */
+    $page = $page ?? null;
+
+    $currentLocale = app()->getLocale();
+    $supportedLocales = (array) config('public_pages.locales', ['en', 'nb']);
+
+    $currentSlug = $page?->slug ?? 'home';
+
+    $localeUrl = static function (string $locale) use ($currentSlug): string {
+        return url('/' . $locale . ($currentSlug === 'home' ? '' : '/' . $currentSlug));
+    };
+
+    $pageTitle =
+        $page?->title !== null && $page->title !== ''
+            ? $page->title
+            : trim($__env->yieldContent('title', __('public.site_name')));
+    $pageDescription =
+        $page?->description !== null && $page->description !== ''
+            ? $page->description
+            : trim($__env->yieldContent('description', ''));
     $canonicalUrl = url()->current();
     $ogImage = asset('logo.png');
-    $siteName = 'Wealth Prognosis';
+    $siteName = __('public.site_name');
 @endphp
 
 <head>
@@ -22,13 +35,19 @@
     <meta name="theme-color" content="#020617">
     <meta name="color-scheme" content="dark light">
 
-    <title>{{ $pageTitle }} — Financial planning &amp; simulation</title>
+    <title>{{ $pageTitle }} — {{ __('public.tagline') }}</title>
 
     <link rel="canonical" href="{{ $canonicalUrl }}">
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
 
+    @foreach ($supportedLocales as $altLocale)
+        <link rel="alternate" hreflang="{{ $altLocale }}" href="{{ $localeUrl($altLocale) }}">
+    @endforeach
+    <link rel="alternate" hreflang="x-default"
+        href="{{ $localeUrl((string) config('public_pages.default_locale', 'en')) }}">
+
     {{-- Open Graph --}}
-    <meta property="og:type" content="{{ $__env->yieldContent('og_type', 'website') }}">
+    <meta property="og:type" content="{{ $page?->ogType ?: $__env->yieldContent('og_type', 'website') }}">
     <meta property="og:site_name" content="{{ $siteName }}">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
@@ -182,50 +201,58 @@
 
 <body class="antialiased bg-slate-950 text-slate-200 selection:bg-brand-500/30 selection:text-white">
 
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#main-content" class="skip-link">{{ __('public.skip_to_main') }}</a>
 
     <header class="fixed top-0 inset-x-0 z-50 backdrop-blur-lg bg-slate-950/70 border-b border-white/5" role="banner">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <nav class="flex items-center justify-between h-16" aria-label="Primary">
-                <a href="{{ url('/') }}" class="flex items-center gap-3 group"
-                    aria-label="{{ $siteName }} — home">
+            <nav class="flex items-center justify-between h-16" aria-label="{{ __('public.nav.primary') }}">
+                <a href="{{ route('home') }}" class="flex items-center gap-3 group"
+                    aria-label="{{ __('public.aria_home', ['site' => $siteName]) }}">
                     <img src="{{ asset('logo.png') }}" alt=""
                         class="h-8 w-8 rounded-lg ring-1 ring-white/10 group-hover:ring-brand-400/40 transition">
-                    <span class="font-semibold tracking-tight text-white">Wealth Prognosis</span>
+                    <span class="font-semibold tracking-tight text-white">{{ $siteName }}</span>
                 </a>
 
                 <div class="hidden md:flex items-center gap-8 text-sm text-slate-300">
-                    <a href="{{ url('/') }}#overview"
-                        class="hover:text-white transition"@if (request()->path() === '/') aria-current="page" @endif>Overview</a>
+                    <a href="{{ route('home') }}#overview"
+                        class="hover:text-white transition"@if (request()->routeIs('home')) aria-current="page" @endif>{{ __('public.nav.overview') }}</a>
                     <a href="{{ route('features') }}"
-                        class="hover:text-white transition"@if (request()->routeIs('features')) aria-current="page" @endif>Features</a>
+                        class="hover:text-white transition"@if (request()->routeIs('features')) aria-current="page" @endif>{{ __('public.nav.features') }}</a>
                     <a href="{{ route('use-cases') }}"
-                        class="hover:text-white transition"@if (request()->routeIs('use-cases')) aria-current="page" @endif>Use
-                        cases</a>
+                        class="hover:text-white transition"@if (request()->routeIs('use-cases')) aria-current="page" @endif>{{ __('public.nav.use_cases') }}</a>
                     <a href="{{ route('pricing') }}"
-                        class="hover:text-white transition"@if (request()->routeIs('pricing')) aria-current="page" @endif>Pricing</a>
+                        class="hover:text-white transition"@if (request()->routeIs('pricing')) aria-current="page" @endif>{{ __('public.nav.pricing') }}</a>
                     <a href="{{ route('glossary') }}"
-                        class="hover:text-white transition"@if (request()->routeIs('glossary')) aria-current="page" @endif>Glossary</a>
+                        class="hover:text-white transition"@if (request()->routeIs('glossary')) aria-current="page" @endif>{{ __('public.nav.glossary') }}</a>
                     <a href="{{ route('methodology') }}"
-                        class="hover:text-white transition"@if (request()->routeIs('methodology')) aria-current="page" @endif>Methodology</a>
+                        class="hover:text-white transition"@if (request()->routeIs('methodology')) aria-current="page" @endif>{{ __('public.nav.methodology') }}</a>
                     <a href="{{ route('about') }}"
-                        class="hover:text-white transition"@if (request()->routeIs('about')) aria-current="page" @endif>About</a>
+                        class="hover:text-white transition"@if (request()->routeIs('about')) aria-current="page" @endif>{{ __('public.nav.about') }}</a>
                     <a href="{{ route('faq') }}"
-                        class="hover:text-white transition"@if (request()->routeIs('faq')) aria-current="page" @endif>FAQ</a>
+                        class="hover:text-white transition"@if (request()->routeIs('faq')) aria-current="page" @endif>{{ __('public.nav.faq') }}</a>
                 </div>
 
                 <div class="flex items-center gap-3">
+                    <div class="hidden sm:inline-flex items-center rounded-lg border border-white/10 bg-white/[0.02] p-0.5"
+                        role="group" aria-label="{{ __('public.nav.language') }}">
+                        @foreach ($supportedLocales as $altLocale)
+                            <a href="{{ $localeUrl($altLocale) }}" hreflang="{{ $altLocale }}"
+                                class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider rounded-md transition {{ $altLocale === $currentLocale ? 'bg-brand-500/20 text-brand-200' : 'text-slate-400 hover:text-white' }}"
+                                @if ($altLocale === $currentLocale) aria-current="true" @endif>{{ $altLocale }}</a>
+                        @endforeach
+                    </div>
+
                     @auth
                         <a href="{{ url('/admin') }}"
                             class="inline-flex items-center gap-2 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 font-semibold px-4 py-2 text-sm transition">
-                            Open dashboard
+                            {{ __('public.nav.open_dashboard') }}
                         </a>
                     @else
                         <a href="{{ url('/admin/login') }}"
-                            class="hidden sm:inline-flex text-sm text-slate-300 hover:text-white transition">Sign in</a>
+                            class="hidden sm:inline-flex text-sm text-slate-300 hover:text-white transition">{{ __('public.nav.sign_in') }}</a>
                         <a href="{{ url('/admin') }}"
                             class="inline-flex items-center gap-2 rounded-lg bg-brand-500 hover:bg-brand-400 text-slate-950 font-semibold px-4 py-2 text-sm transition shadow-lg shadow-brand-500/20">
-                            Get started
+                            {{ __('public.nav.get_started') }}
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                 aria-hidden="true" focusable="false">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -242,18 +269,18 @@
         @yield('content')
     </main>
 
-    <footer class="border-t border-white/5 bg-slate-950" role="contentinfo" aria-label="Site footer">
+    <footer class="border-t border-white/5 bg-slate-950" role="contentinfo"
+        aria-label="{{ __('public.footer.banner') }}">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
             <div class="grid grid-cols-2 md:grid-cols-6 gap-8">
                 <div class="col-span-2 md:col-span-2">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('logo.png') }}" alt=""
                             class="h-8 w-8 rounded-lg ring-1 ring-white/10">
-                        <span class="font-semibold text-white">Wealth Prognosis</span>
+                        <span class="font-semibold text-white">{{ $siteName }}</span>
                     </div>
                     <p class="mt-4 text-sm text-slate-300 max-w-md">
-                        Financial planning and simulation system. Track assets, run year-by-year prognoses across three
-                        scenarios, and plan your path to wealth.
+                        {{ __('public.footer.description') }}
                     </p>
 
                     <address class="mt-6 not-italic text-sm text-slate-300 leading-relaxed" itemscope
@@ -273,37 +300,43 @@
                         </span>
                     </address>
                 </div>
-                <nav aria-label="Product">
-                    <h2 class="text-sm font-semibold text-white">Product</h2>
+                <nav aria-label="{{ __('public.footer.product') }}">
+                    <h2 class="text-sm font-semibold text-white">{{ __('public.footer.product') }}</h2>
                     <ul class="mt-4 space-y-2 text-sm text-slate-300">
-                        <li><a href="{{ route('features') }}" class="hover:text-white transition">Features</a></li>
-                        <li><a href="{{ route('pricing') }}" class="hover:text-white transition">Pricing</a></li>
-                        <li><a href="{{ route('use-cases') }}" class="hover:text-white transition">Use cases</a></li>
-                        <li><a href="{{ url('/admin') }}" class="hover:text-white transition">Dashboard</a></li>
+                        <li><a href="{{ route('features') }}"
+                                class="hover:text-white transition">{{ __('public.nav.features') }}</a></li>
+                        <li><a href="{{ route('pricing') }}"
+                                class="hover:text-white transition">{{ __('public.nav.pricing') }}</a></li>
+                        <li><a href="{{ route('use-cases') }}"
+                                class="hover:text-white transition">{{ __('public.nav.use_cases') }}</a></li>
+                        <li><a href="{{ url('/admin') }}"
+                                class="hover:text-white transition">{{ __('public.footer.dashboard') }}</a></li>
                     </ul>
                 </nav>
-                <nav aria-label="Resources">
-                    <h2 class="text-sm font-semibold text-white">Resources</h2>
+                <nav aria-label="{{ __('public.footer.resources') }}">
+                    <h2 class="text-sm font-semibold text-white">{{ __('public.footer.resources') }}</h2>
                     <ul class="mt-4 space-y-2 text-sm text-slate-300">
-                        <li><a href="{{ route('glossary') }}" class="hover:text-white transition">Glossary</a></li>
-                        <li><a href="{{ route('methodology') }}" class="hover:text-white transition">Methodology</a>
-                        </li>
-                        <li><a href="{{ route('faq') }}" class="hover:text-white transition">FAQ</a></li>
-                        <li><a href="{{ url('/') }}#how-it-works" class="hover:text-white transition">How it
-                                works</a></li>
+                        <li><a href="{{ route('glossary') }}"
+                                class="hover:text-white transition">{{ __('public.nav.glossary') }}</a></li>
+                        <li><a href="{{ route('methodology') }}"
+                                class="hover:text-white transition">{{ __('public.nav.methodology') }}</a></li>
+                        <li><a href="{{ route('faq') }}"
+                                class="hover:text-white transition">{{ __('public.nav.faq') }}</a></li>
+                        <li><a href="{{ route('home') }}#how-it-works"
+                                class="hover:text-white transition">{{ __('public.footer.how_it_works') }}</a></li>
                     </ul>
                 </nav>
-                <nav aria-label="Company">
-                    <h2 class="text-sm font-semibold text-white">Company</h2>
+                <nav aria-label="{{ __('public.footer.company') }}">
+                    <h2 class="text-sm font-semibold text-white">{{ __('public.footer.company') }}</h2>
                     <ul class="mt-4 space-y-2 text-sm text-slate-300">
-                        <li><a href="{{ route('about') }}" class="hover:text-white transition">About</a></li>
-                        <li><a href="{{ route('legal') }}" class="hover:text-white transition">Legal</a></li>
-                        <li><a href="{{ route('personvern') }}" class="hover:text-white transition">Personvern</a>
-                        </li>
+                        <li><a href="{{ route('about') }}"
+                                class="hover:text-white transition">{{ __('public.nav.about') }}</a></li>
+                        <li><a href="{{ route('legal') }}"
+                                class="hover:text-white transition">{{ __('public.footer.legal') }}</a></li>
                     </ul>
                 </nav>
-                <nav aria-label="Contact">
-                    <h2 class="text-sm font-semibold text-white">Kontakt oss</h2>
+                <nav aria-label="{{ __('public.footer.contact') }}">
+                    <h2 class="text-sm font-semibold text-white">{{ __('public.footer.contact') }}</h2>
                     <ul class="mt-4 space-y-2 text-sm text-slate-300">
                         <li>
                             <a href="mailto:thomas@ekdahl.no"
@@ -332,9 +365,8 @@
             </div>
             <div
                 class="mt-10 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p class="text-xs text-slate-400">&copy; {{ date('Y') }} Ekdahl Enterprises AS. All rights
-                    reserved.</p>
-                <p class="text-xs text-slate-400">Made for long-term thinkers.</p>
+                <p class="text-xs text-slate-400">{!! __('public.footer.rights', ['year' => date('Y'), 'company' => 'Ekdahl Enterprises AS']) !!}</p>
+                <p class="text-xs text-slate-400">{{ __('public.footer.made_for') }}</p>
             </div>
         </div>
     </footer>

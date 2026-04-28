@@ -4,7 +4,24 @@ namespace App\Providers;
 
 use App\Livewire\AiAssistantWidget;
 use App\Services\AiAssistantService;
+use App\Services\AssetTypeService;
 use App\Services\FinancialPlanningService;
+use App\Services\MarkdownPageRenderer;
+use App\Services\Processing\GroupProcessor;
+use App\Services\Processing\PostProcessorService;
+use App\Services\Processing\YearlyProcessor;
+use App\Services\Prognosis\ChangerateService;
+use App\Services\Prognosis\PrognosisService;
+use App\Services\Tax\TaxCashflowService;
+use App\Services\Tax\TaxConfigPropertyRepository;
+use App\Services\Tax\TaxConfigRepository;
+use App\Services\Tax\TaxFortuneService;
+use App\Services\Tax\TaxIncomeService;
+use App\Services\Tax\TaxPropertyService;
+use App\Services\Tax\TaxRealizationService;
+use App\Services\Tax\TaxSalaryService;
+use App\Services\Utilities\HelperService;
+use App\Services\Utilities\RulesService;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -12,129 +29,132 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
         $this->app->singleton(AiAssistantService::class);
         $this->app->singleton(FinancialPlanningService::class);
 
+        $this->app->singleton(MarkdownPageRenderer::class, function ($app): MarkdownPageRenderer {
+            return new MarkdownPageRenderer(
+                contentPath: (string) config('public_pages.content_path', resource_path('content')),
+                defaultLocale: (string) config('public_pages.default_locale', 'en'),
+            );
+        });
+
         // Register TaxConfigRepository as a singleton so all Tax classes share the same instance
-        $this->app->singleton(\App\Services\Tax\TaxConfigRepository::class, function ($app) {
-            return new \App\Services\Tax\TaxConfigRepository('no');
+        $this->app->singleton(TaxConfigRepository::class, function ($app) {
+            return new TaxConfigRepository('no');
         });
 
         // Register TaxConfigPropertyRepository as a singleton for property tax data
-        $this->app->singleton(\App\Services\Tax\TaxConfigPropertyRepository::class, function ($app) {
-            return new \App\Services\Tax\TaxConfigPropertyRepository('no');
+        $this->app->singleton(TaxConfigPropertyRepository::class, function ($app) {
+            return new TaxConfigPropertyRepository('no');
         });
 
         // Register Tax calculation classes as singletons with proper dependency injection
-        $this->app->singleton(\App\Services\Tax\TaxSalaryService::class, function ($app) {
-            return new \App\Services\Tax\TaxSalaryService(
+        $this->app->singleton(TaxSalaryService::class, function ($app) {
+            return new TaxSalaryService(
                 'no',
-                $app->make(\App\Services\Tax\TaxConfigRepository::class)
+                $app->make(TaxConfigRepository::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxIncomeService::class, function ($app) {
-            return new \App\Services\Tax\TaxIncomeService(
+        $this->app->singleton(TaxIncomeService::class, function ($app) {
+            return new TaxIncomeService(
                 'no',
-                $app->make(\App\Services\Tax\TaxConfigRepository::class),
-                $app->make(\App\Services\Tax\TaxSalaryService::class)
+                $app->make(TaxConfigRepository::class),
+                $app->make(TaxSalaryService::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxFortuneService::class, function ($app) {
-            return new \App\Services\Tax\TaxFortuneService(
+        $this->app->singleton(TaxFortuneService::class, function ($app) {
+            return new TaxFortuneService(
                 'no',
-                $app->make(\App\Services\Tax\TaxConfigRepository::class)
+                $app->make(TaxConfigRepository::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxRealizationService::class, function ($app) {
-            return new \App\Services\Tax\TaxRealizationService(
+        $this->app->singleton(TaxRealizationService::class, function ($app) {
+            return new TaxRealizationService(
                 'no',
-                $app->make(\App\Services\Tax\TaxConfigRepository::class),
-                $app->make(\App\Services\Tax\TaxSalaryService::class)
+                $app->make(TaxConfigRepository::class),
+                $app->make(TaxSalaryService::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Tax\TaxPropertyService::class, function ($app) {
-            return new \App\Services\Tax\TaxPropertyService(
+        $this->app->singleton(TaxPropertyService::class, function ($app) {
+            return new TaxPropertyService(
                 'no',
-                $app->make(\App\Services\Utilities\HelperService::class),
-                $app->make(\App\Services\Tax\TaxConfigPropertyRepository::class)
+                $app->make(HelperService::class),
+                $app->make(TaxConfigPropertyRepository::class)
             );
         });
 
         // Register utility classes as singletons
-        $this->app->singleton(\App\Services\Utilities\HelperService::class, function ($app) {
-            return new \App\Services\Utilities\HelperService;
+        $this->app->singleton(HelperService::class, function ($app) {
+            return new HelperService;
         });
 
-        $this->app->singleton(\App\Services\Utilities\RulesService::class, function ($app) {
-            return new \App\Services\Utilities\RulesService(
-                $app->make(\App\Services\Utilities\HelperService::class)
+        $this->app->singleton(RulesService::class, function ($app) {
+            return new RulesService(
+                $app->make(HelperService::class)
             );
         });
 
         // Register Changerate as a singleton
         // The scenario type will be set when first instantiated
         // Default to 'realistic' if not specified
-        $this->app->singleton(\App\Services\Prognosis\ChangerateService::class, function ($app) {
+        $this->app->singleton(ChangerateService::class, function ($app) {
             // Get scenario from config or default to 'realistic'
             $scenario = config('app.prognosis_scenario', 'realistic');
 
-            return new \App\Services\Prognosis\ChangerateService($scenario);
+            return new ChangerateService($scenario);
         });
 
         // Register Processing services as singletons
-        $this->app->singleton(\App\Services\Processing\YearlyProcessor::class, function ($app) {
-            return new \App\Services\Processing\YearlyProcessor(
-                $app->make(\App\Services\Tax\TaxFortuneService::class),
-                $app->make(\App\Services\Tax\TaxCashflowService::class),
-                $app->make(\App\Services\Utilities\HelperService::class),
-                $app->make(\App\Services\AssetTypeService::class)
+        $this->app->singleton(YearlyProcessor::class, function ($app) {
+            return new YearlyProcessor(
+                $app->make(TaxFortuneService::class),
+                $app->make(TaxCashflowService::class),
+                $app->make(HelperService::class),
+                $app->make(AssetTypeService::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Processing\GroupProcessor::class, function ($app) {
-            return new \App\Services\Processing\GroupProcessor(
-                $app->make(\App\Services\Tax\TaxFortuneService::class)
+        $this->app->singleton(GroupProcessor::class, function ($app) {
+            return new GroupProcessor(
+                $app->make(TaxFortuneService::class)
             );
         });
 
-        $this->app->singleton(\App\Services\Processing\PostProcessorService::class, function ($app) {
-            return new \App\Services\Processing\PostProcessorService(
-                $app->make(\App\Services\Processing\YearlyProcessor::class),
-                $app->make(\App\Services\Processing\GroupProcessor::class)
+        $this->app->singleton(PostProcessorService::class, function ($app) {
+            return new PostProcessorService(
+                $app->make(YearlyProcessor::class),
+                $app->make(GroupProcessor::class)
             );
         });
 
         // PrognosisService is not a singleton because it takes a runtime $config array.
         // Resolve via: app(PrognosisService::class, ['config' => $configArray])
-        $this->app->bind(\App\Services\Prognosis\PrognosisService::class, function ($app, array $parameters) {
-            return new \App\Services\Prognosis\PrognosisService(
+        $this->app->bind(PrognosisService::class, function ($app, array $parameters) {
+            return new PrognosisService(
                 $parameters['config'] ?? [],
-                $app->make(\App\Services\Tax\TaxIncomeService::class),
-                $app->make(\App\Services\Tax\TaxFortuneService::class),
-                $app->make(\App\Services\Tax\TaxRealizationService::class),
-                $app->make(\App\Services\Prognosis\ChangerateService::class),
-                $app->make(\App\Services\Utilities\HelperService::class),
-                $app->make(\App\Services\Utilities\RulesService::class),
-                $app->make(\App\Services\Tax\TaxCashflowService::class),
-                $app->make(\App\Services\Processing\PostProcessorService::class),
-                $app->make(\App\Services\AssetTypeService::class),
+                $app->make(TaxIncomeService::class),
+                $app->make(TaxFortuneService::class),
+                $app->make(TaxRealizationService::class),
+                $app->make(ChangerateService::class),
+                $app->make(HelperService::class),
+                $app->make(RulesService::class),
+                $app->make(TaxCashflowService::class),
+                $app->make(PostProcessorService::class),
+                $app->make(AssetTypeService::class),
             );
         });
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {

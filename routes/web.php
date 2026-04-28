@@ -1,30 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\AnalysisDownloadController;
 use App\Http\Controllers\InvitationAcceptController;
+use App\Http\Controllers\PublicPageController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Public marketing site (Markdown-driven, locale-prefixed)
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| Each page is sourced from `resources/content/{locale}/{slug}.md` and
+| rendered through PublicPageController::show. Route names match the slug
+| (with `home` for the locale root) and pick up the active locale via
+| URL::defaults so existing `route('features')` calls keep working.
 |
 */
 
-use Illuminate\Support\Facades\Route;
+/** @var array<int, string> $publicSlugs */
+$publicSlugs = ['features', 'pricing', 'about', 'faq', 'use-cases', 'glossary', 'methodology', 'legal'];
 
-Route::view('/', 'welcome')->name('home');
-Route::view('/features', 'features')->name('features');
-Route::view('/pricing', 'pricing')->name('pricing');
-Route::view('/about', 'about')->name('about');
-Route::view('/faq', 'faq')->name('faq');
-Route::view('/use-cases', 'use-cases')->name('use-cases');
-Route::view('/glossary', 'glossary')->name('glossary');
-Route::view('/methodology', 'methodology')->name('methodology');
-Route::view('/legal', 'legal')->name('legal');
-Route::view('/personvern', 'personvern')->name('personvern');
+Route::get('/', fn () => redirect('/'.(string) config('public_pages.default_locale', 'en'), 301));
+
+Route::middleware('set.locale')
+    ->prefix('{locale}')
+    ->where(['locale' => 'en|nb'])
+    ->group(function () use ($publicSlugs): void {
+        Route::get('/', fn (string $locale) => app(PublicPageController::class)->show($locale, 'home'))
+            ->name('home');
+
+        foreach ($publicSlugs as $slug) {
+            Route::get('/'.$slug, fn (string $locale) => app(PublicPageController::class)->show($locale, $slug))
+                ->name($slug);
+        }
+    });
+
+Route::get('/locale/{locale}', [PublicPageController::class, 'switchLocale'])
+    ->where('locale', 'en|nb')
+    ->name('locale.switch');
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated / signed routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/download/analysis/{file}', [AnalysisDownloadController::class, 'download'])
     ->middleware(['auth', 'signed'])

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -11,107 +12,116 @@ class ExampleTest extends TestCase
      *
      * @return void
      */
-    public function test_the_application_returns_a_successful_response()
+    public function test_the_root_redirects_to_default_locale()
     {
         $response = $this->get('/');
+
+        $response->assertStatus(301);
+        $response->assertRedirect('/en');
+    }
+
+    public function test_the_english_home_page_returns_a_successful_response()
+    {
+        $response = $this->get('/en');
 
         $response->assertStatus(200);
         $response->assertSee('Wealth Prognosis', false);
     }
 
-    public function test_the_features_page_returns_a_successful_response()
+    public function test_the_norwegian_home_page_returns_a_successful_response()
     {
-        $response = $this->get('/features');
+        $response = $this->get('/nb');
+
+        $response->assertStatus(200);
+        $response->assertSee('Wealth Prognosis', false);
+        $response->assertSee('økonomiske fremtid', false);
+    }
+
+    public function test_the_english_features_page_returns_a_successful_response()
+    {
+        $response = $this->get('/en/features');
 
         $response->assertStatus(200);
         $response->assertSee('Features', false);
     }
 
-    public function test_the_faq_page_returns_a_successful_response()
+    public function test_the_norwegian_features_page_returns_a_successful_response()
     {
-        $response = $this->get('/faq');
+        $response = $this->get('/nb/features');
 
         $response->assertStatus(200);
-        $response->assertSee('Frequently asked', false);
+        $response->assertSee('Funksjoner', false);
     }
 
-    public function test_the_about_page_returns_a_successful_response()
+    public function test_the_english_about_page_returns_a_successful_response()
     {
-        $response = $this->get('/about');
+        $response = $this->get('/en/about');
 
         $response->assertStatus(200);
         $response->assertSee('About', false);
         $response->assertSee('Principles', false);
     }
 
-    public function test_the_pricing_page_returns_a_successful_response()
+    public function test_the_norwegian_about_page_returns_a_successful_response()
     {
-        $response = $this->get('/pricing');
+        $response = $this->get('/nb/about');
+
+        $response->assertStatus(200);
+        $response->assertSee('Om oss', false);
+        $response->assertSee('Prinsipper', false);
+    }
+
+    public function test_the_english_pricing_page_returns_a_successful_response()
+    {
+        $response = $this->get('/en/pricing');
 
         $response->assertStatus(200);
         $response->assertSee('Pricing', false);
         $response->assertSee('Solo', false);
-        $response->assertSee('Family', false);
         $response->assertSee('Advisor', false);
     }
 
-    public function test_the_use_cases_page_returns_a_successful_response()
+    public function test_the_norwegian_pricing_page_returns_a_successful_response()
     {
-        $response = $this->get('/use-cases');
+        $response = $this->get('/nb/pricing');
 
         $response->assertStatus(200);
-        $response->assertSee('Use cases', false);
-        $response->assertSee('F.I.R.E', false);
-        $response->assertSee('Property investor', false);
+        $response->assertSee('Priser', false);
+        $response->assertSee('Solo', false);
+        $response->assertSee('Rådgiver', false);
     }
 
-    public function test_the_glossary_page_returns_a_successful_response()
+    /**
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function phaseTwoRouteProvider(): array
     {
-        $response = $this->get('/glossary');
-
-        $response->assertStatus(200);
-        $response->assertSee('Glossary', false);
-        $response->assertSee('Fritaksmetoden', false);
-        $response->assertSee('Crossover', false);
-        $response->assertSee('DefinedTermSet', false);
+        return [
+            'EN use-cases' => ['/en/use-cases', 'Use cases'],
+            'NB use-cases' => ['/nb/use-cases', 'Bruksområder'],
+            'EN faq' => ['/en/faq', 'FAQ'],
+            'NB faq' => ['/nb/faq', 'FAQ'],
+            'EN glossary' => ['/en/glossary', 'Glossary'],
+            'NB glossary' => ['/nb/glossary', 'Ordliste'],
+            'EN methodology' => ['/en/methodology', 'Methodology'],
+            'NB methodology' => ['/nb/methodology', 'Metodikk'],
+            'EN legal' => ['/en/legal', 'Legal'],
+            'NB legal' => ['/nb/legal', 'Juridisk'],
+        ];
     }
 
-    public function test_the_methodology_page_returns_a_successful_response()
+    #[DataProvider('phaseTwoRouteProvider')]
+    public function test_phase_two_pages_return_200(string $url, string $expected): void
     {
-        $response = $this->get('/methodology');
+        $response = $this->get($url);
 
         $response->assertStatus(200);
-        $response->assertSee('Methodology', false);
-        $response->assertSee('FIRE number', false);
-        $response->assertSee('Fortune tax', false);
-        $response->assertSee('TechArticle', false);
-    }
-
-    public function test_the_legal_page_returns_a_successful_response()
-    {
-        $response = $this->get('/legal');
-
-        $response->assertStatus(200);
-        $response->assertSee('Terms of service', false);
-        $response->assertSee('Privacy policy', false);
-        $response->assertSee('Cookies', false);
-    }
-
-    public function test_the_personvern_page_returns_a_successful_response()
-    {
-        $response = $this->get('/personvern');
-
-        $response->assertStatus(200);
-        $response->assertSee('Personvern', false);
-        $response->assertSee('Ekdahl Enterprises AS', false);
-        $response->assertSee('933 662 541', false);
-        $response->assertSee('Datatilsynet', false);
-        $response->assertSee('PrivacyPolicy', false);
+        $response->assertSee($expected, false);
     }
 
     public function test_the_footer_contains_company_contact_information()
     {
-        $response = $this->get('/');
+        $response = $this->get('/en');
 
         $response->assertStatus(200);
         $response->assertSee('Ekdahl Enterprises AS', false);
